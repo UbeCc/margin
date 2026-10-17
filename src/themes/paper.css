@@ -1,0 +1,119 @@
+/* Margin theme: Paper — warm light page, serif headings, generous rhythm. */
+:root {
+  color-scheme: light;
+  --margin-bg: #fbfaf6;
+  --margin-fg: #2a2925;
+  --margin-fg-muted: #807b70;
+  --margin-accent: #b0532c;
+  --margin-link: #9a4524;
+  --margin-code-bg: #f1eee6;
+  --margin-code-fg: #5b3d2c;
+  --margin-border: #e4dfd3;
+  --margin-selection: rgba(214, 160, 110, 0.32);
+  --margin-mark-bg: #fbe6a6;
+  --margin-chrome-bg: #f4f2ec;
+  --margin-chrome-fg: #4a4740;
+  --margin-hover: rgba(80, 60, 30, 0.07);
+  --margin-active: rgba(176, 83, 44, 0.12);
+  --margin-font-body: 'Charter', 'Iowan Old Style', 'Source Serif 4', 'Georgia', 'PingFang SC', 'Hiragino Sans GB',
+    'Noto Sans CJK SC', 'Microsoft YaHei', serif;
+  --margin-font-heading: 'Charter', 'Iowan Old Style', 'Source Serif 4', 'Georgia', 'Songti SC', 'Noto Serif CJK SC',
+    'STSong', serif;
+  --margin-font-mono: 'JetBrains Mono', 'SF Mono', 'Menlo', 'Cascadia Code', 'Consolas', 'Sarasa Mono SC', monospace;
+  --margin-font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', 'Noto Sans', sans-serif;
+  --margin-line-height: 1.72;
+  --margin-doc-width: 760px;
+}
+
+.margin-doc {
+  font-family: var(--margin-font-body);
+  font-size: var(--margin-font-size, 16px);
+  line-height: var(--margin-line-height);
+  color: var(--margin-fg);
+  font-kerning: normal;
+  font-variant-ligatures: common-ligatures;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  overflow-wrap: break-word;
+}
+
+.margin-doc h1, .margin-doc h2, .margin-doc h3,
+.margin-doc h4, .margin-doc h5, .margin-doc h6 {
+  font-family: var(--margin-font-heading);
+  font-weight: 600;
+  line-height: 1.3;
+  color: #1d1c19;
+  margin: 1.8em 0 0.6em;
+  letter-spacing: -0.005em;
+}
+.margin-doc h1 { font-size: 2.1em; margin-top: 0.6em; letter-spacing: -0.015em; }
+.margin-doc h2 { font-size: 1.55em; }
+.margin-doc h3 { font-size: 1.28em; }
+.margin-doc h4 { font-size: 1.08em; }
+.margin-doc h5 { font-size: 1em; font-variant: small-caps; letter-spacing: 0.03em; }
+.margin-doc h6 { font-size: 0.92em; color: var(--margin-fg-muted); }
+.margin-doc h1 + h2, .margin-doc h2 + h3 { margin-top: 0.8em; }
+
+.margin-doc p, .margin-doc ul, .margin-doc ol, .margin-doc blockquote, .margin-doc pre,
+.margin-doc table, .margin-doc figure { margin: 0 0 1.05em; }
+
+.margin-doc a { color: var(--margin-link); text-decoration: underline; text-decoration-color: rgba(154, 69, 36, 0.35); text-underline-offset: 0.18em; }
+.margin-doc a:hover { text-decoration-color: currentColor; }
+
+.margin-doc strong { font-weight: 650; color: #1d1c19; }
+.margin-doc mark { background: var(--margin-mark-bg); color: inherit; padding: 0 0.12em; border-radius: 2px; }
+.margin-doc del { color: var(--margin-fg-muted); }
+
+.margin-doc blockquote {
+  padding: 0.1em 1.1em;
+  border-left: 3px solid #d9c9b0;
+  color: #5d584e;
+  font-style: italic;
+}
+.margin-doc blockquote > :last-child { margin-bottom: 0; }
+
+.margin-doc ul, .margin-doc ol { padding-left: 1.6em; }
+.margin-doc li { margin: 0.22em 0; }
+.margin-doc li::marker { color: var(--margin-accent); }
+.margin-doc li > p { margin: 0; }
+.margin-doc .task-list-item { list-style: none; }
+.margin-doc .task-list-item input[type='checkbox'] { margin: 0 0.45em 0 -1.35em; accent-color: var(--margin-accent); }
+
+.margin-doc code {
+  font-family: var(--margin-font-mono);
+  font-size: 0.86em;
+  background: var(--margin-code-bg);
+  color: var(--margin-code-fg);
+  padding: 0.12em 0.36em;
+  border-radius: 4px;
+}
+.margin-doc pre {
+  font-family: var(--margin-font-mono);
+  font-size: 0.86em;
+  line-height: 1.6;
+  background: var(--margin-code-bg);
+  border: 1px solid var(--margin-border);
+  border-radius: 6px;
+  padding: 0.9em 1.1em;
+  overflow-x: auto;
+}
+.margin-doc pre code { background: none; padding: 0; font-size: 1em; color: var(--margin-fg); }
+
+.margin-doc hr { border: 0; text-align: center; margin: 2.2em 0; height: 1em; }
+.margin-doc hr::before { content: '⁂'; color: var(--margin-fg-muted); letter-spacing: 0.5em; }
+
+.margin-doc table { border-collapse: collapse; font-size: 0.94em; }
+.margin-doc th, .margin-doc td { border-bottom: 1px solid var(--margin-border); padding: 0.45em 0.9em; text-align: left; }
+.margin-doc th { font-family: var(--margin-font-ui); font-weight: 600; font-size: 0.9em; border-bottom: 2px solid #d9c9b0; }
+
+.margin-doc img { max-width: 100%; border-radius: 3px; }
+.margin-doc kbd {
+  font-family: var(--margin-font-mono);
+  font-size: 0.8em;
+  border: 1px solid var(--margin-border);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  padding: 0.05em 0.4em;
+}
+.margin-doc ::selection { background: var(--margin-selection); }

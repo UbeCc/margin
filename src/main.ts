@@ -1,22 +1,30 @@
-import { invoke } from "@tauri-apps/api/core";
+import { App } from './app/app';
+import { loadWiring } from './app/wiring';
 
-let greetInputEl: HTMLInputElement | null;
-let greetMsgEl: HTMLElement | null;
-
-async function greet() {
-  if (greetMsgEl && greetInputEl) {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    greetMsgEl.textContent = await invoke("greet", {
-      name: greetInputEl.value,
-    });
+declare global {
+  interface Window {
+    __margin?: App;
   }
 }
 
-window.addEventListener("DOMContentLoaded", () => {
-  greetInputEl = document.querySelector("#greet-input");
-  greetMsgEl = document.querySelector("#greet-msg");
-  document.querySelector("#greet-form")?.addEventListener("submit", (e) => {
-    e.preventDefault();
-    greet();
-  });
+async function boot(): Promise<void> {
+  const mount = document.getElementById('app');
+  if (!mount) throw new Error('#app missing');
+  const wiring = await loadWiring();
+  const app = new App(wiring, mount);
+  window.__margin = app;
+  let demo: { initialFolder: string; initialFile: string } | undefined;
+  if (wiring.using.platform === 'stub') {
+    const { DEMO_ROOT } = await import('./app/dev-stubs');
+    demo = { initialFolder: DEMO_ROOT, initialFile: `${DEMO_ROOT}/Welcome.md` };
+  }
+  await app.start(demo);
+}
+
+boot().catch((e) => {
+  console.error(e);
+  const pre = document.createElement('pre');
+  pre.className = 'boot-error';
+  pre.textContent = `Margin failed to start:\n${e instanceof Error ? e.stack ?? e.message : String(e)}`;
+  document.body.appendChild(pre);
 });
