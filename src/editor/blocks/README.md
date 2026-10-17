@@ -44,7 +44,7 @@ All raw handling is lossless: when the body is unchanged a widget hands back `ct
 
 ### Table keys
 
-Tab / Shift+Tab next/prev cell (Tab in last cell adds a row; Shift+Tab in first cell exits up) · Enter cell below (adds a row at the end) · Mod+Enter insert row below · Shift+Enter inserts `<br>` · arrows move between cells at text edges and exit at the table edges · Mod+Shift+Backspace delete row · Mod+Alt+Arrows move row/column · Escape exits down. Toolbar: align left/center/right/none, insert row above/below, delete row, insert column left/right, delete column, delete table. Cells show rendered inline markdown when idle and raw markdown while being edited. Pasted text is flattened to one line, and unescaped `|` is escaped on serialize.
+Tab / Shift+Tab next/prev cell (Tab in last cell adds a row; Shift+Tab in first cell exits up) · Enter cell below (adds a row at the end) · Mod+Enter insert row below · Shift+Enter inserts `<br>` · Mod+A selects the cell · Mod+B / Mod+I toggle `**` / `*` (native rich formatting is suppressed) · arrows move between cells at text edges and exit at the table edges · Mod+Shift+Backspace delete row · Mod+Alt+Arrows move row/column · Escape exits down. Toolbar: align left/center/right/none, insert row above/below, delete row, insert column left/right, delete column, delete table. Cells show rendered inline markdown when idle and raw markdown while being edited. Pasting TSV (spreadsheets), a markdown pipe table or consistent CSV fills cells from the caret cell and grows the table; other pasted text is flattened to one line. Unescaped `|` is escaped on serialize; `\|` renders as `|` (also in code spans). Keys are ignored while an IME composition is active.
 
 ### Inline math
 
