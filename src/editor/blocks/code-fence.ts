@@ -8,7 +8,7 @@
 import type { BlockWidget, EditorSettings, WidgetContext, WidgetInstance } from '../../contracts';
 import { createCodeEditor, CodeEditor, languageNames, loadLanguage, loadedLanguage } from './cm/setup';
 import { highlightToHtml } from './cm/highlight';
-import { buildFenceRaw, FenceParts, parseFence, withFenceInfo } from './util/delimited';
+import { buildFenceRaw, FenceParts, parseFence, rawRangeToBody, withFenceInfo } from './util/delimited';
 import { escapeHtml, h, isolateEvents, offsetAtPoint } from './util/dom';
 
 export interface CodeFenceOptions {
@@ -236,6 +236,13 @@ class CodeFenceInstance implements WidgetInstance {
 
   focus(at: 'start' | 'end'): void {
     this.ensureEditor().focus(at);
+  }
+
+  select(from: number, to: number): boolean {
+    const r = rawRangeToBody(this.parts, from, to);
+    if (!r) return false;
+    this.ensureEditor().select(r.from, r.to);
+    return true;
   }
 
   renderHTML(): string {

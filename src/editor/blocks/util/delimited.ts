@@ -240,3 +240,33 @@ export function buildHtmlRaw(p: Envelope, body: string): string {
   if (body === p.body) return p.raw;
   return body + (p.tail || '\n');
 }
+
+// ------------------------------------------------------------------ find support (#35)
+
+/**
+ * Map an offset into `p.raw` to an offset into `p.body` (the editable content with
+ * the block indent stripped). Null when the offset lies outside the body (opening
+ * line, closing delimiter, trailing lines). Offsets inside a stripped indent clamp
+ * to the start of that body line.
+ */
+export function rawToBody(p: Envelope, off: number): number | null {
+  let r = p.head.length;
+  let b = 0;
+  const lines = p.body.split('\n');
+  for (const line of lines) {
+    let s = 0;
+    while (s < p.indent.length && p.raw[r + s] === ' ') s++;
+    if (off >= r && off <= r + s + line.length) return b + Math.max(0, off - r - s);
+    r += s + line.length + 1;
+    b += line.length + 1;
+  }
+  return null;
+}
+
+/** Raw range `[from, to)` → body range, or null unless both ends lie in the body. */
+export function rawRangeToBody(p: Envelope, from: number, to: number): { from: number; to: number } | null {
+  const a = rawToBody(p, from);
+  const b = rawToBody(p, to);
+  if (a === null || b === null || b < a) return null;
+  return { from: a, to: b };
+}
