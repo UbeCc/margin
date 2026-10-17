@@ -56,6 +56,7 @@ export class App {
   private lastKeyAction: { id: string; t: number } | null = null;
   private saveSettingsSoon = debounce(() => void this.persistSettings(), 400);
   private refreshOutlineSoon = debounce(() => this.refreshOutline(), 250);
+  private refreshFindSoon = debounce(() => this.findbar.refresh(), 150);
   private refreshStatsSoon = debounce(() => this.status.setStats(this.editor.getStats()), 200);
   private colorScheme: 'light' | 'dark' = 'light';
 
@@ -98,6 +99,7 @@ export class App {
       defaultDir: () => this.folder,
     });
     this.editor.onChange(() => {
+      this.refreshFindSoon();
       this.refreshOutlineSoon();
       this.refreshStatsSoon();
     });
@@ -164,6 +166,7 @@ export class App {
       recentFolders: () => this.settings.recentFolders,
     });
     this.outline = new OutlineView((id) => {
+      this.caretToBlock(id);
       this.editor.scrollToHeading(id);
       this.outline.setActive(id);
     });
@@ -382,6 +385,24 @@ export class App {
       cancelId: 'keep',
     });
     return r === 'reload';
+  }
+
+  /**
+   * Put the caret at the end of block `id`'s text (outline jumps), so the active heading
+   * and further typing follow the jump. DOM-level: the contract has no caret API.
+   */
+  private caretToBlock(id: string): void {
+    if (this.editor.isSourceMode()) return;
+    const content = this.editorHost.querySelector<HTMLElement>(`[data-bid="${CSS.escape(id)}"] .md-content`);
+    const root = content?.closest<HTMLElement>('.md-editor');
+    if (!content || !root) return;
+    root.focus({ preventScroll: true });
+    const r = document.createRange();
+    r.selectNodeContents(content);
+    r.collapse(false);
+    const sel = getSelection();
+    sel?.removeAllRanges();
+    sel?.addRange(r);
   }
 
   // ======================================================== assets & links

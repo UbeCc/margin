@@ -33,7 +33,11 @@ test('outline lists headings and jumps on click', async ({ page }) => {
   await expect(items).toHaveCount(5);
   await expect(items.first()).toHaveText('Welcome to Margin');
   await items.filter({ hasText: 'Writing' }).click();
-  // Scrolls the heading to the top of the editor scroller (caret is not moved, like Typora).
+  // The caret moves to the heading, which scrolls to the top of the editor scroller.
+  await expect
+    .poll(() => page.evaluate(() => (getSelection()!.anchorNode as Node | null)?.parentElement?.closest('.md-block')?.textContent ?? null))
+    .toMatch(/Writing$/);
+  await expect(page.locator('.md-editor')).toBeFocused();
   await expect
     .poll(() =>
       page.evaluate(() => {
@@ -64,7 +68,8 @@ test('find bar finds, reports misses, replaces all', async ({ page }) => {
   await expect(bar).toBeVisible();
   await page.keyboard.type('Simplicity');
   await page.keyboard.press('Enter');
-  await expect.poll(() => selectedText(page)).toBe('Simplicity');
+  await expect(bar.locator('.find-status')).toHaveText('1 of 1');
+  await expect(bar.locator('.find-input').first()).toBeFocused();
   await bar.locator('.find-input').first().fill('zzz-nope');
   await page.keyboard.press('Enter');
   await expect(bar.locator('.find-status')).toHaveText('No results');
@@ -94,4 +99,38 @@ test('native menu actions route through one dispatcher (desktop path)', async ({
   await menu('undo');
   await expect(input).toHaveValue('');
   await expect.poll(() => editorValue(page)).toContain('### Margin is a quiet place');
+});
+
+test('find keeps focus in the bar, counts and cycles matches; replace hits the current one (#44)', async ({ page }) => {
+  await caretAtText(page, 'Margin is');
+  await page.keyboard.press(`${MOD}+f`);
+  const bar = page.locator('.findbar');
+  const status = bar.locator('.find-status');
+  await page.keyboard.type('margin');
+  await expect(status).toHaveText('3 matches'); // live count while typing
+  await page.keyboard.press('Enter');
+  await expect(status).toHaveText(/^\d of 3$/);
+  const first = await status.textContent();
+  await page.keyboard.press('Enter');
+  await page.keyboard.press('Enter');
+  await page.keyboard.press('Enter');
+  await expect(status).toHaveText(first!); // wrapped around
+  await page.keyboard.press('Shift+Enter');
+  await expect(status).not.toHaveText(first!);
+  await expect(bar.locator('.find-input').first()).toBeFocused();
+  const before = await editorValue(page);
+  // Enter never typed into the document
+  expect(before.match(/margin/gi)).toHaveLength(3);
+  await bar.locator('.find-case').click();
+  await expect(status).toHaveText('No results');
+  await bar.locator('.find-input').first().fill('Margin is');
+  await page.keyboard.press('Enter');
+  await expect(status).toHaveText('1 of 1');
+  await page.keyboard.press(`${MOD}+Alt+f`);
+  await page.keyboard.type('Margin was');
+  await page.keyboard.press('Enter');
+  await expect.poll(() => editorValue(page)).toContain('\nMargin was a quiet place');
+  await expect(status).toHaveText('No results');
+  await page.keyboard.press('Escape');
+  await expect(bar).toBeHidden();
 });

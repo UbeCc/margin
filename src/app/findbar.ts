@@ -1,5 +1,6 @@
-import type { EditorHandle } from '../contracts';
+import type { EditorCommand, EditorHandle } from '../contracts';
 import { h, icon } from './util/dom';
+import { clearMatches, currentIndex, findRanges, matchStatus, paintMatches } from './findmatches';
 
 /** Find / replace bar docked at the top of the editor area. */
 export class FindBar {
@@ -10,7 +11,10 @@ export class FindBar {
   private caseBtn: HTMLButtonElement;
   private caseSensitive = false;
 
-  constructor(private editor: () => EditorHandle) {
+  constructor(
+    private editor: () => EditorHandle,
+    private host: () => HTMLElement | null = () => document.querySelector<HTMLElement>('.md-editor'),
+  ) {
     this.query = h('input.find-input', { type: 'text', placeholder: 'Find', 'aria-label': 'Find', spellcheck: 'false' });
     this.replacement = h('input.find-input', { type: 'text', placeholder: 'Replace with', 'aria-label': 'Replace with', spellcheck: 'false' });
     this.status = h('span.find-status', { 'aria-live': 'polite' });
@@ -51,8 +55,8 @@ export class FindBar {
       }
     });
     this.query.addEventListener('input', () => {
-      this.status.textContent = '';
       this.el.classList.remove('no-match');
+      this.refreshSoon();
     });
     this.replacement.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
@@ -80,6 +84,7 @@ export class FindBar {
     if (seed && !seed.includes('\n') && seed.length < 200) this.query.value = seed;
     (replace && this.query.value ? this.replacement : this.query).focus();
     (replace && this.query.value ? this.replacement : this.query).select();
+    this.refresh();
   }
 
   close(): void {
@@ -87,6 +92,7 @@ export class FindBar {
     this.el.hidden = true;
     this.status.textContent = '';
     this.el.classList.remove('no-match');
+    clearMatches();
     this.editor().focus();
   }
 
@@ -94,22 +100,93 @@ export class FindBar {
     this.caseSensitive = !this.caseSensitive;
     this.caseBtn.setAttribute('aria-pressed', String(this.caseSensitive));
     this.caseBtn.classList.toggle('on', this.caseSensitive);
+    this.refresh(null);
+  }
+
+  private refreshTimer = 0;
+  /** Live count while typing, off the keystroke path (large docs; keeps the field's undo grouping). */
+  private refreshSoon(): void {
+    clearTimeout(this.refreshTimer);
+    this.refreshTimer = window.setTimeout(() => this.refresh(null), 120);
+  }
+
+  /** Recount and repaint matches (after typing in the bar or a document change). */
+  refresh(sel: Range | null = this.selectionRange()): void {
+    clearTimeout(this.refreshTimer);
+    if (!this.isOpen) return;
+    const q = this.query.value;
+    if (!q) {
+      clearMatches();
+      this.setStatus('');
+      return;
+    }
+    const ed = this.editor();
+    const host = this.host();
+    if (ed.isSourceMode() || !host) {
+      clearMatches();
+      const hay = this.caseSensitive ? ed.getMarkdown() : ed.getMarkdown().toLowerCase();
+      const needle = this.caseSensitive ? q : q.toLowerCase();
+      const n = hay.split(needle).length - 1;
+      this.setStatus(matchStatus(n, -1));
+      return;
+    }
+    const ranges = findRanges(host, q, this.caseSensitive);
+    const i = currentIndex(ranges, sel);
+    paintMatches(ranges, i >= 0 ? ranges[i] : null);
+    this.setStatus(matchStatus(ranges.length, i));
+  }
+
+  /** Only touch the DOM on change: any mutation while typing breaks Chromium's undo coalescing of the field. */
+  private setStatus(text: string): void {
+    if (this.status.textContent !== text) this.status.textContent = text;
+  }
+
+  private selectionRange(): Range | null {
+    const s = window.getSelection();
+    const host = this.host();
+    if (!s?.rangeCount || !host || !host.contains(s.anchorNode)) return null;
+    return s.getRangeAt(0).cloneRange();
+  }
+
+  /**
+   * The editor focuses itself when it selects a match. Record that selection (the core
+   * learns it from selectionchange, which would otherwise arrive after we refocus), then
+   * give focus back to the bar so Enter keeps searching instead of typing into the doc.
+   */
+  private afterExec(keep: HTMLInputElement | null, ok: boolean): void {
+    const sel = this.selectionRange();
+    if (keep) {
+      document.dispatchEvent(new Event('selectionchange'));
+      keep.focus({ preventScroll: true });
+    }
+    this.refresh(ok ? sel : null);
   }
 
   find(backwards = false): boolean {
     const q = this.query.value;
     if (!q) return false;
+    const keep = this.fieldFocus();
     const ok = this.editor().exec({ kind: 'find', query: q, caseSensitive: this.caseSensitive, backwards });
     this.el.classList.toggle('no-match', !ok);
-    this.status.textContent = ok ? '' : 'No results';
+    this.afterExec(keep, ok);
+    if (!ok) this.status.textContent = 'No results';
     return ok;
+  }
+
+  /** The editor focuses itself when it selects a match; give focus back to the bar so Enter keeps searching. */
+  private fieldFocus(): HTMLInputElement | null {
+    const a = document.activeElement;
+    return a === this.query || a === this.replacement ? (a as HTMLInputElement) : null;
   }
 
   replace(all: boolean): void {
     const q = this.query.value;
     if (!q) return;
-    const ok = this.editor().exec({ kind: 'replace', query: q, replacement: this.replacement.value, all });
+    const keep = this.fieldFocus();
+    const ok = this.editor().exec({ kind: 'replace', query: q, replacement: this.replacement.value, all, caseSensitive: this.caseSensitive } as EditorCommand);
     this.el.classList.toggle('no-match', !ok);
-    this.status.textContent = ok ? (all ? 'Replaced all' : '') : 'No results';
+    this.afterExec(keep, ok && !all);
+    if (!ok) this.status.textContent = 'No results';
+    else if (all) this.status.textContent = 'Replaced all';
   }
 }
