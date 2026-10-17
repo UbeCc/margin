@@ -17,6 +17,8 @@ const PATTERNS: [RegExp, (m: RegExpExecArray, o: InlineOptions, r: (s: string) =
   [/^(`+)([\s\S]*?[^`])\1(?!`)/, (m) => `<code>${escapeHtml(m[2].replace(/^ (.*) $/, '$1'))}</code>`],
   [/^\$(?!\s)((?:\\.|[^$\\])+?)(?<!\s)\$(?!\d)/, (m, o) => (o.renderMath ? o.renderMath(m[1]) : `<span class="mb-imath">${escapeHtml(m[1])}</span>`)],
   [/^<br\s*\/?>/i, () => '<br>'],
+  // HTML entity references stay entities (the browser decodes them as text)
+  [/^&(?:#\d{1,7}|#[xX][\da-fA-F]{1,6}|[a-zA-Z][a-zA-Z\d]{1,31});/, (m) => m[0]],
   [/^<(https?:\/\/[^\s>]+)>/, (m) => `<a href="${escapeHtml(m[1])}">${escapeHtml(m[1])}</a>`],
   [
     /^!\[([^\]]*)\]\(\s*<?([^\s)>]*)>?(?:\s+"([^"]*)")?\s*\)/,
@@ -46,7 +48,7 @@ export function renderInlineMarkdown(src: string, opts: InlineOptions = {}): str
   outer: while (i < src.length) {
     const rest = src.slice(i);
     // fast path: plain chars
-    if (!/^[\\`$<!\[*_~=]/.test(rest)) {
+    if (!/^[\\`$<!\[*_~=&]/.test(rest)) {
       text += src[i++];
       continue;
     }

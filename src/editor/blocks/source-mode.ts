@@ -97,6 +97,8 @@ const markdownClasses = HighlightStyle.define([
 export const createSourceMode: SourceModeFactory = (host, opts) => {
   const theme = new Compartment();
   let settings = opts.settings;
+  // The host may mutate one settings object in place, so remember the scheme itself.
+  let scheme = settings.colorScheme;
   const root = document.createElement('div');
   root.className = 'mb-source';
   root.dataset.scheme = settings.colorScheme;
@@ -165,7 +167,8 @@ export const createSourceMode: SourceModeFactory = (host, opts) => {
       return view.state.doc.lineAt(block.from).number - 1;
     },
     updateSettings(s) {
-      const changed = s.colorScheme !== settings.colorScheme;
+      const changed = s.colorScheme !== scheme;
+      scheme = s.colorScheme;
       settings = s;
       root.dataset.scheme = s.colorScheme;
       if (changed) view.dispatch({ effects: theme.reconfigure(themeExtension(s.colorScheme === 'dark')) });

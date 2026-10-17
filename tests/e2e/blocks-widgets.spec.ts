@@ -139,7 +139,8 @@ test.describe('table', () => {
     await page.keyboard.press('Shift+Tab');
     await expect(cell(1, 0)).toBeFocused();
     expect(await raw(page, 'table')).toBe(
-      ['| Name   | Qty | Note          |', '| :----- | --: | ------------- |', '| apples |   3 | **fresh**     |', '| pear   |  10 | `x` and $a^2$ |'].join('\n') + '\n',
+      // minimal diff (#6): only the edited row is rewritten
+      ['| Name | Qty | Note |', '|:-----|----:|------|', '| apples | 3 | **fresh** |', '| pear | 10 | `x` and $a^2$ |'].join('\n') + '\n',
     );
   });
 

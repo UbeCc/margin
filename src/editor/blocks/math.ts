@@ -4,6 +4,12 @@ import type { BlockWidget, RenderInlineMath } from '../../contracts';
 import { makeRawPreviewWidget, Parsed } from './raw-preview';
 import { buildMathRaw, MathParts, parseMathBlock } from './util/delimited';
 import { escapeHtml, h } from './util/dom';
+import { equationNumber, hasRefs, onLabelsChanged, recompute, registerEquation, stripLabels, substituteRefs } from './math-refs';
+
+/** `\\label` removed, `\\ref`/`\\eqref` replaced by equation numbers (#7). */
+export function prepareTex(tex: string): string {
+  return substituteRefs(stripLabels(tex).tex);
+}
 
 export interface MathOptions {
   /** Auto-number display equations without an explicit \tag (CSS counter). */
@@ -52,27 +58,31 @@ export function createMathBlockWidget(opts: MathOptions = {}): BlockWidget {
     debounceMs: 60,
     editorPosition: 'above',
     render(preview, p) {
-      const { html, error } = renderTexSafe(p.body, true, macros);
       const numbered = !!opts.numbering && !/\\(tag|notag|nonumber)\b/.test(p.body);
+      registerEquation(preview, p.body, numbered);
       preview.classList.toggle('mb-numbered', numbered);
-      if (error) {
-        preview.replaceChildren(h('div', { class: 'mb-math-src' }, p.body), h('div', { class: 'mb-error' }, error));
-      } else {
-        preview.innerHTML = html;
-      }
+      const paint = () => {
+        const { html, error } = renderTexSafe(prepareTex(p.body), true, macros);
+        if (error) preview.replaceChildren(h('div', { class: 'mb-math-src' }, p.body), h('div', { class: 'mb-error' }, error));
+        else preview.innerHTML = html;
+      };
+      paint();
+      onLabelsChanged(preview, hasRefs(p.body) ? paint : null);
     },
-    renderHTML(p) {
-      const { html, error } = renderTexSafe(p.body, true, macros);
-      return error
-        ? `<div class="md-math-block mb-math-error"><pre>${escapeHtml(p.body)}</pre></div>`
-        : `<div class="md-math-block">${html}</div>`;
+    renderHTML(p, _settings, preview) {
+      const { html, error } = renderTexSafe(prepareTex(p.body), true, macros);
+      if (error) return `<div class="md-math-block mb-math-error"><pre>${escapeHtml(p.body)}</pre></div>`;
+      recompute();
+      const n = preview.classList.contains('mb-numbered') ? equationNumber(preview) : null;
+      return `<div class="md-math-block">${html}${n ? `<span class="md-eq-num">(${escapeHtml(n)})</span>` : ''}</div>`;
     },
   });
 }
 
 /** Inline `$…$` renderer for the core. Errors show the source with a tooltip. */
 export const renderInlineMath: RenderInlineMath = (tex, el) => {
-  const { html, error } = renderTexSafe(tex, false);
+  const { html, error } = renderTexSafe(prepareTex(tex), false);
+  onLabelsChanged(el, hasRefs(tex) ? () => renderInlineMath(tex, el) : null);
   el.classList.add('mb-inline-math');
   el.classList.toggle('mb-math-error', !!error);
   if (error) {
@@ -86,6 +96,6 @@ export const renderInlineMath: RenderInlineMath = (tex, el) => {
 
 /** Inline math as an HTML string (export / table cells). */
 export function inlineMathHTML(tex: string): string {
-  const { html, error } = renderTexSafe(tex, false);
+  const { html, error } = renderTexSafe(prepareTex(tex), false);
   return error ? `<span class="mb-inline-math mb-math-error" title="${escapeHtml(error)}">${escapeHtml(tex)}</span>` : `<span class="mb-inline-math">${html}</span>`;
 }
