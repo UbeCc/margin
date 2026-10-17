@@ -97,6 +97,7 @@ s_bundle() {
   cat "$desk"
   desktop-file-validate "$desk"
   grep -q '^MimeType=.*text/markdown' "$desk"
+  grep -q '^Exec=.* %[fFuU]' "$desk"   # file managers pass the clicked file
 }
 s_smoke() { bash "$ROOT/scripts/linux-smoke.sh" "$OUT"; }
 

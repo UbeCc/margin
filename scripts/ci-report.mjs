@@ -14,7 +14,7 @@ const ICON = { pass: '✅', fail: '❌', warn: '⚠️', skip: '⏭️', blocked
 function notes(stage, log) {
   if (stage === 'vitest') {
     const j = json('vitest.json');
-    if (j) return `${j.numPassedTests}/${j.numTotalTests} tests, ${j.numTotalTestSuites} files` +
+    if (j) return `${j.numPassedTests}/${j.numTotalTests} tests` +
       (j.numFailedTests ? `, **${j.numFailedTests} failed**` : '');
   }
   if (stage === 'e2e') {

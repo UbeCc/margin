@@ -68,12 +68,12 @@ echo "screenshot stddev=$SD"
 
 # Open the first menu (GTK menubar, F10) to show accelerator labels (Ctrl, not Cmd).
 xdotool windowactivate --sync "$WIN" 2>/dev/null || xdotool windowfocus "$WIN" 2>/dev/null
-xdotool key --window "$WIN" F10; sleep 1
+xdotool key F10; sleep 1
 import -window root "$OUT/smoke-menu.png"
 xdotool key Escape; sleep 0.5
 
 kill -0 $APP 2>/dev/null || { echo "app exited early"; tail -40 "$LOG"; exit 1; }
-xdotool key --window "$WIN" ctrl+q; sleep 2
+xdotool key ctrl+q; sleep 2
 if kill -0 $APP 2>/dev/null; then echo "still running after Ctrl+Q (close guard?), terminating"; kill $APP; fi
 wait $APP 2>/dev/null
 grep -iE 'panic|segfault|critical' "$LOG" && { echo "errors in app log"; exit 1; }
