@@ -1,0 +1,143 @@
+/* Margin editing core. Themes may override via `.margin-doc` / `.md-editor` selectors
+   and the --margin-* variables shared with editor/blocks. */
+
+.md-editor {
+  outline: none;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: normal;
+  caret-color: var(--margin-accent, #4a7cf7);
+  color: var(--margin-fg, inherit);
+  font-family: var(--margin-font, inherit);
+  line-height: 1.65;
+  padding-bottom: 30vh;
+  min-height: 1.6em;
+  tab-size: 4;
+}
+
+.md-editor .md-block {
+  position: relative;
+  padding-left: var(--indent, 0);
+  margin: 0 0 0.8em;
+}
+.md-editor .md-content { min-height: 1.65em; }
+
+/* markers: hidden unless the caret is in their inline (md-expand) or block (md-focus) */
+.md-editor .md-meta { display: none; color: var(--margin-muted, #8a8f98); font-weight: normal; font-style: normal; }
+.md-editor .md-wrap.md-expand > .md-meta,
+.md-editor .md-focus > .md-content > .md-meta.md-bmeta { display: inline; }
+.md-editor .md-focus.md-heading > .md-content > .md-meta.md-bmeta { font-weight: inherit; }
+
+/* headings */
+.md-editor .md-heading { font-weight: 600; line-height: 1.3; margin: 1em 0 0.6em; }
+.md-editor .md-h1 { font-size: 2em; }
+.md-editor .md-h2 { font-size: 1.5em; }
+.md-editor .md-h3 { font-size: 1.25em; }
+.md-editor .md-h4 { font-size: 1.1em; }
+.md-editor .md-h5 { font-size: 1em; }
+.md-editor .md-h6 { font-size: 0.9em; color: var(--margin-muted, #6a737d); }
+
+/* inline */
+.md-editor .md-strong { font-weight: 700; }
+.md-editor .md-em { font-style: italic; }
+.md-editor .md-del { text-decoration: line-through; }
+.md-editor .md-mark { background: rgba(255, 222, 0, 0.45); }
+.md-editor .md-code {
+  font-family: var(--margin-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 0.9em;
+  background: var(--margin-code-bg, rgba(127, 127, 127, 0.12));
+  border-radius: 3px;
+  padding: 0 0.2em;
+}
+.md-editor .md-link { color: var(--margin-accent, #4a7cf7); text-decoration: underline; text-underline-offset: 2px; cursor: text; }
+.md-editor .md-link.md-expand { text-decoration: none; }
+.md-editor .md-html { color: var(--margin-muted, #8a8f98); font-family: var(--margin-mono, monospace); font-size: 0.9em; }
+.md-editor .md-fnref { vertical-align: super; font-size: 0.8em; }
+.md-editor .md-entity.md-expand > .md-entity-char { display: none; }
+
+/* images: rendered image when idle, source (and image) when the caret is inside */
+.md-editor .md-image > .md-src { display: none; }
+.md-editor .md-image.md-expand > .md-src { display: inline; }
+.md-editor .md-img { max-width: 100%; vertical-align: bottom; }
+.md-editor .md-image.md-expand > .md-img { display: block; margin: 0.3em 0; }
+
+/* inline math: rendered when idle, source when editing */
+.md-editor .md-math > .md-src { display: none; }
+.md-editor .md-math.md-expand > .md-src { display: inline; font-family: var(--margin-mono, monospace); }
+.md-editor .md-math.md-expand > .md-math-render { display: none; }
+
+/* hr */
+.md-editor .md-hr > .md-content { min-height: 1em; display: flex; align-items: center; }
+.md-editor .md-hr-rule { flex: 1; border-top: 2px solid var(--margin-border, rgba(127, 127, 127, 0.35)); height: 0; }
+.md-editor .md-focus.md-hr .md-hr-rule { margin-left: 0.5em; }
+
+/* code / defs */
+.md-editor .md-indented_code > .md-content {
+  font-family: var(--margin-mono, ui-monospace, Menlo, monospace);
+  font-size: 0.9em;
+  background: var(--margin-code-bg, rgba(127, 127, 127, 0.08));
+  padding: 0.5em 0.8em;
+  border-radius: 4px;
+}
+.md-editor .md-def { color: var(--margin-muted, #8a8f98); font-size: 0.9em; }
+.md-editor .md-footnote { font-size: 0.9em; }
+
+/* containers */
+.md-editor .md-in-list,
+.md-editor .md-in-quote { margin-bottom: 0.2em; }
+.md-editor .md-qbar {
+  position: absolute;
+  top: 0;
+  bottom: -0.2em;
+  width: 0.25em;
+  background: var(--margin-border, rgba(127, 127, 127, 0.3));
+  border-radius: 2px;
+}
+.md-editor .md-in-quote > .md-content { color: var(--margin-quote-fg, inherit); }
+.md-editor .md-gutter {
+  position: absolute;
+  top: 0;
+  transform: translateX(-100%);
+  padding-right: 0.45em;
+  user-select: none;
+  color: var(--margin-muted, #8a8f98);
+  white-space: nowrap;
+}
+.md-editor .md-task-box { margin: 0; vertical-align: middle; cursor: pointer; }
+.md-editor .md-task-done > .md-content { opacity: 0.6; }
+
+/* widgets */
+.md-editor .md-widget { white-space: normal; }
+.md-editor .md-widget-host { min-height: 1em; }
+.md-editor .md-fallback {
+  white-space: pre-wrap;
+  font-family: var(--margin-mono, ui-monospace, Menlo, monospace);
+  font-size: 0.9em;
+  background: var(--margin-code-bg, rgba(127, 127, 127, 0.08));
+  padding: 0.6em 0.8em;
+  border-radius: 4px;
+  margin: 0;
+  outline: none;
+}
+
+/* focus mode: dim everything but the caret block */
+.md-editor.md-focus-mode .md-block { opacity: 0.35; transition: opacity 0.15s; }
+.md-editor.md-focus-mode .md-block.md-focus { opacity: 1; }
+/* typewriter mode: room to keep the caret line centred */
+.md-editor.md-typewriter { padding-top: 40vh; padding-bottom: 50vh; }
+
+/* source mode */
+.md-source-host { height: 100%; min-height: 60vh; }
+.md-source-fallback {
+  width: 100%;
+  height: 100%;
+  min-height: 60vh;
+  box-sizing: border-box;
+  border: 0;
+  outline: none;
+  resize: none;
+  font-family: var(--margin-mono, ui-monospace, Menlo, monospace);
+  font-size: 0.95em;
+  background: transparent;
+  color: inherit;
+}
