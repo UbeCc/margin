@@ -40,6 +40,4 @@ Owner: **app**. Vanilla-DOM shell around `EditorHandle` + `Platform` (see `src/c
 ## Known gaps
 
 - Single document per window (Typora model). No tabs and no multi-window.
-- File-tree rename, delete and new folder need the optional platform methods. Without them those menu items are disabled.
 - Exported HTML keeps local image srcs as returned by `renderHTML()` (asset URLs are not rewritten to file paths).
-- Find shows "No results" but no match count, because the contract has no count API.
