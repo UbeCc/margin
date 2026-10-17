@@ -4,7 +4,7 @@ import type { EditorCore } from './editor';
 import { leafContent, leafRaw, contPrefix } from './model';
 import * as E from './edit';
 import { splitBlockMeta } from './render-inline';
-import { findIn } from './query';
+import { find, replace } from './find';
 import { insertMarkdown } from './clipboard';
 
 export function undo(ed: EditorCore): boolean {
@@ -166,42 +166,6 @@ function insertBlock(ed: EditorCore, md: string, focusWidget: boolean): boolean 
   });
   ed.hist.break();
   return true;
-}
-
-function find(ed: EditorCore, q: string, cs = false, back = false): boolean {
-  const text = ed.doc.text();
-  const { from, to } = ed.sel();
-  const i = findIn(text, q, from, to, cs, back);
-  if (i < 0) return false;
-  ed.setSel({ anchor: i, focus: i + q.length });
-  return true;
-}
-
-function replace(ed: EditorCore, q: string, rep: string, all = false, cs = false): boolean {
-  if (!q) return false;
-  const text = ed.doc.text();
-  const eq = (a: string) => (cs ? a === q : a.toLowerCase() === q.toLowerCase());
-  if (all) {
-    const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), cs ? 'g' : 'gi');
-    const next = text.replace(re, () => rep);
-    if (next === text) return false;
-    ed.hist.break();
-    ed.change(() => {
-      ed.doc.replace(0, text.length, next);
-      return { pos: 0 };
-    });
-    ed.hist.break();
-    return true;
-  }
-  const { from, to } = ed.sel();
-  if (to - from === q.length && eq(text.slice(from, to))) {
-    ed.hist.break();
-    ed.replaceRange(from, to, rep, null);
-    ed.hist.break();
-    find(ed, q, cs);
-    return true;
-  }
-  return find(ed, q, cs);
 }
 
 export function execCommand(ed: EditorCore, cmd: EditorCommand): boolean {
