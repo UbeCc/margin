@@ -168,4 +168,25 @@ test.describe('core QA regressions', () => {
     await page.keyboard.press(`${mod}+z`);
     expect(await md(page)).toBe('a\n\nb\n\n- [ ] t\n');
   });
+
+  test('undo/redo shortcuts work while focus is inside a widget (#55)', async ({ page }) => {
+    const src = 'a\n\n```\nx\n```\n\nb\n';
+    await open(page, src);
+    await endOf(page, 'a');
+    await page.keyboard.press('ArrowDown');
+    await page.keyboard.type('yz');
+    await page.keyboard.press('Escape');
+    const edited = await md(page);
+    expect(edited).toContain('yz');
+    await page.keyboard.press(`${mod}+z`);
+    await expect.poll(() => md(page)).toBe(src);
+    await page.keyboard.press(`${mod}+Shift+z`);
+    await expect.poll(() => md(page)).toBe(edited);
+  });
+
+  test('export sanitizes inline HTML (#41)', async ({ page }) => {
+    await open(page, 'a <img src=x onerror="window.__pwned=1"> <a href="javascript:x">l</a>\n', '&blocks=0');
+    const html = await page.evaluate(() => window.__core.ed.renderHTML());
+    expect(html).not.toMatch(/onerror|javascript:/i);
+  });
 });

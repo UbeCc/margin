@@ -119,12 +119,30 @@ export function attachInput(ed: EditorCore): () => void {
     }, 0);
   };
 
+  /** Mod+Z / Mod+Shift+Z / Mod+Y? */
+  const isHistKey = (e: KeyboardEvent) => (e.metaKey || e.ctrlKey) && !e.altKey && /^[zZyY]$/.test(e.key);
+
+  /**
+   * Undo/redo inside a widget uses the one document history (every widget edit
+   * is recorded there synchronously), not the widget's local history, which
+   * goes stale as soon as the document history moves (#55). Capture phase so
+   * the widget's own keymap never sees the key.
+   */
+  const onKeyDownCapture = (e: KeyboardEvent) => {
+    if (!inWidget(e.target) || !isHistKey(e) || e.isComposing || e.keyCode === 229) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.key === 'y' || e.key === 'Y' || e.shiftKey) redo(ed);
+    else undo(ed);
+  };
+
   const onKeyDown = (e: KeyboardEvent) => {
-    if (inWidget(e.target) || e.isComposing || ed.composing || e.keyCode === 229) return;
     const mod = e.metaKey || e.ctrlKey;
-    if (mod && !e.altKey && (e.key === 'z' || e.key === 'Z' || e.key === 'y')) {
+    const histKey = isHistKey(e);
+    if (inWidget(e.target) || e.isComposing || ed.composing || e.keyCode === 229) return;
+    if (histKey) {
       e.preventDefault();
-      if (e.key === 'y' || e.shiftKey) redo(ed);
+      if (e.key === 'y' || e.key === 'Y' || e.shiftKey) redo(ed);
       else undo(ed);
       return;
     }
@@ -241,6 +259,7 @@ export function attachInput(ed: EditorCore): () => void {
     [root, 'compositionstart', onCompStart as EventListener],
     [root, 'compositionend', onCompEnd as EventListener],
     [root, 'keydown', onKeyDown as EventListener],
+    [root, 'keydown', onKeyDownCapture as EventListener, true],
     [root, 'mousedown', onMouseDown as EventListener],
     [root, 'click', onClick as EventListener],
     [root, 'copy', ((e: ClipboardEvent) => !inWidget(e.target) && onCopy(ed, e, false)) as EventListener],
@@ -249,9 +268,9 @@ export function attachInput(ed: EditorCore): () => void {
     [root, 'drop', ((e: DragEvent) => !inWidget(e.target) && onDrop(ed, e)) as EventListener],
     [document, 'selectionchange', onSelChange],
   ];
-  for (const [t, n, f] of L) t.addEventListener(n, f);
+  for (const [t, n, f, c] of L) t.addEventListener(n, f, !!c);
   return () => {
-    for (const [t, n, f] of L) t.removeEventListener(n, f);
+    for (const [t, n, f, c] of L) t.removeEventListener(n, f, !!c);
   };
 }
 
