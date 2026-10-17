@@ -17,6 +17,8 @@ mod watch_state;
 mod watch_live_tests;
 #[cfg(test)]
 mod asset_scope_tests;
+#[cfg(test)]
+mod quick_open_tests;
 
 use serde::Serialize;
 use std::collections::HashMap;
