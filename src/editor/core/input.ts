@@ -178,6 +178,7 @@ export function attachInput(ed: EditorCore): () => void {
       ed.change(() => E.indent(ed.doc, c.i, c.off, e.shiftKey) ?? undefined);
       return;
     }
+    if (isLineStartKey(e)) setTimeout(skipMarker, 0);
     const edge = docEdgeKey(e);
     if (edge) {
       ed.hist.break();
@@ -212,6 +213,22 @@ export function attachInput(ed: EditorCore): () => void {
     if (!E.isTextLeaf(l)) ed.setSel({ widget: l.id, at });
     else ed.setSel({ pos: at === 'start' ? ed.doc.docPos(0, metaLen(l)) : ed.doc.docPos(i, leafContent(l).length) });
     return true;
+  };
+
+  /** Home / ⌘← without Shift: native line-start move (fixed up by `skipMarker`). */
+  const isLineStartKey = (e: KeyboardEvent): boolean => {
+    if (e.shiftKey || e.altKey || e.ctrlKey) return false;
+    const mac = /Mac|iPhone|iPad/.test(navigator.platform);
+    return mac ? e.metaKey && e.key === 'ArrowLeft' : !e.metaKey && e.key === 'Home';
+  };
+
+  /** After a native line-start move: a caret inside a heading's leading marker goes past it (#57, WebKit). */
+  const skipMarker = () => {
+    const c = caretLeaf();
+    if (!c) return;
+    const l = ed.doc.leaves[c.i];
+    const m = metaLen(l);
+    if (m && c.off < m) ed.setSel({ pos: ed.doc.docPos(c.i, m) });
   };
 
   /** Arrow at a text block edge next to a widget → hand the caret to the widget. */
