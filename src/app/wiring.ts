@@ -3,14 +3,14 @@
  *
  * Real modules are discovered with `import.meta.glob`, so once
  *   src/editor/core/index.ts      (export const createEditor: CreateEditor)
- *   src/editor/blocks/index.ts    (export function installBlocks(...))
+ *   src/editor/blocks/index.ts    (blocksCSS for exports; the CORE calls installBlocks)
  *   src/platform/tauri.ts / web.ts (a Platform)
  * exist, they are used automatically; until then the dev stubs are used.
  * Force stubs with `?stub=all` / `?stub=editor` / `?stub=platform` (e2e tests do).
  *
  * If the integrator prefers static imports, replace `loadWiring` with:
  *   import { createEditor } from '../editor/core';
- *   import { installBlocks } from '../editor/blocks';
+ *   import { blocksCSS } from '../editor/blocks';
  *   import { platform } from '../platform/tauri'; …
  */
 import type { CreateEditor, Platform } from '../contracts';
@@ -18,6 +18,8 @@ import type { CreateEditor, Platform } from '../contracts';
 export interface Wiring {
   createEditor: CreateEditor;
   platform: Platform;
+  /** Widget CSS from editor/blocks, inlined into exported HTML/PDF. */
+  blocksCss: string;
   /** Which implementation was chosen (shown in the dev console / used by tests). */
   using: { editor: 'core' | 'stub'; platform: 'tauri' | 'web' | 'stub'; blocks: boolean };
 }
@@ -64,16 +66,16 @@ export async function loadWiring(): Promise<Wiring> {
   let createEditor: CreateEditor | null = null;
   let editorKind: Wiring['using']['editor'] = 'stub';
   let blocks = false;
+  let blocksCss = '';
   const coreLoader = first(coreMods);
   if (coreLoader && !forceEditor) {
     try {
+      // installBlocks(api) is wired by the core itself; we only need the CSS for exports.
       const blocksLoader = first(blockMods);
       if (blocksLoader) {
         const bm = await blocksLoader();
-        if (typeof bm.installBlocks === 'function') {
-          (bm.installBlocks as () => void)();
-          blocks = true;
-        }
+        blocks = true;
+        if (typeof bm.blocksCSS === 'string') blocksCss = bm.blocksCSS;
       }
       const cm = await coreLoader();
       const ce = (cm.createEditor ?? cm.default) as CreateEditor | undefined;
@@ -107,5 +109,5 @@ export async function loadWiring(): Promise<Wiring> {
   }
   const using = { editor: editorKind, platform: platformKind, blocks };
   console.info('[margin] wiring', using);
-  return { createEditor, platform, using };
+  return { createEditor, platform, blocksCss, using };
 }

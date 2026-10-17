@@ -22,6 +22,12 @@
   --margin-font-ui: var(--margin-font-body);
   --margin-line-height: 1.65;
   --margin-doc-width: 820px;
+  /* aliases read by editor/blocks widgets */
+  --margin-muted: var(--margin-fg-muted);
+  --margin-error: #cf222e;
+  --margin-mono: var(--margin-font-mono);
+  --margin-font: var(--margin-font-body);
+  --margin-radius: 6px;
 }
 
 .margin-doc {
