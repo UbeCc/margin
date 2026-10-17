@@ -10,6 +10,9 @@ mod pdf_macos;
 mod quick_open;
 mod settings;
 mod watch;
+mod watch_state;
+#[cfg(test)]
+mod watch_live_tests;
 
 use serde::Serialize;
 use std::collections::HashMap;
