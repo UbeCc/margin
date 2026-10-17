@@ -1,0 +1,108 @@
+/* Margin theme: GitHub-ish — crisp neutral light, system sans, ruled section headings. */
+:root {
+  color-scheme: light;
+  --margin-bg: #ffffff;
+  --margin-fg: #1f2328;
+  --margin-fg-muted: #656d76;
+  --margin-accent: #0a69da;
+  --margin-link: #0a69da;
+  --margin-code-bg: #f3f5f7;
+  --margin-code-fg: #1f2328;
+  --margin-border: #d8dee4;
+  --margin-selection: rgba(84, 154, 255, 0.24);
+  --margin-mark-bg: #fff3b0;
+  --margin-chrome-bg: #f6f8fa;
+  --margin-chrome-fg: #3b434b;
+  --margin-hover: rgba(30, 50, 80, 0.06);
+  --margin-active: rgba(10, 105, 218, 0.1);
+  --margin-font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', 'Helvetica Neue', Arial,
+    'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
+  --margin-font-heading: var(--margin-font-body);
+  --margin-font-mono: ui-monospace, 'SF Mono', 'Menlo', 'Cascadia Code', 'Consolas', 'Sarasa Mono SC', monospace;
+  --margin-font-ui: var(--margin-font-body);
+  --margin-line-height: 1.65;
+  --margin-doc-width: 820px;
+  /* aliases read by editor/blocks widgets */
+  --margin-muted: var(--margin-fg-muted);
+  --margin-error: #cf222e;
+  --margin-mono: var(--margin-font-mono);
+  --margin-font: var(--margin-font-body);
+  --margin-radius: 6px;
+}
+
+.margin-doc {
+  font-family: var(--margin-font-body);
+  font-size: var(--margin-font-size, 16px);
+  line-height: var(--margin-line-height);
+  color: var(--margin-fg);
+  overflow-wrap: break-word;
+  -webkit-font-smoothing: antialiased;
+}
+
+.margin-doc h1, .margin-doc h2, .margin-doc h3,
+.margin-doc h4, .margin-doc h5, .margin-doc h6 {
+  font-weight: 600;
+  line-height: 1.28;
+  margin: 1.5em 0 0.65em;
+}
+.margin-doc h1 { font-size: 2em; padding-bottom: 0.3em; border-bottom: 1px solid var(--margin-border); margin-top: 0.5em; }
+.margin-doc h2 { font-size: 1.5em; padding-bottom: 0.3em; border-bottom: 1px solid var(--margin-border); }
+.margin-doc h3 { font-size: 1.25em; }
+.margin-doc h4 { font-size: 1em; }
+.margin-doc h5 { font-size: 0.875em; }
+.margin-doc h6 { font-size: 0.85em; color: var(--margin-fg-muted); }
+
+.margin-doc p, .margin-doc ul, .margin-doc ol, .margin-doc blockquote, .margin-doc pre,
+.margin-doc table { margin: 0 0 1em; }
+
+.margin-doc a { color: var(--margin-link); text-decoration: none; }
+.margin-doc a:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+.margin-doc strong { font-weight: 600; }
+.margin-doc mark { background: var(--margin-mark-bg); color: inherit; border-radius: 2px; padding: 0 0.1em; }
+
+.margin-doc blockquote { padding: 0 1em; color: var(--margin-fg-muted); border-left: 0.25em solid var(--margin-border); }
+.margin-doc blockquote > :last-child { margin-bottom: 0; }
+
+.margin-doc ul, .margin-doc ol { padding-left: 2em; }
+.margin-doc li + li { margin-top: 0.25em; }
+.margin-doc li > p { margin: 0; }
+.margin-doc .task-list-item { list-style: none; }
+.margin-doc .task-list-item input[type='checkbox'] { margin: 0 0.4em 0 -1.5em; vertical-align: -0.1em; }
+
+.margin-doc code {
+  font-family: var(--margin-font-mono);
+  font-size: 85%;
+  background: rgba(130, 145, 160, 0.16);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+}
+.margin-doc pre {
+  font-family: var(--margin-font-mono);
+  font-size: 85%;
+  line-height: 1.5;
+  background: var(--margin-code-bg);
+  border-radius: 6px;
+  padding: 1em;
+  overflow: auto;
+}
+.margin-doc pre code { background: none; padding: 0; font-size: 100%; }
+
+.margin-doc hr { height: 0.25em; margin: 1.6em 0; background: var(--margin-border); border: 0; }
+
+.margin-doc table { border-collapse: collapse; display: block; max-width: 100%; overflow: auto; }
+.margin-doc th, .margin-doc td { border: 1px solid var(--margin-border); padding: 0.4em 0.85em; }
+.margin-doc th { font-weight: 600; background: var(--margin-chrome-bg); }
+.margin-doc tr:nth-child(2n) td { background: #fafbfc; }
+
+.margin-doc img { max-width: 100%; }
+.margin-doc kbd {
+  font-family: var(--margin-font-mono);
+  font-size: 0.78em;
+  padding: 0.15em 0.4em;
+  border: 1px solid var(--margin-border);
+  border-bottom-color: #c3cad1;
+  border-radius: 6px;
+  box-shadow: inset 0 -1px 0 #c3cad1;
+  background: var(--margin-chrome-bg);
+}
+.margin-doc ::selection { background: var(--margin-selection); }

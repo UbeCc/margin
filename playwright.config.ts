@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const PORT = 5182;
+const PORT = Number(process.env.E2E_PORT ?? 5182);
 // PW_BROWSERS=chromium,webkit (default: chromium locally, both on CI).
 const browsers = (process.env.PW_BROWSERS ?? (process.env.CI ? 'chromium,webkit' : 'chromium')).split(',');
 const all = [

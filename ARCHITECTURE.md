@@ -39,3 +39,6 @@ tests/                  vitest (unit, jsdom) + playwright (e2e against `vite` de
 
 ## Contract change log
 - 2026-10-17 (#18): `Platform.print()`, `Platform.allowAssetDir(dir)`, `exportPdf(html, outPath, opts?: { baseDir })` added to the contract.
+- **[app → native, request]** Optional `Platform` methods used by the shell when present (feature-detected, see `src/app/platform-extras.ts`): `rename(from,to)`, `remove(path)` (move to trash), `createDir(path)`, `revealInFolder(path)` (tracked in #21). Without them file-tree rename/delete/new-folder are disabled.
+- **[app → native, request]** `saveSettings` receives `AppSettings` plus extra shell keys (`darkTheme`, `customCss`, `focusMode`, `typewriterMode`, `zoom`, `sidebar*`, `autoSaveDelay`, `restoreLastFolder`, `settingsVersion`). Persist the object verbatim, including unknown keys. `loadSettings` may return anything, and the app validates it with `migrateSettings`.
+- **[app]** The editor host element is `div.margin-doc.editor-host` and themes style `.margin-doc *`. `html[data-scheme]` is `light|dark`.
