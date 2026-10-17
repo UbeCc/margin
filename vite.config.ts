@@ -1,6 +1,9 @@
 import { defineConfig } from "vite";
 // @ts-expect-error type error without @types/node package
 import process from "node:process";
+// @ts-expect-error type error without @types/node package
+import { realpathSync } from "node:fs";
+import { searchForWorkspaceRoot } from "vite";
 const host = process.env.TAURI_DEV_HOST;
 
 // https://vite.dev/config/
@@ -22,6 +25,10 @@ export default defineConfig(() => ({
           port: 1421,
         }
       : undefined,
+    // Worktrees symlink node_modules from the main checkout; allow serving it (KaTeX fonts etc.).
+    fs: {
+      allow: [searchForWorkspaceRoot(process.cwd()), realpathSync("node_modules")],
+    },
     watch: {
       // 3. tell Vite to ignore watching `src-tauri`
       ignored: ["**/src-tauri/**"],
