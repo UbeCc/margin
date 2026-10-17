@@ -87,7 +87,8 @@ pub fn relative_path(base: &Path, target: &Path) -> Option<PathBuf> {
 /// characters that break `![](...)` or URL parsing are percent-encoded
 /// (space, %, (, ), <, >, #, ?). Non-ASCII stays readable.
 pub fn to_markdown_src(p: &Path) -> String {
-    let s = p.to_string_lossy().replace('\\', "/");
+    // Windows separators become `/`; on Unix a backslash is a legal name character.
+    let s = if cfg!(windows) { p.to_string_lossy().replace('\\', "/") } else { p.to_string_lossy().into_owned() };
     let mut out = String::with_capacity(s.len());
     for ch in s.chars() {
         match ch {
@@ -99,6 +100,14 @@ pub fn to_markdown_src(p: &Path) -> String {
             '>' => out.push_str("%3E"),
             '#' => out.push_str("%23"),
             '?' => out.push_str("%3F"),
+            // a backslash escapes punctuation in CommonMark link destinations
+            '\\' => out.push_str("%5C"),
+            c if c.is_control() => {
+                let mut b = [0u8; 4];
+                for byte in c.encode_utf8(&mut b).bytes() {
+                    out.push_str(&format!("%{byte:02X}"));
+                }
+            }
             c => out.push(c),
         }
     }
@@ -161,19 +170,39 @@ pub fn unique_generated_name(dir: &Path, ext: &str) -> PathBuf {
     }
 }
 
-/// Keep the original file name; on clash append `-1`, `-2`, …
-pub fn unique_copy_name(dir: &Path, file_name: &str) -> PathBuf {
-    let p = dir.join(file_name);
-    if !p.exists() {
-        return p;
+/// Copy `src` into `dir` as `name`, `stem-1.ext`, `stem-2.ext`, … — reusing any of
+/// those that already holds identical bytes, and never overwriting another file
+/// (create-new, so concurrent pastes of same-named images can't clobber each other).
+fn copy_unique(src: &Path, dir: &Path, name: &str) -> std::io::Result<PathBuf> {
+    let meta = fs::metadata(src)?;
+    if meta.is_dir() {
+        return Err(std::io::Error::other(format!("{} is a directory", src.display())));
     }
-    let path = Path::new(file_name);
+    let path = Path::new(name);
     let stem = path.file_stem().map(|s| s.to_string_lossy().into_owned()).unwrap_or_default();
     let ext = path.extension().map(|e| format!(".{}", e.to_string_lossy())).unwrap_or_default();
-    (1..)
-        .map(|i| dir.join(format!("{stem}-{i}{ext}")))
-        .find(|p| !p.exists())
-        .unwrap()
+    for i in 0u32.. {
+        let cand = if i == 0 { dir.join(name) } else { dir.join(format!("{stem}-{i}{ext}")) };
+        if cand.exists() {
+            if same_contents(&cand, src) {
+                return Ok(cand);
+            }
+            continue;
+        }
+        let mut out = match fs::OpenOptions::new().write(true).create_new(true).open(&cand) {
+            Ok(f) => f,
+            Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => continue,
+            Err(e) => return Err(e),
+        };
+        let res = fs::File::open(src).and_then(|mut i| std::io::copy(&mut i, &mut out)).and_then(|_| out.sync_all());
+        if let Err(e) = res {
+            let _ = fs::remove_file(&cand);
+            return Err(e);
+        }
+        let _ = fs::set_permissions(&cand, meta.permissions());
+        return Ok(cand);
+    }
+    unreachable!()
 }
 
 fn same_contents(a: &Path, b: &Path) -> bool {
@@ -243,14 +272,7 @@ pub fn store_image(
                     .file_name()
                     .map(|n| n.to_string_lossy().into_owned())
                     .unwrap_or_else(|| "image.png".into());
-                let candidate = target_dir.join(&name);
-                if candidate.exists() && same_contents(&candidate, &src) {
-                    candidate
-                } else {
-                    let dest = unique_copy_name(&target_dir, &name);
-                    fs::copy(&src, &dest)?; // copy, never move
-                    dest
-                }
+                copy_unique(&src, &target_dir, &name)?
             }
         }
         ImageInput::Bytes { data, mime, name } => {
