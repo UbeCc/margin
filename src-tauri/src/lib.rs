@@ -21,6 +21,8 @@ mod asset_scope_tests;
 mod quick_open_tests;
 #[cfg(test)]
 mod images_tests;
+#[cfg(test)]
+mod settings_tests;
 
 use serde::Serialize;
 use std::collections::HashMap;

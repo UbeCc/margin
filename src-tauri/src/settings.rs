@@ -140,9 +140,32 @@ pub fn parse(text: &str) -> Map<String, Value> {
 }
 
 pub fn load(path: &Path) -> Map<String, Value> {
-    match std::fs::read_to_string(path) {
-        Ok(t) => parse(&t),
-        Err(_) => defaults_value(),
+    let Ok(bytes) = std::fs::read(path) else { return defaults_value() };
+    let text = String::from_utf8_lossy(&bytes);
+    let readable = matches!(serde_json::from_str::<Value>(&text), Ok(Value::Object(_)));
+    if !readable && !text.trim().is_empty() {
+        backup_corrupt(path, &bytes);
+    }
+    parse(&text)
+}
+
+/// Keep a copy of an unreadable settings file before defaults replace it on the next
+/// save: `settings.json.corrupt-YYYYMMDD-HHMMSS` (one per distinct content).
+fn backup_corrupt(path: &Path, bytes: &[u8]) {
+    let (Some(dir), Some(name)) = (path.parent(), path.file_name()) else { return };
+    let prefix = format!("{}.corrupt-", name.to_string_lossy());
+    let already = std::fs::read_dir(dir).into_iter().flatten().flatten().any(|e| {
+        e.file_name().to_string_lossy().starts_with(&prefix) && std::fs::read(e.path()).ok().as_deref() == Some(bytes)
+    });
+    if already {
+        return;
+    }
+    let stamp = chrono::Local::now().format("%Y%m%d-%H%M%S");
+    let target = dir.join(format!("{prefix}{stamp}"));
+    if let Err(e) = std::fs::write(&target, bytes) {
+        log::warn!("could not back up corrupt settings to {}: {e}", target.display());
+    } else {
+        log::warn!("settings file was unreadable; kept a copy at {}", target.display());
     }
 }
 
