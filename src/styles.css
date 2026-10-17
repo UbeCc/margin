@@ -292,6 +292,8 @@ button { cursor: default; }
 .findbar.no-match .find-row:first-child .find-field { border-color: #d9534f; }
 .find-icon { opacity: 0.5; width: 14px; height: 14px; }
 .find-input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; }
+::highlight(margin-find) { background-color: color-mix(in srgb, #f5c518 38%, transparent); }
+::highlight(margin-find-current) { background-color: color-mix(in srgb, #ff8a00 70%, transparent); color: inherit; }
 .find-status { font-size: 11.5px; color: var(--margin-fg-muted); min-width: 0; padding: 0 4px; white-space: nowrap; }
 .findbar.no-match .find-status { color: #d9534f; }
 .find-case.on { background: var(--margin-active); color: var(--margin-accent); }

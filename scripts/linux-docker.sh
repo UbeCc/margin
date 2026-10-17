@@ -82,7 +82,7 @@ cmd_sync() {
     if [ -d '$dest/src-tauri' ]; then find '$dest/src-tauri' -mindepth 1 -maxdepth 1 ! -name target -exec rm -rf {} + ; fi"
   tar -C "$src" --exclude=./node_modules --exclude=./src-tauri/target --exclude=./dist \
       --exclude=./ci-out --exclude=./test-results --exclude=./playwright-report -cf - . \
-    | docker exec -i "$CTR" tar -C "$dest" -xf - --no-same-owner
+    | docker exec -i "$CTR" tar -m -C "$dest" -xf - --no-same-owner
 }
 
 cmd_exec() {

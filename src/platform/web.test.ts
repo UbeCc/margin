@@ -19,6 +19,30 @@ describe('WebPlatform filesystem', () => {
     expect(names).toContain('Welcome.md');
   });
 
+  it('rename / remove / createDir / reveal (file-tree extras, #21)', async () => {
+    const p = fresh({ seed: false });
+    const evs: FsEvent[] = [];
+    await p.writeTextFile('/r/a.md', 'A');
+    await p.writeTextFile('/r/b.md', 'B');
+    await p.watch('/r', (e) => evs.push(...e));
+    await p.rename('/r/a.md', '/r/c.md');
+    expect(await p.readTextFile('/r/c.md')).toBe('A');
+    expect(await p.stat('/r/a.md')).toBeNull();
+    await expect(p.rename('/r/c.md', '/r/b.md')).rejects.toThrow(/EEXIST/);
+    await p.createDir('/r/sub');
+    await expect(p.createDir('/r/sub')).rejects.toThrow(/EEXIST/);
+    await expect(p.rename('/r', '/r/sub/x')).rejects.toThrow(/itself/);
+    await p.rename('/r/c.md', '/r/sub/c.md');
+    await p.remove('/r/sub');
+    expect(await p.stat('/r/sub/c.md')).toBeNull();
+    await p.revealInFolder('/r/b.md');
+    expect(p.revealed).toEqual(['/r/b.md']);
+    await tick();
+    expect(evs).toContainEqual({ kind: 'renamed', from: '/r/a.md', to: '/r/c.md' });
+    expect(evs).toContainEqual({ kind: 'created', path: '/r/sub' });
+    expect(evs).toContainEqual({ kind: 'removed', path: '/r/sub' });
+  });
+
   it('reads, writes, stats and lists', async () => {
     const p = fresh({ seed: false });
     await p.writeTextFile('/a/b/c.md', 'hello');

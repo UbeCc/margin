@@ -24,6 +24,7 @@ export function effectiveTheme(
   const themeIsDark = isDarkThemeCss(themes[theme] ?? '');
   if (wantDark) return themeIsDark ? theme : dark;
   if (opts.colorScheme === 'system' && themeIsDark) {
+    if (exists('paper') && !isDarkThemeCss(themes.paper)) return 'paper';
     return Object.keys(themes).find((n) => !isDarkThemeCss(themes[n])) ?? theme;
   }
   return theme;

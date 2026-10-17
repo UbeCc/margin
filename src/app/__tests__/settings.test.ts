@@ -66,6 +66,8 @@ describe('themes', () => {
     expect(effectiveTheme({ ...base, colorScheme: 'system' }, true, t)).toBe('night');
     expect(effectiveTheme({ ...base, colorScheme: 'system' }, false, t)).toBe('github');
     expect(effectiveTheme({ theme: 'missing', darkTheme: 'paper', colorScheme: 'dark' }, false, t)).toBe('night');
+    // a dark main theme under a light OS falls back to the default light theme, not whichever comes first
+    expect(effectiveTheme({ theme: 'night', darkTheme: 'night', colorScheme: 'system' }, false, { github: t.github, night: t.night, paper: t.paper })).toBe('paper');
   });
   it('built-in themes define the widget variables', () => {
     for (const css of Object.values(BUILTIN_THEMES))

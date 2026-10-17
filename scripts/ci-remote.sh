@@ -42,7 +42,7 @@ status() {  # state description
 status pending "running on $HOST${QUICK:+ (quick)}"
 
 # Ship the tree (only committed content) and run.
-git archive --format=tar "$SHA" | ssh "$HOST" "mkdir -p $DIR/runs/$SHORT && tar -C $DIR/runs/$SHORT -xf -"
+git archive --format=tar "$SHA" | ssh "$HOST" "mkdir -p $DIR/runs/$SHORT && tar -m -C $DIR/runs/$SHORT -xf -"
 T0=$SECONDS
 set +e
 ssh "$HOST" "cd $DIR/runs/$SHORT && flock $DIR/ci.lock bash scripts/linux-docker.sh ci . work $QUICK" \
