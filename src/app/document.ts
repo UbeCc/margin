@@ -87,7 +87,8 @@ export class DocumentController {
   }
 
   private isModified(): boolean {
-    return this.eol !== this.savedEol || this.host.editor.getMarkdown() !== this.saved;
+    // A document whose file vanished is unsaved until it is written again.
+    return this.missing || this.eol !== this.savedEol || this.host.editor.getMarkdown() !== this.saved;
   }
 
   private recomputeDirty = debounce(() => {
@@ -163,7 +164,8 @@ export class DocumentController {
   /** Make sure unsaved changes are handled. Returns false if the user cancelled. */
   async confirmLeave(reason: string): Promise<boolean> {
     if (!this.dirty) return true;
-    if (this.path && this.host.autoSave().enabled) return this.save({ quiet: true });
+    // Auto-save may write silently, but never resurrect a file deleted behind our back.
+    if (this.path && this.host.autoSave().enabled && !this.missing) return this.save({ quiet: true });
     const choice = await this.host.askUnsaved(this.name, reason);
     if (choice === 'cancel') return false;
     if (choice === 'save') return this.save();
@@ -287,6 +289,10 @@ export class DocumentController {
     if (!this.path) return;
     if (this.path === from || this.path.startsWith(from + '/') || this.path.startsWith(from + '\\')) {
       this.path = to + this.path.slice(from.length);
+      if (this.missing) {
+        this.missing = false;
+        this.dirty = this.isModified();
+      }
       this.host.willLoad(this.path);
       this.emit();
       void this.rewatch();
@@ -305,6 +311,8 @@ export class DocumentController {
       if (ev.kind === 'removed') {
         if (!this.missing) {
           this.missing = true;
+          this.recomputeDirty.cancel();
+          this.dirty = true;
           this.emit();
           this.host.notify(`${this.name} was deleted or moved on disk. Save to keep it.`, 'warning');
         }
@@ -326,6 +334,7 @@ export class DocumentController {
     if (md === this.saved) {
       if (this.missing) {
         this.missing = false;
+        this.dirty = this.isModified();
         this.emit();
       }
       return; // our own write echoing back
