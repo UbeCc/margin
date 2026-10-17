@@ -168,3 +168,31 @@ test('math \\label renders; \\eqref follows the referenced \\tag (#7)', async ({
   const html = await page.evaluate(() => window.__core.ed.renderHTML());
   expect(html).not.toContain('mb-math-error');
 });
+
+test('Cmd/Ctrl+A in a table cell selects the cell, not the document', async ({ page }) => {
+  await open(page, 'p\n\n|a|b|\n|-|-|\n|one|2|\n\nq\n');
+  await cell(page, 1, 0).click();
+  await page.keyboard.press(`${mod}+a`);
+  await page.keyboard.type('sel');
+  await expect.poll(() => md(page)).toBe('p\n\n|a|b|\n|-|-|\n|sel|2|\n\nq\n');
+});
+
+test('Cmd/Ctrl+B / I in a table cell write markdown emphasis (no hidden <b>)', async ({ page }) => {
+  await open(page, 'p\n\n|a|b|\n|-|-|\n|one|2|\n\nq\n');
+  await cell(page, 1, 0).click();
+  await page.keyboard.press(`${mod}+a`);
+  await page.keyboard.press(`${mod}+b`);
+  await expect.poll(() => md(page)).toBe('p\n\n|a|b|\n|-|-|\n|**one**|2|\n\nq\n');
+  await page.keyboard.press(`${mod}+a`);
+  await page.keyboard.press(`${mod}+b`); // toggles off
+  await expect.poll(() => md(page)).toBe('p\n\n|a|b|\n|-|-|\n|one|2|\n\nq\n');
+  await cell(page, 1, 1).click();
+  await page.keyboard.press(lineEnd);
+  await page.keyboard.press(`${mod}+i`);
+  await page.keyboard.type('x');
+  await expect.poll(() => md(page)).toBe('p\n\n|a|b|\n|-|-|\n|one|2*x*|\n\nq\n');
+  await page.keyboard.press(`${mod}+u`);
+  await page.keyboard.type('y');
+  await expect.poll(() => md(page)).toBe('p\n\n|a|b|\n|-|-|\n|one|2*xy*|\n\nq\n');
+  await expect(cell(page, 1, 1).locator('b, i, u, strong, em')).toHaveCount(0); // editing view is plain text
+});

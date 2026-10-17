@@ -94,6 +94,26 @@ function setCaret(el: HTMLElement, off: number) {
   sel.addRange(range);
 }
 
+function selectRange(el: HTMLElement, from: number, to: number) {
+  const sel = window.getSelection();
+  if (!sel) return;
+  const pos = (off: number): [Node, number] => {
+    const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    let n: Node | null;
+    let rest = off;
+    while ((n = w.nextNode())) {
+      if (rest <= (n as Text).length) return [n, rest];
+      rest -= (n as Text).length;
+    }
+    return [el, el.childNodes.length];
+  };
+  const r = document.createRange();
+  r.setStart(...pos(from));
+  r.setEnd(...pos(to));
+  sel.removeAllRanges();
+  sel.addRange(r);
+}
+
 function cellText(el: HTMLElement): string {
   return (el.innerText ?? el.textContent ?? '').replace(/\u00a0/g, ' ').replace(/\r?\n/g, ' ');
 }
@@ -243,6 +263,10 @@ class TableInstance implements WidgetInstance {
       document.execCommand('insertText', false, text.replace(/\r?\n/g, ' '));
     });
     cell.addEventListener('drop', (e) => e.preventDefault());
+    // no native rich formatting (Cmd+U, context menu Bold…): cells hold plain markdown
+    cell.addEventListener('beforeinput', (e) => {
+      if (e.inputType.startsWith('format')) e.preventDefault();
+    });
     cell.addEventListener('keydown', (e) => {
       keyed = true;
       this.onKey(e, cell, pos());
@@ -363,6 +387,22 @@ class TableInstance implements WidgetInstance {
       else this.structural((m) => [insertRow(m, nrows), { r: nrows, c: p.c }]);
       return;
     }
+    if (mod && !e.shiftKey && !e.altKey && (e.key === 'a' || e.key === 'A')) {
+      // Select the cell, not the whole document (the cell is a nested editing host).
+      handled();
+      const r = document.createRange();
+      r.selectNodeContents(cell);
+      const s = window.getSelection();
+      s?.removeAllRanges();
+      s?.addRange(r);
+      return;
+    }
+    if (mod && !e.shiftKey && !e.altKey && (e.key === 'b' || e.key === 'i' || e.key === 'B' || e.key === 'I')) {
+      // Markdown emphasis instead of the browser's <b>/<i> (which the model can't see).
+      handled();
+      this.wrapSelection(cell, e.key.toLowerCase() === 'b' ? '**' : '*');
+      return;
+    }
     if (mod && e.shiftKey && (e.key === 'Backspace' || e.key === 'Delete')) {
       handled();
       this.deleteRowAt();
@@ -416,6 +456,28 @@ class TableInstance implements WidgetInstance {
         handled();
         this.ctx.onExit('down');
         return;
+    }
+  }
+
+  /** Toggle `marker` around the selection (or insert an empty pair at the caret). */
+  private wrapSelection(cell: HTMLElement, marker: string) {
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount || !cell.contains(sel.anchorNode)) return;
+    const text = cell.textContent || '';
+    const start = textOffset(cell) ?? 0;
+    const selected = sel.toString();
+    const end = start + selected.length;
+    const m = marker.length;
+    const before = text.slice(Math.max(0, start - m), start);
+    const after = text.slice(end, end + m);
+    if (selected.length > 2 * m && selected.startsWith(marker) && selected.endsWith(marker)) {
+      document.execCommand('insertText', false, selected.slice(m, -m));
+    } else if (before === marker && after === marker && !(marker === '*' && (text[start - 2] === '*' || text[end + 1] === '*'))) {
+      selectRange(cell, start - m, end + m);
+      document.execCommand('insertText', false, selected);
+    } else {
+      document.execCommand('insertText', false, marker + selected + marker);
+      if (!selected) setCaret(cell, start + m);
     }
   }
 
