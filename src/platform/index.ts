@@ -11,6 +11,8 @@ export type { Shortcut } from './shortcuts';
 export interface PlatformExtras {
   /** Print the current window/document through the system dialog. */
   print(): Promise<void>;
+  /** Desktop: allow `assetUrl()` for one extra directory (non-recursive). Web: no-op. */
+  allowAssetDir(path: string): Promise<void>;
 }
 
 let instance: (Platform & PlatformExtras) | null = null;

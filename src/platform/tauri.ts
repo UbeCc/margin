@@ -125,6 +125,11 @@ export class TauriPlatform implements Platform {
     }
   }
 
+  /** Extra: let the webview load images from one more directory (non-recursive). */
+  allowAssetDir(path: string): Promise<void> {
+    return call('allow_asset_dir', { path });
+  }
+
   /** Not in the Platform contract yet: print the current window (system dialog). */
   print(): Promise<void> {
     return call('print_window');

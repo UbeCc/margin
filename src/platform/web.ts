@@ -518,6 +518,8 @@ export class WebPlatform implements Platform {
     if (!navigatorIsAutomated() && typeof document !== 'undefined') await printHtmlInIframe(html);
   }
 
+  async allowAssetDir(_path: string): Promise<void> {}
+
   async print(): Promise<void> {
     if (!navigatorIsAutomated()) window.print();
   }

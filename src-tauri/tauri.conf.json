@@ -30,7 +30,7 @@
     "security": {
       "csp": {
         "default-src": "'self' asset: http://asset.localhost",
-        "connect-src": "ipc: http://ipc.localhost",
+        "connect-src": "ipc: http://ipc.localhost asset: http://asset.localhost",
         "script-src": "'self'",
         "style-src": "'self' 'unsafe-inline' asset: http://asset.localhost",
         "img-src": "'self' asset: http://asset.localhost data: blob: https: http:",
