@@ -187,7 +187,12 @@ export interface Platform {
   saveFileDialog(opts?: { defaultPath?: string; filters?: { name: string; extensions: string[] }[] }): Promise<string | null>;
   /** Write HTML, or print given HTML to PDF at outPath. */
   exportHtml(html: string, outPath: string): Promise<void>;
-  exportPdf(html: string, outPath: string): Promise<void>;
+  /** baseDir: directory relative srcs resolve against (default: outPath's directory). */
+  exportPdf(html: string, outPath: string, opts?: { baseDir?: string }): Promise<void>;
+  /** Print the current window (system print dialog). */
+  print(): Promise<void>;
+  /** Allow the webview to load assets from dir (non-recursive), e.g. images outside the opened folder. */
+  allowAssetDir(dir: string): Promise<void>;
   loadSettings(): Promise<AppSettings>;
   saveSettings(s: AppSettings): Promise<void>;
   /** CSS texts of available themes, keyed by name (built-ins + user themes dir). */
