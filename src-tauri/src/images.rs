@@ -40,11 +40,10 @@ pub fn expand_dir(template: &str, doc_path: Option<&Path>, home: Option<&Path>) 
         .map(|s| s.to_string_lossy().into_owned())
         .unwrap_or_else(|| "untitled".into());
     let mut s = template.replace("${filename}", &stem);
-    if let Some(h) = home {
-        if s == "~" || s.starts_with("~/") {
+    if let Some(h) = home
+        && (s == "~" || s.starts_with("~/")) {
             s = format!("{}{}", h.to_string_lossy(), &s[1..]);
         }
-    }
     s
 }
 
