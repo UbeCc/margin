@@ -67,3 +67,12 @@ test('export HTML inlines the theme', async ({ page }) => {
   expect(html).toContain('<em>emphasis</em>');
   expect(html).not.toContain('md-meta');
 });
+
+test('preferences: Theme lists light themes, Dark theme lists dark ones', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'light' });
+  await boot(page);
+  await page.keyboard.press(`${MOD}+Comma`);
+  const values = (sel: string) => page.locator(sel).locator('option').evaluateAll((os) => os.map((o) => (o as HTMLOptionElement).value));
+  expect(await values('select[data-pref=theme]')).toEqual(['paper', 'github']);
+  expect(await values('select[data-pref=darkTheme]')).toEqual(['night']);
+});
