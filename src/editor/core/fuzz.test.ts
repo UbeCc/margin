@@ -24,6 +24,9 @@ const SEEDS = [
   '```js\ncode\n```\n\n$$\nx\n$$\n\n|a|b|\n|-|-|\n|1|2|\n',
   '- a\n\n  para\n\n- b\n',
   'a\r\nb\r\n\r\n- c\r\n',
+  // large documents exercise the windowed re-parse (Doc.replaceLocal, #33)
+  Array.from({ length: 12 }, (_, k) => `# H${k}\n\npara ${k}\nline\n\n- a\n- b\n  - c\n\n1. x\n2. y\n\n> q\n> r\n\n\`\`\`\ncode\n\`\`\`\n\n`).join(''),
+  Array.from({ length: 40 }, (_, k) => `p${k}\n\n`).join('') + '```\nunclosed\n\n' + Array.from({ length: 10 }, (_, k) => `q${k}\n\n`).join(''),
 ];
 
 function step(d: Doc, r: () => number, log: string[]): string {

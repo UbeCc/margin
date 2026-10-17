@@ -142,3 +142,31 @@ describe('Enter at the start of a heading (#58)', () => {
     }
   });
 });
+
+describe('windowed re-parse for structural edits in large documents (#33)', () => {
+  const big = Array.from({ length: 200 }, (_, k) => `para ${k}\n\n- item ${k}\n- b\n\n`).join('');
+  it('Enter / replace in the middle does not re-parse the whole document', () => {
+    const d = new Doc(big);
+    const full = d.reparse.bind(d);
+    let fulls = 0;
+    d.reparse = (md: string) => {
+      fulls++;
+      full(md);
+    };
+    const i = d.leaves.findIndex((l) => leafContent(l) === 'item 100');
+    const id = d.leaves[i + 5].id;
+    enter(d, i, 4);
+    d.replace(d.start(i), d.start(i), '# New\n\n');
+    expect(fulls).toBe(0);
+    expect(d.leaves.find((l) => l.id === id)).toBeTruthy();
+    ok(d);
+  });
+  it('falls back to a full re-parse when an unclosed fence swallows the rest', () => {
+    const d = new Doc(big);
+    const i = d.leaves.findIndex((l) => leafContent(l) === 'para 50');
+    d.replace(d.start(i), d.start(i), '```\n');
+    expect(d.leaves[i].type).toBe('code_fence');
+    expect(d.leaves.length).toBeLessThan(i + 3);
+    ok(d);
+  });
+});

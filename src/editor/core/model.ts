@@ -45,6 +45,17 @@ export class Doc {
   private starts: number[] | null = null;
   private byId = new Map<string, number>();
   private refsCache: Map<string, { href: string; title?: string }> | null = null;
+  private textCache: string | null = null;
+  private keySeq = 0;
+  /** Bumped on every structural change (set / re-parse): leaf list, types or containers changed. */
+  structRev = 0;
+  /** Bumped when the outline may have changed (structural change or a heading's text edited). */
+  outlineRev = 0;
+  /**
+   * Text replacements since the last `takeEdits()` (document coordinates at
+   * the time of each edit), or null once a re-parse made them unknown.
+   */
+  private journal: Edit[] | null = [];
 
   constructor(md = '') {
     this.set(md);
@@ -61,14 +72,37 @@ export class Doc {
   }
 
   text(): string {
-    return serializeLeaves(this.leaves);
+    return (this.textCache ??= serializeLeaves(this.leaves));
   }
 
+  /** Edits since the previous call; null = unknown (the caller must diff texts). */
+  takeEdits(): Edit[] | null {
+    const j = this.journal;
+    this.journal = [];
+    return j;
+  }
+
+  /** Full invalidation after the leaf list changed. */
   private touch(): void {
     this.starts = null;
     this.refsCache = null;
+    this.textCache = null;
+    this.journal = null;
+    this.structRev++;
+    this.outlineRev++;
     this.byId.clear();
     this.leaves.forEach((l, i) => this.byId.set(l.id, i));
+  }
+
+  /** Cheap invalidation after leaf `i`'s raw source changed in place (O(leaves) at most, no re-serialisation). */
+  private touchLocal(i: number, edit: Edit): void {
+    const l = this.leaves[i];
+    const delta = edit.after.length - edit.before.length;
+    if (this.starts) for (let k = i + 1; k < this.starts.length; k++) this.starts[k] += delta;
+    if (this.textCache !== null) this.textCache = this.textCache.slice(0, edit.from) + edit.after + this.textCache.slice(edit.to);
+    if (l.type === 'def') this.refsCache = null;
+    if (l.type === 'heading') this.outlineRev++;
+    this.journal?.push(edit);
   }
 
   indexOf(id: string): number {
@@ -137,21 +171,111 @@ export class Doc {
   replace(from: number, to: number, text: string): Edit {
     const old = this.text();
     const before = old.slice(from, to);
-    this.reparse(old.slice(0, from) + text + old.slice(to));
+    if (!this.replaceLocal(from, to, text)) this.reparse(old.slice(0, from) + text + old.slice(to));
     return { from, to, before, after: text };
+  }
+
+  /** Leaf index containing document offset `pos` (by leaf start). */
+  private leafAt(pos: number): number {
+    let lo = 0;
+    let hi = this.leaves.length - 1;
+    while (lo < hi) {
+      const mid = (lo + hi + 1) >> 1;
+      if (this.start(mid) <= pos) lo = mid;
+      else hi = mid - 1;
+    }
+    return lo;
+  }
+
+  /**
+   * A top-level leaf right after a blank line: the parser state there (no open
+   * containers, no open paragraph / fence, no list to continue) is the same as
+   * at the document start, so parsing can restart at it.
+   */
+  private restartable(k: number): boolean {
+    const l = this.leaves[k];
+    const p = this.leaves[k - 1];
+    return !!l && !!p && l.chain.length === 0 && p.lines.length > p.n && l.type !== 'front_matter';
+  }
+
+  /**
+   * Re-parse only the window of leaves around [from, to] between two restart
+   * points (#33). Returns false when the window is unbounded or the leaf after
+   * it would parse differently (e.g. an unclosed fence), so the caller falls
+   * back to a full re-parse.
+   */
+  private replaceLocal(from: number, to: number, text: string): boolean {
+    const n = this.leaves.length;
+    if (n < 32) return false;
+    const i0 = this.leafAt(from);
+    const i1 = this.leafAt(to);
+    let s = i0;
+    while (s > 0 && i0 - s < 512 && !this.restartable(s)) s--;
+    if (!this.restartable(s)) return false;
+    let e = i1 + 1;
+    while (e < n && e - i1 < 512 && !this.restartable(e)) e++;
+    if (e < n && !this.restartable(e)) return false;
+    const old = this.text();
+    const ws = this.start(s);
+    const we = this.start(e);
+    const win = old.slice(ws, from) + text + old.slice(to, we);
+    const check = e < n ? this.leaves[e] : null;
+    const parsed = parseBlocks(win + (check ? leafRaw(check) : ''), (this.keySeq += 1_000_000));
+    if (check) {
+      const last = parsed.pop();
+      const same =
+        !!last &&
+        last.type === check.type &&
+        last.chain.length === 0 &&
+        last.n === check.n &&
+        last.level === check.level &&
+        !!last.setext === !!check.setext &&
+        last.lang === check.lang &&
+        leafRaw(last) === leafRaw(check) &&
+        last.lines.every((x, k) => x.prefix === check.lines[k].prefix);
+      if (!same) return false;
+    }
+    // A window must not end in a leaf that would absorb following lines.
+    if (check && parsed.length && parsed[parsed.length - 1].lines.length === parsed[parsed.length - 1].n) return false;
+    const next = this.reconcile(this.leaves.slice(s, e), parsed);
+    this.leaves.splice(s, e - s, ...next);
+    // incremental bookkeeping (no full re-serialisation)
+    const delta = text.length - (to - from);
+    if (this.starts) {
+      const st: number[] = [];
+      let p = ws;
+      for (const l of next) {
+        st.push(p);
+        p += leafRaw(l).length;
+      }
+      const rest = this.starts.slice(e).map((x) => x + delta);
+      this.starts = [...this.starts.slice(0, s), ...st, ...rest];
+    }
+    this.textCache = old.slice(0, from) + text + old.slice(to);
+    this.refsCache = null;
+    this.journal?.push({ from, to, before: old.slice(from, to), after: text });
+    this.structRev++;
+    this.outlineRev++;
+    this.byId.clear();
+    this.leaves.forEach((l, i) => this.byId.set(l.id, i));
+    return true;
   }
 
   /** Re-parse `md` and reconcile ids with the current leaves. */
   reparse(md: string): void {
-    const next = parseBlocks(md);
-    const old = this.leaves;
+    this.leaves = this.reconcile(this.leaves, parseBlocks(md));
+    this.touch();
+  }
+
+  /** Give `next` the ids of matching `old` leaves (common prefix / suffix, then positional by type). */
+  private reconcile(old: Leaf[], next: ParsedLeaf[]): Leaf[] {
     const key = (l: ParsedLeaf) => l.type + '\u0000' + leafRaw(l);
     let p = 0;
     while (p < old.length && p < next.length && key(old[p]) === key(next[p])) p++;
     let s = 0;
     while (s < old.length - p && s < next.length - p && key(old[old.length - 1 - s]) === key(next[next.length - 1 - s])) s++;
     const used = new Set<string>();
-    this.leaves = next.map((l, j) => {
+    return next.map((l, j) => {
       let id: string | undefined;
       if (j < p) id = old[j].id;
       else if (j >= next.length - s) id = old[old.length - (next.length - j)].id;
@@ -163,7 +287,6 @@ export class Doc {
       used.add(id);
       return { ...l, id };
     });
-    this.touch();
   }
 
   /**
@@ -187,14 +310,16 @@ export class Doc {
     }
     l.lines = [...lines, ...extra, ...trail];
     l.n = lines.length;
+    const newRaw = leafRaw(l);
+    const edit = { from, to: from + oldRaw.length, before: oldRaw, after: newRaw };
     if (!content && l.type === 'heading' && !l.setext) {
       // Last `#` deleted: an empty ATX heading is an empty paragraph (kept as caret target).
       l.type = 'paragraph';
       delete l.level;
+      this.outlineRev++;
+      this.structRev++;
     }
-    this.touch();
-    const newRaw = leafRaw(l);
-    const edit = { from, to: from + oldRaw.length, before: oldRaw, after: newRaw };
+    this.touchLocal(i, edit);
     // A filled blank leaf may leave (or join) the containers it was parsed into.
     const regroup = wasEmpty && l.chain.length > 0 && !HOLD_RE.test(content.split('\n')[0]);
     if (regroup || this.containerSyntaxChanged(l, oldTexts) || this.needsReparse(l, content)) this.reparse(this.text());
