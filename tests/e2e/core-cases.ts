@@ -135,7 +135,7 @@ export function coreCases(): void {
             }),
           );
       });
-      expect(await md(page)).toBe("x## T\n\na **b**\n\n- c\n");
+      expect(await md(page)).toBe("x\n\n## T\n\na **b**\n\n- c\n");
     });
 
     test("exec: heading, strong, block quote, find/replace, stats, html", async ({

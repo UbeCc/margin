@@ -44,8 +44,24 @@ export class History {
     this.seal = true;
   }
 
-  record(textBefore: string, textAfter: string, selBefore: Sel, selAfter: Sel, key: string | null, now = Date.now()): void {
-    const d = diff(textBefore, textAfter);
+  /**
+   * Record the change textBefore → textAfter. `hint` (a known replaced region,
+   * e.g. one leaf's source) bounds the diff so typing stays O(edited block).
+   */
+  record(
+    textBefore: string,
+    textAfter: string,
+    selBefore: Sel,
+    selAfter: Sel,
+    key: string | null,
+    now = Date.now(),
+    hint?: { from: number; before: string; after: string },
+  ): void {
+    let d: { from: number; before: string; after: string } | null;
+    if (hint) {
+      const r = diff(hint.before, hint.after);
+      d = r && { ...r, from: r.from + hint.from };
+    } else d = diff(textBefore, textAfter);
     if (!d) return;
     this.redos = [];
     const last = this.undos[this.undos.length - 1];

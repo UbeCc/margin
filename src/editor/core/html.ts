@@ -8,14 +8,29 @@ import { leafContent, widgetRaw } from './model';
 import type { Container, Leaf } from './types';
 import { parseInline, type INode } from './parser/inline';
 import { splitBlockMeta, type InlineCtx } from './render-inline';
+import { sanitizeHtml, isSafeUrl } from '../blocks/sanitize';
 
 export const esc = (s: string) =>
   s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 
 const TAG: Record<string, string> = { em: 'em', strong: 'strong', del: 'del', mark: 'mark', code: 'code' };
 
+/** Dangerous schemes (`javascript:`, `vbscript:`, `data:` documents, control-char obfuscation) → '#'. */
 function safeHref(h: string): string {
-  return /^\s*javascript:/i.test(h) ? '#' : h;
+  return isSafeUrl(h, 'href') ? h : '#';
+}
+
+const hasHtml = (ns: INode[]): boolean => ns.some((n) => n.k === 'html' || (n.k === 'wrap' && hasHtml(n.ch)));
+
+/**
+ * Inline HTML of a text block. Raw inline HTML in the source (`<img onerror>`,
+ * `<a href="javascript:">`) is passed through the blocks' allowlist sanitizer
+ * (fixed-point, mXSS-safe) together with the rest of the block (#41).
+ */
+export function blockInlineHTML(src: string, ctx: InlineCtx): string {
+  const ns = parseInline(src, ctx.refs);
+  const out = inlineHTML(ns, ctx);
+  return hasHtml(ns) && typeof DOMParser !== 'undefined' ? sanitizeHtml(out) : out;
 }
 
 export function inlineHTML(nodes: INode[], ctx: InlineCtx): string {
@@ -37,6 +52,7 @@ export function inlineHTML(nodes: INode[], ctx: InlineCtx): string {
         s += esc(n.ch);
         break;
       case 'image':
+        if (!isSafeUrl(n.src, 'src')) break;
         s += `<img src="${esc(ctx.resolveAsset(n.src))}" alt="${esc(n.alt)}"${n.title ? ` title="${esc(n.title)}"` : ''}>`;
         break;
       case 'math': {
@@ -69,10 +85,10 @@ function leafHTML(l: Leaf, ctx: InlineCtx, widgetHTML: (l: Leaf) => string | nul
   const c = leafContent(l);
   switch (l.type) {
     case 'paragraph':
-      return c.trim() ? `<p>${inlineHTML(parseInline(c.replace(/^[ \t]+/gm, ''), ctx.refs), ctx)}</p>` : '';
+      return c.trim() ? `<p>${blockInlineHTML(c.replace(/^[ \t]+/gm, ''), ctx)}</p>` : '';
     case 'heading': {
       const body = splitBlockMeta(l, c)[1].trim();
-      return `<h${l.level} id="${esc(l.id)}">${inlineHTML(parseInline(body, ctx.refs), ctx)}</h${l.level}>`;
+      return `<h${l.level} id="${esc(l.id)}">${blockInlineHTML(body, ctx)}</h${l.level}>`;
     }
     case 'hr':
       return '<hr>';
@@ -82,7 +98,7 @@ function leafHTML(l: Leaf, ctx: InlineCtx, widgetHTML: (l: Leaf) => string | nul
       return '';
     case 'footnote': {
       const [pre, body] = splitBlockMeta(l, c);
-      return `<div class="md-footnote"><sup>${esc(pre.replace(/[[\]^:\s]/g, ''))}</sup> ${inlineHTML(parseInline(body, ctx.refs), ctx)}</div>`;
+      return `<div class="md-footnote"><sup>${esc(pre.replace(/[[\]^:\s]/g, ''))}</sup> ${blockInlineHTML(body, ctx)}</div>`;
     }
     default: {
       const h = widgetHTML(l);

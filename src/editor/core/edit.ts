@@ -44,6 +44,12 @@ function replaceLeaf(doc: Doc, i: number, lines: Line[], off: number): Caret {
   return { pos: posIn(lines, s, off) };
 }
 
+/** Move `pos` into the content of the leaf it falls in (the split-off text may start with block syntax). */
+function snap(doc: Doc, pos: number): Caret {
+  const at = doc.locate(pos);
+  return { pos: doc.docPos(at.i, at.off) };
+}
+
 function widgetCaret(doc: Doc, pos: number, at: 'start' | 'end'): Caret {
   const { i } = doc.locate(pos);
   const l = doc.leaves[i];
@@ -57,8 +63,10 @@ export function enter(doc: Doc, i: number, off: number, soft = false): Caret {
   const E = doc.eol;
   const p = contPrefix(l.chain);
   if (soft && l.type !== 'heading' && l.type !== 'hr') {
+    const base = doc.start(i);
     doc.setContent(i, c.slice(0, off) + '\n' + c.slice(off));
-    return { pos: doc.docPos(i, off + 1) };
+    // `l` keeps its new lines even when setContent re-parsed the document
+    return snap(doc, posIn(l.lines, base, off + 1));
   }
   const before = c.slice(0, off);
   const after = c.slice(off);
@@ -78,6 +86,29 @@ export function enter(doc: Doc, i: number, off: number, soft = false): Caret {
       return widgetCaret(doc, s, 'start');
     }
   }
+  if (l.type === 'heading' && l.setext && !soft) {
+    // Enter in a setext heading: the text after the caret becomes a new
+    // paragraph *below the underline* (never split the text from it).
+    const k = c.lastIndexOf('\n');
+    if (off <= k) {
+      const pb = contPrefix(l.chain, true);
+      const j = (t: string) => t.split('\n').join(E + p);
+      const head = c.slice(0, off).replace(/[ \t]+$/, '');
+      const rest = c.slice(off, k).replace(/^[ \t]+/, '');
+      const s0 = doc.docPos(i, 0);
+      const pre = (head ? j(head) + E + p : '') + c.slice(k + 1) + E + pb + E + p;
+      doc.replace(s0, doc.docPos(i, c.length), head ? pre + j(rest) : j(rest) + E + pb + E + p);
+      return snap(doc, head ? s0 + pre.length : s0);
+    }
+  }
+  if (l.type === 'heading' && !l.setext && !l.chain.length && c.trim() && off <= splitBlockMeta(l, c)[0].length) {
+    // Enter at the start of a heading: open an empty paragraph above, keep the heading.
+    const prev = doc.leaves[i - 1];
+    const s0 = doc.start(i);
+    doc.replace(s0, s0, prev && prev.lines.length === prev.n ? E + E : E);
+    const j = doc.indexOf(l.id);
+    return { pos: doc.docPos(j >= 0 ? j : i + 1, off) };
+  }
   const inner = l.chain[l.chain.length - 1];
   if (inner && !c.trim() && isTextType(l.type)) return exitContainer(doc, i);
   const pos = doc.docPos(i, off);
@@ -86,7 +117,7 @@ export function enter(doc: Doc, i: number, off: number, soft = false): Caret {
     if (inner.task !== null) mk += '[ ] ';
     const ins = E + contPrefix(l.chain.slice(0, -1)) + mk;
     doc.replace(pos, pos, ins);
-    return { pos: pos + ins.length };
+    return snap(doc, pos + ins.length);
   }
   if (l.type === 'indented_code') {
     const line = c.slice(0, off).split('\n').pop()!;
@@ -94,14 +125,15 @@ export function enter(doc: Doc, i: number, off: number, soft = false): Caret {
     doc.replace(pos, pos, ins);
     return { pos: pos + ins.length };
   }
-  const ins = E + contPrefix(l.chain, true) + E + p;
-  if (l.type === 'hr') {
-    const end = doc.docPos(i, c.length);
-    doc.replace(end, end, ins);
-    return { pos: end + ins.length };
-  }
-  doc.replace(pos, pos, ins);
-  return { pos: pos + ins.length };
+  // A blank paragraph needs no separator line: the next blank line is a new block.
+  const ins = l.type === 'paragraph' && !c.trim() ? E + p : E + contPrefix(l.chain, true) + E + p;
+  // At the very end of a document without a final newline the new empty
+  // line needs its own line ending, else it parses as a trailing blank line.
+  const last = l.lines[l.lines.length - 1];
+  const tail = i === doc.leaves.length - 1 && l.lines.length === l.n && !last.eol && (l.type === 'hr' || off === c.length) ? E : '';
+  const at = l.type === 'hr' ? doc.docPos(i, c.length) : pos;
+  doc.replace(at, at, ins + tail);
+  return snap(doc, at + ins.length);
 }
 
 /** Enter on an empty item/quote line: outdent a nested item, else leave the container as an empty paragraph. */
@@ -115,10 +147,19 @@ function exitContainer(doc: Doc, i: number): Caret {
   const sep = prev && prev.lines.length === prev.n ? contPrefix(outer, true) + E : '';
   const last = l.lines[l.n - 1];
   const trail = l.lines.slice(l.n).map((x) => x.prefix + x.text + x.eol).join('');
-  const rep = sep + contPrefix(outer) + (last.eol || (i + 1 < doc.leaves.length ? E : '')) + trail;
-  const s = doc.start(i);
-  doc.replace(s, s + leafRaw(l).length, rep);
-  return { pos: s + sep.length + contPrefix(outer).length };
+  // the emptied line always needs a line ending (a final empty line would vanish)
+  const rep = sep + contPrefix(outer) + (last.eol || E) + trail;
+  let s = doc.start(i);
+  // `> a⏎⏎`: the `>` separator line left in the quote becomes a plain blank line
+  const inner = l.chain[l.chain.length - 1];
+  let lead = '';
+  if (inner.kind === 'quote' && prev && prev.lines.length > prev.n && prev.chain[l.chain.length - 1] === inner) {
+    const old = prev.lines.slice(prev.n);
+    lead = old.map((x) => contPrefix(outer, true) + x.eol).join('');
+    s -= old.reduce((n, x) => n + x.prefix.length + x.text.length + x.eol.length, 0);
+  }
+  doc.replace(s, doc.start(i) + leafRaw(l).length, lead + rep);
+  return { pos: s + lead.length + sep.length + contPrefix(outer).length };
 }
 
 /** Strip the innermost container's syntax from every line of leaf `i`. */
@@ -130,7 +171,12 @@ export function dropContainer(doc: Doc, i: number, off: number): Caret {
   const lines = l.lines.map((ln, k) => {
     let prefix = ln.prefix;
     if (inner.kind === 'quote') prefix = prefix.replace(/ {0,3}>[ \t]?$/, '');
-    else if (k === 0 && opened) prefix = prefix.replace(MARKER_RE, '').replace(/ {0,3}$/, '');
+    else if (k === 0 && opened) {
+      const before = prefix.replace(MARKER_RE, '');
+      const t = before.replace(/ {0,3}$/, '');
+      // keep the space that belongs to an enclosing `> `
+      prefix = t.endsWith('>') && before.length > t.length ? t + ' ' : t;
+    }
     else prefix = prefix.replace(new RegExp(` {0,${inner.width}}$`), '');
     return { ...ln, prefix };
   });
@@ -191,33 +237,38 @@ export function del(doc: Doc, i: number, off: number): Caret | null {
   return { pos: from };
 }
 
-/** Tab / Shift+Tab inside a list item. Null when leaf `i` is not a list item. */
+/**
+ * Tab / Shift+Tab inside a list item: the item moves together with its whole
+ * subtree (nested items, continuation paragraphs, code…) (#34). Null when leaf
+ * `i` is not a list item.
+ */
 export function indent(doc: Doc, i: number, off: number, out: boolean): Caret | null {
   const l = doc.leaves[i];
   const items = l.chain.filter((x): x is ItemContainer => x.kind === 'item');
   const item = items[items.length - 1];
   if (!item || l.chain[l.chain.length - 1] !== item) return null;
   const opened = l.openFrom <= l.chain.length - 1;
-  if (out) {
-    const parent = items[items.length - 2];
-    if (!parent) return dropContainer(doc, i, off);
-    const lines = l.lines.map((ln, k) => {
-      const cut = k === 0 && opened ? ln.prefix.search(MARKER_RE) : ln.prefix.length - item.width;
-      if (cut < 0) return ln;
-      const before = ln.prefix.slice(0, cut);
-      const m = new RegExp(` {1,${parent.width}}$`).exec(before);
-      return m ? { ...ln, prefix: before.slice(0, m.index) + ln.prefix.slice(cut) } : ln;
-    });
-    return replaceLeaf(doc, i, lines, off);
-  }
-  if (item.index === 0 || !opened) return { pos: doc.docPos(i, off) };
+  const parent = items[items.length - 2];
+  if (out && !parent) return dropContainer(doc, i, off);
+  if (!out && (item.index === 0 || !opened)) return { pos: doc.docPos(i, off) };
+  // column where this item's own syntax starts (marker on its first line)
+  const base = opened ? l.lines[0].prefix.search(MARKER_RE) : l.lines[0].prefix.length - item.width;
+  if (base < 0) return { pos: doc.docPos(i, off) };
+  let j = i + 1;
+  while (j < doc.leaves.length && doc.leaves[j].chain.includes(item)) j++;
   const pad = ' '.repeat(item.width);
-  const lines = l.lines.map((ln, k) => {
-    const cut = k === 0 ? ln.prefix.search(MARKER_RE) : ln.prefix.length - item.width;
-    if (cut < 0 || (k >= l.n && !ln.text)) return ln;
-    return { ...ln, prefix: ln.prefix.slice(0, cut) + pad + ln.prefix.slice(cut) };
-  });
-  return replaceLeaf(doc, i, lines, off);
+  const shift = (ln: Line): Line => {
+    const pre = ln.prefix;
+    // lazy continuation / short blank lines carry no indentation of this item
+    if (pre.length < base + item.width) return ln;
+    if (!out) return { ...ln, prefix: pre.slice(0, base) + pad + pre.slice(base) };
+    const m = new RegExp(` {1,${parent!.width}}$`).exec(pre.slice(0, base));
+    return m ? { ...ln, prefix: pre.slice(0, m.index) + pre.slice(base) } : ln;
+  };
+  const s0 = doc.start(i);
+  const groups = doc.leaves.slice(i, j).map((x) => x.lines.map(shift));
+  doc.replace(s0, doc.start(j), groups.map(raw).join(''));
+  return snap(doc, posIn(groups[0], s0, off));
 }
 
 /** Toggle the task checkbox shown on leaf `i`. */

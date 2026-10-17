@@ -119,12 +119,30 @@ export function attachInput(ed: EditorCore): () => void {
     }, 0);
   };
 
+  /** Mod+Z / Mod+Shift+Z / Mod+Y? */
+  const isHistKey = (e: KeyboardEvent) => (e.metaKey || e.ctrlKey) && !e.altKey && /^[zZyY]$/.test(e.key);
+
+  /**
+   * Undo/redo inside a widget uses the one document history (every widget edit
+   * is recorded there synchronously), not the widget's local history, which
+   * goes stale as soon as the document history moves (#55). Capture phase so
+   * the widget's own keymap never sees the key.
+   */
+  const onKeyDownCapture = (e: KeyboardEvent) => {
+    if (!inWidget(e.target) || !isHistKey(e) || e.isComposing || e.keyCode === 229) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.key === 'y' || e.key === 'Y' || e.shiftKey) redo(ed);
+    else undo(ed);
+  };
+
   const onKeyDown = (e: KeyboardEvent) => {
-    if (inWidget(e.target) || e.isComposing || ed.composing || e.keyCode === 229) return;
     const mod = e.metaKey || e.ctrlKey;
-    if (mod && !e.altKey && (e.key === 'z' || e.key === 'Z' || e.key === 'y')) {
+    const histKey = isHistKey(e);
+    if (inWidget(e.target) || e.isComposing || ed.composing || e.keyCode === 229) return;
+    if (histKey) {
       e.preventDefault();
-      if (e.key === 'y' || e.shiftKey) redo(ed);
+      if (e.key === 'y' || e.key === 'Y' || e.shiftKey) redo(ed);
       else undo(ed);
       return;
     }
@@ -190,7 +208,16 @@ export function attachInput(ed: EditorCore): () => void {
       e.preventDefault();
       const b = ed.view.blockOf(t);
       const i = b ? ed.doc.indexOf(b.id) : -1;
-      if (i >= 0) ed.change(() => void E.toggleTask(ed.doc, i));
+      if (i < 0) return;
+      // mousedown was prevented, so the editor may not have focus: give it focus
+      // and a caret in the task so Cmd+Z / typing work right after the click.
+      const focused = document.activeElement === root;
+      const id = ed.doc.leaves[i].id;
+      ed.change(() => {
+        E.toggleTask(ed.doc, i);
+        const j = ed.doc.indexOf(id);
+        return focused || j < 0 ? undefined : { pos: ed.doc.docPos(j, leafContent(ed.doc.leaves[j]).length) };
+      });
       return;
     }
     const link = t.closest?.('.md-link') as HTMLElement | null;
@@ -232,6 +259,7 @@ export function attachInput(ed: EditorCore): () => void {
     [root, 'compositionstart', onCompStart as EventListener],
     [root, 'compositionend', onCompEnd as EventListener],
     [root, 'keydown', onKeyDown as EventListener],
+    [root, 'keydown', onKeyDownCapture as EventListener, true],
     [root, 'mousedown', onMouseDown as EventListener],
     [root, 'click', onClick as EventListener],
     [root, 'copy', ((e: ClipboardEvent) => !inWidget(e.target) && onCopy(ed, e, false)) as EventListener],
@@ -240,9 +268,9 @@ export function attachInput(ed: EditorCore): () => void {
     [root, 'drop', ((e: DragEvent) => !inWidget(e.target) && onDrop(ed, e)) as EventListener],
     [document, 'selectionchange', onSelChange],
   ];
-  for (const [t, n, f] of L) t.addEventListener(n, f);
+  for (const [t, n, f, c] of L) t.addEventListener(n, f, !!c);
   return () => {
-    for (const [t, n, f] of L) t.removeEventListener(n, f);
+    for (const [t, n, f, c] of L) t.removeEventListener(n, f, !!c);
   };
 }
 

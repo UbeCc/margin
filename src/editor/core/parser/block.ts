@@ -31,13 +31,14 @@ export function interrupts(s: string, col = 0): boolean {
 
 const isBlankLeaf = (l: ParsedLeaf) => l.type === 'paragraph' && l.n === 1 && isBlank(l.lines[0].text);
 
-export function parseBlocks(src: string): ParsedLeaf[] {
+/** `keyBase` offsets container keys (local re-parse of a window must not reuse keys). */
+export function parseBlocks(src: string, keyBase = 0): ParsedLeaf[] {
   const raw = splitLines(src);
   const leaves: ParsedLeaf[] = [];
   const open: Container[] = [];
   const lastItem: (ItemContainer | null)[] = [];
   const lastParent: number[] = [];
-  let key = 0;
+  let key = keyBase;
   let cur: Cur | null = null;
   let last: ParsedLeaf | null = null;
   let start = 0;

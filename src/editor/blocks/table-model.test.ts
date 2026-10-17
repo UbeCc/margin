@@ -64,11 +64,39 @@ describe('serializeTable', () => {
     expect(serializeTable(t, cloneModel(t))).toBe(raw);
   });
 
-  it('reformats into an aligned pipe table after an edit', () => {
+  it('re-formats the whole table on column-level changes', () => {
     const t = parseTable('|a|b|\n|:-:|-:|\n|1|2|\n\n');
+    const m = setAlign(cloneModel(t), 0, 'left');
+    m.rows[1][0] = 'longer';
+    expect(serializeTable(t, m)).toBe(['| a      |   b |', '| :----- | --: |', '| longer |   2 |'].join('\n') + '\n\n');
+  });
+
+  it('only rewrites the edited row of a compact table (#6)', () => {
+    const t = parseTable('|a|b|\n|:-:|-:|\n|1|2|\n|3|4|\n\n');
     const m = cloneModel(t);
     m.rows[1][0] = 'longer';
-    expect(serializeTable(t, m)).toBe(['|   a    |   b |', '| :----: | --: |', '| longer |   2 |'].join('\n') + '\n\n');
+    expect(serializeTable(t, m)).toBe('|a|b|\n|:-:|-:|\n|longer|2|\n|3|4|\n\n');
+    const s = parseTable('a | b\n--|--\n1 | 2\n');
+    const n = cloneModel(s);
+    n.rows[1][1] = 'x|y';
+    expect(serializeTable(s, n)).toBe('a | b\n--|--\n1 | x\\|y\n');
+  });
+
+  it('keeps untouched lines of an aligned table and pads edits to its widths (#6)', () => {
+    const src = '| h1  | h2  |\n| --- | --- |\n| a   | b   |\n| c   | d   |\n';
+    const t = parseTable(src);
+    expect(t.pretty).toBe(true);
+    let m = cloneModel(t);
+    m.rows[2][1] = 'x';
+    expect(serializeTable(t, m)).toBe(src.replace('| c   | d   |', '| c   | x   |'));
+    m.rows[2][1] = 'a much longer cell';
+    expect(serializeTable(t, m)).toBe(src.replace('| c   | d   |', '| c   | a much longer cell |'));
+    m = insertRow(cloneModel(t), 2);
+    expect(serializeTable(t, m)).toBe('| h1  | h2  |\n| --- | --- |\n| a   | b   |\n|     |     |\n| c   | d   |\n');
+    m = moveRow(deleteRow(cloneModel(t), 1), 1, 1);
+    expect(serializeTable(t, m)).toBe('| h1  | h2  |\n| --- | --- |\n| c   | d   |\n');
+    m = moveRow(cloneModel(t), 2, 1);
+    expect(serializeTable(t, m)).toBe('| h1  | h2  |\n| --- | --- |\n| c   | d   |\n| a   | b   |\n');
   });
 
   it('uses display width for CJK and keeps indent', () => {
@@ -76,7 +104,12 @@ describe('serializeTable', () => {
     const t = parseTable('  |名前|x|\n  |-|-|\n');
     const m = cloneModel(t);
     m.rows[0][1] = 'y';
-    expect(serializeTable(t, m)).toBe('  | 名前 | y   |\n  | ---- | --- |\n');
+    expect(serializeTable(t, m)).toBe('  |名前|y|\n  |-|-|\n');
+    expect(formatTable(m, '  ')).toBe('  | 名前 | y   |\n  | ---- | --- |');
+    const p = parseTable('| 名前 | x   |\n| ---- | --- |\n| a    | b   |\n');
+    const n = cloneModel(p);
+    n.rows[1][0] = '漢';
+    expect(serializeTable(p, n)).toBe('| 名前 | x   |\n| ---- | --- |\n| 漢   | b   |\n');
   });
 
   it('escapes pipes and flattens newlines in cells', () => {
@@ -122,5 +155,29 @@ describe('structural edits', () => {
   });
   it('emptyTable', () => {
     expect(formatTable(emptyTable(2, 2))).toBe('|     |     |\n| --- | --- |\n|     |     |');
+  });
+});
+
+describe('clipboard grids', () => {
+  it('parses TSV, markdown tables and consistent CSV; plain text is not a grid', async () => {
+    const { parseClipboardGrid } = await import('./table-model');
+    expect(parseClipboardGrid('x\ty\nz\tw\n')).toEqual([['x', 'y'], ['z', 'w']]);
+    expect(parseClipboardGrid('a\tb')).toEqual([['a', 'b']]);
+    expect(parseClipboardGrid('|h|i|\n|-|-|\n|1|2|\n')).toEqual([['h', 'i'], ['1', '2']]);
+    expect(parseClipboardGrid('name,qty\n"apple, red",3\r\n')).toEqual([['name', 'qty'], ['apple, red', '3']]);
+    expect(parseClipboardGrid('hello, world')).toBeNull();
+    expect(parseClipboardGrid('line one, a\nline two')).toBeNull();
+    expect(parseClipboardGrid('plain')).toBeNull();
+  });
+  it('pastes at a position and grows the table', async () => {
+    const { pasteGrid } = await import('./table-model');
+    const t = parseTable('|a|b|\n|-|-|\n|1|2|\n');
+    const m = pasteGrid(cloneModel(t), 1, 1, [['x', 'y'], ['z', 'w|v']]);
+    expect(m.rows).toEqual([['a', 'b', ''], ['1', 'x', 'y'], ['', 'z', 'w|v']]);
+    expect(serializeTable(t, m)).toBe('| a   | b   |      |\n| --- | --- | ---- |\n| 1   | x   | y    |\n|     | z   | w\\|v |\n');
+  });
+  it('renders \\| inside code spans as a pipe', async () => {
+    const { unescapeCellPipes } = await import('./table');
+    expect(unescapeCellPipes('`a\\|b` c \\| d \\\\ e')).toBe('`a|b` c | d \\\\ e');
   });
 });

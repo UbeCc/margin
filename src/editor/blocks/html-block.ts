@@ -35,8 +35,9 @@ export function createHtmlBlockWidget(): BlockWidget {
       });
     },
     renderHTML(p) {
-      // Export the author's HTML verbatim (it's their document), like other md→html converters.
-      return p.body;
+      // Exported HTML is opened in browsers / printed to PDF: run it through the same
+      // allowlist as the preview so scripts and event handlers never reach the file (#8).
+      return sanitizeHtml(p.body);
     },
   });
 }
