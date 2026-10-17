@@ -63,5 +63,7 @@ test('export HTML inlines the theme', async ({ page }) => {
   const html = await page.evaluate(() => window.__MARGIN_WEB__!.exports[0].html);
   expect(html).toContain('<title>Welcome to Margin</title>');
   expect(html).toContain('--margin-accent');
-  expect(html).toContain('<h1 id="h-0">Welcome to Margin</h1>');
+  expect(html).toMatch(/<h1 id="[^"]+">Welcome to Margin<\/h1>/);
+  expect(html).toContain('<em>emphasis</em>');
+  expect(html).not.toContain('md-meta');
 });
