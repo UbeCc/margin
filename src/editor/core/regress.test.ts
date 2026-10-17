@@ -111,3 +111,34 @@ describe('model follows container syntax changed by content edits (#53)', () => 
     ok(d);
   });
 });
+
+describe('leaving a block quote with Enter on an empty quote line (#58)', () => {
+  it('does not leave a dangling `>` line', () => {
+    const d = new Doc('> quoted');
+    let c = enter(d, 0, 6);
+    c = enter(d, (at(d, c) as { i: number }).i, 0);
+    expect(d.text()).toBe('> quoted\n\n\n');
+    expect(at(d, c)).toEqual({ i: 1, off: 0 });
+    ok(d);
+  });
+});
+
+describe('Enter at the start of a heading (#58)', () => {
+  it('opens an empty paragraph above and keeps the heading', () => {
+    for (const [src, out] of [
+      ['p\n\n# Head\n', 'p\n\n\n# Head\n'],
+      ['p\n# Head\n', 'p\n\n\n# Head\n'],
+      ['# Head\n', '\n# Head\n'],
+    ]) {
+      const d = new Doc(src);
+      const i = d.leaves.findIndex((l) => l.type === 'heading');
+      const c = enter(d, i, 2);
+      expect(d.text(), src).toBe(out);
+      const p = at(d, c) as { i: number; off: number };
+      expect(d.leaves[p.i].type, src).toBe('heading');
+      expect(p.off).toBe(2);
+      expect(d.leaves[p.i - 1].type).toBe('paragraph');
+      ok(d);
+    }
+  });
+});

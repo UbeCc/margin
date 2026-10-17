@@ -86,6 +86,14 @@ export function enter(doc: Doc, i: number, off: number, soft = false): Caret {
       return widgetCaret(doc, s, 'start');
     }
   }
+  if (l.type === 'heading' && !l.setext && !l.chain.length && c.trim() && off <= splitBlockMeta(l, c)[0].length) {
+    // Enter at the start of a heading: open an empty paragraph above, keep the heading.
+    const prev = doc.leaves[i - 1];
+    const s0 = doc.start(i);
+    doc.replace(s0, s0, prev && prev.lines.length === prev.n ? E + E : E);
+    const j = doc.indexOf(l.id);
+    return { pos: doc.docPos(j >= 0 ? j : i + 1, off) };
+  }
   const inner = l.chain[l.chain.length - 1];
   if (inner && !c.trim() && isTextType(l.type)) return exitContainer(doc, i);
   const pos = doc.docPos(i, off);
@@ -126,9 +134,17 @@ function exitContainer(doc: Doc, i: number): Caret {
   const trail = l.lines.slice(l.n).map((x) => x.prefix + x.text + x.eol).join('');
   // the emptied line always needs a line ending (a final empty line would vanish)
   const rep = sep + contPrefix(outer) + (last.eol || E) + trail;
-  const s = doc.start(i);
-  doc.replace(s, s + leafRaw(l).length, rep);
-  return { pos: s + sep.length + contPrefix(outer).length };
+  let s = doc.start(i);
+  // `> a⏎⏎`: the `>` separator line left in the quote becomes a plain blank line
+  const inner = l.chain[l.chain.length - 1];
+  let lead = '';
+  if (inner.kind === 'quote' && prev && prev.lines.length > prev.n && prev.chain[l.chain.length - 1] === inner) {
+    const old = prev.lines.slice(prev.n);
+    lead = old.map((x) => contPrefix(outer, true) + x.eol).join('');
+    s -= old.reduce((n, x) => n + x.prefix.length + x.text.length + x.eol.length, 0);
+  }
+  doc.replace(s, doc.start(i) + leafRaw(l).length, lead + rep);
+  return { pos: s + lead.length + sep.length + contPrefix(outer).length };
 }
 
 /** Strip the innermost container's syntax from every line of leaf `i`. */
