@@ -60,15 +60,16 @@ export function enter(doc: Doc, i: number, off: number, soft = false): Caret {
     doc.setContent(i, c.slice(0, off) + '\n' + c.slice(off));
     return { pos: doc.docPos(i, off + 1) };
   }
-  const atEnd = off === c.length && !c.includes('\n');
-  if (atEnd && l.type === 'paragraph') {
+  const before = c.slice(0, off);
+  const after = c.slice(off);
+  if (!c.includes('\n') && l.type === 'paragraph') {
     const s = doc.docPos(i, 0);
     const to = doc.docPos(i, c.length);
     let rep: string | null = null;
-    const f = /^( {0,3})(`{3,}|~{3,})([^`]*)$/.exec(c);
-    if (f && !(f[2][0] === '`' && f[3].includes('`'))) rep = c + E + p + E + p + f[1] + f[2];
-    else if (/^ {0,3}\$\$[ \t]*$/.test(c)) rep = c + E + p + E + p + '$$';
-    else if (/^ {0,3}\|.*\|[ \t]*$/.test(c) && !isDelimRow(c)) {
+    const f = /^( {0,3})(`{3,}|~{3,})([^`]*)$/.exec(before);
+    if (f && !(f[2][0] === '`' && f[3].includes('`'))) rep = before + E + p + after + E + p + f[1] + f[2];
+    else if (/^ {0,3}\$\$[ \t]*$/.test(before)) rep = before + E + p + after + E + p + '$$';
+    else if (!after && /^ {0,3}\|.*\|[ \t]*$/.test(c) && !isDelimRow(c)) {
       const n = Math.max(1, splitRow(c).length);
       rep = c + E + p + '|' + ' --- |'.repeat(n) + E + p + '|' + '   |'.repeat(n);
     }
@@ -78,7 +79,7 @@ export function enter(doc: Doc, i: number, off: number, soft = false): Caret {
     }
   }
   const inner = l.chain[l.chain.length - 1];
-  if (inner && !c.trim() && isTextType(l.type)) return dropContainer(doc, i, 0);
+  if (inner && !c.trim() && isTextType(l.type)) return exitContainer(doc, i);
   const pos = doc.docPos(i, off);
   if (inner?.kind === 'item' && l.type !== 'indented_code') {
     let mk = inner.ordered ? `${inner.number + 1}${inner.delim} ` : `${inner.delim} `;
@@ -101,6 +102,23 @@ export function enter(doc: Doc, i: number, off: number, soft = false): Caret {
   }
   doc.replace(pos, pos, ins);
   return { pos: pos + ins.length };
+}
+
+/** Enter on an empty item/quote line: outdent a nested item, else leave the container as an empty paragraph. */
+function exitContainer(doc: Doc, i: number): Caret {
+  const l = doc.leaves[i];
+  const outerItem = l.chain.slice(0, -1).some((x) => x.kind === 'item');
+  if (l.chain[l.chain.length - 1].kind === 'item' && outerItem) return indent(doc, i, 0, true)!;
+  const E = doc.eol;
+  const outer = l.chain.slice(0, -1);
+  const prev = doc.leaves[i - 1];
+  const sep = prev && prev.lines.length === prev.n ? contPrefix(outer, true) + E : '';
+  const last = l.lines[l.n - 1];
+  const trail = l.lines.slice(l.n).map((x) => x.prefix + x.text + x.eol).join('');
+  const rep = sep + contPrefix(outer) + (last.eol || (i + 1 < doc.leaves.length ? E : '')) + trail;
+  const s = doc.start(i);
+  doc.replace(s, s + leafRaw(l).length, rep);
+  return { pos: s + sep.length + contPrefix(outer).length };
 }
 
 /** Strip the innermost container's syntax from every line of leaf `i`. */

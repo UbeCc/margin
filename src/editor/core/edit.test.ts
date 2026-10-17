@@ -17,8 +17,11 @@ describe('enter', () => {
     expect(d.text()).toBe('- a\n- \n');
     expect(at(d, c)).toEqual({ i: 1, off: 0 });
     c = enter(d, 1, 0);
-    expect(d.text()).toBe('- a\n\n');
-    expect(d.leaves[1]?.chain.length ?? 0).toBe(0);
+    expect(d.text()).toBe('- a\n\n\n');
+    expect(at(d, c)).toEqual({ i: 1, off: 0 });
+    d.setContent(1, 'p');
+    expect(d.text()).toBe('- a\n\np\n');
+    expect(d.leaves[1].chain.length).toBe(0);
   });
   it('ordered + task markers continue', () => {
     const d = new Doc('1. a\n');

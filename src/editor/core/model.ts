@@ -189,7 +189,9 @@ export class Doc {
     this.touch();
     const newRaw = leafRaw(l);
     const edit = { from, to: from + oldRaw.length, before: oldRaw, after: newRaw };
-    if (this.needsReparse(l, content)) this.reparse(this.text());
+    // A filled blank leaf may leave (or join) the containers it was parsed into.
+    const regroup = wasEmpty && l.chain.length > 0 && !HOLD_RE.test(content.split('\n')[0]);
+    if (regroup || this.needsReparse(l, content)) this.reparse(this.text());
     return edit;
   }
 

@@ -62,6 +62,17 @@ export function fallbackWidget(type: WidgetBlockType): BlockWidget {
           const r = document.createRange();
           r.selectNodeContents(pre);
           r.collapse(at === 'start');
+          // inside the body of delimited blocks (after the opening fence / $$ line)
+          const t = pre.firstChild;
+          const nl = raw.indexOf('\n');
+          if (t && t.nodeType === 3 && nl >= 0 && /^ {0,3}(?:`{3,}|~{3,}|\$\$|---)/.test(raw)) {
+            const lines = raw.split('\n');
+            let close = raw.length;
+            for (let k = lines.length - 1; k > 0; k--) if (lines[k].trim()) { close = raw.length - lines.slice(k).join('\n').length; break; }
+            const o = at === 'start' ? nl + 1 : Math.max(nl + 1, close - 1);
+            r.setStart(t, Math.min(o, (t as Text).length));
+            r.collapse(true);
+          }
           const s = getSelection();
           s?.removeAllRanges();
           s?.addRange(r);
