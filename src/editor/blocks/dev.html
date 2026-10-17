@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Margin blocks — dev</title>
+    <style>
+      :root { --margin-fg: #24292f; --margin-bg: #fff; --margin-accent: #4a7cf7; --margin-code-bg: #f6f8fa; }
+      body.dark { --margin-fg: #d8dce3; --margin-bg: #1e2026; --margin-accent: #6e9bff; --margin-code-bg: #262a31; }
+      body { margin: 0; font: 16px/1.6 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: var(--margin-fg); background: var(--margin-bg); }
+      header { position: sticky; top: 0; z-index: 10; display: flex; gap: 8px; padding: 8px 16px; background: var(--margin-bg); border-bottom: 1px solid rgba(127,127,127,.25); }
+      main { max-width: 860px; margin: 0 auto; padding: 16px 24px 40vh; }
+      section { margin: 28px 0 40px; }
+      section > h2 { font-size: 15px; text-transform: uppercase; letter-spacing: .06em; opacity: .6; }
+      .raw { font: 12px/1.4 ui-monospace, Menlo, monospace; background: rgba(127,127,127,.08); padding: 6px 8px; white-space: pre-wrap; border-radius: 4px; margin: 6px 0 0; }
+      .log { font: 11px ui-monospace, Menlo, monospace; opacity: .7; min-height: 1em; }
+      #source-host { height: 260px; border: 1px solid rgba(127,127,127,.3); border-radius: 6px; overflow: hidden; }
+      #source-host .mb-source { height: 100%; }
+      #export-out { max-height: 300px; overflow: auto; }
+      p.fake-para { margin: 4px 0; padding: 4px 6px; border-radius: 4px; background: rgba(127,127,127,.06); }
+      p.fake-para.active { outline: 2px solid var(--margin-accent); }
+    </style>
+  </head>
+  <body>
+    <header>
+      <button id="theme-toggle" type="button">Toggle dark</button>
+      <button id="export" type="button">renderHTML()</button>
+      <span id="status" class="log"></span>
+    </header>
+    <main id="app"></main>
+    <script type="module" src="./dev.ts"></script>
+  </body>
+</html>

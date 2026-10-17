@@ -196,6 +196,7 @@ class TableInstance implements WidgetInstance {
   private bindCell(cell: HTMLElement) {
     const pos = (): Pos => ({ r: +cell.dataset.r!, c: +cell.dataset.c! });
     let clickOff: number | null = null;
+    let keyed = false; // a key was pressed before the deferred caret mapping ran
     cell.addEventListener('mousedown', (e) => {
       if (cell.classList.contains('mb-editing')) return;
       // rendered → raw switch happens on focus; remember where the user clicked
@@ -208,7 +209,8 @@ class TableInstance implements WidgetInstance {
       this.enterCell(cell, pos(), off ?? undefined);
       if (off !== null) {
         const raw = this.model.rows[pos().r][pos().c];
-        setTimeout(() => document.activeElement === cell && setCaret(cell, renderedToRawOffset(raw, off)), 0);
+        keyed = false;
+        setTimeout(() => !keyed && document.activeElement === cell && setCaret(cell, renderedToRawOffset(raw, off)), 0);
       }
     });
     cell.addEventListener('blur', () => this.leaveCell(cell, pos()));
@@ -223,7 +225,10 @@ class TableInstance implements WidgetInstance {
       document.execCommand('insertText', false, text);
     });
     cell.addEventListener('drop', (e) => e.preventDefault());
-    cell.addEventListener('keydown', (e) => this.onKey(e, cell, pos()));
+    cell.addEventListener('keydown', (e) => {
+      keyed = true;
+      this.onKey(e, cell, pos());
+    });
   }
 
   private enterCell(cell: HTMLElement, p: Pos, renderedOff?: number) {
