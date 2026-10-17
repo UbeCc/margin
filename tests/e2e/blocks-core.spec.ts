@@ -35,3 +35,33 @@ test.describe('table in the core', () => {
     await expect.poll(() => md(page)).toBe(`p\n\n${src.replace('| a   | b   |', '| aXYZW | b   |')}| n   |     |\n\nq\n`);
   });
 });
+
+test.describe('html block in the core', () => {
+  const VECTORS = [
+    '<img src=x onerror="window.__pwned=1">',
+    '<svg onload="window.__pwned=2"><circle r="1"/></svg>',
+    '<details open ontoggle="window.__pwned=3">x</details>',
+    '<math><mtext><table><mglyph><style><img src=x onerror="window.__pwned=4">',
+    '<svg></p><style><a id="</style><img src=1 onerror=window.__pwned=5>">',
+    '<noscript><p title="</noscript><img src=x onerror=window.__pwned=6>"></noscript>',
+    '<a href="javascript:window.__pwned=7" id="jsl">link</a>',
+    '<iframe srcdoc="<script>parent.__pwned=8</script>"></iframe>',
+    '<video><source onerror="window.__pwned=9"></video>',
+  ];
+  test('preview and export neutralize XSS vectors (#8)', async ({ page }) => {
+    const doc = 'top\n\n' + VECTORS.map((v) => `<div>\n${v}\n</div>\n`).join('\n') + '\nend\n';
+    await open(page, doc);
+    await expect(W(page, 'html_block', VECTORS.length - 1)).toBeVisible();
+    const hrefs = await page.locator('.mb-html-block a').evaluateAll((as) => as.map((a) => a.getAttribute('href')));
+    expect(hrefs.filter((h) => h && /javascript/i.test(h))).toEqual([]);
+    await page.waitForTimeout(300);
+    expect(await page.evaluate(() => (window as unknown as { __pwned?: number }).__pwned)).toBeUndefined();
+    const html = await page.evaluate(() => window.__core.ed.renderHTML());
+    expect(html).not.toMatch(/\son[a-z]+\s*=/i);
+    expect(html).not.toMatch(/javascript:|<script|<iframe|<style/i);
+    // the exported file itself must not execute anything either
+    await page.setContent(html);
+    await page.waitForTimeout(300);
+    expect(await page.evaluate(() => (window as unknown as { __pwned?: number }).__pwned)).toBeUndefined();
+  });
+});
