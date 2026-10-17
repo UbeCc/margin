@@ -136,19 +136,28 @@ pub fn ext_for(mime: Option<&str>, name: Option<&str>, data: &[u8]) -> &'static 
             }
         }
     }
-    // sniff magic bytes
+    sniff(data).unwrap_or("png")
+}
+
+/// Extension from magic bytes, if recognisable.
+pub fn sniff(data: &[u8]) -> Option<&'static str> {
     if data.starts_with(b"\x89PNG") {
-        "png"
+        Some("png")
     } else if data.starts_with(&[0xFF, 0xD8, 0xFF]) {
-        "jpg"
+        Some("jpg")
     } else if data.starts_with(b"GIF8") {
-        "gif"
+        Some("gif")
     } else if data.len() > 12 && &data[0..4] == b"RIFF" && &data[8..12] == b"WEBP" {
-        "webp"
+        Some("webp")
     } else if data.starts_with(b"BM") {
-        "bmp"
+        Some("bmp")
+    } else if data.len() > 12 && &data[4..8] == b"ftyp" && (&data[8..12] == b"avif" || &data[8..12] == b"avis") {
+        Some("avif")
+    } else if data.starts_with(b"II*\0") || data.starts_with(b"MM\0*") {
+        Some("tiff")
     } else {
-        "png"
+        let head = String::from_utf8_lossy(&data[..data.len().min(512)]).to_ascii_lowercase();
+        (head.contains("<svg")).then_some("svg")
     }
 }
 
@@ -290,6 +299,37 @@ pub fn store_image(
         None => dest.clone(),
     };
     Ok(Stored { src: to_markdown_src(&src_path), abs: dest })
+}
+
+/// After an unsaved document got its first path: copy the images that were parked in
+/// `fallback_dir` (srcs returned while unsaved: absolute, percent-encoded) under the
+/// document's rule. Returns `(old_src, new_src)` for every src that moved; other srcs
+/// (remote, relative, outside the fallback dir, missing) are left alone.
+pub fn relocate_fallback(
+    doc_path: &Path,
+    rule: &ImageRule,
+    srcs: &[String],
+    fallback_dir: &Path,
+    home: Option<&Path>,
+) -> Vec<(String, String, PathBuf)> {
+    if matches!(rule, ImageRule::None) {
+        return vec![];
+    }
+    let fb = normalize(fallback_dir);
+    let mut out = Vec::new();
+    for src in srcs {
+        let decoded = percent_encoding::percent_decode_str(src).decode_utf8_lossy().into_owned();
+        let p = normalize(Path::new(&decoded));
+        if !p.is_absolute() || !p.starts_with(&fb) || !p.is_file() {
+            continue;
+        }
+        if let Ok(st) = store_image(Some(doc_path), rule, ImageInput::File(&p), fallback_dir, home)
+            && st.src != *src
+        {
+            out.push((src.clone(), st.src, st.abs));
+        }
+    }
+    out
 }
 
 #[cfg(test)]

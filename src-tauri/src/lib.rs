@@ -10,6 +10,7 @@ mod menu;
 #[cfg(target_os = "macos")]
 mod pdf_macos;
 mod quick_open;
+mod remote_images;
 #[doc(hidden)]
 pub mod recent;
 mod settings;
@@ -253,6 +254,7 @@ pub fn run() {
             commands::take_pending_open_files,
             commands::allow_asset_dir,
             commands::set_theme_menu,
+            commands::relocate_images,
         ])
         .setup(|app| {
             let handle = app.handle().clone();

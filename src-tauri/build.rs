@@ -29,6 +29,7 @@ const COMMANDS: &[&str] = &[
     "take_pending_open_files",
     "allow_asset_dir",
     "set_theme_menu",
+    "relocate_images",
 ];
 
 fn main() {

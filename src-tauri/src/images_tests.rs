@@ -143,5 +143,25 @@ fn ext_sniffing_and_mime_precedence() {
     assert_eq!(ext_for(Some("IMAGE/PNG"), Some("x.jpg"), b""), "png");
     assert_eq!(ext_for(Some("application/octet-stream"), Some("x.JPEG"), b""), "jpg");
     assert_eq!(ext_for(None, Some("x.exe"), b"RIFF\0\0\0\0WEBPVP8 "), "webp");
-    assert_eq!(ext_for(None, None, b"<svg xmlns"), "png", "unknown bytes default to png (documented)");
+    assert_eq!(ext_for(None, None, b"<?xml ?><svg xmlns"), "svg");
+    assert_eq!(ext_for(None, None, b"????"), "png", "unknown bytes default to png");
+}
+
+#[test]
+fn relocate_parked_images_on_first_save() {
+    let dir = tempfile::tempdir().unwrap();
+    let fb = dir.path().join("app data/images");
+    let a = store_image(None, &rel("./assets"), ImageInput::Bytes { data: b"\x89PNG a", mime: None, name: None }, &fb, None).unwrap();
+    let b = store_image(None, &rel("./assets"), ImageInput::Bytes { data: b"GIF89a", mime: None, name: None }, &fb, None).unwrap();
+    assert!(a.src.contains("app%20data"), "{}", a.src);
+    let doc = dir.path().join("notes/My Doc.md");
+    fs::create_dir_all(doc.parent().unwrap()).unwrap();
+    let srcs = vec![a.src.clone(), b.src.clone(), "https://x/y.png".into(), "assets/z.png".into(), "/nonexistent/p.png".into()];
+    let moved = relocate_fallback(&doc, &rel("./${filename}.assets"), &srcs, &fb, None);
+    assert_eq!(moved.len(), 2);
+    for (old, new, abs) in &moved {
+        assert!(new.starts_with("My%20Doc.assets/image-"), "{old} → {new}");
+        assert_eq!(doc.parent().unwrap().join(decode(new)), *abs);
+    }
+    assert!(relocate_fallback(&doc, &ImageRule::None, &srcs, &fb, None).is_empty());
 }

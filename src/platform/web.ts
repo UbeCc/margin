@@ -520,6 +520,11 @@ export class WebPlatform implements Platform {
 
   async allowAssetDir(_path: string): Promise<void> {}
 
+  /** Web stores unsaved-doc images as data: URLs, so nothing is parked to relocate. */
+  async relocateImages(_docPath: string, _rule: ImageRule, _srcs: string[]): Promise<Record<string, string>> {
+    return {};
+  }
+
   async print(): Promise<void> {
     if (!navigatorIsAutomated()) window.print();
   }

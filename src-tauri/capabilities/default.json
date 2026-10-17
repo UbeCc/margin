@@ -2,7 +2,9 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "Least-privilege capability for the main editor window. File access goes through Margin's own commands (no fs plugin); dialogs and the opener are invoked from Rust, so no plugin permissions are granted to JS.",
-  "windows": ["main"],
+  "windows": [
+    "main"
+  ],
   "permissions": [
     "core:event:allow-listen",
     "core:event:allow-unlisten",
@@ -31,6 +33,7 @@
     "allow-confirm-close",
     "allow-take-pending-open-files",
     "allow-allow-asset-dir",
-    "allow-set-theme-menu"
+    "allow-set-theme-menu",
+    "allow-relocate-images"
   ]
 }

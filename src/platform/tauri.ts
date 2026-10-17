@@ -125,6 +125,15 @@ export class TauriPlatform implements Platform {
     }
   }
 
+  /**
+   * After the first save of a document: copy images that were stored while it was
+   * unsaved (`<app data>/images`, absolute srcs) under `rule`. Returns
+   * `{ oldSrc: newSrc }`; rewrite those srcs in the document. Others are untouched.
+   */
+  relocateImages(docPath: string, rule: ImageRule, srcs: string[]): Promise<Record<string, string>> {
+    return call('relocate_images', { docPath, rule, srcs });
+  }
+
   /** Let the webview load images from one more directory (non-recursive). */
   allowAssetDir(path: string): Promise<void> {
     return call('allow_asset_dir', { path });

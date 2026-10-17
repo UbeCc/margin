@@ -153,14 +153,34 @@ pub async fn store_image<Rt: Runtime>(
     rule: ImageRule,
     path: String,
 ) -> R<String> {
-    // Remote / data URLs are kept as-is (no download in this version).
-    if path.starts_with("http://") || path.starts_with("https://") || path.starts_with("data:") {
-        return Ok(path);
-    }
-    let src = abs(&path)?;
     let doc = doc_path.map(PathBuf::from);
     let fallback = image_fallback_dir(&app)?;
     let home = app.path().home_dir().ok();
+    let remote = path.starts_with("http://") || path.starts_with("https://");
+    if remote || path.starts_with("data:") {
+        // `none` rule: reference remote images where they are. Otherwise copy them in
+        // like local files (#17). Any failure keeps the original URL.
+        if matches!(rule, ImageRule::None) && remote {
+            return Ok(path);
+        }
+        let url = path.clone();
+        let stored = blocking(move || -> Option<images::Stored> {
+            let fetched = if remote {
+                std::fs::create_dir_all(&fallback).ok()?;
+                crate::remote_images::download(&url, &fallback).map_err(|e| log::warn!("image download failed: {e}")).ok()?
+            } else {
+                crate::remote_images::decode_data_url(&url)?
+            };
+            let input = ImageInput::Bytes { data: &fetched.data, mime: fetched.mime.as_deref(), name: fetched.name.as_deref() };
+            images::store_image(doc.as_deref(), &rule, input, &fallback, home.as_deref()).ok()
+        })
+        .await?;
+        return Ok(match stored {
+            Some(st) => finish_store(&app, &state, st),
+            None => path,
+        });
+    }
+    let src = abs(&path)?;
     let stored = blocking(move || images::store_image(doc.as_deref(), &rule, ImageInput::File(&src), &fallback, home.as_deref()))
         .await?
         .map_err(err)?;
@@ -210,6 +230,27 @@ pub async fn store_image_bytes<Rt: Runtime>(
     .await?
     .map_err(err)?;
     Ok(finish_store(&app, &state, stored))
+}
+
+/// First save of a document that had images pasted while unsaved: copy those parked
+/// images under the rule. Returns `{ oldSrc: newSrc }` for the srcs to rewrite.
+#[tauri::command]
+pub async fn relocate_images<Rt: Runtime>(
+    app: AppHandle<Rt>,
+    state: State<'_, AppState>,
+    doc_path: String,
+    rule: ImageRule,
+    srcs: Vec<String>,
+) -> R<HashMap<String, String>> {
+    let doc = abs(&doc_path)?;
+    let fallback = image_fallback_dir(&app)?;
+    let home = app.path().home_dir().ok();
+    let moved = blocking(move || images::relocate_fallback(&doc, &rule, &srcs, &fallback, home.as_deref())).await?;
+    let mut out = HashMap::new();
+    for (old, new, abs_path) in moved {
+        out.insert(old, finish_store(&app, &state, images::Stored { src: new, abs: abs_path }));
+    }
+    Ok(out)
 }
 
 // ------------------------------------------------------------------ dialogs
