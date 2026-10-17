@@ -166,6 +166,36 @@ fn maybe_pdf_selftest<R: Runtime>(app: &AppHandle<R>) {
     });
 }
 
+/// Debug builds only: `MARGIN_E2E_DIR=/tmp/x` makes the app poll `/tmp/x/cmd` and run
+/// each line — `menu <action>` (the native menu path, as if the item was clicked) or
+/// `eval <js>` (in the main webview). Lets QA drive the real app without Accessibility
+/// permissions; results are written back by the JS through the app's own file commands.
+#[cfg(debug_assertions)]
+fn e2e_driver<R: Runtime>(app: &AppHandle<R>) {
+    let Ok(dir) = std::env::var("MARGIN_E2E_DIR") else { return };
+    let app = app.clone();
+    std::thread::spawn(move || {
+        let cmd = PathBuf::from(&dir).join("cmd");
+        loop {
+            std::thread::sleep(std::time::Duration::from_millis(150));
+            let Ok(text) = std::fs::read_to_string(&cmd) else { continue };
+            let _ = std::fs::remove_file(&cmd);
+            for line in text.lines() {
+                if let Some(id) = line.strip_prefix("menu ") {
+                    let (app2, id) = (app.clone(), id.trim().to_string());
+                    let _ = app.run_on_main_thread(move || handle_menu(&app2, &id));
+                } else if let Some(js) = line.strip_prefix("eval ") {
+                    if let Some(w) = app.get_webview_window(MAIN) {
+                        let _ = w.eval(js);
+                    }
+                } else if let Some(ms) = line.strip_prefix("sleep ") {
+                    std::thread::sleep(std::time::Duration::from_millis(ms.trim().parse().unwrap_or(0)));
+                }
+            }
+        }
+    });
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let app = tauri::Builder::default()
@@ -226,6 +256,8 @@ pub fn run() {
             open_files(&handle, cli_paths());
             #[cfg(debug_assertions)]
             maybe_pdf_selftest(&handle);
+            #[cfg(debug_assertions)]
+            e2e_driver(&handle);
             Ok(())
         })
         .on_window_event(|window, event| {
