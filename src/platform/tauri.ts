@@ -116,21 +116,21 @@ export class TauriPlatform implements Platform {
    * `src`s resolve against the output file's directory; asset URLs work as-is.
    * Other platforms: falls back to the system print dialog (user picks "Save as PDF").
    */
-  async exportPdf(html: string, outPath: string): Promise<void> {
+  async exportPdf(html: string, outPath: string, opts?: { baseDir?: string }): Promise<void> {
     try {
-      await call('export_pdf', { html, outPath, baseDir: null });
+      await call('export_pdf', { html, outPath, baseDir: opts?.baseDir ?? null });
     } catch (e) {
       if (String((e as Error).message).startsWith('unsupported')) return printHtmlInIframe(html);
       throw e;
     }
   }
 
-  /** Extra: let the webview load images from one more directory (non-recursive). */
+  /** Let the webview load images from one more directory (non-recursive). */
   allowAssetDir(path: string): Promise<void> {
     return call('allow_asset_dir', { path });
   }
 
-  /** Not in the Platform contract yet: print the current window (system dialog). */
+  /** Print the current window (system dialog). */
   print(): Promise<void> {
     return call('print_window');
   }

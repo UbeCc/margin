@@ -38,3 +38,4 @@ tests/                  vitest (unit, jsdom) + playwright (e2e against `vite` de
 - Each owner only edits files in their directories (+ their tests). Request contract changes via a note at the bottom of this file.
 
 ## Contract change log
+- 2026-10-17 (#18): `Platform.print()`, `Platform.allowAssetDir(dir)`, `exportPdf(html, outPath, opts?: { baseDir })` added to the contract.
