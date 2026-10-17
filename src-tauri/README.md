@@ -133,6 +133,32 @@ Limits:
   printing the HTML in a hidden iframe (system print dialog → "Save as PDF").
   WebView2's `PrintToPdf` would be the Windows upgrade path.
 
+## Linux
+
+Built and smoke-tested in `docker/linux` (Ubuntu 24.04, WebKitGTK 4.1); see
+`docker/linux/README.md`. `npm run tauri build -- --bundles deb,appimage` gives
+`Margin_<ver>_amd64.deb` (~3 MB) and `.AppImage` (~78 MB).
+
+- **Menus**: a GTK menubar inside the window. `CmdOrCtrl` accelerators show as Ctrl
+  (checked by screenshot in the smoke test). Preferences and Quit sit in File, About
+  in Help. Some GNOME global shortcuts (Ctrl+Alt+T opens a terminal) shadow
+  `CmdOrCtrl+Alt+…` items; they still work from the menu.
+- **Desktop integration**: `linux/margin.desktop` is the deb/rpm template:
+  `Exec=margin %F`, so file managers pass the opened files as CLI args, which go to
+  `onOpenFiles`. `MimeType=text/markdown;text/plain` comes from `fileAssociations`.
+  The .deb registers it, and `xdg-mime query default text/markdown` returns
+  `Margin.desktop` after install.
+- **Window**: `titleBarStyle` and `tabbingIdentifier` are macOS-only and ignored.
+  Decorations come from the window manager.
+- **Watcher**: inotify. When `fs.inotify.max_user_watches` runs out on a big tree,
+  `watch` falls back to watching only the top level and logs a `watch-limit:` warning
+  with the sysctl to raise it, instead of failing the folder open.
+- **PDF**: `export_pdf` returns `unsupported:`, so the frontend prints the HTML in a
+  hidden iframe (GTK print dialog → "Print to File" → PDF). The fallback settles even
+  if the frame never loads (10 s timeout), so export can't hang (#14).
+- **Open files**: no single-instance plugin yet, so opening a second file starts a
+  second process.
+
 ## Build & test
 
 ```sh

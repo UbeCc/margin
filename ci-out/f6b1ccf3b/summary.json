@@ -1,0 +1,60 @@
+{
+  "ok": false,
+  "total_seconds": 253,
+  "cache": [
+    "node_modules: hit (lock 975215959a357a01)",
+    "cargo debug target: warm",
+    "cargo release target: cold"
+  ],
+  "stages": [
+    {
+      "stage": "npm_ci",
+      "status": "pass",
+      "seconds": 0,
+      "notes": ""
+    },
+    {
+      "stage": "typecheck",
+      "status": "pass",
+      "seconds": 1,
+      "notes": ""
+    },
+    {
+      "stage": "vitest",
+      "status": "pass",
+      "seconds": 1,
+      "notes": "88/88 tests, 26 files"
+    },
+    {
+      "stage": "e2e",
+      "status": "fail",
+      "seconds": 17,
+      "notes": "chromium 16/16, webkit 14/16, **2 failed**",
+      "tail": "        npx playwright show-trace test-results/blocks-widgets-html-front--a4b31-k-is-sanitized-and-editable-webkit/trace.zip\n    ────────────────────────────────────────────────────────────────────────────────────────────────\n    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────\n    Error: expect(locator).toHaveText(expected) failed\n    Locator: locator('[data-host=\"html_block\"]').locator('.mb-preview p')\n    Expected: \"new\"\n    Error: strict mode violation: locator('[data-host=\"html_block\"]').locator('.mb-preview p') resolved to 2 elements:\n        1) <p>new</p> aka getByText('new', { exact: true })\n        2) <p></p> aka getByRole('paragraph').filter({ hasText: /^$/ })\n    Call log:\n      - Expect \"toHaveText\" locator('[data-host=\"html_block\"]').locator('.mb-preview p') with timeout 5000ms\n      - waiting for locator('[data-host=\"html_block\"]').locator('.mb-preview p')\n      188 |     await page.keyboard.press(`${mod}+a`);\n      189 |     await page.keyboard.type('<p>new</p>');\n    > 190 |     await expect(h.locator('.mb-preview p')).toHaveText('new');\n          |                                              ^\n      191 |     expect(await raw(page, 'html_block')).toBe('<p>new</p>\\n');\n      192 |   });\n      193 |\n        at /ci/work/tests/e2e/blocks-widgets.spec.ts:190:46\n    Error Context: test-results/blocks-widgets-html-front--a4b31-k-is-sanitized-and-editable-webkit-retry1/error-context.md\n    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────\n    test-results/blocks-widgets-html-front--a4b31-k-is-sanitized-and-editable-webkit-retry1/trace.zip\n    Usage:\n        npx playwright show-trace test-results/blocks-widgets-html-front--a4b31-k-is-sanitized-and-editable-webkit-retry1/trace.zip\n    ────────────────────────────────────────────────────────────────────────────────────────────────\n  2 failed\n    [webkit] › tests/e2e/blocks-widgets.spec.ts:31:3 › code fence › language box edits info string, copy button works \n    [webkit] › tests/e2e/blocks-widgets.spec.ts:182:3 › html, front matter, toc › html block is sanitized and editable \n  30 passed (16.2s)"
+    },
+    {
+      "stage": "cargo_test",
+      "status": "pass",
+      "seconds": 8,
+      "notes": "30 passed, 0 failed / 0 passed, 0 failed / 0 passed, 0 failed"
+    },
+    {
+      "stage": "clippy",
+      "status": "pass",
+      "seconds": 2,
+      "notes": "clean"
+    },
+    {
+      "stage": "bundle",
+      "status": "pass",
+      "seconds": 233,
+      "notes": "Margin_0.1.0_amd64.AppImage (78.2 MB), Margin_0.1.0_amd64.deb (3.2 MB)"
+    },
+    {
+      "stage": "smoke",
+      "status": "pass",
+      "seconds": 10,
+      "notes": "window ok, screenshot stddev 0.376439"
+    }
+  ]
+}

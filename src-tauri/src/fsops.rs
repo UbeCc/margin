@@ -70,7 +70,7 @@ pub fn decode_text(bytes: &[u8]) -> String {
     }
     let utf16 = |rest: &[u8], le: bool| {
         let units: Vec<u16> = rest
-            .chunks_exact(2)
+            .as_chunks::<2>().0.iter()
             .map(|c| if le { u16::from_le_bytes([c[0], c[1]]) } else { u16::from_be_bytes([c[0], c[1]]) })
             .collect();
         String::from_utf16_lossy(&units)

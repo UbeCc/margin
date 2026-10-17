@@ -357,11 +357,10 @@ fn read_user_themes(dir: &Path) -> HashMap<String, String> {
     if let Ok(rd) = std::fs::read_dir(dir) {
         for e in rd.flatten() {
             let p = e.path();
-            if p.extension().is_some_and(|x| x.eq_ignore_ascii_case("css")) {
-                if let (Some(stem), Ok(css)) = (p.file_stem(), std::fs::read_to_string(&p)) {
+            if p.extension().is_some_and(|x| x.eq_ignore_ascii_case("css"))
+                && let (Some(stem), Ok(css)) = (p.file_stem(), std::fs::read_to_string(&p)) {
                     out.insert(stem.to_string_lossy().into_owned(), css);
                 }
-            }
         }
     }
     out

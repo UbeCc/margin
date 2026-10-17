@@ -62,3 +62,12 @@ describe('shortcuts', () => {
     expect(shortcutLabel('toggleFocus', false)).toBe('F8');
   });
 });
+
+describe('printHtmlInIframe', () => {
+  it('always settles and removes its frame (no print support, no load)', async () => {
+    const { printHtmlInIframe } = await import('./common');
+    await printHtmlInIframe('<p>x</p>', 50);
+    await new Promise((r) => setTimeout(r, 1100));
+    expect(document.querySelectorAll('iframe').length).toBe(0);
+  });
+});

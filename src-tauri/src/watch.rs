@@ -74,11 +74,10 @@ pub fn translate(events: &[DebouncedEvent], root: &RootMap, own: &OwnWrites) -> 
     for ev in events {
         let paths = &ev.event.paths;
         let mut push = |e: Option<FsEvent>| {
-            if let Some(e) = e {
-                if !out.contains(&e) {
+            if let Some(e) = e
+                && !out.contains(&e) {
                     out.push(e);
                 }
-            }
         };
         match ev.event.kind {
             EventKind::Access(_) | EventKind::Modify(ModifyKind::Metadata(_)) => {}
@@ -150,10 +149,37 @@ pub fn start(
         }
     })
     .map_err(|e| e.to_string())?;
-    debouncer
-        .watch(&map.canonical, notify::RecursiveMode::Recursive)
-        .map_err(|e| e.to_string())?;
+    if let Err(e) = debouncer.watch(&map.canonical, notify::RecursiveMode::Recursive) {
+        if !is_watch_limit(&e) {
+            return Err(e.to_string());
+        }
+        // Linux: a big tree can exhaust fs.inotify.max_user_watches. Degrade to
+        // watching just the top level rather than failing the folder open.
+        log::warn!("{}", watch_limit_message(&map.canonical));
+        let _ = debouncer.unwatch(&map.canonical);
+        debouncer
+            .watch(&map.canonical, notify::RecursiveMode::NonRecursive)
+            .map_err(|e| if is_watch_limit(&e) { watch_limit_message(&map.canonical) } else { e.to_string() })?;
+    }
     Ok(Watch { root: root.to_path_buf(), _debouncer: debouncer })
+}
+
+/// inotify watch/instance limits surface as `MaxFilesWatch` or as ENOSPC/EMFILE.
+pub fn is_watch_limit(e: &notify::Error) -> bool {
+    match &e.kind {
+        notify::ErrorKind::MaxFilesWatch => true,
+        notify::ErrorKind::Io(io) => matches!(io.raw_os_error(), Some(28) | Some(24)),
+        _ => false,
+    }
+}
+
+pub fn watch_limit_message(root: &Path) -> String {
+    format!(
+        "watch-limit: the OS file watch limit was reached while watching {} recursively; \
+         changes in subfolders won't be detected. On Linux raise it with \
+         `sudo sysctl fs.inotify.max_user_watches=524288` (persist in /etc/sysctl.d/).",
+        root.display()
+    )
 }
 
 #[cfg(test)]
@@ -168,6 +194,14 @@ mod tests {
             e = e.add_path(p.to_path_buf());
         }
         DebouncedEvent::new(e, Instant::now())
+    }
+
+    #[test]
+    fn recognises_watch_limits() {
+        assert!(is_watch_limit(&notify::Error::new(notify::ErrorKind::MaxFilesWatch)));
+        assert!(is_watch_limit(&notify::Error::io(std::io::Error::from_raw_os_error(28))));
+        assert!(!is_watch_limit(&notify::Error::path_not_found()));
+        assert!(watch_limit_message(Path::new("/x")).starts_with("watch-limit:"));
     }
 
     #[test]
