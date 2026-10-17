@@ -388,6 +388,39 @@ pub async fn set_theme_menu<Rt: Runtime>(app: AppHandle<Rt>, names: Vec<String>,
     .map_err(err)
 }
 
+// ------------------------------------------------------------------ file-tree operations (#21)
+
+/// Rename / move a file or folder. Never overwrites an existing destination.
+#[tauri::command]
+pub async fn rename_path(from: String, to: String) -> R<()> {
+    let (f, t) = (abs(&from)?, abs(&to)?);
+    blocking(move || fsops::rename_no_clobber(&f, &t)).await?.map_err(|e| format!("{from} → {to}: {e}"))
+}
+
+/// Move a file or folder to the Trash (macOS / Linux with `gio`); never a silent hard delete.
+#[tauri::command]
+pub async fn trash_path(path: String) -> R<()> {
+    let p = abs(&path)?;
+    blocking(move || fsops::trash(&p)).await?.map_err(|e| format!("{path}: {e}"))
+}
+
+#[tauri::command]
+pub async fn create_dir(path: String) -> R<()> {
+    let p = abs(&path)?;
+    blocking(move || std::fs::create_dir(&p)).await?.map_err(|e| format!("{path}: {e}"))
+}
+
+/// Show the item selected in Finder / Explorer / the file manager.
+#[tauri::command]
+pub async fn reveal_path<Rt: Runtime>(app: AppHandle<Rt>, path: String) -> R<()> {
+    use tauri_plugin_opener::OpenerExt;
+    let p = abs(&path)?;
+    if !p.exists() {
+        return Err(format!("not found: {path}"));
+    }
+    app.opener().reveal_item_in_dir(p).map_err(err)
+}
+
 // ------------------------------------------------------------------ window & misc
 
 #[tauri::command]

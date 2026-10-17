@@ -173,6 +173,20 @@ describe('DocumentController', () => {
     expect(doc.path).toBe('/n/c.md');
   });
 
+  it('a doc deleted on disk counts as unsaved: leaving asks, even with auto-save', async () => {
+    host.autoSave = () => ({ enabled: true, delay: 30 });
+    await doc.open('/n/a.md');
+    platform.externalRemove('/n/a.md');
+    await flush();
+    expect(doc.dirty).toBe(true);
+    answer = 'cancel';
+    expect(await doc.open('/n/b.md')).toBe(false);
+    expect(host.askUnsaved).toHaveBeenCalled();
+    answer = 'save';
+    expect(await doc.open('/n/b.md')).toBe(true);
+    expect(await platform.read('/n/a.md')).toBe('# A\n');
+  });
+
   it('toggling EOL marks dirty and toggling back cleans', async () => {
     await doc.open('/n/a.md');
     doc.setEol('\r\n');

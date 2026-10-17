@@ -160,6 +160,7 @@ export type MenuAction =
   | 'undo' | 'redo' | 'find' | 'replace'
   | 'toggleSidebar' | 'toggleSource' | 'toggleFocus' | 'toggleTypewriter' | 'quickOpen'
   | 'zoomIn' | 'zoomOut' | 'zoomReset'
+  | 'commandPalette' | 'showOutline' | 'showFiles' | 'revealActiveFile' | 'reloadFromDisk' | 'toggleLineEnding'
   | `heading:${0 | 1 | 2 | 3 | 4 | 5 | 6}`
   | `mark:${'strong' | 'em' | 'code' | 'strike' | 'highlight' | 'link'}`
   | `block:${'quote' | 'ul' | 'ol' | 'task' | 'code' | 'math' | 'table' | 'hr' | 'toc'}`

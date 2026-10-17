@@ -58,7 +58,8 @@ export function openPreferences(host: PreferencesHost, initial: Section = 'appea
     { 'data-section': 'appearance' },
     row(
       'Theme',
-      select('theme', names.map((n) => [n, themeLabel(n)]), s.theme, (v) => set({ theme: v })),
+      // Light themes only: dark ones are picked below (a dark "Theme" in a light OS would silently fall back).
+      select('theme', names.filter((n) => !host.isDarkTheme(n) || n === s.theme).map((n) => [n, themeLabel(n)]), s.theme, (v) => set({ theme: v })),
     ),
     row(
       'Appearance',
