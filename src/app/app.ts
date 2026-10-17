@@ -20,7 +20,7 @@ import { debounce, h } from './util/dom';
 import { fuzzyFilter, fuzzyMatch } from './util/fuzzy';
 import { formatShortcut, isMac } from './util/keymap';
 import { matchShortcut as nativeShortcut } from '../platform/shortcuts';
-import { basename, dirname, displayPath, isInside, isMarkdownPath, isUrlLike, relative, resolveDocPath, stripExt } from './util/path';
+import { basename, dirname, displayPath, isAbsolute, isInside, isMarkdownPath, isUrlLike, relative, resolveDocPath, stripExt } from './util/path';
 
 const ZOOM_STEPS = [0.5, 0.67, 0.75, 0.8, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2, 2.5, 3];
 
@@ -409,9 +409,14 @@ export class App {
 
   private allowedAssetDirs = new Set<string>();
 
+  /** While rendering an HTML export: directory of the output file (srcs become relative to it). */
+  private exportDir: string | null = null;
+
   private resolveAsset(src: string): string {
     const p = resolveDocPath(src, this.doc?.dir ?? null);
     if (!p) return src;
+    if (this.exportDir && isAbsolute(src.trim())) return src; // absolute paths stay absolute
+    if (this.exportDir) return encodeURI(relative(this.exportDir, p)).replace(/[?#]/g, encodeURIComponent);
     // Desktop serves asset:// only from opened folders; whitelist other image dirs.
     const dir = dirname(p);
     const inside = (this.folder && isInside(this.folder, p)) || (this.doc?.dir && isInside(this.doc.dir, p));
@@ -742,7 +747,15 @@ export class App {
       filters: [kind === 'html' ? { name: 'HTML', extensions: ['html'] } : { name: 'PDF', extensions: ['pdf'] }],
     });
     if (!target) return false;
-    const body = this.editor.renderHTML();
+    // HTML: local images as paths relative to the exported file (webview asset URLs don't
+    // work outside the app). PDF keeps asset URLs, which the native renderer loads (#27).
+    if (kind === 'html') this.exportDir = dirname(target);
+    let body: string;
+    try {
+      body = this.editor.renderHTML();
+    } finally {
+      this.exportDir = null;
+    }
     const katex = needsKatex(body) ? await loadKatexCss() : '';
     const html = buildExportHtml({ title: documentTitle(md, this.doc.path ? basename(this.doc.path) : null), body, themeCss: this.themes.exportCss(), extraCss: `${await this.wiring.loadBlocksCss()}\n${katex}` });
     try {

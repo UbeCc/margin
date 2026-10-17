@@ -76,3 +76,20 @@ test('preferences: Theme lists light themes, Dark theme lists dark ones', async 
   expect(await values('select[data-pref=theme]')).toEqual(['paper', 'github']);
   expect(await values('select[data-pref=darkTheme]')).toEqual(['night']);
 });
+
+test('export HTML rewrites local image srcs relative to the output file (#27)', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(async (root) => {
+    await window.__MARGIN_WEB__!.writeTextFile(`${root}/Ideas/Pic.md`, '# Pic\n\n![dot](../img/dot.png) ![abs](/Shared/x.png) ![web](https://example.com/a.png)\n');
+    await window.__margin!.doc.open(`${root}/Ideas/Pic.md`);
+  }, ROOT);
+  await queueDialog(page, `${ROOT}/Export/Pic.html`);
+  await page.evaluate(() => window.__margin!.run('exportHtml'));
+  await expect(page.locator('.toast').last()).toContainText('Exported Pic.html');
+  const html = await page.evaluate(() => window.__MARGIN_WEB__!.exports.at(-1)!.html);
+  expect(html).toContain('src="../img/dot.png"');
+  expect(html).toContain('src="/Shared/x.png"');
+  expect(html).toContain('src="https://example.com/a.png"');
+  // the live editor still shows platform asset URLs
+  expect(await page.locator('.md-editor img').first().getAttribute('src')).not.toBe('../img/dot.png');
+});
