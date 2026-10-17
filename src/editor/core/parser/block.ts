@@ -128,7 +128,10 @@ export function parseBlocks(src: string): ParsedLeaf[] {
           }
           const newDef = c.leaf.type !== 'paragraph' && (isLinkDef(rest) || isFootnoteDef(rest));
           const ls = all ? null : listStart(rest, col);
-          const lazyOk = all || (c.leaf.type === 'paragraph' && !(ls && !ls.empty));
+          const oi = open[matched];
+          // A sibling item of an open list may be empty / any number (only the first item of a list is restricted).
+          const sib = !!ls && oi?.kind === 'item' && oi.ordered === ls.ordered && oi.delim === ls.delim;
+          const lazyOk = all || (c.leaf.type === 'paragraph' && !(ls && (!ls.empty || sib)));
           if (!interrupts(rest, col) && !newDef && lazyOk) {
             push(c.leaf, line());
             continue;
