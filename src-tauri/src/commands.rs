@@ -339,6 +339,11 @@ pub async fn save_settings<Rt: Runtime>(app: AppHandle<Rt>, settings: Value) -> 
     if let Some(theme) = saved.get("theme").and_then(Value::as_str) {
         menu::check_theme(&app, theme);
     }
+    let typed = settings::typed(&saved);
+    let app2 = app.clone();
+    let _ = app.run_on_main_thread(move || {
+        let _ = crate::recent::set_menu(&app2, &typed.recent_files, &typed.recent_folders);
+    });
     Ok(())
 }
 

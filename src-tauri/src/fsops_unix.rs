@@ -63,6 +63,7 @@ pub fn xattr_names(p: &Path) -> Vec<CString> {
 }
 
 #[cfg(any(target_os = "macos", target_os = "linux"))]
+#[cfg_attr(not(test), allow(dead_code))]
 pub fn xattr_get(p: &Path, name: &str) -> Option<Vec<u8>> {
     let (c, n) = (cpath(p)?, CString::new(name).ok()?);
     get_c(&c, &n)
@@ -84,6 +85,7 @@ fn get_c(c: &CString, n: &CString) -> Option<Vec<u8>> {
 }
 
 #[cfg(any(target_os = "macos", target_os = "linux"))]
+#[cfg_attr(not(test), allow(dead_code))]
 pub fn xattr_set(p: &Path, name: &str, v: &[u8]) -> bool {
     match (cpath(p), CString::new(name)) {
         (Some(c), Ok(n)) => unsafe { sys::set(&c, &n, v) == 0 },

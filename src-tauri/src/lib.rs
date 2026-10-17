@@ -10,6 +10,7 @@ mod menu;
 #[cfg(target_os = "macos")]
 mod pdf_macos;
 mod quick_open;
+mod recent;
 mod settings;
 mod watch;
 mod watch_state;
@@ -126,16 +127,20 @@ pub fn open_files<R: Runtime>(app: &AppHandle<R>, paths: Vec<PathBuf>) {
 }
 
 fn cli_paths() -> Vec<PathBuf> {
-    let cwd = std::env::current_dir().unwrap_or_default();
-    std::env::args_os()
-        .skip(1)
-        .filter(|a| !a.to_string_lossy().starts_with('-'))
-        .map(|a| {
-            let p = PathBuf::from(a);
-            if p.is_absolute() { p } else { cwd.join(p) }
-        })
-        .filter(|p| p.exists())
-        .collect()
+    let args: Vec<String> = std::env::args_os().map(|a| a.to_string_lossy().into_owned()).collect();
+    recent::paths_from_args(&args, &std::env::current_dir().unwrap_or_default(), true)
+}
+
+/// Another `margin …` was started (Linux file manager, Windows Explorer, CLI): it
+/// exits and hands us its arguments.
+fn on_second_instance<R: Runtime>(app: &AppHandle<R>, argv: Vec<String>, cwd: String) {
+    let paths = recent::paths_from_args(&argv, Path::new(&cwd), true);
+    if let Some(w) = app.get_webview_window(MAIN) {
+        let _ = w.unminimize();
+        let _ = w.show();
+        let _ = w.set_focus();
+    }
+    open_files(app, paths);
 }
 
 fn request_close<R: Runtime>(app: &AppHandle<R>) -> bool {
@@ -165,6 +170,15 @@ fn handle_menu<R: Runtime>(app: &AppHandle<R>, id: &str) {
             use tauri_plugin_opener::OpenerExt;
             if let Ok(dir) = commands::themes_dir_path(app) {
                 let _ = app.opener().open_path(fsops::path_str(&dir), None::<&str>);
+            }
+        }
+        recent::ID_CLEAR => {
+            let _ = recent::set_menu(app, &[], &[]);
+            let _ = app.emit_to(MAIN, EV_MENU, recent::ID_CLEAR);
+        }
+        other if other.starts_with(recent::ID_PREFIX) => {
+            if let Some(p) = recent::path_for(app, other) {
+                open_files(app, vec![PathBuf::from(p)]);
             }
         }
         other => {
@@ -205,9 +219,12 @@ fn maybe_pdf_selftest<R: Runtime>(app: &AppHandle<R>) {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let app = tauri::Builder::default()
+        // must be the first plugin: a second instance exits before doing anything else
+        .plugin(tauri_plugin_single_instance::init(on_second_instance))
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .manage(AppState::default())
+        .manage(recent::RecentState::default())
         .invoke_handler(tauri::generate_handler![
             commands::read_text_file,
             commands::write_text_file,
@@ -239,7 +256,8 @@ pub fn run() {
         .setup(|app| {
             let handle = app.handle().clone();
             // Menu: built-in themes + user themes, current one ticked.
-            let current = settings::typed(&settings::load(&commands::settings_path(&handle)?)).theme;
+            let saved = settings::typed(&settings::load(&commands::settings_path(&handle)?));
+            let current = saved.theme.clone();
             let mut themes: Vec<String> = menu::BUILTIN_THEMES.iter().map(|s| s.to_string()).collect();
             if let Ok(user) = commands::user_theme_names(&handle) {
                 for t in user {
@@ -248,7 +266,10 @@ pub fn run() {
                     }
                 }
             }
-            let m = menu::build(&handle, &themes, &current)?;
+            let home = handle.path().home_dir().ok();
+            let recents = recent::entries(&saved.recent_files, &saved.recent_folders, home.as_deref());
+            *handle.state::<recent::RecentState>().0.lock().unwrap() = recents.iter().map(|(_, p)| p.clone()).collect();
+            let m = menu::build(&handle, &themes, &current, &recents)?;
             app.set_menu(m)?;
             app.on_menu_event(|app, event| handle_menu(app, event.id().as_ref()));
 

@@ -205,7 +205,7 @@ pub fn atomic_write(path: &Path, data: &[u8]) -> std::io::Result<bool> {
     Ok(existing.is_some())
 }
 
-#[cfg(unix)]
+#[cfg(all(unix, test))]
 pub use crate::fsops_unix::{xattr_get, xattr_set};
 
 /// Children of a directory: hidden entries (dot files) and our temp files filtered,

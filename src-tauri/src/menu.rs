@@ -18,10 +18,12 @@ pub const ID_HELP_THEMES_FOLDER: &str = "help:themesFolder";
 /// (id/action, label, accelerator)
 type Item = (&'static str, &'static str, Option<&'static str>);
 
-const FILE: &[Item] = &[
+const FILE_OPEN: &[Item] = &[
     ("new", "New", Some("CmdOrCtrl+N")),
     ("open", "Open…", Some("CmdOrCtrl+O")),
     ("openFolder", "Open Folder…", Some("CmdOrCtrl+Shift+O")),
+];
+const FILE: &[Item] = &[
     ("quickOpen", "Quick Open…", Some("CmdOrCtrl+P")),
     ("-", "", None),
     ("save", "Save", Some("CmdOrCtrl+S")),
@@ -75,12 +77,12 @@ const VIEW: &[Item] = &[
 /// Every action the menu can emit (used by tests to keep Rust and TS in sync).
 #[cfg(test)]
 pub fn all_actions() -> Vec<&'static str> {
-    let mut v: Vec<&'static str> = [FILE, EXPORT, EDIT_TOP, EDIT_FIND, PARAGRAPH, FORMAT, VIEW]
+    let mut v: Vec<&'static str> = [FILE_OPEN, FILE, EXPORT, EDIT_TOP, EDIT_FIND, PARAGRAPH, FORMAT, VIEW]
         .iter()
         .flat_map(|g| g.iter().map(|i| i.0))
         .filter(|id| *id != "-")
         .collect();
-    v.extend(["print", "close", "preferences"]);
+    v.extend(["print", "close", "preferences", crate::recent::ID_CLEAR]);
     v
 }
 
@@ -124,7 +126,12 @@ fn title_case(s: &str) -> String {
         .join(" ")
 }
 
-pub fn build<R: Runtime>(app: &AppHandle<R>, themes: &[String], current_theme: &str) -> tauri::Result<Menu<R>> {
+pub fn build<R: Runtime>(
+    app: &AppHandle<R>,
+    themes: &[String],
+    current_theme: &str,
+    recent: &[(String, String)],
+) -> tauri::Result<Menu<R>> {
     let mac = cfg!(target_os = "macos");
     let pkg = app.package_info();
     let about = AboutMetadata {
@@ -155,7 +162,10 @@ pub fn build<R: Runtime>(app: &AppHandle<R>, themes: &[String], current_theme: &
     }
 
     let export = add_items(app, SubmenuBuilder::new(app, "Export"), EXPORT)?.build()?;
-    let mut file = add_items(app, SubmenuBuilder::new(app, "File"), FILE)?
+    let recent_menu = SubmenuBuilder::with_id(app, crate::recent::SUBMENU_ID, "Open Recent").build()?;
+    crate::recent::fill(app, &recent_menu, recent)?;
+    let file = add_items(app, SubmenuBuilder::new(app, "File"), FILE_OPEN)?.item(&recent_menu);
+    let mut file = add_items(app, file, FILE)?
         .separator()
         .item(&export)
         .item(&MenuItem::with_id(app, "print", "Print…", true, Some("CmdOrCtrl+Shift+P"))?)
@@ -241,7 +251,7 @@ mod tests {
     #[test]
     fn accelerators_are_unique() {
         let mut seen = std::collections::HashSet::new();
-        for g in [FILE, EXPORT, EDIT_TOP, EDIT_FIND, PARAGRAPH, FORMAT, VIEW] {
+        for g in [FILE_OPEN, FILE, EXPORT, EDIT_TOP, EDIT_FIND, PARAGRAPH, FORMAT, VIEW] {
             for (_, _, a) in g.iter() {
                 if let Some(a) = a {
                     assert!(seen.insert(*a), "duplicate accelerator {a}");
@@ -257,7 +267,7 @@ mod tests {
             let ok = [
                 "new", "open", "openFolder", "save", "saveAs", "close", "exportHtml", "exportPdf", "print", "undo",
                 "redo", "find", "replace", "toggleSidebar", "toggleSource", "toggleFocus", "toggleTypewriter",
-                "quickOpen", "zoomIn", "zoomOut", "zoomReset", "preferences",
+                "quickOpen", "zoomIn", "zoomOut", "zoomReset", "preferences", "clearRecent",
             ]
             .contains(&a)
                 || a.starts_with("heading:")
