@@ -41,7 +41,7 @@ describe('paste html', () => {
     expect(htmlToMarkdown('<p>a <em>b</em> <a href="u">l</a></p><pre><code class="language-js">x\n</code></pre>')).toBe(
       'a *b* [l](u)\n\n```js\nx\n```',
     );
-    expect(htmlToMarkdown('<ol><li>a</li><li>b<ul><li>c</li></ul></li></ol>')).toBe('1. a\n2. b\n\n   - c');
+    expect(htmlToMarkdown('<ol><li>a</li><li>b<ul><li>c</li></ul></li></ol>')).toBe('1. a\n2. b\n   - c');
   });
 });
 
