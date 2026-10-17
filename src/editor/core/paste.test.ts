@@ -40,3 +40,10 @@ describe('fitToContext (#62)', () => {
     expect(fitToContext(new Doc('AB\n'), 'x\n', 1, 1)).toBe('x');
   });
 });
+
+describe('pasted list items inside a list item (#71)', () => {
+  it('become siblings, not children', () => {
+    expect(fitToContext(new Doc('- x\n'), 'a\n- b\n  - c', 3, 3)).toBe('a\n- b\n  - c');
+    expect(fitToContext(new Doc('> - x\n'), 'a\n- b', 5, 5)).toBe('a\n> - b');
+  });
+});

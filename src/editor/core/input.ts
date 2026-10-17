@@ -190,7 +190,16 @@ export function attachInput(ed: EditorCore): () => void {
       e.preventDefault();
       const b = ed.view.blockOf(t);
       const i = b ? ed.doc.indexOf(b.id) : -1;
-      if (i >= 0) ed.change(() => void E.toggleTask(ed.doc, i));
+      if (i < 0) return;
+      // mousedown was prevented, so the editor may not have focus: give it focus
+      // and a caret in the task so Cmd+Z / typing work right after the click.
+      const focused = document.activeElement === root;
+      const id = ed.doc.leaves[i].id;
+      ed.change(() => {
+        E.toggleTask(ed.doc, i);
+        const j = ed.doc.indexOf(id);
+        return focused || j < 0 ? undefined : { pos: ed.doc.docPos(j, leafContent(ed.doc.leaves[j]).length) };
+      });
       return;
     }
     const link = t.closest?.('.md-link') as HTMLElement | null;

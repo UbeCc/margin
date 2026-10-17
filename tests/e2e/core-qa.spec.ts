@@ -132,4 +132,40 @@ test.describe('core QA regressions', () => {
     await page.keyboard.type('!');
     expect(await md(page)).toBe('- a\n- b!\n  - c\n- d\n');
   });
+
+  test('cut/paste list items, toggle list on two blocks, undo after task click (#71)', async ({ page }) => {
+    await open(page, 'x\n\n- a\n- b\n\ny\n', '&blocks=0');
+    await page.evaluate(() => {
+      const ed = window.__core.ed;
+      ed.exec({ kind: 'find', query: 'a' });
+      const s = getSelection()!;
+      const [n, o] = [s.anchorNode!, s.anchorOffset];
+      ed.exec({ kind: 'find', query: 'b' });
+      s.setBaseAndExtent(n, o, s.focusNode!, s.focusOffset);
+      const dt = new DataTransfer();
+      const root = document.querySelector('.md-editor')!;
+      root.dispatchEvent(new ClipboardEvent('cut', { clipboardData: dt, bubbles: true, cancelable: true }));
+      const dt2 = new DataTransfer();
+      dt2.setData('text/plain', dt.getData('text/plain'));
+      root.dispatchEvent(new ClipboardEvent('paste', { clipboardData: dt2, bubbles: true, cancelable: true }));
+    });
+    expect(await md(page)).toBe('x\n\n- a\n- b\n\ny\n');
+    await open(page, 'a\n\nb\n\n- [ ] t\n', '&blocks=0');
+    await page.evaluate(() => {
+      const ed = window.__core.ed;
+      ed.exec({ kind: 'selectAll' });
+      ed.exec({ kind: 'find', query: 'a' });
+      const s = getSelection()!;
+      const [n, o] = [s.anchorNode!, s.anchorOffset];
+      ed.exec({ kind: 'find', query: 'b' });
+      s.setBaseAndExtent(n, o, s.focusNode!, s.focusOffset);
+      ed.exec({ kind: 'block', block: 'quote' });
+      ed.exec({ kind: 'block', block: 'quote' });
+    });
+    expect(await md(page)).toBe('a\n\nb\n\n- [ ] t\n');
+    await page.locator('.md-task-box').click();
+    expect(await md(page)).toBe('a\n\nb\n\n- [x] t\n');
+    await page.keyboard.press(`${mod}+z`);
+    expect(await md(page)).toBe('a\n\nb\n\n- [ ] t\n');
+  });
 });
