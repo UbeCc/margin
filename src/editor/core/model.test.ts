@@ -51,6 +51,25 @@ describe('Doc', () => {
     d.setWidgetRaw(0, '```\nx\ny\n```\n\n');
     expect(d.text()).toBe('> ```\n> x\n> y\n> ```\n\np');
   });
+  it('setWidgetRaw with unchanged raw is identity for every widget leaf', () => {
+    const docs = [
+      '```js\nx\n```\n\n\np', '> $$\n> a\n> $$\n>\n> q', '- ```\n  a\n  ```\n\n- b', '| a | b |\n|---|---|\n| 1 | 2 |',
+      '---\nt: 1\n---\n\n# h', '<div>\nx\n</div>\n\nz', '[toc]\n', '> > ~~~\n> > k\n> > ~~~',
+    ];
+    for (const s of docs) {
+      const d = new Doc(s);
+      d.leaves.forEach((l, i) => {
+        if (l.type === 'paragraph' || l.type === 'heading') return;
+        d.setWidgetRaw(i, widgetRaw(l));
+        expect(d.text()).toBe(s);
+      });
+    }
+  });
+  it('widget edit adds trailing blank lines with container prefixes', () => {
+    const d = new Doc('> ```\n> a\n> ```\n> q\n');
+    d.setWidgetRaw(0, '```\na\nb\n```\n\n');
+    expect(d.text()).toBe('> ```\n> a\n> b\n> ```\n>\n> q\n');
+  });
   it('refs', () => {
     expect(new Doc('[A b]: /u "t"\n').refs().get('a b')).toEqual({ href: '/u', title: 't' });
   });
