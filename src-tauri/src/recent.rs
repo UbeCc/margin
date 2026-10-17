@@ -185,7 +185,7 @@ mod tests {
         let b = mk("b.md");
         let gone = d.path().join("gone.md").to_string_lossy().into_owned();
         let folder = d.path().to_string_lossy().into_owned();
-        let e = entries(&[a.clone(), gone, b.clone(), a.clone()], &[folder.clone()], None);
+        let e = entries(&[a.clone(), gone, b.clone(), a.clone()], std::slice::from_ref(&folder), None);
         let paths: Vec<_> = e.iter().map(|x| x.1.clone()).collect();
         assert_eq!(paths, vec![a, b, folder]);
         let many: Vec<String> = (0..30).map(|i| mk(&format!("n{i}.md"))).collect();
