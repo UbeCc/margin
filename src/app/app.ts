@@ -435,6 +435,11 @@ export class App {
       'keydown',
       (e) => {
         if (e.isComposing || e.key === 'Process') return;
+        if (e.key === 'Escape' && this.findbar.isOpen && !isPaletteOpen() && !document.querySelector('.modal-backdrop, .context-menu')) {
+          e.preventDefault();
+          this.findbar.close();
+          return;
+        }
         const spec = commandForKey(e);
         if (!spec || spec.passthrough) return;
         if (document.querySelector('.modal-backdrop')) return;
