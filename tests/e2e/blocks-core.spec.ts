@@ -196,3 +196,20 @@ test('Cmd/Ctrl+B / I in a table cell write markdown emphasis (no hidden <b>)', a
   await expect.poll(() => md(page)).toBe('p\n\n|a|b|\n|-|-|\n|one|2*xy*|\n\nq\n');
   await expect(cell(page, 1, 1).locator('b, i, u, strong, em')).toHaveCount(0); // editing view is plain text
 });
+
+test('theme switch through the core re-themes CodeMirror, mermaid and source mode', async ({ page }) => {
+  await open(page, 'a\n\n```js\nconst x = 1\n```\n\n```mermaid\ngraph TD; A-->B\n```\n');
+  const svg = W(page, 'diagram').locator('svg');
+  await expect(svg).toBeVisible();
+  // CodeMirror swaps its base-theme class when the dark flag changes
+  const cmColor = () => W(page, 'code_fence').locator('.cm-editor').evaluate((e) => e.className);
+  const light = { cm: await cmColor(), svg: await svg.innerHTML() };
+  await page.evaluate(() => window.__core.ed.updateSettings({ colorScheme: 'dark' }));
+  await expect.poll(cmColor).not.toBe(light.cm);
+  await expect.poll(() => svg.innerHTML()).not.toBe(light.svg);
+  await page.evaluate(() => window.__core.ed.setSourceMode(true));
+  const srcBg = () => page.locator('.mb-source .cm-editor').evaluate((e) => e.className);
+  const darkBg = await srcBg();
+  await page.evaluate(() => window.__core.ed.updateSettings({ colorScheme: 'light' }));
+  await expect.poll(srcBg).not.toBe(darkBg);
+});

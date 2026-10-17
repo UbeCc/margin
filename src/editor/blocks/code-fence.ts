@@ -244,7 +244,8 @@ class CodeFenceInstance implements WidgetInstance {
 
   updateSettings(settings: EditorSettings): void {
     const dark = settings.colorScheme === 'dark';
-    const changed = settings.colorScheme !== this.settings.colorScheme;
+    // compare with the rendered scheme: the core mutates one settings object in place
+    const changed = settings.colorScheme !== this.root.dataset.scheme;
     this.settings = settings;
     this.root.dataset.scheme = settings.colorScheme;
     if (changed) this.editor?.setDark(dark);
