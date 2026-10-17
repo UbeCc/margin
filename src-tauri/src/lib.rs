@@ -53,11 +53,10 @@ pub fn allow_assets<R: Runtime>(app: &AppHandle<R>, dir: &Path, recursive: bool)
     let scope = app.asset_protocol_scope();
     let _ = scope.allow_directory(dir, recursive && !broad);
     // FSEvents/realpath style paths (/private/var vs /var) may be requested too.
-    if let Ok(canon) = std::fs::canonicalize(dir) {
-        if canon != dir {
+    if let Ok(canon) = std::fs::canonicalize(dir)
+        && canon != dir {
             let _ = scope.allow_directory(&canon, recursive && !broad);
         }
-    }
 }
 
 pub fn allow_assets_for_file<R: Runtime>(app: &AppHandle<R>, file: &Path) {
@@ -229,11 +228,10 @@ pub fn run() {
             if window.label() != MAIN {
                 return;
             }
-            if let WindowEvent::CloseRequested { api, .. } = event {
-                if request_close(window.app_handle()) {
+            if let WindowEvent::CloseRequested { api, .. } = event
+                && request_close(window.app_handle()) {
                     api.prevent_close();
                 }
-            }
         })
         .build(tauri::generate_context!())
         .expect("error while building Margin");
@@ -244,13 +242,12 @@ pub fn run() {
             let paths = urls.into_iter().filter_map(|u| u.to_file_path().ok()).collect();
             open_files(app, paths);
         }
-        RunEvent::ExitRequested { code: None, api, .. } => {
+        RunEvent::ExitRequested { code: None, api, .. }
             // User-initiated quit (Cmd+Q, Dock) while the editor is open: let the
             // frontend veto through the same close flow.
-            if app.get_webview_window(MAIN).is_some() && request_close(app) {
+            if app.get_webview_window(MAIN).is_some() && request_close(app) => {
                 api.prevent_exit();
             }
-        }
         _ => {}
     });
 }

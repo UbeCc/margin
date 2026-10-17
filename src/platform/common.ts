@@ -134,20 +134,32 @@ export function generatedImageName(ext: string, now = new Date()): string {
 }
 
 /** Best-effort print of an HTML string through a hidden iframe. */
-export function printHtmlInIframe(html: string): Promise<void> {
+export function printHtmlInIframe(html: string, loadTimeoutMs = 10_000): Promise<void> {
   return new Promise((resolve) => {
     const frame = document.createElement('iframe');
     frame.style.cssText = 'position:fixed;width:0;height:0;border:0;visibility:hidden';
-    frame.srcdoc = html;
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      setTimeout(() => frame.remove(), 1000);
+      resolve();
+    };
+    // Never leave the caller hanging if the frame doesn't load (CSP, odd WebView).
+    const timer = setTimeout(finish, loadTimeoutMs);
     frame.onload = () => {
       try {
         frame.contentWindow?.focus();
+        // Blocks until the print dialog closes in most engines (WebKitGTK included).
         frame.contentWindow?.print();
+      } catch {
+        /* print unavailable: nothing else to fall back to */
       } finally {
-        setTimeout(() => frame.remove(), 1000);
-        resolve();
+        finish();
       }
     };
+    frame.srcdoc = html;
     document.body.appendChild(frame);
   });
 }

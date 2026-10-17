@@ -90,11 +90,10 @@ pub fn migrate(mut m: Map<String, Value>) -> Map<String, Value> {
         if m.get("colorScheme").and_then(Value::as_str) == Some("auto") {
             m.insert("colorScheme".into(), json!("system"));
         }
-        if let Some(rule) = m.get_mut("imageRule").and_then(Value::as_object_mut) {
-            if rule.get("kind").and_then(Value::as_str) == Some("copy") {
+        if let Some(rule) = m.get_mut("imageRule").and_then(Value::as_object_mut)
+            && rule.get("kind").and_then(Value::as_str) == Some("copy") {
                 rule.insert("kind".into(), json!("relative"));
             }
-        }
     }
     m.insert(VERSION_KEY.into(), json!(SETTINGS_VERSION));
     m
