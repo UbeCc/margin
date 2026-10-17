@@ -44,6 +44,12 @@ function replaceLeaf(doc: Doc, i: number, lines: Line[], off: number): Caret {
   return { pos: posIn(lines, s, off) };
 }
 
+/** Move `pos` into the content of the leaf it falls in (the split-off text may start with block syntax). */
+function snap(doc: Doc, pos: number): Caret {
+  const at = doc.locate(pos);
+  return { pos: doc.docPos(at.i, at.off) };
+}
+
 function widgetCaret(doc: Doc, pos: number, at: 'start' | 'end'): Caret {
   const { i } = doc.locate(pos);
   const l = doc.leaves[i];
@@ -57,8 +63,10 @@ export function enter(doc: Doc, i: number, off: number, soft = false): Caret {
   const E = doc.eol;
   const p = contPrefix(l.chain);
   if (soft && l.type !== 'heading' && l.type !== 'hr') {
+    const base = doc.start(i);
     doc.setContent(i, c.slice(0, off) + '\n' + c.slice(off));
-    return { pos: doc.docPos(i, off + 1) };
+    // `l` keeps its new lines even when setContent re-parsed the document
+    return snap(doc, posIn(l.lines, base, off + 1));
   }
   const before = c.slice(0, off);
   const after = c.slice(off);
@@ -86,7 +94,7 @@ export function enter(doc: Doc, i: number, off: number, soft = false): Caret {
     if (inner.task !== null) mk += '[ ] ';
     const ins = E + contPrefix(l.chain.slice(0, -1)) + mk;
     doc.replace(pos, pos, ins);
-    return { pos: pos + ins.length };
+    return snap(doc, pos + ins.length);
   }
   if (l.type === 'indented_code') {
     const line = c.slice(0, off).split('\n').pop()!;
@@ -94,14 +102,15 @@ export function enter(doc: Doc, i: number, off: number, soft = false): Caret {
     doc.replace(pos, pos, ins);
     return { pos: pos + ins.length };
   }
-  const ins = E + contPrefix(l.chain, true) + E + p;
-  if (l.type === 'hr') {
-    const end = doc.docPos(i, c.length);
-    doc.replace(end, end, ins);
-    return { pos: end + ins.length };
-  }
-  doc.replace(pos, pos, ins);
-  return { pos: pos + ins.length };
+  // A blank paragraph needs no separator line: the next blank line is a new block.
+  const ins = l.type === 'paragraph' && !c.trim() ? E + p : E + contPrefix(l.chain, true) + E + p;
+  // At the very end of a document without a final newline the new empty
+  // line needs its own line ending, else it parses as a trailing blank line.
+  const last = l.lines[l.lines.length - 1];
+  const tail = i === doc.leaves.length - 1 && l.lines.length === l.n && !last.eol && (l.type === 'hr' || off === c.length) ? E : '';
+  const at = l.type === 'hr' ? doc.docPos(i, c.length) : pos;
+  doc.replace(at, at, ins + tail);
+  return snap(doc, at + ins.length);
 }
 
 /** Enter on an empty item/quote line: outdent a nested item, else leave the container as an empty paragraph. */
@@ -115,7 +124,8 @@ function exitContainer(doc: Doc, i: number): Caret {
   const sep = prev && prev.lines.length === prev.n ? contPrefix(outer, true) + E : '';
   const last = l.lines[l.n - 1];
   const trail = l.lines.slice(l.n).map((x) => x.prefix + x.text + x.eol).join('');
-  const rep = sep + contPrefix(outer) + (last.eol || (i + 1 < doc.leaves.length ? E : '')) + trail;
+  // the emptied line always needs a line ending (a final empty line would vanish)
+  const rep = sep + contPrefix(outer) + (last.eol || E) + trail;
   const s = doc.start(i);
   doc.replace(s, s + leafRaw(l).length, rep);
   return { pos: s + sep.length + contPrefix(outer).length };
@@ -130,7 +140,12 @@ export function dropContainer(doc: Doc, i: number, off: number): Caret {
   const lines = l.lines.map((ln, k) => {
     let prefix = ln.prefix;
     if (inner.kind === 'quote') prefix = prefix.replace(/ {0,3}>[ \t]?$/, '');
-    else if (k === 0 && opened) prefix = prefix.replace(MARKER_RE, '').replace(/ {0,3}$/, '');
+    else if (k === 0 && opened) {
+      const before = prefix.replace(MARKER_RE, '');
+      const t = before.replace(/ {0,3}$/, '');
+      // keep the space that belongs to an enclosing `> `
+      prefix = t.endsWith('>') && before.length > t.length ? t + ' ' : t;
+    }
     else prefix = prefix.replace(new RegExp(` {0,${inner.width}}$`), '');
     return { ...ln, prefix };
   });

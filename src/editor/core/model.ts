@@ -176,6 +176,7 @@ export class Doc {
     const from = this.start(i);
     const oldRaw = leafRaw(l);
     const wasEmpty = l.n === 1 && isBlank(l.lines[0].text);
+    const oldTexts = l.lines.slice(0, l.n).map((x) => x.text);
     const texts = content.split('\n');
     const trail = l.lines.slice(l.n);
     const hasNext = i + 1 < this.leaves.length;
@@ -186,13 +187,35 @@ export class Doc {
     }
     l.lines = [...lines, ...extra, ...trail];
     l.n = lines.length;
+    if (!content && l.type === 'heading' && !l.setext) {
+      // Last `#` deleted: an empty ATX heading is an empty paragraph (kept as caret target).
+      l.type = 'paragraph';
+      delete l.level;
+    }
     this.touch();
     const newRaw = leafRaw(l);
     const edit = { from, to: from + oldRaw.length, before: oldRaw, after: newRaw };
     // A filled blank leaf may leave (or join) the containers it was parsed into.
     const regroup = wasEmpty && l.chain.length > 0 && !HOLD_RE.test(content.split('\n')[0]);
-    if (regroup || this.needsReparse(l, content)) this.reparse(this.text());
+    if (regroup || this.containerSyntaxChanged(l, oldTexts) || this.needsReparse(l, content)) this.reparse(this.text());
     return edit;
+  }
+
+  /**
+   * Content edits whose meaning depends on the surrounding containers, which
+   * the leaf-local check in needsReparse cannot see: changed leading blanks
+   * (list-marker spacing, `> ` padding, lazy lines becoming continuation or
+   * indented code), `[ ] ` right after a list marker (task item), and a soft
+   * line starting with a list / quote marker inside a container.
+   */
+  private containerSyntaxChanged(l: Leaf, oldTexts: string[]): boolean {
+    const lead = (t: string | undefined) => (t === undefined ? '' : /^[ \t]*/.exec(t)![0]);
+    for (let k = 0; k < l.n; k++) if (lead(l.lines[k].text) !== lead(oldTexts[k])) return true;
+    if (!l.chain.length) return false;
+    const inner = l.chain[l.chain.length - 1];
+    if (l.openFrom <= l.chain.length - 1 && inner.kind === 'item' && inner.task === null && /^\[[ xX]\](?:[ \t]|$)/.test(l.lines[0].text)) return true;
+    for (let k = 1; k < l.n; k++) if (/^ {0,3}(?:[-+*>]|\d{1,9}[.)])(?:[ \t]|$)/.test(l.lines[k].text)) return true;
+    return false;
   }
 
   private needsReparse(l: Leaf, content: string): boolean {
