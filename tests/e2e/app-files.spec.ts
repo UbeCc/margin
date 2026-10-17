@@ -29,11 +29,11 @@ test('editing marks dirty, Cmd+S saves to disk', async ({ page }) => {
 test('new untitled document → Save As writes file and shows it in the tree', async ({ page }) => {
   await page.keyboard.press(`${MOD}+n`);
   await expect(page.locator('.title-text')).toHaveText('Untitled');
-  await typeInEditor(page, '# Fresh idea');
+  await typeInEditor(page, '# Fresh idea\nBody'); // Enter in an empty new doc splits (#38)
   await queueDialog(page, `${ROOT}/Fresh idea.md`);
   await page.keyboard.press(`${MOD}+s`);
   await expect(page.locator('.title-text')).toHaveText('Fresh idea');
-  expect(await diskFile(page, `${ROOT}/Fresh idea.md`)).toBe('# Fresh idea');
+  expect(await diskFile(page, `${ROOT}/Fresh idea.md`)).toBe('# Fresh idea\n\nBody\n');
   await expect(page.locator(`.tree-row[data-path="${ROOT}/Fresh idea.md"]`)).toHaveClass(/active/);
 });
 
