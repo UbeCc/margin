@@ -220,6 +220,9 @@ body { counter-reset: margin-eq; }
 .mb-front-matter.mb-editing .mb-fm-body { display: none; }
 
 /* ---------------------------------------------------------------- table */
+/* The toolbar lives in a reserved band above the grid so it never covers the
+   line above the table (#9). */
+.mb-block.mb-table { margin-top: 0.2em; padding-top: 34px; }
 .mb-table-scroll { overflow-x: auto; }
 .mb-table-grid { border-collapse: collapse; margin: 0; min-width: 4em; }
 .mb-table-grid th, .mb-table-grid td {
@@ -235,13 +238,15 @@ body { counter-reset: margin-eq; }
 .mb-cell code { font: 0.9em var(--mb-mono); background: var(--mb-code-bg); padding: 0 3px; border-radius: 3px; }
 .mb-table-tools {
   position: absolute;
-  bottom: 100%;
+  top: 0;
   left: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto;
   display: none;
   gap: 2px;
   align-items: center;
   padding: 2px 4px;
-  margin-bottom: 2px;
   background: var(--mb-bg);
   border: 1px solid var(--mb-border);
   border-radius: var(--mb-radius);

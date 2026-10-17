@@ -96,3 +96,19 @@ test.describe('table IME (#10)', () => {
     await expect(cell(page, 2, 0)).toBeFocused();
   });
 });
+
+test('table toolbar does not overlap the line above (#9)', async ({ page }) => {
+  await open(page, 'line above the table\n\n|a|b|\n|-|-|\n|1|2|\n\nq\n');
+  await cell(page, 1, 0).click();
+  const tools = W(page, 'table').locator('.mb-table-tools');
+  await expect(tools).toBeVisible();
+  const t = (await tools.boundingBox())!;
+  const p = (await page.locator('.md-block').first().locator('.md-content').boundingBox())!;
+  const grid = (await W(page, 'table').locator('table').boundingBox())!;
+  expect(t.y).toBeGreaterThanOrEqual(p.y + p.height - 0.5);
+  expect(t.y + t.height).toBeLessThanOrEqual(grid.y + 0.5);
+  // clicking the paragraph text right above the toolbar still reaches the paragraph
+  await page.mouse.click(p.x + 5, p.y + p.height - 3);
+  await page.keyboard.type('Z');
+  await expect.poll(() => md(page)).toMatch(/^[^\n]*Z[^\n]*\n\n\|a\|b\|\n/);
+});
