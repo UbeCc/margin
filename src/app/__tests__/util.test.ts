@@ -3,8 +3,9 @@ import { fuzzyFilter, fuzzyMatch, highlightSegments } from '../util/fuzzy';
 import {
   basename, dirname, displayPath, extname, isInside, isValidFileName, join, normalize, relative, resolveDocPath, stripExt, uniqueName,
 } from '../util/path';
+import { SHORTCUTS } from '../../platform/shortcuts';
 import { formatShortcut, matchShortcut, parseShortcut } from '../util/keymap';
-import { commandForKey, COMMANDS, isCommandId } from '../commands';
+import { commandForKey, COMMANDS, isCommandId, nativeKey } from '../commands';
 
 describe('fuzzy', () => {
   it('matches subsequences and rejects non-matches', () => {
@@ -104,7 +105,9 @@ describe('keymap & commands', () => {
     expect(commandForKey(ev('KeyB', { meta: true }), true)?.id).toBe('mark:strong');
     expect(commandForKey(ev('Slash', { meta: true }), true)?.id).toBe('toggleSource');
     expect(commandForKey(ev('F8'), true)?.id).toBe('toggleFocus');
-    expect(commandForKey(ev('KeyP', { meta: true, shift: true }), true)?.id).toBe('commandPalette');
+    expect(commandForKey(ev('KeyP', { meta: true, shift: true }), true)?.id).toBe('print');
+    expect(commandForKey(ev('KeyA', { meta: true, shift: true }), true)?.id).toBe('commandPalette');
+    expect(commandForKey(ev('Digit0', { meta: true, shift: true }), true)?.id).toBe('zoomReset');
     expect(commandForKey(ev('KeyF', { meta: true, alt: true }), true)?.id).toBe('replace');
   });
   it('has no duplicate shortcuts', () => {
@@ -115,6 +118,12 @@ describe('keymap & commands', () => {
         expect(seen.get(p), `${k} used by ${seen.get(p)} and ${c.id}`).toBeUndefined();
         seen.set(p, c.id);
       }
+  });
+  it('shows the native menu accelerator for every menu action', () => {
+    for (const s of SHORTCUTS) {
+      const spec = COMMANDS.find((c) => c.id === s.action);
+      if (spec) expect(spec.keys?.[0], s.action).toBe(nativeKey(s));
+    }
   });
   it('validates ids from native menus', () => {
     expect(isCommandId('save')).toBe(true);

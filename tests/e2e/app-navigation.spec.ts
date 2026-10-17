@@ -17,7 +17,7 @@ test('quick open fuzzy-finds files with highlights', async ({ page }) => {
 });
 
 test('command palette runs commands', async ({ page }) => {
-  await page.keyboard.press(`${MOD}+Shift+p`);
+  await page.keyboard.press(`${MOD}+Shift+a`);
   await page.keyboard.type('toggle sidebar');
   await page.keyboard.press('Enter');
   await expect(page.locator('.app')).toHaveClass(/sidebar-hidden/);

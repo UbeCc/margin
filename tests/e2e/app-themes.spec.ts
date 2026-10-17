@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { boot, MOD } from './app-helpers';
+import { boot, MOD, queueDialog, ROOT } from './app-helpers';
 
 test('theme switching via preferences persists across reloads', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'light' });
@@ -25,7 +25,8 @@ test('theme switching via preferences persists across reloads', async ({ page })
   await page.keyboard.press('Escape');
   await expect(prefs).toHaveCount(0);
 
-  await page.waitForTimeout(600); // settings save is debounced
+  // settings save is debounced: wait until it is persisted
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('margin.web.settings.v1') ?? '')).toContain('"colorScheme":"dark"');
   await page.reload();
   await expect(page.locator('.app.ready')).toBeVisible();
   await expect(root).toHaveAttribute('data-theme', 'night');
@@ -42,7 +43,7 @@ test('system color scheme is followed', async ({ page }) => {
 test('command palette theme entry and custom CSS', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'light' });
   await boot(page);
-  await page.keyboard.press(`${MOD}+Shift+p`);
+  await page.keyboard.press(`${MOD}+Shift+a`);
   await page.keyboard.type('theme github');
   await page.keyboard.press('Enter');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'github');
@@ -54,12 +55,12 @@ test('command palette theme entry and custom CSS', async ({ page }) => {
 
 test('export HTML inlines the theme', async ({ page }) => {
   await boot(page);
-  await page.evaluate(() => window.__marginStub!.dialogQueue.push('/Users/demo/Notes/Welcome.html'));
-  await page.keyboard.press(`${MOD}+Shift+p`);
+  await queueDialog(page, `${ROOT}/Welcome.html`);
+  await page.keyboard.press(`${MOD}+Shift+a`);
   await page.keyboard.type('export html');
   await page.keyboard.press('Enter');
   await expect(page.locator('.toast')).toContainText('Exported Welcome.html');
-  const html = await page.evaluate(() => window.__marginStub!.exported[0].html);
+  const html = await page.evaluate(() => window.__MARGIN_WEB__!.exports[0].html);
   expect(html).toContain('<title>Welcome to Margin</title>');
   expect(html).toContain('--margin-accent');
   expect(html).toContain('<h1 id="h-0">Welcome to Margin</h1>');

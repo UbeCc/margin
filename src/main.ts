@@ -14,11 +14,12 @@ async function boot(): Promise<void> {
   const wiring = await loadWiring();
   const app = new App(wiring, mount);
   window.__margin = app;
-  // In the browser build, start in the sample folder (unless files were passed via ?open=).
+  // In the browser build, start in the sample folder (or ?folder=) unless files were passed via ?open=.
   let demo: { initialFolder: string; initialFile: string | null } | undefined;
   if (wiring.platform.kind === 'web') {
-    const opening = new URLSearchParams(location.search).has('open');
-    demo = { initialFolder: WEB_ROOT, initialFile: opening ? null : `${WEB_ROOT}/Welcome.md` };
+    const q = new URLSearchParams(location.search);
+    const folder = q.get('folder') || WEB_ROOT;
+    demo = { initialFolder: folder, initialFile: q.has('open') ? null : `${folder}/Welcome.md` };
   }
   await app.start(demo);
 }

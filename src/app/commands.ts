@@ -1,4 +1,5 @@
 import type { MenuAction } from '../contracts';
+import { SHORTCUTS, type Shortcut } from '../platform/shortcuts';
 import { isMac, matchShortcut, parseShortcut, type KeyLike, type ParsedShortcut } from './util/keymap';
 
 /** Shell-only commands that have no native menu equivalent. */
@@ -47,12 +48,12 @@ export const COMMANDS: CommandSpec[] = [
   { id: 'reloadFromDisk', label: 'Reload From Disk', category: 'File' },
   { id: 'exportHtml', label: 'Export as HTML…', category: 'File' },
   { id: 'exportPdf', label: 'Export as PDF…', category: 'File', keys: ['Mod+Alt+E'] },
-  { id: 'print', label: 'Print…', category: 'File', keys: ['Mod+Alt+P'] },
+  { id: 'print', label: 'Print…', category: 'File', keys: ['Mod+Shift+P'] },
   { id: 'preferences', label: 'Preferences…', category: 'App', keys: ['Mod+,'] },
-  { id: 'commandPalette', label: 'Command Palette…', category: 'App', keys: ['Mod+Shift+P'] },
+  { id: 'commandPalette', label: 'Command Palette…', category: 'App', keys: ['Mod+Shift+A'] },
 
   { id: 'undo', label: 'Undo', category: 'Edit', keys: ['Mod+Z'], scope: 'editor', passthrough: true },
-  { id: 'redo', label: 'Redo', category: 'Edit', keys: [isMac ? 'Mod+Shift+Z' : 'Mod+Y'], scope: 'editor', passthrough: true },
+  { id: 'redo', label: 'Redo', category: 'Edit', keys: isMac ? ['Mod+Shift+Z'] : ['Mod+Shift+Z', 'Mod+Y'], scope: 'editor', passthrough: true },
   { id: 'find', label: 'Find…', category: 'Edit', keys: ['Mod+F'] },
   { id: 'replace', label: 'Find and Replace…', category: 'Edit', keys: isMac ? ['Mod+Alt+F'] : ['Mod+H', 'Mod+Alt+F'] },
 
@@ -87,6 +88,21 @@ export const COMMANDS: CommandSpec[] = [
   { id: 'toggleLineEnding', label: 'Toggle Line Endings (LF / CRLF)', category: 'View' },
   { id: 'openThemesFolder', label: 'Open Themes Folder', category: 'Theme' },
 ];
+
+/** 'Mod+Shift+S' form of a native menu accelerator (src/platform/shortcuts.ts). */
+export function nativeKey(s: Shortcut): string {
+  const key = s.code.replace(/^Key|^Digit/, '').replace('Backslash', '\\').replace('Slash', '/').replace('Equal', '=').replace('Minus', '-').replace('Comma', ',');
+  return [s.mod === false ? null : 'Mod', s.alt ? 'Alt' : null, s.shift ? 'Shift' : null, key].filter(Boolean).join('+');
+}
+
+// The native menu owns these keys (they arrive via platform.onMenu, never as keydown on
+// desktop): make its accelerator the displayed one so labels never drift from the menu.
+for (const s of SHORTCUTS) {
+  const spec = COMMANDS.find((c) => c.id === s.action);
+  if (!spec) continue;
+  const k = nativeKey(s);
+  spec.keys = [k, ...(spec.keys ?? []).filter((x) => x !== k)];
+}
 
 const BY_ID = new Map(COMMANDS.map((c) => [c.id, c]));
 export function commandSpec(id: CommandId): CommandSpec | undefined {

@@ -146,7 +146,7 @@ export const createStubEditor: CreateEditor = (host: HTMLElement, initial: Edito
     if (document.activeElement === ta) emitSel();
   };
   document.addEventListener('selectionchange', onDocSel);
-  const ro = new ResizeObserver(autosize);
+  const ro = new ResizeObserver(() => requestAnimationFrame(autosize)); // rAF: avoid "ResizeObserver loop" errors
   ro.observe(host);
 
   const lineIndexAt = (pos: number): number => ta.value.slice(0, pos).split('\n').length - 1;
