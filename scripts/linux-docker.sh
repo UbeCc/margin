@@ -10,7 +10,7 @@
 #   scripts/linux-docker.sh exec <cmd...>       run a command in the container (cwd /work)
 #   scripts/linux-docker.sh shell               interactive bash
 #   scripts/linux-docker.sh pull <src> <dest>   docker cp out of the container
-#   scripts/linux-docker.sh ci <dir> <ref>      sync <dir> → /ci/<ref>, run scripts/ci-local.sh, copy /ci/<ref>/ci-out back to <dir>/ci-out
+#   scripts/linux-docker.sh ci <dir> <ref> [--quick]  sync <dir> → /ci/<ref>, run scripts/ci-local.sh, copy /ci/<ref>/ci-out back to <dir>/ci-out
 #   scripts/linux-docker.sh snapshot            commit the container (with /cache) as <image>:warm
 #   scripts/linux-docker.sh down                remove the container
 #
@@ -78,7 +78,7 @@ cmd_sync() {
   local src="${1:?dir}" dest="${2:-/work}"
   running || cmd_up
   docker exec "$CTR" sh -c "mkdir -p '$dest' && find '$dest' -mindepth 1 -maxdepth 1 \
-    ! -name node_modules ! -name src-tauri ! -name ci-out -exec rm -rf {} + ; \
+    ! -name node_modules ! -name src-tauri -exec rm -rf {} + ; \
     if [ -d '$dest/src-tauri' ]; then find '$dest/src-tauri' -mindepth 1 -maxdepth 1 ! -name target -exec rm -rf {} + ; fi"
   tar -C "$src" --exclude=./node_modules --exclude=./src-tauri/target --exclude=./dist \
       --exclude=./ci-out --exclude=./test-results --exclude=./playwright-report -cf - . \
@@ -92,10 +92,11 @@ cmd_exec() {
 
 cmd_ci() {
   local src="${1:?dir}" ref="${2:?ref}" dest
-  dest="/ci/$(echo "$ref" | tr -c 'A-Za-z0-9._-' '_')"
+  shift 2
+  dest="/ci/$(echo "$ref" | tr -c 'A-Za-z0-9._-' '_' | sed 's/_$//')"
   cmd_sync "$src" "$dest"
   local rc=0
-  docker exec -w "$dest" -e CI=1 "$CTR" bash scripts/ci-local.sh || rc=$?
+  docker exec -w "$dest" -e CI=1 "$CTR" bash scripts/ci-local.sh "$@" || rc=$?
   rm -rf "$src/ci-out"
   docker cp "$CTR:$dest/ci-out" "$src/ci-out" >/dev/null 2>&1 || true
   return $rc
