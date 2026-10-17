@@ -14,18 +14,6 @@
   --mb-error: var(--margin-error, #d1242f);
   --mb-radius: var(--margin-radius, 6px);
   --mb-mono: var(--margin-mono, ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace);
-  /* syntax tokens (light) */
-  --tok-keyword: #cf222e;
-  --tok-string: #0a3069;
-  --tok-number: #0550ae;
-  --tok-comment: #6e7781;
-  --tok-def: #8250df;
-  --tok-type: #953800;
-  --tok-prop: #0550ae;
-  --tok-meta: #6e7781;
-  --tok-tag: #116329;
-  --tok-attr: #0550ae;
-  --tok-invalid: #d1242f;
   position: relative;
   color: var(--mb-fg);
   margin: 0.8em 0;
@@ -39,6 +27,28 @@
   --mb-border: var(--margin-border, rgba(200, 200, 200, 0.18));
   --mb-muted: var(--margin-muted, #8b929e);
   --mb-error: var(--margin-error, #ff7b72);
+}
+
+
+/* syntax token colours: editor widgets and exported fences (`pre.md-fences`, #61) */
+.mb-block,
+.md-fences {
+  --tok-keyword: #cf222e;
+  --tok-string: #0a3069;
+  --tok-number: #0550ae;
+  --tok-comment: #6e7781;
+  --tok-def: #8250df;
+  --tok-type: #953800;
+  --tok-prop: #0550ae;
+  --tok-meta: #6e7781;
+  --tok-tag: #116329;
+  --tok-attr: #0550ae;
+  --tok-invalid: #d1242f;
+}
+
+.mb-block[data-scheme='dark'],
+.md-fences[data-scheme='dark'],
+[data-scheme='dark'] .md-fences {
   --tok-keyword: #ff7b72;
   --tok-string: #a5d6ff;
   --tok-number: #79c0ff;
@@ -53,25 +63,25 @@
 }
 
 /* ---------------------------------------------------------------- tokens */
-.mb-block .tok-keyword, .mb-source .tok-keyword { color: var(--tok-keyword); }
-.mb-block .tok-string, .mb-block .tok-string2, .mb-source .tok-string, .mb-source .tok-string2 { color: var(--tok-string); }
-.mb-block .tok-number, .mb-block .tok-bool, .mb-block .tok-atom,
+:is(.mb-block, .md-fences) .tok-keyword, .mb-source .tok-keyword { color: var(--tok-keyword); }
+:is(.mb-block, .md-fences) .tok-string, :is(.mb-block, .md-fences) .tok-string2, .mb-source .tok-string, .mb-source .tok-string2 { color: var(--tok-string); }
+:is(.mb-block, .md-fences) .tok-number, :is(.mb-block, .md-fences) .tok-bool, :is(.mb-block, .md-fences) .tok-atom,
 .mb-source .tok-number, .mb-source .tok-bool, .mb-source .tok-atom { color: var(--tok-number); }
-.mb-block .tok-comment, .mb-source .tok-comment { color: var(--tok-comment); font-style: italic; }
-.mb-block .tok-variableName.tok-definition, .mb-block .tok-macroName, .mb-block .tok-className,
+:is(.mb-block, .md-fences) .tok-comment, .mb-source .tok-comment { color: var(--tok-comment); font-style: italic; }
+:is(.mb-block, .md-fences) .tok-variableName.tok-definition, :is(.mb-block, .md-fences) .tok-macroName, :is(.mb-block, .md-fences) .tok-className,
 .mb-source .tok-variableName.tok-definition { color: var(--tok-def); }
-.mb-block .tok-typeName, .mb-block .tok-namespace { color: var(--tok-type); }
-.mb-block .tok-propertyName, .mb-block .tok-variableName2 { color: var(--tok-prop); }
-.mb-block .tok-meta, .mb-block .tok-punctuation { color: var(--tok-meta); }
-.mb-block .tok-tagName { color: var(--tok-tag); }
-.mb-block .tok-attributeName { color: var(--tok-attr); }
-.mb-block .tok-invalid { color: var(--tok-invalid); }
-.mb-block .tok-heading, .mb-source .tok-heading { font-weight: 600; color: var(--tok-def); }
-.mb-block .tok-emphasis, .mb-source .tok-emphasis { font-style: italic; }
-.mb-block .tok-strong, .mb-source .tok-strong { font-weight: 700; }
-.mb-block .tok-link, .mb-block .tok-url, .mb-source .tok-link, .mb-source .tok-url { color: var(--tok-prop); }
-.mb-block .tok-inserted { color: var(--tok-tag); }
-.mb-block .tok-deleted { color: var(--tok-invalid); }
+:is(.mb-block, .md-fences) .tok-typeName, :is(.mb-block, .md-fences) .tok-namespace { color: var(--tok-type); }
+:is(.mb-block, .md-fences) .tok-propertyName, :is(.mb-block, .md-fences) .tok-variableName2 { color: var(--tok-prop); }
+:is(.mb-block, .md-fences) .tok-meta, :is(.mb-block, .md-fences) .tok-punctuation { color: var(--tok-meta); }
+:is(.mb-block, .md-fences) .tok-tagName { color: var(--tok-tag); }
+:is(.mb-block, .md-fences) .tok-attributeName { color: var(--tok-attr); }
+:is(.mb-block, .md-fences) .tok-invalid { color: var(--tok-invalid); }
+:is(.mb-block, .md-fences) .tok-heading, .mb-source .tok-heading { font-weight: 600; color: var(--tok-def); }
+:is(.mb-block, .md-fences) .tok-emphasis, .mb-source .tok-emphasis { font-style: italic; }
+:is(.mb-block, .md-fences) .tok-strong, .mb-source .tok-strong { font-weight: 700; }
+:is(.mb-block, .md-fences) .tok-link, :is(.mb-block, .md-fences) .tok-url, .mb-source .tok-link, .mb-source .tok-url { color: var(--tok-prop); }
+:is(.mb-block, .md-fences) .tok-inserted { color: var(--tok-tag); }
+:is(.mb-block, .md-fences) .tok-deleted { color: var(--tok-invalid); }
 
 .mb-placeholder { color: var(--mb-muted); font-style: italic; user-select: none; }
 .mb-error {

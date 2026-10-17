@@ -61,10 +61,11 @@ function wantsLineNumbers(info: string, global: boolean): boolean {
   return global;
 }
 
-export function staticCodeHTML(p: FenceParts): string {
+export function staticCodeHTML(p: FenceParts, scheme?: 'light' | 'dark'): string {
   const code = highlightToHtml(p.body, loadedLanguage(p.lang));
   const lang = escapeHtml(p.lang);
-  return `<pre class="md-fences"${lang ? ` lang="${lang}"` : ''}><code${lang ? ` class="language-${lang}"` : ''}>${code}</code></pre>`;
+  const sch = scheme === 'dark' ? ' data-scheme="dark"' : '';
+  return `<pre class="md-fences"${lang ? ` lang="${lang}"` : ''}${sch}><code${lang ? ` class="language-${lang}"` : ''}>${code}</code></pre>`;
 }
 
 class CodeFenceInstance implements WidgetInstance {
@@ -246,7 +247,7 @@ class CodeFenceInstance implements WidgetInstance {
   }
 
   renderHTML(): string {
-    return staticCodeHTML(this.parts);
+    return staticCodeHTML(this.parts, this.settings.colorScheme === 'dark' ? 'dark' : 'light');
   }
 
   updateSettings(settings: EditorSettings): void {
