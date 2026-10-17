@@ -49,7 +49,19 @@
             "**/.ssh/**",
             "**/.gnupg/**",
             "**/.aws/**",
-            "**/Library/Keychains/**"
+            "**/.kube/**",
+            "**/.docker/**",
+            "**/.config/gh/**",
+            "**/.config/gcloud/**",
+            "**/.azure/**",
+            "**/.password-store/**",
+            "**/.netrc",
+            "**/.git-credentials",
+            "**/.npmrc",
+            "**/.pypirc",
+            "**/Library/Keychains/**",
+            "**/Library/Cookies/**",
+            "**/.local/share/keyrings/**"
           ],
           "requireLiteralLeadingDot": false
         }

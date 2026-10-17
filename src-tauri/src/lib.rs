@@ -15,6 +15,8 @@ mod watch;
 mod watch_state;
 #[cfg(test)]
 mod watch_live_tests;
+#[cfg(test)]
+mod asset_scope_tests;
 
 use serde::Serialize;
 use std::collections::HashMap;
@@ -49,19 +51,42 @@ pub struct FsEventsPayload {
     pub events: Vec<watch::FsEvent>,
 }
 
+/// Directories that must never be granted recursively: filesystem roots, the home
+/// directory, and the directories that contain all users' homes.
+fn is_broad(dir: &Path, home: Option<&Path>) -> bool {
+    dir.parent().is_none()
+        || home == Some(dir)
+        || home.and_then(Path::parent) == Some(dir)
+        || [Path::new("/Users"), Path::new("/home"), Path::new("/Volumes"), Path::new("/private"), Path::new("/var")]
+            .contains(&dir)
+}
+
+/// What to put into the asset scope for `dir`: the lexically normalized path and the
+/// canonical one (symlinks, `/var` → `/private/var`). The "too broad" check runs on
+/// the *resolved* paths, so `~/notes/..` or a symlink to `/` can't widen the grant.
+pub fn asset_grants(dir: &Path, home: Option<&Path>, recursive: bool) -> Vec<(PathBuf, bool)> {
+    let lexical = images::normalize(dir);
+    let canon = std::fs::canonicalize(&lexical).ok();
+    let home_canon = home.and_then(|h| std::fs::canonicalize(h).ok());
+    let broad = |p: &Path| is_broad(p, home) || is_broad(p, home_canon.as_deref());
+    let any_broad = broad(&lexical) || canon.as_deref().is_some_and(broad);
+    let rec = recursive && !any_broad;
+    let mut out = vec![(lexical.clone(), rec)];
+    if let Some(c) = canon
+        && c != lexical
+    {
+        out.push((c, rec));
+    }
+    out
+}
+
 /// Grant the asset protocol read access for images next to a document/folder.
-/// Directories that are too broad (filesystem root, home itself) are only allowed
-/// non-recursively.
 pub fn allow_assets<R: Runtime>(app: &AppHandle<R>, dir: &Path, recursive: bool) {
     let home = app.path().home_dir().ok();
-    let broad = dir.parent().is_none() || home.as_deref() == Some(dir) || dir == Path::new("/Users") || dir == Path::new("/home");
     let scope = app.asset_protocol_scope();
-    let _ = scope.allow_directory(dir, recursive && !broad);
-    // FSEvents/realpath style paths (/private/var vs /var) may be requested too.
-    if let Ok(canon) = std::fs::canonicalize(dir)
-        && canon != dir {
-            let _ = scope.allow_directory(&canon, recursive && !broad);
-        }
+    for (p, rec) in asset_grants(dir, home.as_deref(), recursive) {
+        let _ = scope.allow_directory(&p, rec);
+    }
 }
 
 pub fn allow_assets_for_file<R: Runtime>(app: &AppHandle<R>, file: &Path) {
