@@ -86,6 +86,21 @@ export function enter(doc: Doc, i: number, off: number, soft = false): Caret {
       return widgetCaret(doc, s, 'start');
     }
   }
+  if (l.type === 'heading' && l.setext && !soft) {
+    // Enter in a setext heading: the text after the caret becomes a new
+    // paragraph *below the underline* (never split the text from it).
+    const k = c.lastIndexOf('\n');
+    if (off <= k) {
+      const pb = contPrefix(l.chain, true);
+      const j = (t: string) => t.split('\n').join(E + p);
+      const head = c.slice(0, off).replace(/[ \t]+$/, '');
+      const rest = c.slice(off, k).replace(/^[ \t]+/, '');
+      const s0 = doc.docPos(i, 0);
+      const pre = (head ? j(head) + E + p : '') + c.slice(k + 1) + E + pb + E + p;
+      doc.replace(s0, doc.docPos(i, c.length), head ? pre + j(rest) : j(rest) + E + pb + E + p);
+      return snap(doc, head ? s0 + pre.length : s0);
+    }
+  }
   if (l.type === 'heading' && !l.setext && !l.chain.length && c.trim() && off <= splitBlockMeta(l, c)[0].length) {
     // Enter at the start of a heading: open an empty paragraph above, keep the heading.
     const prev = doc.leaves[i - 1];

@@ -190,3 +190,19 @@ describe('Tab / Shift+Tab move the whole item subtree (#34)', () => {
     expect(run('1. a\n   1. b\n      - c\n', 'b', true)).toBe('1. a\n1. b\n   - c\n');
   });
 });
+
+describe('Enter in a setext heading keeps the underline with the heading (#72)', () => {
+  it('at the end and in the middle of the text', () => {
+    let d = new Doc('Title\n===\n\np\n');
+    let c = enter(d, 0, 5);
+    expect(d.text()).toBe('Title\n===\n\n\n\np\n');
+    expect(at(d, c)).toEqual({ i: 1, off: 0 });
+    ok(d);
+    d = new Doc('Title\n---\n');
+    c = enter(d, 0, 2);
+    expect(d.text()).toBe('Ti\n---\n\ntle\n');
+    expect(d.leaves[0]).toMatchObject({ type: 'heading', setext: true });
+    expect(at(d, c)).toEqual({ i: 1, off: 0 });
+    ok(d);
+  });
+});
