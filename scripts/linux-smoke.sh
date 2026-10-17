@@ -50,7 +50,8 @@ dbus-run-session -- "$BIN" "$DOC" >"$LOG" 2>&1 &
 APP=$!
 WIN=""
 for _ in $(seq 60); do
-  WIN=$(xdotool search --onlyvisible --name 'Margin' 2>/dev/null | head -1)
+  # The title is the document name, so match the window class (fall back to the title).
+  WIN=$( (xdotool search --onlyvisible --class '^margin$' 2>/dev/null; xdotool search --onlyvisible --name 'Margin|Smoke\.md' 2>/dev/null) | head -1)
   [ -n "$WIN" ] && break
   kill -0 $APP 2>/dev/null || break
   sleep 0.5
@@ -59,7 +60,9 @@ if [ -z "$WIN" ]; then
   echo "no Margin window appeared"; import -window root "$OUT/smoke.png" 2>/dev/null
   tail -40 "$LOG"; exit 1
 fi
-echo "window $WIN: $(xdotool getwindowname "$WIN")"
+TITLE=$(xdotool getwindowname "$WIN")
+echo "window $WIN: $TITLE"
+case "$TITLE" in *Smoke.md*) echo "document opened from argv";; *) echo "warning: title does not show Smoke.md";; esac
 sleep "${SMOKE_SETTLE:-6}"
 import -window root "$OUT/smoke.png"
 # A rendered window is not a flat colour.
