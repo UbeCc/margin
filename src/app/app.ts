@@ -723,7 +723,7 @@ export class App {
     if (!target) return false;
     const body = this.editor.renderHTML();
     const katex = needsKatex(body) ? await loadKatexCss() : '';
-    const html = buildExportHtml({ title: documentTitle(md, this.doc.path ? basename(this.doc.path) : null), body, themeCss: this.themes.exportCss(), extraCss: `${this.wiring.blocksCss}\n${katex}` });
+    const html = buildExportHtml({ title: documentTitle(md, this.doc.path ? basename(this.doc.path) : null), body, themeCss: this.themes.exportCss(), extraCss: `${await this.wiring.loadBlocksCss()}\n${katex}` });
     try {
       if (kind === 'html') await this.platform.exportHtml(html, target);
       else await this.platform.exportPdf(html, target, { baseDir: this.doc.dir ?? undefined });

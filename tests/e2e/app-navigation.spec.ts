@@ -71,3 +71,23 @@ test('find bar finds, reports misses, replaces all', async ({ page }) => {
   await page.keyboard.press('Escape');
   await expect(bar).toBeHidden();
 });
+
+test('native menu actions route through one dispatcher (desktop path)', async ({ page }) => {
+  const menu = (a: string) => page.evaluate((x) => window.__MARGIN_WEB__!.triggerMenu(x as never), a);
+  const ed = page.locator('.stub-editor');
+  await ed.focus();
+  await ed.evaluate((el: HTMLTextAreaElement) => el.setSelectionRange(el.value.indexOf('Margin is'), el.value.indexOf('Margin is')));
+  await menu('heading:3');
+  await expect.poll(() => editorValue(page)).toContain('### Margin is a quiet place');
+  await menu('toggleTypewriter');
+  await expect(page.locator('.app')).toHaveClass(/typewriter-mode/);
+
+  // Undo while typing in the find bar undoes the input, not the document.
+  await menu('find');
+  const input = page.locator('.findbar .find-input').first();
+  await expect(input).toBeFocused();
+  await page.keyboard.type('abc');
+  await menu('undo');
+  await expect(input).toHaveValue('');
+  await expect.poll(() => editorValue(page)).toContain('### Margin is a quiet place');
+});
