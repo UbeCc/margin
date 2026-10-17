@@ -26,6 +26,8 @@ export interface ViewCallbacks {
 interface Rec {
   el: HTMLElement;
   sig: string;
+  /** Leaf state the signature was computed from (identity check skips unchanged leaves). */
+  seen?: { lines: Leaf['lines']; chain: Leaf['chain']; type: string; level?: number; lang?: string; openFrom: number };
   content?: HTMLElement;
   wtype?: WidgetBlockType;
   inst?: WidgetInstance;
@@ -48,6 +50,7 @@ export class View {
   readonly recs = new Map<string, Rec>();
   focusId: string | null = null;
   private refsSig = '';
+  private refsObj: unknown = null;
 
   constructor(readonly root: HTMLElement, readonly doc: Doc, private cb: ViewCallbacks) {}
 
@@ -60,19 +63,31 @@ export class View {
   sync(force = false): Set<string> {
     const changed = new Set<string>();
     const refs = this.doc.refs();
-    const rs = JSON.stringify([...refs]);
-    const refsChanged = rs !== this.refsSig;
-    this.refsSig = rs;
+    let refsChanged = false;
+    if (refs !== this.refsObj) {
+      this.refsObj = refs;
+      const rs = JSON.stringify([...refs]);
+      refsChanged = rs !== this.refsSig;
+      this.refsSig = rs;
+    }
     const ictx = this.inlineCtx();
     const seen = new Set<string>();
     let prev: Element | null = null;
     const leaves = this.doc.leaves.length ? this.doc.leaves : [this.emptyLeaf()];
     for (const l of leaves) {
       seen.add(l.id);
+      let rec = this.recs.get(l.id);
+      const sn = rec?.seen;
+      if (rec && sn && !force && !refsChanged && sn.lines === l.lines && sn.chain === l.chain && sn.type === l.type && sn.level === l.level && sn.lang === l.lang && sn.openFrom === l.openFrom) {
+        // untouched leaf: only make sure it sits at the right place
+        const want: Element | null = prev ? prev.nextElementSibling : this.root.firstElementChild;
+        if (want !== rec.el) this.root.insertBefore(rec.el, want);
+        prev = rec.el;
+        continue;
+      }
       const text = isTextLeaf(l);
       const wt = text ? undefined : widgetType(l);
       const sig = l.type + (l.level ?? '') + (wt ?? '') + '\0' + chainSig(l) + '\0' + leafRaw(l);
-      let rec = this.recs.get(l.id);
       if (rec && (!!rec.content !== text || rec.wtype !== wt)) {
         this.drop(l.id);
         rec = undefined;
@@ -96,6 +111,7 @@ export class View {
         }
         rec.sig = sig;
       }
+      rec.seen = { lines: l.lines, chain: l.chain, type: l.type, level: l.level, lang: l.lang, openFrom: l.openFrom };
       const want: Element | null = prev ? prev.nextElementSibling : this.root.firstElementChild;
       if (want !== rec.el) this.root.insertBefore(rec.el, want);
       prev = rec.el;

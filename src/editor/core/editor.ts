@@ -177,17 +177,26 @@ export class EditorCore {
   change(fn: () => Caret | Sel | void, key: string | null = null): void {
     const before = this.doc.text();
     const selB = this.readSel() ?? this.lastSel;
+    this.doc.takeEdits();
     const caret = fn();
+    const edits = this.doc.takeEdits();
+    // A single in-place leaf edit (typing) gives the diff region directly: no O(document) work.
+    const hint = edits && edits.length === 1 ? edits[0] : undefined;
     const after = this.doc.text();
     this.view.sync();
     if (caret) this.setSel(caret);
     const selA = this.readSel() ?? (caret && 'pos' in caret ? { anchor: caret.pos, focus: caret.pos } : selB);
-    this.hist.record(before, after, selB, selA, key);
-    if (before !== after) this.emitChange();
+    if (edits ? edits.every((e) => e.before === e.after) : before === after) return;
+    this.hist.record(before, after, selB, selA, key, Date.now(), hint);
+    this.emitChange();
   }
+
+  private outlineRev = -1;
 
   emitChange(): void {
     for (const cb of this.changeCbs) cb();
+    if (this.doc.outlineRev === this.outlineRev) return;
+    this.outlineRev = this.doc.outlineRev;
     const sig = JSON.stringify(this.outline());
     if (sig !== this.outlineSig) {
       this.outlineSig = sig;
