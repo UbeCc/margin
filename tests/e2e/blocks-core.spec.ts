@@ -65,3 +65,34 @@ test.describe('html block in the core', () => {
     expect(await page.evaluate(() => (window as unknown as { __pwned?: number }).__pwned)).toBeUndefined();
   });
 });
+
+test.describe('table IME (#10)', () => {
+  test('Enter/Tab/arrows during composition stay with the IME', async ({ page }) => {
+    await open(page, 'p\n\n|a|b|\n|-|-|\n|1|2|\n\nq\n');
+    await cell(page, 1, 0).click();
+    await page.keyboard.press(lineEnd);
+    // synthetic composing keydowns (what WebKit/Chromium send while an IME candidate window is open)
+    for (const key of ['Enter', 'Tab', 'ArrowDown', 'ArrowRight', 'Escape', 'Backspace']) {
+      await page.evaluate((k) => {
+        const el = document.activeElement!;
+        el.dispatchEvent(new KeyboardEvent('keydown', { key: k, keyCode: 229, isComposing: true, bubbles: true, cancelable: true }));
+      }, key);
+    }
+    await expect(cell(page, 1, 0)).toBeFocused();
+    expect(await md(page)).toBe('p\n\n|a|b|\n|-|-|\n|1|2|\n\nq\n');
+  });
+
+  test('real IME composition commits CJK text into the cell (Chromium CDP)', async ({ page, browserName }) => {
+    test.skip(browserName !== 'chromium', 'CDP Input.imeSetComposition is Chromium-only');
+    await open(page, 'p\n\n|a|b|\n|-|-|\n|1|2|\n\nq\n');
+    await cell(page, 1, 1).click();
+    await page.keyboard.press(lineEnd);
+    const cdp = await page.context().newCDPSession(page);
+    for (const s of ['n', 'ni', 'nih', 'niha', 'nihao']) await cdp.send('Input.imeSetComposition', { text: s, selectionStart: s.length, selectionEnd: s.length });
+    await cdp.send('Input.insertText', { text: '你好' });
+    await expect.poll(() => md(page)).toBe('p\n\n|a|b|\n|-|-|\n|1|2你好|\n\nq\n');
+    await expect(cell(page, 1, 1)).toBeFocused();
+    await page.keyboard.press('Tab'); // after commit, keys work again
+    await expect(cell(page, 2, 0)).toBeFocused();
+  });
+});

@@ -113,6 +113,7 @@ class CodeFenceInstance implements WidgetInstance {
     this.langInput.addEventListener('focus', () => this.langInput.setAttribute('list', ensureDatalist()));
     this.langInput.addEventListener('input', () => this.onInfoInput());
     this.langInput.addEventListener('keydown', (e) => {
+      if (e.isComposing || e.keyCode === 229) return;
       if (e.key === 'Enter' || e.key === 'ArrowDown' || e.key === 'Escape') {
         e.preventDefault();
         this.focus('start');

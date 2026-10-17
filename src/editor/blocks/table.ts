@@ -306,6 +306,8 @@ class TableInstance implements WidgetInstance {
   }
 
   private onKey(e: KeyboardEvent, cell: HTMLElement, p: Pos) {
+    // IME composition (CJK input): Enter/arrows/Tab belong to the IME, not to the grid (#10).
+    if (e.isComposing || e.keyCode === 229) return;
     const mod = e.metaKey || e.ctrlKey;
     const nrows = this.model.rows.length;
     const ncols = this.model.align.length;
