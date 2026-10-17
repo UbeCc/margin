@@ -316,3 +316,57 @@ export function setAlign(m: TableModel, col: number, a: Align): TableModel {
 export function emptyTable(rows: number, cols: number): TableModel {
   return { rows: Array.from({ length: rows }, () => Array.from({ length: cols }, () => '')), align: Array(cols).fill(null) };
 }
+
+// ------------------------------------------------------------ clipboard grids
+
+function parseCsvLine(line: string): string[] | null {
+  const out: string[] = [];
+  let cur = '';
+  let q = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (q) {
+      if (ch === '"' && line[i + 1] === '"') {
+        cur += '"';
+        i++;
+      } else if (ch === '"') q = false;
+      else cur += ch;
+    } else if (ch === '"' && cur.trim() === '') {
+      q = true;
+      cur = '';
+    } else if (ch === ',') {
+      out.push(cur.trim());
+      cur = '';
+    } else cur += ch;
+  }
+  if (q) return null;
+  out.push(cur.trim());
+  return out;
+}
+
+/**
+ * Interpret pasted text as a grid of cells: TSV (spreadsheets), a markdown pipe
+ * table, or CSV with a consistent column count. Returns null for plain text that
+ * should be inserted into one cell.
+ */
+export function parseClipboardGrid(text: string): string[][] | null {
+  const t = text.replace(/\r\n?/g, '\n').replace(/\n+$/, '');
+  if (!t) return null;
+  const lines = t.split('\n');
+  if (t.includes('\t')) return lines.map((l) => l.split('\t').map((c) => c.trim()));
+  if (lines.length < 2) return null;
+  if (lines[0].includes('|') && isDelimiterRow(lines[1])) return parseTable(t + '\n').rows;
+  const csv = lines.map(parseCsvLine);
+  if (csv.every((r) => r && r.length > 1 && r.length === csv[0]!.length)) return csv as string[][];
+  return null;
+}
+
+/** Paste a grid with its top-left at (r, c), growing the table as needed. */
+export function pasteGrid(m: TableModel, r: number, c: number, grid: string[][]): TableModel {
+  let n = cloneModel(m);
+  const width = Math.max(...grid.map((g) => g.length));
+  while (n.align.length < c + width) n = insertCol(n, n.align.length);
+  while (n.rows.length < r + grid.length) n = insertRow(n, n.rows.length);
+  grid.forEach((row, i) => row.forEach((v, j) => (n.rows[r + i][c + j] = v)));
+  return n;
+}

@@ -112,3 +112,40 @@ test('table toolbar does not overlap the line above (#9)', async ({ page }) => {
   await page.keyboard.type('Z');
   await expect.poll(() => md(page)).toMatch(/^[^\n]*Z[^\n]*\n\n\|a\|b\|\n/);
 });
+
+test.describe('table cells', () => {
+  const paste = (page: Page, text: string) =>
+    page.evaluate((t) => {
+      const dt = new DataTransfer();
+      dt.setData('text/plain', t);
+      document.activeElement!.dispatchEvent(new ClipboardEvent('paste', { clipboardData: dt, bubbles: true, cancelable: true }));
+    }, text);
+
+  test('pasting TSV / CSV fills and grows the grid; plain multi-line text is flattened', async ({ page }) => {
+    await open(page, 'p\n\n|a|b|\n|-|-|\n|1|2|\n\nq\n');
+    await cell(page, 1, 1).click();
+    await paste(page, 'x\ty\nz\tw\n');
+    await expect.poll(() => md(page)).toBe('p\n\n| a   | b   |     |\n| --- | --- | --- |\n| 1   | x   | y   |\n|     | z   | w   |\n\nq\n');
+    await expect(cell(page, 2, 2)).toBeFocused();
+    await cell(page, 0, 0).click();
+    await paste(page, 'k,v\n"a, b",c');
+    await expect.poll(async () => (await md(page)).split('\n')[2]).toBe('| k    | v   |     |');
+    await cell(page, 1, 0).click();
+    await page.keyboard.press(lineEnd);
+    await paste(page, 'one\ntwo');
+    await expect.poll(async () => (await md(page)).split('\n')[4]).toContain('one two');
+  });
+
+  test('escaped pipes render as | (also inside code spans) and round-trip', async ({ page }) => {
+    const src = '| `a\\|b` | c \\| d |\n|---|---|\n| x | y |\n';
+    await open(page, `p\n\n${src}\nq\n`);
+    await expect(cell(page, 0, 0).locator('code')).toHaveText('a|b');
+    await expect(cell(page, 0, 1)).toHaveText('c | d');
+    await cell(page, 1, 1).click();
+    await page.keyboard.press(lineEnd);
+    await page.keyboard.type('|z');
+    await expect.poll(() => md(page)).toBe(`p\n\n${src.replace('| x | y |', '| x | y\\|z |')}\nq\n`);
+    await cell(page, 0, 0).click();
+    await expect(cell(page, 0, 0)).toHaveText('`a\\|b`'); // raw while editing
+  });
+});

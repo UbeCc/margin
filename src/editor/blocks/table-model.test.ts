@@ -157,3 +157,27 @@ describe('structural edits', () => {
     expect(formatTable(emptyTable(2, 2))).toBe('|     |     |\n| --- | --- |\n|     |     |');
   });
 });
+
+describe('clipboard grids', () => {
+  it('parses TSV, markdown tables and consistent CSV; plain text is not a grid', async () => {
+    const { parseClipboardGrid } = await import('./table-model');
+    expect(parseClipboardGrid('x\ty\nz\tw\n')).toEqual([['x', 'y'], ['z', 'w']]);
+    expect(parseClipboardGrid('a\tb')).toEqual([['a', 'b']]);
+    expect(parseClipboardGrid('|h|i|\n|-|-|\n|1|2|\n')).toEqual([['h', 'i'], ['1', '2']]);
+    expect(parseClipboardGrid('name,qty\n"apple, red",3\r\n')).toEqual([['name', 'qty'], ['apple, red', '3']]);
+    expect(parseClipboardGrid('hello, world')).toBeNull();
+    expect(parseClipboardGrid('line one, a\nline two')).toBeNull();
+    expect(parseClipboardGrid('plain')).toBeNull();
+  });
+  it('pastes at a position and grows the table', async () => {
+    const { pasteGrid } = await import('./table-model');
+    const t = parseTable('|a|b|\n|-|-|\n|1|2|\n');
+    const m = pasteGrid(cloneModel(t), 1, 1, [['x', 'y'], ['z', 'w|v']]);
+    expect(m.rows).toEqual([['a', 'b', ''], ['1', 'x', 'y'], ['', 'z', 'w|v']]);
+    expect(serializeTable(t, m)).toBe('| a   | b   |      |\n| --- | --- | ---- |\n| 1   | x   | y    |\n|     | z   | w\\|v |\n');
+  });
+  it('renders \\| inside code spans as a pipe', async () => {
+    const { unescapeCellPipes } = await import('./table');
+    expect(unescapeCellPipes('`a\\|b` c \\| d \\\\ e')).toBe('`a|b` c | d \\\\ e');
+  });
+});

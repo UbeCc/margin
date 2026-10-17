@@ -17,6 +17,8 @@ import {
   moveCol,
   moveRow,
   ParsedTable,
+  parseClipboardGrid,
+  pasteGrid,
   parseTable,
   serializeTable,
   setAlign,
@@ -43,8 +45,16 @@ export function renderedToRawOffset(raw: string, off: number): number {
   return raw.length;
 }
 
+/**
+ * GFM: `\|` in a cell is a table-level escape, removed before inline parsing, so it
+ * renders as `|` even inside code spans. Escaped backslashes (`\\`) stay as they are.
+ */
+export function unescapeCellPipes(text: string): string {
+  return text.replace(/\\([\s\S])/g, (m, c: string) => (c === '|' ? '|' : m));
+}
+
 function cellHTML(text: string, settings: EditorSettings): string {
-  return renderInlineMarkdown(text, { renderMath: inlineMathHTML, resolveAsset: (s) => settings.resolveAsset(s) });
+  return renderInlineMarkdown(unescapeCellPipes(text), { renderMath: inlineMathHTML, resolveAsset: (s) => settings.resolveAsset(s) });
 }
 
 function textOffset(el: HTMLElement): number | null {
@@ -221,8 +231,16 @@ class TableInstance implements WidgetInstance {
     });
     cell.addEventListener('paste', (e) => {
       e.preventDefault();
-      const text = (e.clipboardData?.getData('text/plain') || '').replace(/\r?\n/g, ' ');
-      document.execCommand('insertText', false, text);
+      const text = e.clipboardData?.getData('text/plain') || '';
+      const grid = parseClipboardGrid(text);
+      if (grid) {
+        const p = pos();
+        const rows = grid.length;
+        const cols = Math.max(...grid.map((g) => g.length));
+        this.structural((m) => [pasteGrid(m, p.r, p.c, grid), { r: p.r + rows - 1, c: p.c + cols - 1 }], 'end');
+        return;
+      }
+      document.execCommand('insertText', false, text.replace(/\r?\n/g, ' '));
     });
     cell.addEventListener('drop', (e) => e.preventDefault());
     cell.addEventListener('keydown', (e) => {
@@ -274,14 +292,14 @@ class TableInstance implements WidgetInstance {
     this.ctx.onChange(raw);
   }
 
-  private structural(op: (m: TableModel, p: Pos) => [TableModel, Pos]) {
+  private structural(op: (m: TableModel, p: Pos) => [TableModel, Pos], at: 'start' | 'end' = 'start') {
     const p = this.active ?? this.lastPos;
     const [m, next] = op(this.model, p);
     this.model = m;
     this.active = null;
     this.buildGrid();
     this.emit();
-    this.focusCell(next, 'start');
+    this.focusCell(next, at);
   }
 
   private deleteRowAt() {
