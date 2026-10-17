@@ -1,0 +1,14 @@
+import { chromium, webkit } from 'playwright';
+const b = await (process.env.WK ? webkit : chromium).launch();
+const ctx = await b.newContext(); const page = await ctx.newPage();
+const errs=[]; page.on('pageerror', e => errs.push('PAGEERR '+e.message));
+page.on('console', m => { if (m.type()==='error'||m.type()==='warning') errs.push('CONSOLE '+m.type()+' '+m.text().slice(0,200)); });
+await page.goto('http://localhost:5182/' + (process.env.Q||''));
+await page.waitForSelector('.app.ready'); await page.waitForTimeout(300);
+const E = (f, a) => page.evaluate(f, a);
+const log = (...a) => console.log(...a);
+globalThis.page = page; globalThis.E = E;
+const mod = await import(process.argv[2]);
+await mod.default({ page, E, log });
+if (errs.length) log('ERRORS:', errs.join('\n'));
+await b.close();

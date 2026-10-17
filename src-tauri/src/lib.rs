@@ -199,6 +199,10 @@ pub fn run() {
             commands::take_pending_open_files,
             commands::allow_asset_dir,
             commands::set_theme_menu,
+            commands::rename_path,
+            commands::trash_path,
+            commands::create_dir,
+            commands::reveal_path,
         ])
         .setup(|app| {
             let handle = app.handle().clone();
