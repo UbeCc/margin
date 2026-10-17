@@ -286,26 +286,59 @@ pub fn natural_cmp(a: &str, b: &str) -> std::cmp::Ordering {
 /// Remembers paths we wrote ourselves so the watcher can drop the echo.
 #[derive(Default)]
 pub struct OwnWrites {
-    inner: Mutex<HashMap<PathBuf, (Instant, bool)>>,
+    inner: Mutex<HashMap<PathBuf, OwnWrite>>,
+}
+
+struct OwnWrite {
+    at: Instant,
+    existed: bool,
+    /// The file as we left it; an event long after the write still counts as our
+    /// echo while the file is unchanged (FSEvents can lag well past the window).
+    stamp: Option<FileStamp>,
+}
+
+#[derive(PartialEq, Clone, Copy, Debug)]
+pub struct FileStamp {
+    len: u64,
+    mtime_ns: u128,
+    id: u64,
+}
+
+pub fn file_stamp(p: &Path) -> Option<FileStamp> {
+    let m = fs::metadata(p).ok()?;
+    #[cfg(unix)]
+    let id = std::os::unix::fs::MetadataExt::ino(&m);
+    #[cfg(not(unix))]
+    let id = 0;
+    let mtime_ns = m.modified().ok()?.duration_since(UNIX_EPOCH).ok()?.as_nanos();
+    Some(FileStamp { len: m.len(), mtime_ns, id })
 }
 
 pub const OWN_WRITE_WINDOW: Duration = Duration::from_millis(300);
+/// How long an unchanged file is still attributed to our own write.
+pub const OWN_STAMP_WINDOW: Duration = Duration::from_secs(10);
 
 impl OwnWrites {
+    /// Call before and after writing: the second call captures the written state.
     pub fn record(&self, path: &Path, existed: bool) {
         let mut m = self.inner.lock().unwrap();
         let now = Instant::now();
-        m.retain(|_, (t, _)| now.duration_since(*t) < Duration::from_secs(5));
-        m.insert(normalize_key(path), (now, existed));
+        m.retain(|_, w| now.duration_since(w.at) < Duration::from_secs(30));
+        m.insert(normalize_key(path), OwnWrite { at: now, existed, stamp: file_stamp(path) });
     }
 
-    /// If `path` was written by us shortly before `at`, returns `Some(existed_before)`.
+    /// If `path` was written by us shortly before `at` (or is still exactly as we
+    /// wrote it), returns `Some(existed_before)`.
     pub fn lookup(&self, path: &Path, at: Instant) -> Option<bool> {
         let m = self.inner.lock().unwrap();
-        let (t, existed) = m.get(&normalize_key(path))?;
+        let w = m.get(&normalize_key(path))?;
         // `at` may be slightly before our timestamp (event raised while renaming).
-        let delta = if at >= *t { at - *t } else { *t - at };
-        (delta <= OWN_WRITE_WINDOW).then_some(*existed)
+        let delta = if at >= w.at { at - w.at } else { w.at - at };
+        if delta <= OWN_WRITE_WINDOW {
+            return Some(w.existed);
+        }
+        let unchanged = w.stamp.is_some() && w.stamp == file_stamp(path);
+        (unchanged && w.at.elapsed() <= OWN_STAMP_WINDOW).then_some(w.existed)
     }
 }
 
@@ -398,6 +431,10 @@ mod tests {
         fs::write(&p, "").unwrap();
         ow.record(&p, true);
         assert_eq!(ow.lookup(&p, Instant::now()), Some(true));
+        // long after the window, an unchanged file is still our echo…
+        assert_eq!(ow.lookup(&p, Instant::now() + Duration::from_secs(2)), Some(true));
+        // …but not once someone else changed it
+        fs::write(&p, "external").unwrap();
         assert_eq!(ow.lookup(&p, Instant::now() + Duration::from_secs(2)), None);
     }
 }
