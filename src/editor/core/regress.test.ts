@@ -170,3 +170,23 @@ describe('windowed re-parse for structural edits in large documents (#33)', () =
     ok(d);
   });
 });
+
+describe('Tab / Shift+Tab move the whole item subtree (#34)', () => {
+  const run = (src: string, text: string, out: boolean) => {
+    const d = new Doc(src);
+    const i = d.leaves.findIndex((l) => leafContent(l) === text);
+    const c = indent(d, i, 1, out)!;
+    expect(at(d, c)).toMatchObject({ off: 1 });
+    ok(d);
+    return d.text();
+  };
+  it('indent carries nested items and continuation paragraphs', () => {
+    expect(run('- a\n- b\n  - c\n  - d\n- e\n', 'b', false)).toBe('- a\n  - b\n    - c\n    - d\n- e\n');
+    expect(run('- a\n- b\n\n  cont\n- e\n', 'b', false)).toBe('- a\n  - b\n\n    cont\n- e\n');
+    expect(run('> - a\n> - b\n>   - c\n', 'b', false)).toBe('> - a\n>   - b\n>     - c\n');
+  });
+  it('outdent carries them back; lazy lines untouched', () => {
+    expect(run('- a\n  - b\n    - c\n  para\n- e\n', 'b', true)).toBe('- a\n- b\n  - c\n  para\n- e\n');
+    expect(run('1. a\n   1. b\n      - c\n', 'b', true)).toBe('1. a\n1. b\n   - c\n');
+  });
+});

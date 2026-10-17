@@ -222,33 +222,38 @@ export function del(doc: Doc, i: number, off: number): Caret | null {
   return { pos: from };
 }
 
-/** Tab / Shift+Tab inside a list item. Null when leaf `i` is not a list item. */
+/**
+ * Tab / Shift+Tab inside a list item: the item moves together with its whole
+ * subtree (nested items, continuation paragraphs, code…) (#34). Null when leaf
+ * `i` is not a list item.
+ */
 export function indent(doc: Doc, i: number, off: number, out: boolean): Caret | null {
   const l = doc.leaves[i];
   const items = l.chain.filter((x): x is ItemContainer => x.kind === 'item');
   const item = items[items.length - 1];
   if (!item || l.chain[l.chain.length - 1] !== item) return null;
   const opened = l.openFrom <= l.chain.length - 1;
-  if (out) {
-    const parent = items[items.length - 2];
-    if (!parent) return dropContainer(doc, i, off);
-    const lines = l.lines.map((ln, k) => {
-      const cut = k === 0 && opened ? ln.prefix.search(MARKER_RE) : ln.prefix.length - item.width;
-      if (cut < 0) return ln;
-      const before = ln.prefix.slice(0, cut);
-      const m = new RegExp(` {1,${parent.width}}$`).exec(before);
-      return m ? { ...ln, prefix: before.slice(0, m.index) + ln.prefix.slice(cut) } : ln;
-    });
-    return replaceLeaf(doc, i, lines, off);
-  }
-  if (item.index === 0 || !opened) return { pos: doc.docPos(i, off) };
+  const parent = items[items.length - 2];
+  if (out && !parent) return dropContainer(doc, i, off);
+  if (!out && (item.index === 0 || !opened)) return { pos: doc.docPos(i, off) };
+  // column where this item's own syntax starts (marker on its first line)
+  const base = opened ? l.lines[0].prefix.search(MARKER_RE) : l.lines[0].prefix.length - item.width;
+  if (base < 0) return { pos: doc.docPos(i, off) };
+  let j = i + 1;
+  while (j < doc.leaves.length && doc.leaves[j].chain.includes(item)) j++;
   const pad = ' '.repeat(item.width);
-  const lines = l.lines.map((ln, k) => {
-    const cut = k === 0 ? ln.prefix.search(MARKER_RE) : ln.prefix.length - item.width;
-    if (cut < 0 || (k >= l.n && !ln.text)) return ln;
-    return { ...ln, prefix: ln.prefix.slice(0, cut) + pad + ln.prefix.slice(cut) };
-  });
-  return replaceLeaf(doc, i, lines, off);
+  const shift = (ln: Line): Line => {
+    const pre = ln.prefix;
+    // lazy continuation / short blank lines carry no indentation of this item
+    if (pre.length < base + item.width) return ln;
+    if (!out) return { ...ln, prefix: pre.slice(0, base) + pad + pre.slice(base) };
+    const m = new RegExp(` {1,${parent!.width}}$`).exec(pre.slice(0, base));
+    return m ? { ...ln, prefix: pre.slice(0, m.index) + pre.slice(base) } : ln;
+  };
+  const s0 = doc.start(i);
+  const groups = doc.leaves.slice(i, j).map((x) => x.lines.map(shift));
+  doc.replace(s0, doc.start(j), groups.map(raw).join(''));
+  return snap(doc, posIn(groups[0], s0, off));
 }
 
 /** Toggle the task checkbox shown on leaf `i`. */

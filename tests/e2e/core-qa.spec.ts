@@ -121,4 +121,15 @@ test.describe('core QA regressions', () => {
     await page.keyboard.press(`${mod}+z`);
     expect(await md(page)).toBe(big);
   });
+
+  test('Tab moves an item with its nested children (#34)', async ({ page }) => {
+    await open(page, '- a\n- b\n  - c\n- d\n', '&blocks=0');
+    await endOf(page, 'b');
+    await page.keyboard.press('Tab');
+    expect(await md(page)).toBe('- a\n  - b\n    - c\n- d\n');
+    await page.keyboard.press('Shift+Tab');
+    expect(await md(page)).toBe('- a\n- b\n  - c\n- d\n');
+    await page.keyboard.type('!');
+    expect(await md(page)).toBe('- a\n- b!\n  - c\n- d\n');
+  });
 });
