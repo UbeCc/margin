@@ -213,3 +213,10 @@ test('theme switch through the core re-themes CodeMirror, mermaid and source mod
   await page.evaluate(() => window.__core.ed.updateSettings({ colorScheme: 'light' }));
   await expect.poll(srcBg).not.toBe(darkBg);
 });
+
+test('table cells decode HTML entities like the core does', async ({ page }) => {
+  await open(page, 'p\n\n| a &amp; b | &copy; 2026 |\n|---|---|\n| x | y |\n');
+  await expect(cell(page, 0, 0)).toHaveText('a & b');
+  await expect(cell(page, 0, 1)).toHaveText('© 2026');
+  expect(await page.evaluate(() => window.__core.ed.renderHTML())).toContain('<th>a &amp; b</th><th>&copy; 2026</th>');
+});
