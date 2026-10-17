@@ -8,7 +8,7 @@
 import type { BlockWidget, EditorSettings, WidgetContext, WidgetInstance } from '../../contracts';
 import { createCodeEditor, CodeEditor, languageNames, loadLanguage, loadedLanguage } from './cm/setup';
 import { highlightToHtml } from './cm/highlight';
-import { buildRaw, FenceParts, parseFence, withFenceInfo } from './util/delimited';
+import { buildFenceRaw, FenceParts, parseFence, withFenceInfo } from './util/delimited';
 import { escapeHtml, h, isolateEvents, offsetAtPoint } from './util/dom';
 
 export interface CodeFenceOptions {
@@ -170,7 +170,7 @@ class CodeFenceInstance implements WidgetInstance {
         onRemove: () => this.ctx.onRemove(),
       },
       onDocChange: (doc) => {
-        this.setRaw(buildRaw(this.parts, doc));
+        this.setRaw(buildFenceRaw(this.parts, doc));
       },
     });
     this.editor.setLanguage(this.parts.lang);

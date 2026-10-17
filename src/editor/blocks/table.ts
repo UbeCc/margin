@@ -4,7 +4,7 @@
  * Cells show rendered inline markdown when idle and their raw markdown while being
  * edited. Tab/Shift+Tab/Enter/arrows navigate; a toolbar (shown while the table
  * has focus) adds/removes rows & columns and sets column alignment. Unchanged
- * tables keep their original source; edited tables are re-formatted.
+ * tables keep their original source; edits only rewrite touched rows (#6).
  */
 import type { BlockWidget, EditorSettings, WidgetContext, WidgetInstance } from '../../contracts';
 import {

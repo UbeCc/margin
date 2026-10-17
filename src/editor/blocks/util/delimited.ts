@@ -133,6 +133,26 @@ export function parseFence(raw: string): FenceParts {
   return { ...env, char, length, info, lang: fenceLang(info) };
 }
 
+/**
+ * Rebuild a fence for a new body. If the body contains a line that would close the
+ * fence early (e.g. the user typed ``` inside a ``` fence), the opening and closing
+ * markers are lengthened so the block keeps its structure on re-parse.
+ */
+export function buildFenceRaw(p: FenceParts, body: string): string {
+  if (body === p.body) return p.raw;
+  const re = p.char === '`' ? /^ {0,3}(`{3,})[ \t]*$/ : /^ {0,3}(~{3,})[ \t]*$/;
+  let need = p.length;
+  for (const l of body.split('\n')) {
+    const m = re.exec(l);
+    if (m && m[1].length >= need) need = m[1].length + 1;
+  }
+  if (need === p.length) return buildRaw(p, body);
+  const marker = p.char.repeat(need);
+  const head = p.indent + marker + p.info + (p.head.endsWith('\n') ? '\n' : '');
+  const tail = p.closed ? p.tail.replace(/^( {0,3})(`+|~+)/, (_m, i: string) => i + marker) : p.tail;
+  return buildRaw({ ...p, head, tail }, body);
+}
+
 /** Language id from an info string: first word, braces/dots stripped, lowercased. */
 export function fenceLang(info: string): string {
   const w = info.trim().split(/\s+/, 1)[0] || '';
