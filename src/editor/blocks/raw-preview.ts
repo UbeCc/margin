@@ -190,7 +190,8 @@ class RawPreviewInstance<P extends Parsed> implements WidgetInstance {
   }
 
   updateSettings(settings: EditorSettings): void {
-    const schemeChanged = settings.colorScheme !== this.settings.colorScheme;
+    // compare with the rendered scheme: the core mutates one settings object in place
+    const schemeChanged = settings.colorScheme !== this.root.dataset.scheme;
     this.settings = settings;
     this.applyScheme();
     if (schemeChanged) {

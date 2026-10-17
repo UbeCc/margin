@@ -93,3 +93,13 @@ describe('misc helpers', () => {
     expect(inlineMathHTML('\\badcmd{')).toContain('mb-math-error');
   });
 });
+
+describe('inline markdown entities', () => {
+  it('keeps entity references and escapes bare ampersands', async () => {
+    const { renderInlineMarkdown } = await import('./inline-md');
+    expect(renderInlineMarkdown('a &amp; b &copy; &#169; &#xA9; & c')).toBe('a &amp; b &copy; &#169; &#xA9; &amp; c');
+    expect(renderInlineMarkdown('`&amp;`')).toBe('<code>&amp;amp;</code>');
+    expect(renderInlineMarkdown('&lt;script&gt;')).toBe('&lt;script&gt;');
+    expect(renderInlineMarkdown('&notanentity')).toBe('&amp;notanentity');
+  });
+});
