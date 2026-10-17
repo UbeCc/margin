@@ -27,6 +27,10 @@ export npm_config_cache="${npm_config_cache:-/cache/npm}"
 export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-/cache/target}"
 export CARGO_BUILD_JOBS="${CARGO_BUILD_JOBS:-16}"
 export PLAYWRIGHT_BROWSERS_PATH="${PLAYWRIGHT_BROWSERS_PATH:-/ms-playwright}"
+# A private vite port per run (#75): a stale or parallel run can't take ours.
+. "$ROOT/scripts/free-port.sh"
+export E2E_PORT="${E2E_PORT:-$(free_port)}"
+echo "e2e port: $E2E_PORT" >>"$OUT/cache.txt"
 mkdir -p "$npm_config_cache" "$CARGO_TARGET_DIR" 2>/dev/null || true
 
 SKIP=" ${CI_SKIP:-} "

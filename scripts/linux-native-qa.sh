@@ -24,8 +24,9 @@ if [ -n "$DEB" ] && [ "$(id -u)" = 0 ]; then
 fi
 BIN=/usr/bin/margin; [ -x "$BIN" ] || { res all skip "no installed binary"; exit 0; }
 
-export DISPLAY=:98
-Xvfb :98 -screen 0 1280x800x24 -nolisten tcp >/dev/null 2>&1 & XVFB=$!
+. "$(dirname "${BASH_SOURCE[0]}")/free-port.sh"
+DISPLAY=":$(free_display 98)"; export DISPLAY
+Xvfb "$DISPLAY" -screen 0 1280x800x24 -nolisten tcp >/dev/null 2>&1 & XVFB=$!
 eval "$(dbus-launch --sh-syntax)"
 cleanup() { pkill -f /usr/bin/margin 2>/dev/null; kill "$XVFB" "$DBUS_SESSION_BUS_PID" 2>/dev/null; }
 trap cleanup EXIT
@@ -44,11 +45,11 @@ wait_title a.md && res first_launch pass "$(title)" || { res first_launch fail "
 sleep 3
 
 # 2. single instance
-"$BIN" "$H/notes/b.md" >"$OUT/qa-second.log" 2>&1; rc=$?
+timeout 20 "$BIN" "$H/notes/b.md" >"$OUT/qa-second.log" 2>&1; rc=$?
 sleep 1
 n=$(nproc_margin)
 wait_title b.md && [ "$n" = 1 ] && res single_instance_cli pass "rc=$rc procs=$n" || res single_instance_cli fail "rc=$rc procs=$n title=$(title)"
-(cd "$H/notes" && "$BIN" c.md >/dev/null 2>&1)   # relative path resolved against the 2nd instance's cwd
+(cd "$H/notes" && timeout 20 "$BIN" c.md >/dev/null 2>&1)   # relative path resolved against the 2nd instance's cwd
 wait_title c.md && res single_instance_relative pass || res single_instance_relative fail "$(title)"
 xdg-open "$H/notes/a.md" >/dev/null 2>&1 &
 sleep 4

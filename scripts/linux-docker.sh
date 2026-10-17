@@ -94,9 +94,13 @@ cmd_ci() {
   local src="${1:?dir}" ref="${2:?ref}" dest
   shift 2
   dest="/ci/$(echo "$ref" | tr -c 'A-Za-z0-9._-' '_' | sed 's/_$//')"
+  docker exec "$CTR" flock /ci/.ci.lock true   # wait for an orphaned run before replacing $dest
   cmd_sync "$src" "$dest"
   local rc=0
-  docker exec -w "$dest" -e CI=1 "$CTR" bash scripts/ci-local.sh "$@" || rc=$?
+  # The lock lives *inside* the container (#75): if the ssh/host side dies, the
+  # orphaned `docker exec` keeps holding it until ci-local.sh really finishes, so the
+  # next run waits instead of sharing $dest, ports and the cargo target with it.
+  docker exec -w "$dest" -e CI=1 "$CTR" flock /ci/.ci.lock bash scripts/ci-local.sh "$@" || rc=$?
   rm -rf "$src/ci-out"
   docker cp "$CTR:$dest/ci-out" "$src/ci-out" >/dev/null 2>&1 || true
   return $rc

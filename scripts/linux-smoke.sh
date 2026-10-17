@@ -25,8 +25,10 @@ if [ -z "$BIN" ]; then
 fi
 [ -x "$BIN" ] || { echo "no binary at $BIN"; exit 1; }
 
-export DISPLAY=:99
-Xvfb :99 -screen 0 1280x800x24 -nolisten tcp >/dev/null 2>&1 &
+. "$(dirname "${BASH_SOURCE[0]}")/free-port.sh"
+DNUM=$(free_display 99) || { echo "no free X display"; exit 1; }
+export DISPLAY=":$DNUM"
+Xvfb "$DISPLAY" -screen 0 1280x800x24 -nolisten tcp >/dev/null 2>&1 &
 XVFB=$!
 trap 'kill $APP $XVFB 2>/dev/null; wait 2>/dev/null' EXIT
 for _ in $(seq 50); do xdpyinfo >/dev/null 2>&1 && break; sleep 0.1; done
