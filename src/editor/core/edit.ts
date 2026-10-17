@@ -230,9 +230,10 @@ export function ensureParagraphAfter(doc: Doc, i: number): Caret {
   const next = doc.leaves[i + 1];
   if (next && isTextLeaf(next)) return { pos: doc.docPos(i + 1, 0) };
   if (next) return { widget: next.id, at: 'start' };
-  const end = doc.start(doc.leaves.length);
-  const t = doc.text();
-  const ins = (t.endsWith('\n') || t.endsWith('\r') ? '' : doc.eol) + doc.eol;
-  doc.replace(end, end, ins);
+  const n = doc.leaves.length;
+  for (let k = 0; k < 3 && doc.leaves.length === n; k++) {
+    const end = doc.start(doc.leaves.length);
+    doc.replace(end, end, doc.eol);
+  }
   return { pos: doc.start(doc.leaves.length - 1) };
 }
