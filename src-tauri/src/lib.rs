@@ -10,7 +10,8 @@ mod menu;
 #[cfg(target_os = "macos")]
 mod pdf_macos;
 mod quick_open;
-mod recent;
+#[doc(hidden)]
+pub mod recent;
 mod settings;
 mod watch;
 mod watch_state;
@@ -266,9 +267,7 @@ pub fn run() {
                     }
                 }
             }
-            let home = handle.path().home_dir().ok();
-            let recents = recent::entries(&saved.recent_files, &saved.recent_folders, home.as_deref());
-            *handle.state::<recent::RecentState>().0.lock().unwrap() = recents.iter().map(|(_, p)| p.clone()).collect();
+            let recents = recent::prepare(&handle, &saved.recent_files, &saved.recent_folders);
             let m = menu::build(&handle, &themes, &current, &recents)?;
             app.set_menu(m)?;
             app.on_menu_event(|app, event| handle_menu(app, event.id().as_ref()));

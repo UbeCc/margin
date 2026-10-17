@@ -79,13 +79,20 @@ pub fn paths_from_args(args: &[String], cwd: &Path, skip_program: bool) -> Vec<P
         .collect()
 }
 
-/// Rebuild the Open Recent submenu.
-pub fn set_menu<R: Runtime>(app: &AppHandle<R>, files: &[String], folders: &[String]) -> tauri::Result<()> {
+/// Compute the entries and remember their paths for the `recent:<n>` ids (used when
+/// the whole menu is built at startup).
+pub fn prepare<R: Runtime>(app: &AppHandle<R>, files: &[String], folders: &[String]) -> Vec<(String, String)> {
     let home = app.path().home_dir().ok();
     let list = entries(files, folders, home.as_deref());
     if let Some(state) = app.try_state::<RecentState>() {
         *state.0.lock().unwrap() = list.iter().map(|(_, p)| p.clone()).collect();
     }
+    list
+}
+
+/// Rebuild the Open Recent submenu.
+pub fn set_menu<R: Runtime>(app: &AppHandle<R>, files: &[String], folders: &[String]) -> tauri::Result<()> {
+    let list = prepare(app, files, folders);
     let Some(menu) = app.menu() else { return Ok(()) };
     let Some(sub) = find_submenu(&menu.items()?, SUBMENU_ID) else { return Ok(()) };
     for item in sub.items()? {
@@ -128,6 +135,37 @@ pub fn fill<R: Runtime>(app: &AppHandle<R>, sub: &Submenu<R>, list: &[(String, S
 pub fn path_for<R: Runtime>(app: &AppHandle<R>, id: &str) -> Option<String> {
     let i: usize = id.strip_prefix(ID_PREFIX)?.parse().ok()?;
     app.try_state::<RecentState>()?.0.lock().unwrap().get(i).cloned()
+}
+
+/// Main-thread check of the Open Recent submenu (muda only builds menus on the main
+/// thread, so this runs from `tests/menu_main.rs` with `harness = false`).
+#[doc(hidden)]
+pub fn menu_selftest<R: Runtime>(h: &AppHandle<R>, file: &str) -> Result<(), String> {
+    let e = |x: tauri::Error| x.to_string();
+    let files = vec![file.to_string()];
+    let m = crate::menu::build(h, &["paper".into()], "paper", &prepare(h, &files, &[])).map_err(e)?;
+    h.set_menu(m).map_err(e)?;
+    let ids = |h: &AppHandle<R>| -> Result<Vec<String>, String> {
+        let sub = find_submenu(&h.menu().ok_or("no menu")?.items().map_err(e)?, SUBMENU_ID).ok_or("no Open Recent submenu")?;
+        Ok(sub.items().map_err(e)?.iter().map(|i| i.id().as_ref().to_string()).collect())
+    };
+    let got = ids(h)?;
+    if got != ["recent:0", got[1].as_str(), ID_CLEAR] {
+        return Err(format!("unexpected items {got:?}"));
+    }
+    if path_for(h, "recent:0").as_deref() != Some(file) {
+        return Err("recent:0 does not map to the file".into());
+    }
+    set_menu(h, &[], &[]).map_err(e)?;
+    let got = ids(h)?;
+    if got.first().map(String::as_str) != Some("recent:none") || path_for(h, "recent:0").is_some() {
+        return Err(format!("not cleared: {got:?}"));
+    }
+    set_menu(h, &files, &files).map_err(e)?;
+    if ids(h)?.len() != 3 {
+        return Err("duplicate file+folder entry".into());
+    }
+    Ok(())
 }
 
 #[cfg(test)]
@@ -182,28 +220,4 @@ mod tests {
         assert!(paths_from_args(&["margin".into()], cwd, true).is_empty());
     }
 
-    // muda creates native menus only on the main thread (test threads aren't); this is
-    // exercised in the real app instead (see the PR's macOS run notes).
-    #[test]
-    #[ignore = "native menus need the main thread"]
-    fn menu_is_built_and_rebuilt() {
-        let d = tempfile::tempdir().unwrap();
-        let f = d.path().join("doc.md");
-        fs::write(&f, "").unwrap();
-        let app = tauri::test::mock_builder().manage(RecentState::default()).build(tauri::test::mock_context(tauri::test::noop_assets())).unwrap();
-        let h = app.handle().clone();
-        let files = vec![f.to_string_lossy().into_owned()];
-        let m = crate::menu::build(&h, &["paper".into()], "paper", &entries(&files, &[], None)).unwrap();
-        h.set_menu(m).unwrap();
-        set_menu(&h, &files, &[]).unwrap();
-        assert_eq!(path_for(&h, "recent:0").as_deref(), Some(files[0].as_str()));
-        let sub = find_submenu(&h.menu().unwrap().items().unwrap(), SUBMENU_ID).unwrap();
-        let ids: Vec<String> = sub.items().unwrap().iter().map(|i| i.id().as_ref().to_string()).collect();
-        assert_eq!(ids.first().map(String::as_str), Some("recent:0"));
-        assert_eq!(ids.last().map(String::as_str), Some(ID_CLEAR));
-        set_menu(&h, &[], &[]).unwrap();
-        let ids: Vec<String> = sub.items().unwrap().iter().map(|i| i.id().as_ref().to_string()).collect();
-        assert_eq!(ids.first().map(String::as_str), Some("recent:none"));
-        assert_eq!(path_for(&h, "recent:0"), None);
-    }
 }

@@ -53,3 +53,7 @@ strip = true
 
 [dev-dependencies]
 tauri = { version = "2", features = ["protocol-asset", "test"] }
+
+[[test]]
+name = "menu_main"
+harness = false
