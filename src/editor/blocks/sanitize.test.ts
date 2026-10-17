@@ -1,0 +1,89 @@
+import { describe, expect, it } from 'vitest';
+import { sanitizeHtml } from './sanitize';
+import { createHtmlBlockWidget } from './html-block';
+import type { EditorSettings, WidgetContext } from '../../contracts';
+
+/** XSS / mutation-XSS vectors (preview and export must neutralize every one). */
+const VECTORS = [
+  '<img src=x onerror=alert(1)>',
+  '<svg onload=alert(1)><circle r=1 /></svg>',
+  '<a href="javascript:alert(1)">x</a>',
+  '<a href="jav&#x09;ascript:alert(1)">x</a>',
+  '<a href=" &#14;javascript:alert(1)">x</a>',
+  '<a href="JaVaScRiPt:alert(1)">x</a>',
+  '<a href="vbscript:msgbox(1)">x</a>',
+  '<a href="data:text/html,<script>alert(1)</script>">x</a>',
+  '<img src="data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==">',
+  '<iframe src="javascript:alert(1)"></iframe>',
+  '<iframe srcdoc="<script>alert(1)</script>"></iframe>',
+  '<object data="javascript:alert(1)"></object><embed src="javascript:alert(1)">',
+  '<form action="javascript:alert(1)"><button>x</button></form>',
+  '<math><mtext><table><mglyph><style><img src=x onerror=alert(1)>',
+  '<svg></p><style><a id="</style><img src=1 onerror=alert(1)>">',
+  '<math><mi xlink:href="javascript:alert(1)">x</mi></math>',
+  '<svg><a xlink:href="javascript:alert(1)"><text x="1" y="1">x</text></a></svg>',
+  '<svg><animate attributeName="href" values="javascript:alert(1)" /></svg>',
+  '<svg><set attributeName="onmouseover" to="alert(1)" /></svg>',
+  '<svg><use href="data:image/svg+xml,<svg id=x xmlns=http://www.w3.org/2000/svg><image href=1 onerror=alert(1) /></svg>#x" /></svg>',
+  '<noscript><p title="</noscript><img src=x onerror=alert(1)>"></noscript>',
+  '<noembed><img src=x onerror=alert(1)></noembed>',
+  '<xmp><img src=x onerror=alert(1)></xmp>',
+  '<template><img src=x onerror=alert(1)></template>',
+  '<div style="background:url(javascript:alert(1))">x</div>',
+  '<div style="width: expression(alert(1))">x</div>',
+  '<div style="position:fixed;inset:0">x</div>',
+  '<base href="javascript:alert(1)//">',
+  '<meta http-equiv="refresh" content="0;url=javascript:alert(1)">',
+  '<link rel=stylesheet href="javascript:alert(1)">',
+  '<details open ontoggle=alert(1)>x</details>',
+  '<video><source onerror=alert(1)></video>',
+  '<img srcset="javascript:alert(1) 1x, x.png 2x">',
+  '<a href="#" target="_blank">x</a>',
+  '<!--><img src=x onerror=alert(1)>-->',
+  '<p>a</p><script>alert(1)</script><p>b</p>',
+  '<table><tr><td><style>*{}</style><img src=x onerror=alert(1)></td></tr></table>',
+  '<select><template><style><img src=x onerror=alert(1)></style></template></select>',
+  '<div id="x"><svg><foreignObject><img src=x onerror=alert(1)></foreignObject></svg></div>',
+];
+
+function assertSafe(html: string) {
+  const doc = new DOMParser().parseFromString(`<!doctype html><body>${html}`, 'text/html');
+  for (const el of Array.from(doc.querySelectorAll('*'))) {
+    expect(['script', 'style', 'iframe', 'object', 'embed', 'base', 'meta', 'link', 'form', 'template', 'animate', 'set', 'noscript', 'foreignobject']).not.toContain(el.localName.toLowerCase());
+    for (const a of Array.from(el.attributes)) {
+      expect(a.name.toLowerCase().startsWith('on'), `${a.name} on <${el.localName}>`).toBe(false);
+      const v = a.value.replace(/[\u0000-\u0020]/g, '').toLowerCase();
+      expect(v, `${a.name}=${a.value}`).not.toMatch(/^(javascript|vbscript|data:text)/);
+      if (a.name === 'style') expect(v).not.toMatch(/url\(|expression|position:fixed/);
+    }
+  }
+}
+
+describe('sanitizeHtml vectors', () => {
+  for (const v of VECTORS) {
+    it(v.slice(0, 70), () => {
+      const out = sanitizeHtml(v);
+      assertSafe(out);
+      // stable: re-sanitizing the serialized output changes nothing (no mutation XSS)
+      expect(sanitizeHtml(out)).toBe(out);
+    });
+  }
+  it('keeps harmless markup', () => {
+    expect(sanitizeHtml('<p align="center"><b>x</b> <kbd>⌘</kbd></p>')).toBe('<p align="center"><b>x</b> <kbd>⌘</kbd></p>');
+    expect(sanitizeHtml('<a href="#" target="_blank">x</a>')).toBe('<a href="#" target="_blank" rel="noopener noreferrer">x</a>');
+  });
+});
+
+describe('html_block export (#8)', () => {
+  const settings = { resolveAsset: (s: string) => s, colorScheme: 'light' } as unknown as EditorSettings;
+  const mount = (raw: string) => {
+    const ctx = { raw, settings, onChange() {}, onExit() {}, onRemove() {}, getOutline: () => [], scrollToHeading() {} } as WidgetContext;
+    return createHtmlBlockWidget().mount(document.createElement('div'), ctx);
+  };
+  for (const v of VECTORS) {
+    it(`export is sanitized: ${v.slice(0, 50)}`, () => assertSafe(mount(v + '\n').renderHTML()));
+  }
+  it('export keeps safe author HTML', () => {
+    expect(mount('<div align="center">\n  <b>Bold</b> <img src="x.png">\n</div>\n').renderHTML()).toBe('<div align="center">\n  <b>Bold</b> <img src="x.png">\n</div>');
+  });
+});

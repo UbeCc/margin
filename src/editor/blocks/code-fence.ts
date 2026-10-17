@@ -8,7 +8,7 @@
 import type { BlockWidget, EditorSettings, WidgetContext, WidgetInstance } from '../../contracts';
 import { createCodeEditor, CodeEditor, languageNames, loadLanguage, loadedLanguage } from './cm/setup';
 import { highlightToHtml } from './cm/highlight';
-import { buildRaw, FenceParts, parseFence, withFenceInfo } from './util/delimited';
+import { buildFenceRaw, FenceParts, parseFence, withFenceInfo } from './util/delimited';
 import { escapeHtml, h, isolateEvents, offsetAtPoint } from './util/dom';
 
 export interface CodeFenceOptions {
@@ -113,6 +113,7 @@ class CodeFenceInstance implements WidgetInstance {
     this.langInput.addEventListener('focus', () => this.langInput.setAttribute('list', ensureDatalist()));
     this.langInput.addEventListener('input', () => this.onInfoInput());
     this.langInput.addEventListener('keydown', (e) => {
+      if (e.isComposing || e.keyCode === 229) return;
       if (e.key === 'Enter' || e.key === 'ArrowDown' || e.key === 'Escape') {
         e.preventDefault();
         this.focus('start');
@@ -170,7 +171,7 @@ class CodeFenceInstance implements WidgetInstance {
         onRemove: () => this.ctx.onRemove(),
       },
       onDocChange: (doc) => {
-        this.setRaw(buildRaw(this.parts, doc));
+        this.setRaw(buildFenceRaw(this.parts, doc));
       },
     });
     this.editor.setLanguage(this.parts.lang);
@@ -243,7 +244,8 @@ class CodeFenceInstance implements WidgetInstance {
 
   updateSettings(settings: EditorSettings): void {
     const dark = settings.colorScheme === 'dark';
-    const changed = settings.colorScheme !== this.settings.colorScheme;
+    // compare with the rendered scheme: the core mutates one settings object in place
+    const changed = settings.colorScheme !== this.root.dataset.scheme;
     this.settings = settings;
     this.root.dataset.scheme = settings.colorScheme;
     if (changed) this.editor?.setDark(dark);

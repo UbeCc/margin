@@ -1,7 +1,7 @@
 /** diagram widget: ```mermaid / ```sequence / ```flow fences rendered via mermaid. */
 import type { BlockWidget } from '../../contracts';
 import { makeRawPreviewWidget, Parsed } from './raw-preview';
-import { buildRaw, FenceParts, parseFence } from './util/delimited';
+import { buildFenceRaw, FenceParts, parseFence } from './util/delimited';
 import { escapeHtml, h } from './util/dom';
 import { toMermaid } from './diagram-translate';
 
@@ -63,7 +63,7 @@ export function createDiagramWidget(): BlockWidget {
     className: 'mb-diagram',
     parse(raw) {
       const parts = parseFence(raw);
-      return { parts, body: parts.body, build: (b) => buildRaw(parts, b) };
+      return { parts, body: parts.body, build: (b) => buildFenceRaw(parts, b) };
     },
     language: () => '',
     label: (p) => p.parts.lang || 'mermaid',

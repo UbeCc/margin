@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   buildMathRaw,
   buildRaw,
+  buildFenceRaw,
   buildHtmlRaw,
   fenceLang,
   makeFence,
@@ -133,5 +134,24 @@ describe('front matter & html envelopes', () => {
     expect(buildHtmlRaw(p, p.body)).toBe(raw);
     expect(buildHtmlRaw(p, '<p>x</p>')).toBe('<p>x</p>\n\n');
     expect(buildHtmlRaw(parseHtmlBlock('<br>'), '<hr>')).toBe('<hr>\n');
+  });
+});
+
+describe('buildFenceRaw keeps the fence intact', () => {
+  it('lengthens the fence when the body contains a closing-fence line', () => {
+    const p = parseFence('```js\nx\n```\n\n');
+    const raw = buildFenceRaw(p, 'x\n```\ny');
+    expect(raw).toBe('````js\nx\n```\ny\n````\n\n');
+    expect(parseFence(raw).body).toBe('x\n```\ny');
+  });
+  it('handles tildes, longer runs, indent and unclosed fences', () => {
+    expect(buildFenceRaw(parseFence('~~~\na\n~~~\n'), 'a\n~~~~~')).toBe('~~~~~~\na\n~~~~~\n~~~~~~\n');
+    expect(buildFenceRaw(parseFence('  ```\n  a\n  ```\n'), 'a\n```')).toBe('  ````\n  a\n  ```\n  ````\n');
+    expect(buildFenceRaw(parseFence('```\na\n'), 'a\n```')).toBe('````\na\n```\n');
+  });
+  it('leaves fences alone when no body line could close them', () => {
+    const p = parseFence('```js\nx\n```\n');
+    expect(buildFenceRaw(p, 'x\n``` not a close\n~~~')).toBe('```js\nx\n``` not a close\n~~~\n```\n');
+    expect(buildFenceRaw(p, 'x')).toBe(p.raw);
   });
 });

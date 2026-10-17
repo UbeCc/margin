@@ -127,9 +127,21 @@ function cleanNode(node: Node, opts: SanitizeOptions, doc: Document): void {
 
 /** Sanitize an HTML fragment and return the safe HTML string. */
 export function sanitizeHtml(html: string, opts: SanitizeOptions = {}): string {
-  const doc = new DOMParser().parseFromString(`<!doctype html><body>${html}`, 'text/html');
-  cleanNode(doc.body, opts, doc);
-  return doc.body.innerHTML;
+  const once = (s: string, o: SanitizeOptions) => {
+    const doc = new DOMParser().parseFromString(`<!doctype html><body>${s}`, 'text/html');
+    cleanNode(doc.body, o, doc);
+    return doc.body.innerHTML;
+  };
+  // Serializing and re-parsing can mutate the tree (namespace / raw-text confusion,
+  // "mutation XSS"). Re-sanitize until the output is a fixed point; if it never
+  // settles, fall back to escaped text.
+  let out = once(html, opts);
+  for (let i = 0; i < 4; i++) {
+    const next = once(out, {});
+    if (next === out) return out;
+    out = next;
+  }
+  return out.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 }
 
 /** True if the HTML has nothing visible (only comments / whitespace / dropped tags). */

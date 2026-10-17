@@ -9,6 +9,11 @@ export interface TableModel {
   /** rows[0] is the header row. Every row has `align.length` cells. Cell text is raw inline markdown. */
   rows: string[][];
   align: Align[];
+  /**
+   * For each row, the index of the original source row it came from (null for new
+   * rows). Lets the serializer keep untouched source lines byte-for-byte (#6).
+   */
+  src?: (number | null)[];
 }
 
 export interface ParsedTable extends TableModel {
@@ -17,6 +22,14 @@ export interface ParsedTable extends TableModel {
   indent: string;
   /** Trailing blank lines / newline after the last table row. */
   tail: string;
+  /** Source line of each row (index-aligned with `rows`). */
+  lines: string[];
+  /** Source delimiter line, or null when the table had none. */
+  delimLine: string | null;
+  /** True when the source is exactly `formatTable(model)` (aligned columns). */
+  pretty: boolean;
+  /** Row style of the source: leading/trailing pipe and spaces around pipes. */
+  style: { outer: boolean; spaced: boolean };
 }
 
 /** Split one table row into cells on unescaped `|` (GFM semantics). Cells are trimmed. */
@@ -90,7 +103,15 @@ export function parseTable(raw: string): ParsedTable {
   while (align.length < ncol) align.push(null);
   align = align.slice(0, ncol);
   const rows = [norm(header), ...bodyLines.map((l) => norm(splitRow(l)))];
-  return { raw, indent, tail, rows, align };
+  const hasDelim = bodyLines.length === lines.length - 2;
+  const first = (lines[0] ?? '').trim();
+  const style = { outer: first.startsWith('|'), spaced: / \||\| /.test(first) };
+  const t: ParsedTable = {
+    raw, indent, tail, rows, align, src: rows.map((_, i) => i),
+    lines: [lines[0] ?? '', ...bodyLines], delimLine: hasDelim ? lines[1] : null, pretty: false, style,
+  };
+  t.pretty = hasDelim && formatTable(t, indent) === lines.join('\n');
+  return t;
 }
 
 /** Display width: East Asian wide / fullwidth characters count as 2 columns. */
@@ -151,15 +172,21 @@ function delim(width: number, a: Align): string {
   return '-'.repeat(w);
 }
 
+function formatWidths(rows: string[][], ncol: number): number[] {
+  return Array.from({ length: ncol }, (_, c) => Math.max(3, ...rows.map((r) => strWidth(r[c] ?? ''))));
+}
+
+function escapedRow(r: string[], ncol: number): string[] {
+  const out = r.slice(0, ncol).map(escapeCell);
+  while (out.length < ncol) out.push('');
+  return out;
+}
+
 /** Format a model as an aligned pipe table (no trailing newline). */
 export function formatTable(model: TableModel, indent = ''): string {
   const ncol = model.align.length;
-  const rows = model.rows.map((r) => {
-    const out = r.slice(0, ncol).map(escapeCell);
-    while (out.length < ncol) out.push('');
-    return out;
-  });
-  const widths = model.align.map((_, c) => Math.max(3, ...rows.map((r) => strWidth(r[c]))));
+  const rows = model.rows.map((r) => escapedRow(r, ncol));
+  const widths = formatWidths(rows, ncol);
   const line = (cells: string[]) => indent + '| ' + cells.join(' | ') + ' |';
   const out: string[] = [];
   rows.forEach((r, i) => {
@@ -175,14 +202,45 @@ export function modelsEqual(a: TableModel, b: TableModel): boolean {
   return a.rows.every((r, i) => r.length === b.rows[i].length && r.every((c, j) => c === b.rows[i][j]));
 }
 
-/** Serialize: original raw if nothing changed, else a freshly formatted table + original tail. */
+const rowEq = (a: string[], b: string[] | undefined) => !!b && a.length === b.length && a.every((c, i) => c === b[i]);
+
+/**
+ * Serialize with a minimal diff (#6): the original raw if nothing changed; otherwise
+ * untouched source rows are kept byte-for-byte and only edited / new rows are
+ * written (padded to the original column widths for aligned tables, in the
+ * original pipe style otherwise). Column-level changes (alignment, inserting,
+ * deleting or moving columns) re-format the whole table.
+ */
 export function serializeTable(orig: ParsedTable, model: TableModel): string {
   if (modelsEqual(orig, model)) return orig.raw;
-  return formatTable(model, orig.indent) + (orig.tail || '\n');
+  const tail = orig.tail || '\n';
+  const ncol = model.align.length;
+  const sameCols = ncol === orig.align.length && model.align.every((a, i) => a === orig.align[i]);
+  if (!sameCols || orig.delimLine === null || !model.src || model.src.length !== model.rows.length) {
+    return formatTable(model, orig.indent) + tail;
+  }
+  const widths = orig.pretty ? formatWidths(orig.rows.map((r) => escapedRow(r, ncol)), ncol) : null;
+  const { outer, spaced } = orig.style;
+  const fmt = (r: string[]) => {
+    const cells = escapedRow(r, ncol).map((c, j) => (widths ? pad(c, widths[j], model.align[j]) : c));
+    if (widths) return orig.indent + '| ' + cells.join(' | ') + ' |';
+    const sep = spaced ? ' | ' : '|';
+    const body = cells.join(sep);
+    return orig.indent + (outer ? (spaced ? '| ' + body + ' |' : '|' + body + '|') : body);
+  };
+  const out: string[] = [];
+  model.rows.forEach((r, i) => {
+    const s = model.src![i];
+    out.push(s !== null && s !== undefined && rowEq(r, orig.rows[s]) ? orig.lines[s] : fmt(r));
+    if (i === 0) out.push(orig.delimLine!);
+  });
+  return out.join('\n') + tail;
 }
 
 export function cloneModel(m: TableModel): TableModel {
-  return { rows: m.rows.map((r) => r.slice()), align: m.align.slice() };
+  const n: TableModel = { rows: m.rows.map((r) => r.slice()), align: m.align.slice() };
+  if (m.src) n.src = m.src.slice();
+  return n;
 }
 
 // ------------------------------------------------------------ structural edits
@@ -190,6 +248,7 @@ export function cloneModel(m: TableModel): TableModel {
 export function insertRow(m: TableModel, at: number): TableModel {
   const n = cloneModel(m);
   n.rows.splice(Math.max(1, at), 0, n.align.map(() => ''));
+  n.src?.splice(Math.max(1, at), 0, null);
   return n;
 }
 
@@ -197,9 +256,14 @@ export function deleteRow(m: TableModel, at: number): TableModel {
   const n = cloneModel(m);
   if (at === 0) {
     // deleting the header promotes the first body row (or clears the header)
-    if (n.rows.length > 1) n.rows.splice(0, 1);
-    else n.rows[0] = n.align.map(() => '');
-  } else n.rows.splice(at, 1);
+    if (n.rows.length > 1) {
+      n.rows.splice(0, 1);
+      n.src?.splice(0, 1);
+    } else n.rows[0] = n.align.map(() => '');
+  } else {
+    n.rows.splice(at, 1);
+    n.src?.splice(at, 1);
+  }
   return n;
 }
 
@@ -223,6 +287,10 @@ export function moveRow(m: TableModel, from: number, to: number): TableModel {
   if (from < 1 || to < 1 || to >= n.rows.length) return n;
   const [r] = n.rows.splice(from, 1);
   n.rows.splice(to, 0, r);
+  if (n.src) {
+    const [x] = n.src.splice(from, 1);
+    n.src.splice(to, 0, x);
+  }
   return n;
 }
 
@@ -247,4 +315,58 @@ export function setAlign(m: TableModel, col: number, a: Align): TableModel {
 /** A fresh empty table with given size (rows includes header). */
 export function emptyTable(rows: number, cols: number): TableModel {
   return { rows: Array.from({ length: rows }, () => Array.from({ length: cols }, () => '')), align: Array(cols).fill(null) };
+}
+
+// ------------------------------------------------------------ clipboard grids
+
+function parseCsvLine(line: string): string[] | null {
+  const out: string[] = [];
+  let cur = '';
+  let q = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (q) {
+      if (ch === '"' && line[i + 1] === '"') {
+        cur += '"';
+        i++;
+      } else if (ch === '"') q = false;
+      else cur += ch;
+    } else if (ch === '"' && cur.trim() === '') {
+      q = true;
+      cur = '';
+    } else if (ch === ',') {
+      out.push(cur.trim());
+      cur = '';
+    } else cur += ch;
+  }
+  if (q) return null;
+  out.push(cur.trim());
+  return out;
+}
+
+/**
+ * Interpret pasted text as a grid of cells: TSV (spreadsheets), a markdown pipe
+ * table, or CSV with a consistent column count. Returns null for plain text that
+ * should be inserted into one cell.
+ */
+export function parseClipboardGrid(text: string): string[][] | null {
+  const t = text.replace(/\r\n?/g, '\n').replace(/\n+$/, '');
+  if (!t) return null;
+  const lines = t.split('\n');
+  if (t.includes('\t')) return lines.map((l) => l.split('\t').map((c) => c.trim()));
+  if (lines.length < 2) return null;
+  if (lines[0].includes('|') && isDelimiterRow(lines[1])) return parseTable(t + '\n').rows;
+  const csv = lines.map(parseCsvLine);
+  if (csv.every((r) => r && r.length > 1 && r.length === csv[0]!.length)) return csv as string[][];
+  return null;
+}
+
+/** Paste a grid with its top-left at (r, c), growing the table as needed. */
+export function pasteGrid(m: TableModel, r: number, c: number, grid: string[][]): TableModel {
+  let n = cloneModel(m);
+  const width = Math.max(...grid.map((g) => g.length));
+  while (n.align.length < c + width) n = insertCol(n, n.align.length);
+  while (n.rows.length < r + grid.length) n = insertRow(n, n.rows.length);
+  grid.forEach((row, i) => row.forEach((v, j) => (n.rows[r + i][c + j] = v)));
+  return n;
 }
