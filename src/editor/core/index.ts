@@ -27,13 +27,33 @@ function textareaSource(host: HTMLElement, opts: { markdown: string; onChange(md
   ta.value = opts.markdown;
   ta.addEventListener('input', () => opts.onChange(ta.value));
   host.append(ta);
+  const lh = () => parseFloat(getComputedStyle(ta).lineHeight) || 20;
   return {
     getMarkdown: () => ta.value,
     setMarkdown: (md) => void (ta.value = md),
+    getSelection: () => (ta.selectionDirection === 'backward' ? { anchor: ta.selectionEnd, head: ta.selectionStart } : { anchor: ta.selectionStart, head: ta.selectionEnd }),
+    setSelection: (a, h) => ta.setSelectionRange(Math.min(a, h), Math.max(a, h), h < a ? 'backward' : 'forward'),
+    getTopLine: () => Math.floor(ta.scrollTop / lh()),
+    scrollToLine: (line) => void (ta.scrollTop = line * lh()),
     focus: () => ta.focus(),
     destroy: () => ta.remove(),
   };
 }
+
+const lineOf = (text: string, pos: number) => {
+  let n = 0;
+  for (let i = text.indexOf('\n'); i >= 0 && i < pos; i = text.indexOf('\n', i + 1)) n++;
+  return n;
+};
+const offsetOfLine = (text: string, line: number) => {
+  let p = 0;
+  for (let k = 0; k < line; k++) {
+    const i = text.indexOf('\n', p);
+    if (i < 0) return text.length;
+    p = i + 1;
+  }
+  return p;
+};
 
 export function createEditor(host: HTMLElement, settings: EditorSettings): EditorHandle {
   const ed = new EditorCore(host, { ...settings });
@@ -59,13 +79,52 @@ export function createEditor(host: HTMLElement, settings: EditorSettings): Edito
       el.textContent = '';
       inst = textareaSource(el, opts);
     }
+    const sel = ed.readSel() ?? ed.lastSel ?? { anchor: 0, focus: 0 };
+    const top = topLeafLine();
     ed.root.hidden = true;
     source = { inst, el };
     inst.focus();
+    // carry caret and scroll position into source mode (#35)
+    try {
+      if (top !== null) inst.scrollToLine?.(top);
+      if (inst.setSelection) inst.setSelection(sel.anchor, sel.focus);
+      else inst.view?.dispatch({ selection: { anchor: sel.anchor, head: sel.focus }, scrollIntoView: top === null });
+    } catch (e) {
+      console.error('[margin] source mode caret hand-off failed', e);
+    }
+  };
+
+  /** 0-based source line of the first text block visible in the viewport (null when unknown / at the top). */
+  const topLeafLine = (): number | null => {
+    const r = ed.root.getBoundingClientRect();
+    const sc = scrollBox();
+    const limit = Math.max(r.top, sc ? sc.getBoundingClientRect().top : 0);
+    if (r.top >= limit) return null;
+    for (const l of ed.doc.leaves) {
+      const el = ed.view.recs.get(l.id)?.el;
+      if (el && el.getBoundingClientRect().bottom > limit) return lineOf(ed.doc.text(), ed.doc.start(ed.doc.indexOf(l.id)));
+    }
+    return null;
+  };
+  const scrollBox = (): HTMLElement | null => {
+    for (let p = host as HTMLElement | null; p; p = p.parentElement) {
+      const o = getComputedStyle(p).overflowY;
+      if ((o === 'auto' || o === 'scroll') && p.scrollHeight > p.clientHeight) return p;
+    }
+    return null;
   };
   const sourceOff = () => {
     if (!source) return;
     const md = source.inst.getMarkdown();
+    let sel: { anchor: number; head: number } | null = null;
+    let top: number | null = null;
+    try {
+      const m = source.inst.view?.state.selection.main; // CodeMirror SelectionRange: anchor/head are getters
+      sel = source.inst.getSelection?.() ?? (m ? { anchor: m.anchor, head: m.head } : null);
+      top = source.inst.getTopLine?.() ?? null;
+    } catch {
+      /* hand-off is best effort */
+    }
     source.inst.destroy();
     source.el.remove();
     source = null;
@@ -78,6 +137,20 @@ export function createEditor(host: HTMLElement, settings: EditorSettings): Edito
       ed.hist.break();
     }
     ed.view.sync();
+    // carry caret and scroll position back (#35)
+    if (top !== null && top > 0) {
+      const pos = offsetOfLine(md, top);
+      const leaf = ed.doc.leaves[ed.doc.locate(pos).i];
+      ed.view.recs.get(leaf?.id ?? '')?.el.scrollIntoView({ block: 'start' });
+    }
+    if (sel) {
+      const fit = (p: number) => {
+        const at = ed.doc.locate(Math.max(0, Math.min(p, md.length)));
+        return ed.doc.docPos(at.i, at.off);
+      };
+      ed.root.focus({ preventScroll: true });
+      ed.setSel({ anchor: fit(sel.anchor), focus: fit(sel.head) }, top === null);
+    }
   };
 
   const handle: EditorHandle = {

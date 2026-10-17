@@ -105,4 +105,20 @@ test.describe('core QA regressions', () => {
     expect(await md(page)).toContain('Para 500 zzzzzzzzzzzzzzzzzzzzwith');
     expect(ms).toBeLessThan(25);
   });
+
+  test('source mode keeps the caret both ways; undo after leaving it (#35)', async ({ page }) => {
+    const big = Array.from({ length: 120 }, (_, i) => `## H${i}\n\npara ${i}\n`).join('\n');
+    await open(page, 'x\n');
+    await page.evaluate((m) => window.__core.ed.setMarkdown(m), big);
+    await endOf(page, 'para 100');
+    await page.evaluate(() => window.__core.ed.setSourceMode(true));
+    await page.keyboard.type('X');
+    expect(await md(page)).toContain('para 100X\n');
+    await page.evaluate(() => window.__core.ed.setSourceMode(false));
+    await page.keyboard.type('Y');
+    expect(await md(page)).toContain('para 100XY\n');
+    await page.keyboard.press(`${mod}+z`);
+    await page.keyboard.press(`${mod}+z`);
+    expect(await md(page)).toBe(big);
+  });
 });
