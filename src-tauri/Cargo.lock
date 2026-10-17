@@ -2119,6 +2119,7 @@ dependencies = [
  "block2",
  "chrono",
  "ignore",
+ "libc",
  "log",
  "notify",
  "notify-debouncer-full",

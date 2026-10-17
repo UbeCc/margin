@@ -3,6 +3,8 @@
 
 mod commands;
 mod fsops;
+#[cfg(unix)]
+mod fsops_unix;
 mod images;
 mod menu;
 #[cfg(target_os = "macos")]
