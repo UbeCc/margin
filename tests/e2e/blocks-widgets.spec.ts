@@ -28,8 +28,9 @@ test.describe('code fence', () => {
     );
   });
 
-  test('language box edits info string, copy button works', async ({ page, context }) => {
-    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  test('language box edits info string, copy button works', async ({ page, context, browserName }) => {
+    // Only Chromium knows these permission names; WebKit allows clipboard writes from user gestures.
+    if (browserName === 'chromium') await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     const h = host(page, 'code_fence_plain');
     await h.hover();
     const lang = h.locator('.mb-lang');
@@ -186,9 +187,12 @@ test.describe('html, front matter, toc', () => {
     expect(await page.evaluate(() => (window as any).__pwned)).toBeUndefined();
     await h.locator('.mb-preview').click();
     await page.keyboard.press(`${mod}+a`);
-    await page.keyboard.type('<p>new</p>');
-    await expect(h.locator('.mb-preview p')).toHaveText('new');
-    expect(await raw(page, 'html_block')).toBe('<p>new</p>\n');
+    // insertText bypasses the editor's tag auto-closing, which keystroke typing races with.
+    await page.keyboard.insertText('<p>new</p>');
+    // The preview re-renders on every keystroke, so wait for the final source first.
+    await expect.poll(() => raw(page, 'html_block')).toBe('<p>new</p>\n');
+    await expect(h.locator('.mb-preview p', { hasText: 'new' })).toHaveCount(1);
+    await expect(h.locator('.mb-preview p:empty')).toHaveCount(0);
   });
 
   test('front matter collapsed box and yaml editing', async ({ page }) => {
