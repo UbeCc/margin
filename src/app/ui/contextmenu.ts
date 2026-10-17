@@ -14,7 +14,7 @@ export function closeContextMenu(): void {
 export function showContextMenu(x: number, y: number, items: MenuItem[]): void {
   closeContextMenu();
   const buttons: HTMLButtonElement[] = [];
-  const menu = h('div.context-menu', { role: 'menu' });
+  const menu = h('div.context-menu', { role: 'menu', tabindex: '-1' });
   for (const it of items) {
     if ('separator' in it) {
       menu.appendChild(h('div.context-sep', { role: 'separator' }));
@@ -49,7 +49,7 @@ export function showContextMenu(x: number, y: number, items: MenuItem[]): void {
     const i = list.indexOf(document.activeElement as HTMLButtonElement);
     if (e.key === 'Escape') close();
     else if (e.key === 'ArrowDown') list[(i + 1) % list.length]?.focus();
-    else if (e.key === 'ArrowUp') list[(i - 1 + list.length) % list.length]?.focus();
+    else if (e.key === 'ArrowUp') list[(i - 1 + list.length + (i < 0 ? 1 : 0)) % list.length]?.focus();
     else return;
     e.preventDefault();
     e.stopPropagation();
@@ -69,5 +69,5 @@ export function showContextMenu(x: number, y: number, items: MenuItem[]): void {
   document.addEventListener('keydown', onKey, true);
   document.addEventListener('mousedown', onDown, true);
   window.addEventListener('blur', close);
-  enabled()[0]?.focus({ preventScroll: true });
+  menu.focus({ preventScroll: true });
 }
