@@ -149,3 +149,22 @@ test.describe('table cells', () => {
     await expect(cell(page, 0, 0)).toHaveText('`a\\|b`'); // raw while editing
   });
 });
+
+test('math \\label renders; \\eqref follows the referenced \\tag (#7)', async ({ page }) => {
+  await open(page, 'See $\\eqref{e}$ here.\n\n$$\nE = mc^2 \\tag{1} \\label{e}\n$$\n\n$$\nx \\label{plain}\n$$\n');
+  await expect(W(page, 'math_block', 1).locator('.katex')).toBeVisible();
+  await expect(W(page, 'math_block', 1).locator('.mb-error')).toHaveCount(0);
+  await expect(page.locator('.md-paragraph .mb-inline-math, .md-block').first()).toContainText('(1)');
+  await W(page, 'math_block', 0).click();
+  await page.waitForTimeout(150);
+  await page.keyboard.press(`${mod}+Home`);
+  await page.keyboard.press('End');
+  // change \tag{1} → \tag{7} through the editor
+  for (let i = 0; i < ' \\label{e}'.length + 1; i++) await page.keyboard.press('ArrowLeft');
+  await page.keyboard.press('Backspace');
+  await page.keyboard.type('7');
+  await expect.poll(() => md(page)).toContain('\\tag{7} \\label{e}');
+  await expect(page.locator('.md-block').first()).toContainText('(7)');
+  const html = await page.evaluate(() => window.__core.ed.renderHTML());
+  expect(html).not.toContain('mb-math-error');
+});

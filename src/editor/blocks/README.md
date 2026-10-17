@@ -10,7 +10,7 @@ import { registerWidget, registerInlineMath, registerSourceMode } from './index'
 
 installBlocks({ registerWidget, registerInlineMath, registerSourceMode }, {
   code: { lineNumbers: false },   // global fence line numbers (per fence: info `{.numberLines}`)
-  math: { numbering: false },     // auto (n) equation numbers via CSS counter
+  math: { numbering: false },     // auto (n) equation numbers (document order; \tag wins)
 });
 ```
 
@@ -21,7 +21,7 @@ Importing `editor/blocks` also imports `blocks.css` and KaTeX's CSS (side effect
 | type | raw it expects | notes |
 |---|---|---|
 | `code_fence` | a whole fence (``` or ~~~, any length, ≤3 indent, info string, optional closing, trailing blank lines) | CM6 per fence, created lazily: static highlighted `<pre>` until near viewport (IntersectionObserver, 300px margin) or click/`focus()`. Language box edits the info string, Copy button. |
-| `math_block` | `$$\n…\n$$` or `$$ … $$` | KaTeX preview; CM (latex) panel above while editing; errors inline. |
+| `math_block` | `$$\n…\n$$` or `$$ … $$` | KaTeX preview; CM (latex) panel above while editing; errors inline. `\label{x}` is accepted and `\ref{x}`/`\eqref{x}` (block or inline math) show the label's number — its `\tag` or, with `numbering`, its position (`math-refs.ts`, #7). |
 | `diagram` | fence with lang `mermaid`, `sequence`, `flow`, `flowchart` | mermaid (lazy `import()`), 350 ms debounce, theme follows `colorScheme`. js-sequence / flowchart.js syntax is translated to mermaid (`diagram-translate.ts`). The core should route fences with `isDiagramLang(lang)` to this widget. |
 | `table` | GFM pipe table (header + delimiter + rows) | contenteditable cells, toolbar, see keys below. Unchanged tables keep their exact source. Edits are minimal-diff: untouched rows stay byte-for-byte, edited/new rows are padded to the column widths of an aligned table (CJK width aware) or written in the source's pipe style; column-level changes (alignment, insert/delete/move column) re-format the whole table. |
 | `html_block` | the HTML block lines | allowlist sanitizer (`sanitize.ts`, re-sanitized to a fixed point against mutation XSS) for preview **and** export (#8). |

@@ -177,16 +177,17 @@
 .mb-math-block .katex-display { margin: 0.4em 0; }
 .mb-math-src { font: 0.9em var(--mb-mono); white-space: pre-wrap; color: var(--mb-muted); }
 .mb-inline-math.mb-math-error { color: var(--margin-error, #d1242f); font-family: var(--margin-mono, monospace); border-bottom: 1px dotted currentColor; }
-body { counter-reset: margin-eq; }
-.mb-math-block > .mb-preview.mb-numbered { counter-increment: margin-eq; }
-.mb-math-block > .mb-preview.mb-numbered::after {
-  content: '(' counter(margin-eq) ')';
+/* equation numbers are computed in math-refs.ts (document order, \label/\eqref) */
+.mb-math-block > .mb-preview.mb-numbered[data-eq]::after { content: '(' attr(data-eq) ')'; }
+.mb-math-block > .mb-preview.mb-numbered[data-eq]::after,
+.md-math-block > .md-eq-num {
   position: absolute;
   right: 0.5em;
   top: 50%;
   transform: translateY(-50%);
   color: var(--mb-fg);
 }
+.md-math-block { position: relative; }
 
 /* diagram */
 .mb-diagram > .mb-preview { text-align: center; overflow-x: auto; padding: 4px 0; }
