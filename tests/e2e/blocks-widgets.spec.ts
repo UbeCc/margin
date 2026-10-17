@@ -28,8 +28,9 @@ test.describe('code fence', () => {
     );
   });
 
-  test('language box edits info string, copy button works', async ({ page, context }) => {
-    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  test('language box edits info string, copy button works', async ({ page, context, browserName }) => {
+    // Only Chromium knows these permission names; WebKit allows clipboard writes from user gestures.
+    if (browserName === 'chromium') await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     const h = host(page, 'code_fence_plain');
     await h.hover();
     const lang = h.locator('.mb-lang');
