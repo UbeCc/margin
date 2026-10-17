@@ -1,5 +1,6 @@
 import { App } from './app/app';
 import { loadWiring } from './app/wiring';
+import { WEB_ROOT } from './platform';
 
 declare global {
   interface Window {
@@ -13,10 +14,11 @@ async function boot(): Promise<void> {
   const wiring = await loadWiring();
   const app = new App(wiring, mount);
   window.__margin = app;
-  let demo: { initialFolder: string; initialFile: string } | undefined;
-  if (wiring.using.platform === 'stub') {
-    const { DEMO_ROOT } = await import('./app/dev-stubs');
-    demo = { initialFolder: DEMO_ROOT, initialFile: `${DEMO_ROOT}/Welcome.md` };
+  // In the browser build, start in the sample folder (unless files were passed via ?open=).
+  let demo: { initialFolder: string; initialFile: string | null } | undefined;
+  if (wiring.platform.kind === 'web') {
+    const opening = new URLSearchParams(location.search).has('open');
+    demo = { initialFolder: WEB_ROOT, initialFile: opening ? null : `${WEB_ROOT}/Welcome.md` };
   }
   await app.start(demo);
 }

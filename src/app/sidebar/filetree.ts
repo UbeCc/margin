@@ -258,7 +258,7 @@ export class FileTree {
       if (ev.kind === 'renamed') {
         dirs.add(dirname(ev.from));
         dirs.add(dirname(ev.to));
-      } else if (ev.kind !== 'modified') dirs.add(dirname(ev.path));
+      } else if (ev.kind !== 'modified' || !this.rows.has(ev.path)) dirs.add(dirname(ev.path)); // atomic saves can surface as 'modified' of a new path
     }
     for (const d of dirs) void this.refreshDir(d);
   }

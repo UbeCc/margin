@@ -2,7 +2,7 @@ import type { Platform } from '../contracts';
 
 /**
  * Optional Platform capabilities the shell uses when present (feature-detected).
- * Requested as a contract addition in ARCHITECTURE.md; until then file-tree
+ * Requested in ARCHITECTURE.md / issue #21; until then file-tree
  * rename/delete/new-folder are disabled on platforms that lack them.
  */
 export interface PlatformExtras {
@@ -13,8 +13,6 @@ export interface PlatformExtras {
   createDir?(path: string): Promise<void>;
   /** Reveal in Finder / Explorer. */
   revealInFolder?(path: string): Promise<void>;
-  /** Native print of the current webview (falls back to window.print()). */
-  print?(): Promise<void>;
 }
 
 export type FullPlatform = Platform & PlatformExtras;

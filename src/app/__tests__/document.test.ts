@@ -1,7 +1,8 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import type { EditorHandle } from '../../contracts';
 import { DocumentController, applyEol, detectEol, normalizeEol, suggestName, type DocumentHost } from '../document';
-import { createMemoryPlatform, countStats, miniMarkdownToHtml } from '../dev-stubs';
+import { countStats, miniMarkdownToHtml } from '../dev-stubs';
+import { WebPlatform } from '../../platform/web';
 import { buildExportHtml, documentTitle, needsKatex } from '../export';
 
 function fakeEditor(): EditorHandle & { type(s: string): void } {
@@ -30,7 +31,17 @@ function fakeEditor(): EditorHandle & { type(s: string): void } {
   };
 }
 
-const flush = () => new Promise((r) => setTimeout(r, 200));
+const flush = () => new Promise((r) => setTimeout(r, 150));
+
+/** The real in-browser platform over an in-memory fs (no persistence, no key listener). */
+async function memPlatform(files: Record<string, string>) {
+  const p = new WebPlatform({ persist: false, seed: false, keyboardShortcuts: false, useFileSystemAccess: false, watchDelay: 5 });
+  for (const [path, text] of Object.entries(files)) await p.writeTextFile(path, text);
+  const dialogQueue: (string | null)[] = [];
+  p.dialogHook = () => dialogQueue.shift() ?? null;
+  const read = (path: string) => p.readTextFile(path);
+  return Object.assign(p, { dialogQueue, read });
+}
 
 describe('line endings', () => {
   it('detects, normalizes, re-applies', () => {
@@ -42,15 +53,15 @@ describe('line endings', () => {
 });
 
 describe('DocumentController', () => {
-  let platform: ReturnType<typeof createMemoryPlatform>;
+  let platform: Awaited<ReturnType<typeof memPlatform>>;
   let editor: ReturnType<typeof fakeEditor>;
   let host: DocumentHost;
   let doc: DocumentController;
   let answer: 'save' | 'discard' | 'cancel';
   let reload: boolean;
 
-  beforeEach(() => {
-    platform = createMemoryPlatform({ '/n/a.md': '# A\n', '/n/b.md': 'B\r\nline\r\n' });
+  beforeEach(async () => {
+    platform = await memPlatform({ '/n/a.md': '# A\n', '/n/b.md': 'B\r\nline\r\n' });
     editor = fakeEditor();
     answer = 'cancel';
     reload = false;
@@ -75,9 +86,9 @@ describe('DocumentController', () => {
     expect(doc.dirty).toBe(false);
     editor.type('more');
     expect(doc.dirty).toBe(true);
-    expect(platform.control.edited).toBe(false); // setDocumentEdited is the app's job via onState
+    expect(platform.documentEdited).toBe(false); // setDocumentEdited is the app's job via onState
     await doc.save();
-    expect(platform.control.files.get('/n/a.md')).toBe('# A\nmore');
+    expect(await platform.read('/n/a.md')).toBe('# A\nmore');
     expect(doc.dirty).toBe(false);
   });
 
@@ -86,7 +97,7 @@ describe('DocumentController', () => {
     expect(editor.getMarkdown()).toBe('B\nline\n');
     editor.type('x');
     await doc.save();
-    expect(platform.control.files.get('/n/b.md')).toBe('B\r\nline\r\nx');
+    expect(await platform.read('/n/b.md')).toBe('B\r\nline\r\nx');
   });
 
   it('undoing back to the saved text clears dirty', async () => {
@@ -106,29 +117,29 @@ describe('DocumentController', () => {
     expect(doc.path).toBe('/n/a.md');
     answer = 'discard';
     expect(await doc.open('/n/b.md')).toBe(true);
-    expect(platform.control.files.get('/n/a.md')).toBe('# A\n');
+    expect(await platform.read('/n/a.md')).toBe('# A\n');
   });
 
   it('save-as on untitled uses the dialog and starts watching', async () => {
     await doc.newDocument();
     editor.type('# Hello world\n');
-    platform.control.dialogQueue.push('/n/hello.md');
+    platform.dialogQueue.push('/n/hello.md');
     expect(await doc.save()).toBe(true);
     expect(doc.path).toBe('/n/hello.md');
-    expect(platform.control.files.get('/n/hello.md')).toBe('# Hello world\n');
+    expect(await platform.read('/n/hello.md')).toBe('# Hello world\n');
     expect(host.onOpened).toHaveBeenCalledWith('/n/hello.md');
   });
 
   it('reloads silently on external change when clean, asks when dirty', async () => {
     await doc.open('/n/a.md');
-    platform.control.writeExternal('/n/a.md', '# A changed\n');
+    platform.externalWrite('/n/a.md', '# A changed\n');
     await flush();
     expect(editor.getMarkdown()).toBe('# A changed\n');
     expect(host.askReloadDirty).not.toHaveBeenCalled();
 
     editor.type('mine');
     reload = false;
-    platform.control.writeExternal('/n/a.md', '# A again\n');
+    platform.externalWrite('/n/a.md', '# A again\n');
     await flush();
     expect(host.askReloadDirty).toHaveBeenCalled();
     expect(editor.getMarkdown()).toBe('# A changed\nmine');
@@ -149,13 +160,13 @@ describe('DocumentController', () => {
     await doc.open('/n/a.md');
     editor.type('auto');
     await flush();
-    expect(platform.control.files.get('/n/a.md')).toBe('# A\nauto');
+    expect(await platform.read('/n/a.md')).toBe('# A\nauto');
     expect(doc.dirty).toBe(false);
   });
 
   it('marks missing on delete and follows renames', async () => {
     await doc.open('/n/a.md');
-    platform.control.removeExternal('/n/a.md');
+    platform.externalRemove('/n/a.md');
     await flush();
     expect(doc.missing).toBe(true);
     doc.renamed('/n/a.md', '/n/c.md');
@@ -173,20 +184,6 @@ describe('DocumentController', () => {
   it('suggests names from the first line', () => {
     expect(suggestName('# My: Notes?\n')).toBe('My Notes');
     expect(suggestName('')).toBe('Untitled');
-  });
-});
-
-describe('memory platform', () => {
-  it('stores pasted images relative to the doc', async () => {
-    const p = createMemoryPlatform({ '/n/My Doc.md': '' });
-    const src = await p.storeImage('/n/My Doc.md', { kind: 'relative', dir: './${filename}.assets' }, { bytes: new Uint8Array([1]), name: 'a b.png' });
-    expect(src).toBe('My%20Doc.assets/a%20b.png');
-    expect(p.control.files.has('/n/My Doc.assets/a b.png')).toBe(true);
-    await expect(p.storeImage(null, { kind: 'relative', dir: './assets' }, { bytes: new Uint8Array([1]) })).rejects.toThrow();
-  });
-  it('quick open ranks under root', async () => {
-    const p = createMemoryPlatform({ '/r/a/roadmap.md': '', '/r/x.txt': '', '/other/road.md': '' });
-    expect(await p.quickOpen('/r', 'road')).toEqual(['/r/a/roadmap.md']);
   });
 });
 

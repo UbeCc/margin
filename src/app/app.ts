@@ -19,6 +19,7 @@ import { closeContextMenu } from './ui/contextmenu';
 import { debounce, h } from './util/dom';
 import { fuzzyFilter, fuzzyMatch } from './util/fuzzy';
 import { formatShortcut, isMac } from './util/keymap';
+import { matchShortcut as nativeShortcut } from '../platform/shortcuts';
 import { basename, dirname, displayPath, isInside, isMarkdownPath, isUrlLike, relative, resolveDocPath, stripExt } from './util/path';
 
 const ZOOM_STEPS = [0.5, 0.67, 0.75, 0.8, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2, 2.5, 3];
@@ -385,9 +386,19 @@ export class App {
 
   // ======================================================== assets & links
 
+  private allowedAssetDirs = new Set<string>();
+
   private resolveAsset(src: string): string {
     const p = resolveDocPath(src, this.doc?.dir ?? null);
-    return p ? this.platform.assetUrl(p) : src;
+    if (!p) return src;
+    // Desktop serves asset:// only from opened folders; whitelist other image dirs.
+    const dir = dirname(p);
+    const inside = (this.folder && isInside(this.folder, p)) || (this.doc?.dir && isInside(this.doc.dir, p));
+    if (!inside && !this.allowedAssetDirs.has(dir)) {
+      this.allowedAssetDirs.add(dir);
+      void this.platform.allowAssetDir(dir).catch(() => undefined);
+    }
+    return this.platform.assetUrl(p);
   }
 
   private async storeImage(input: { bytes?: Uint8Array; mime?: string; path?: string; name?: string }): Promise<string | null> {
@@ -441,13 +452,14 @@ export class App {
           return;
         }
         const spec = commandForKey(e);
-        if (!spec || spec.passthrough) return;
+        if (!spec) return;
+        // Keys owned by the native menu (emulated by WebPlatform in the browser) reach us
+        // through platform.onMenu; only handle app-only keys or ones the app maps differently.
+        if (nativeShortcut(e) === spec.id || spec.passthrough) return;
         if (document.querySelector('.modal-backdrop')) return;
-        const active = document.activeElement;
-        const inEditor = !active || active === document.body || this.editorHost.contains(active);
-        if (spec.scope === 'editor' && !inEditor) return;
+        if (spec.scope === 'editor' && !this.focusInEditor()) return;
         e.preventDefault();
-        e.stopPropagation();
+        e.stopImmediatePropagation();
         this.lastKeyAction = { id: spec.id, t: performance.now() };
         void this.run(spec.id);
       },
@@ -455,11 +467,26 @@ export class App {
     );
   }
 
+  private focusInEditor(): boolean {
+    const a = document.activeElement;
+    return !a || a === document.body || this.editorHost.contains(a);
+  }
+
   private onMenu(action: MenuAction): void {
-    // Native menu accelerators may duplicate a shortcut we already handled in JS.
+    // A key we already handled in JS may also arrive as a menu action.
     const last = this.lastKeyAction;
     if (last && last.id === action && performance.now() - last.t < 250) return;
     if (!isCommandId(action)) return console.warn('[margin] unknown menu action', action);
+    // Menu accelerators fire regardless of focus: keep editor commands out of the
+    // find bar / palette / dialogs, and give their text fields native undo/redo.
+    if (commandSpec(action)?.scope === 'editor' && !this.focusInEditor()) {
+      const a = document.activeElement;
+      if ((action === 'undo' || action === 'redo') && (a instanceof HTMLInputElement || a instanceof HTMLTextAreaElement)) {
+        document.execCommand(action);
+      }
+      return;
+    }
+    if (document.querySelector('.modal-backdrop') && action !== 'preferences') return;
     void this.run(action);
   }
 
@@ -503,12 +530,9 @@ export class App {
       case 'exportHtml':
       case 'exportPdf':
         return this.export(id === 'exportHtml' ? 'html' : 'pdf');
-      case 'print': {
-        const pr = extras(this.platform).print;
-        if (pr) await pr.call(this.platform);
-        else window.print();
+      case 'print':
+        await this.platform.print();
         return true;
-      }
       case 'undo':
       case 'redo':
         return ed.exec({ kind: id });
@@ -702,7 +726,7 @@ export class App {
     const html = buildExportHtml({ title: documentTitle(md, this.doc.path ? basename(this.doc.path) : null), body, themeCss: this.themes.exportCss(), extraCss: `${this.wiring.blocksCss}\n${katex}` });
     try {
       if (kind === 'html') await this.platform.exportHtml(html, target);
-      else await this.platform.exportPdf(html, target);
+      else await this.platform.exportPdf(html, target, { baseDir: this.doc.dir ?? undefined });
     } catch (e) {
       toast(`Export failed: ${e instanceof Error ? e.message : e}`, { kind: 'error' });
       return false;

@@ -1,113 +1,66 @@
 /**
  * THE single integration point between the app shell and the other modules.
  *
- * Real modules are discovered with `import.meta.glob`, so once
- *   src/editor/core/index.ts      (export const createEditor: CreateEditor)
- *   src/editor/blocks/index.ts    (blocksCSS for exports; the CORE calls installBlocks)
- *   src/platform/tauri.ts / web.ts (a Platform)
- * exist, they are used automatically; until then the dev stubs are used.
- * Force stubs with `?stub=all` / `?stub=editor` / `?stub=platform` (e2e tests do).
+ *  - Platform: `getPlatform()` from src/platform (Tauri in the app, WebPlatform in a browser).
+ *  - Blocks:   `installBlocks` + `blocksCSS` from src/editor/blocks.
+ *  - Editor:   src/editor/core/index.ts (`createEditor`) is discovered with `import.meta.glob`;
+ *              until the core lands (or with `?stub=editor`) a <textarea> stub is used.
  *
- * If the integrator prefers static imports, replace `loadWiring` with:
- *   import { createEditor } from '../editor/core';
- *   import { blocksCSS } from '../editor/blocks';
- *   import { platform } from '../platform/tauri'; …
+ * When the core is merged the integrator may replace the glob with a static
+ * `import { createEditor } from '../editor/core'` — nothing else imports these modules.
  */
 import type { CreateEditor, Platform } from '../contracts';
+import { getPlatform } from '../platform';
+import { blocksCSS, installBlocks, type BlocksApi } from '../editor/blocks';
+import { createStubEditor } from './dev-stubs';
 
 export interface Wiring {
   createEditor: CreateEditor;
   platform: Platform;
   /** Widget CSS from editor/blocks, inlined into exported HTML/PDF. */
   blocksCss: string;
-  /** Which implementation was chosen (shown in the dev console / used by tests). */
-  using: { editor: 'core' | 'stub'; platform: 'tauri' | 'web' | 'stub'; blocks: boolean };
+  /** Which implementation was chosen (dev console / tests). */
+  using: { editor: 'core' | 'stub'; platform: Platform['kind']; blocks: boolean };
 }
 
 type Loader = () => Promise<Record<string, unknown>>;
-
 const coreMods = import.meta.glob('../editor/core/index.ts') as Record<string, Loader>;
-const blockMods = import.meta.glob('../editor/blocks/index.ts') as Record<string, Loader>;
-const tauriMods = import.meta.glob('../platform/tauri.ts') as Record<string, Loader>;
-const webMods = import.meta.glob('../platform/web.ts') as Record<string, Loader>;
 
-function first(mods: Record<string, Loader>): Loader | null {
-  const k = Object.keys(mods)[0];
-  return k ? mods[k] : null;
-}
+let blocksInstalled = false;
 
-const isPlatform = (v: unknown): v is Platform =>
-  typeof v === 'object' && v !== null && 'readTextFile' in v && 'kind' in v;
-
-/** Accept `export const platform`, `export default`, or a `create*Platform()` factory. */
-async function pickPlatform(mod: Record<string, unknown>): Promise<Platform | null> {
-  for (const key of ['platform', 'default', 'tauriPlatform', 'webPlatform']) {
-    if (isPlatform(mod[key])) return mod[key] as Platform;
-  }
-  for (const [key, v] of Object.entries(mod)) {
-    if (typeof v === 'function' && /^create\w*Platform$/i.test(key)) {
-      const p = await (v as () => Platform | Promise<Platform>)();
-      if (isPlatform(p)) return p;
-    }
-  }
-  for (const v of Object.values(mod)) if (isPlatform(v)) return v;
-  return null;
-}
-
-export function isTauri(): boolean {
-  return typeof window !== 'undefined' && ('__TAURI_INTERNALS__' in window || '__TAURI__' in window);
+/** Register the block widgets with the core, unless the core already did it itself. */
+function wireBlocks(core: Record<string, unknown>): boolean {
+  if (blocksInstalled || core.blocksInstalled === true) return true;
+  const { registerWidget, registerInlineMath, registerSourceMode } = core;
+  if (typeof registerWidget !== 'function') return false;
+  installBlocks({ registerWidget, registerInlineMath, registerSourceMode } as BlocksApi);
+  blocksInstalled = true;
+  return true;
 }
 
 export async function loadWiring(): Promise<Wiring> {
-  const force = new URLSearchParams(location.search).get('stub') ?? '';
-  const forceEditor = /all|editor/.test(force);
-  const forcePlatform = /all|platform/.test(force);
-
-  let createEditor: CreateEditor | null = null;
-  let editorKind: Wiring['using']['editor'] = 'stub';
+  const forceStub = /all|editor/.test(new URLSearchParams(location.search).get('stub') ?? '');
+  let createEditor: CreateEditor = createStubEditor;
+  let editor: Wiring['using']['editor'] = 'stub';
   let blocks = false;
-  let blocksCss = '';
-  const coreLoader = first(coreMods);
-  if (coreLoader && !forceEditor) {
+
+  const loader = Object.values(coreMods)[0];
+  if (loader && !forceStub) {
     try {
-      // installBlocks(api) is wired by the core itself; we only need the CSS for exports.
-      const blocksLoader = first(blockMods);
-      if (blocksLoader) {
-        const bm = await blocksLoader();
-        blocks = true;
-        if (typeof bm.blocksCSS === 'string') blocksCss = bm.blocksCSS;
-      }
-      const cm = await coreLoader();
-      const ce = (cm.createEditor ?? cm.default) as CreateEditor | undefined;
+      const core = await loader();
+      const ce = (core.createEditor ?? core.default) as CreateEditor | undefined;
       if (typeof ce === 'function') {
+        blocks = wireBlocks(core);
         createEditor = ce;
-        editorKind = 'core';
+        editor = 'core';
       }
     } catch (e) {
-      console.error('[margin] failed to load editor core, falling back to stub', e);
+      console.error('[margin] failed to load editor core, using the textarea stub', e);
     }
   }
 
-  let platform: Platform | null = null;
-  let platformKind: Wiring['using']['platform'] = 'stub';
-  if (!forcePlatform) {
-    const loader = isTauri() ? first(tauriMods) : first(webMods);
-    if (loader) {
-      try {
-        platform = await pickPlatform(await loader());
-        if (platform) platformKind = platform.kind;
-      } catch (e) {
-        console.error('[margin] failed to load platform, falling back to stub', e);
-      }
-    }
-  }
-
-  if (!createEditor || !platform) {
-    const stubs = await import('./dev-stubs');
-    createEditor ??= stubs.createStubEditor;
-    platform ??= stubs.createMemoryPlatform();
-  }
-  const using = { editor: editorKind, platform: platformKind, blocks };
+  const platform = getPlatform();
+  const using = { editor, platform: platform.kind, blocks };
   console.info('[margin] wiring', using);
-  return { createEditor, platform, blocksCss, using };
+  return { createEditor, platform, blocksCss: blocksCSS, using };
 }

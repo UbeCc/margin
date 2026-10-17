@@ -46,7 +46,7 @@ export const COMMANDS: CommandSpec[] = [
   { id: 'close', label: 'Close File', category: 'File', keys: ['Mod+W'] },
   { id: 'reloadFromDisk', label: 'Reload From Disk', category: 'File' },
   { id: 'exportHtml', label: 'Export as HTML…', category: 'File' },
-  { id: 'exportPdf', label: 'Export as PDF…', category: 'File' },
+  { id: 'exportPdf', label: 'Export as PDF…', category: 'File', keys: ['Mod+Alt+E'] },
   { id: 'print', label: 'Print…', category: 'File', keys: ['Mod+Alt+P'] },
   { id: 'preferences', label: 'Preferences…', category: 'App', keys: ['Mod+,'] },
   { id: 'commandPalette', label: 'Command Palette…', category: 'App', keys: ['Mod+Shift+P'] },
