@@ -176,3 +176,35 @@ export function coreCases(): void {
     });
   });
 }
+
+export function widgetCases(): void {
+  test.describe("core + real block widgets", () => {
+    test("arrow into a code fence, edit, Escape out", async ({ page }) => {
+      await open(page, "p\n\n```js\nx\n```\n\nq\n");
+      await page.evaluate(() => window.__core.ed.exec({ kind: "find", query: "p" }));
+      await page.keyboard.press("ArrowRight");
+      await page.keyboard.press("ArrowDown");
+      await expect(page.locator(".md-widget .cm-focused")).toHaveCount(1);
+      await page.keyboard.type("y");
+      await expect.poll(() => md(page)).toBe("p\n\n```js\nyx\n```\n\nq\n");
+      await page.keyboard.press("Escape");
+      await page.keyboard.type("Z");
+      await expect.poll(() => md(page)).toBe("p\n\n```js\nyx\n```\n\nZq\n");
+    });
+
+    test("table shortcut mounts the table widget; headings fire outline events", async ({ page }) => {
+      await open(page, "x\n\n\n");
+      await page.keyboard.press("Tab"); // no-op outside lists
+      await page.locator(".md-editor").focus();
+      await page.keyboard.press(docEnd);
+      await page.keyboard.type("|a|b|");
+      await page.keyboard.press("Enter");
+      await expect(page.locator('.md-widget[data-type="table"] table')).toHaveCount(1);
+      expect(await md(page)).toBe("x\n\n|a|b|\n| --- | --- |\n|   |   |\n");
+      const before = await page.evaluate(() => window.__core.outlineEvents);
+      await page.evaluate(() => window.__core.ed.exec({ kind: "find", query: "x" }));
+      await page.evaluate(() => window.__core.ed.exec({ kind: "heading", level: 1 }));
+      expect(await page.evaluate(() => window.__core.outlineEvents)).toBeGreaterThan(before);
+    });
+  });
+}
