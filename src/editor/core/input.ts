@@ -10,6 +10,13 @@ import { leafContent } from './model';
 import * as E from './edit';
 import { onCopy, onPaste, onDrop } from './clipboard';
 import { undo, redo } from './commands';
+import { splitBlockMeta } from './render-inline';
+import type { Leaf } from './types';
+
+/** Length of a text leaf's leading hidden block marker ("## ", "[^1]: "). */
+function metaLen(l: Leaf): number {
+  return splitBlockMeta(l, leafContent(l))[0].length;
+}
 
 export function attachInput(ed: EditorCore): () => void {
   const root = ed.root;
@@ -171,11 +178,40 @@ export function attachInput(ed: EditorCore): () => void {
       ed.change(() => E.indent(ed.doc, c.i, c.off, e.shiftKey) ?? undefined);
       return;
     }
+    const edge = docEdgeKey(e);
+    if (edge) {
+      ed.hist.break();
+      if (docEdge(edge)) e.preventDefault();
+      return;
+    }
     if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
       ed.hist.break();
       if (e.shiftKey || mod || e.altKey) return;
       arrowIntoWidget(e);
     }
+  };
+
+  /** ⌘↑/⌘↓ (macOS) or Ctrl+Home/End without Shift: document start/end. */
+  const docEdgeKey = (e: KeyboardEvent): 'start' | 'end' | null => {
+    if (e.shiftKey || e.altKey) return null;
+    const mac = /Mac|iPhone|iPad/.test(navigator.platform);
+    if (e.ctrlKey && !e.metaKey && (e.key === 'Home' || e.key === 'End')) return e.key === 'Home' ? 'start' : 'end';
+    if (mac && e.metaKey && !e.ctrlKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) return e.key === 'ArrowUp' ? 'start' : 'end';
+    return null;
+  };
+
+  /**
+   * Move to the document start/end ourselves: native moves cannot enter a widget
+   * (#56) and WebKit lands before a heading's hidden marker (#57).
+   */
+  const docEdge = (at: 'start' | 'end'): boolean => {
+    const n = ed.doc.leaves.length;
+    if (!n) return false;
+    const i = at === 'start' ? 0 : n - 1;
+    const l = ed.doc.leaves[i];
+    if (!E.isTextLeaf(l)) ed.setSel({ widget: l.id, at });
+    else ed.setSel({ pos: at === 'start' ? ed.doc.docPos(0, metaLen(l)) : ed.doc.docPos(i, leafContent(l).length) });
+    return true;
   };
 
   /** Arrow at a text block edge next to a widget → hand the caret to the widget. */
