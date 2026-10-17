@@ -148,7 +148,12 @@ fn maybe_pdf_selftest<R: Runtime>(app: &AppHandle<R>) {
     let Ok(out) = std::env::var("MARGIN_PDF_SELFTEST") else { return };
     let app = app.clone();
     tauri::async_runtime::spawn(async move {
-        let mut html = String::from("<!doctype html><meta charset=utf-8><style>body{font:14px -apple-system;margin:0} h1{page-break-before:always} pre{background:#eee}</style><body>");
+        let mut html = String::from("<!doctype html><meta charset=utf-8><style>body{font:14px -apple-system;margin:0} h1:not(:first-of-type){page-break-before:always} pre{background:#eee}</style><body>");
+        // relative image → must resolve through the scoped asset protocol
+        if let Some(dir) = PathBuf::from(&out).parent() {
+            let _ = std::fs::write(dir.join("margin-selftest dot.svg"), "<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><circle cx='60' cy='60' r='50' fill='red'/></svg>");
+        }
+        html.push_str("<p><img src='margin-selftest%20dot.svg' width=120></p>");
         for i in 1..=6 {
             html.push_str(&format!("<h1>Section {i} — 中文标题</h1>"));
             for j in 0..12 {

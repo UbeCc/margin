@@ -126,6 +126,11 @@ pub async fn export_pdf<R: Runtime>(app: &AppHandle<R>, html: String, base_dir: 
 
 async fn run<R: Runtime>(win: &WebviewWindow<R>, html: String, base: String, out: PathBuf) -> Result<(), String> {
     on_main(win, move |wk, _| unsafe {
+        // Print CSS backgrounds (code blocks, tables, themes). macOS 13.3+.
+        let prefs = wk.configuration().preferences();
+        if prefs.respondsToSelector(sel!(setShouldPrintBackgrounds:)) {
+            prefs.setShouldPrintBackgrounds(true);
+        }
         let base_url = NSURL::URLWithString(&NSString::from_str(&base));
         wk.loadHTMLString_baseURL(&NSString::from_str(&html), base_url.as_deref());
     })?;
