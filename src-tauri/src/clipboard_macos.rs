@@ -72,11 +72,12 @@ pub fn validate_native(d: &NativeClipboardData) -> Result<(), String> {
     if empty {
         return Err("clipboard payload is empty".into());
     }
-    for s in [Some(d.plain.as_str()), d.html.as_deref(), d.markdown.as_deref(), d.rtf.as_deref()] {
-        if let Some(s) = s {
-            if s.len() > MAX_FLAVOR_BYTES {
-                return Err("clipboard flavour too large".into());
-            }
+    for s in [Some(d.plain.as_str()), d.html.as_deref(), d.markdown.as_deref(), d.rtf.as_deref()]
+        .into_iter()
+        .flatten()
+    {
+        if s.len() > MAX_FLAVOR_BYTES {
+            return Err("clipboard flavour too large".into());
         }
     }
     Ok(())
@@ -290,6 +291,7 @@ mod mac {
         ok
     }
 
+    #[cfg(test)]
     /// Raw bytes of a flavour (tests).
     pub(super) fn data_bytes(pb: &AnyObject, ty: &str) -> Option<Vec<u8>> {
         let ty = NSString::from_str(ty);

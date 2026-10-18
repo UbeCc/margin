@@ -354,9 +354,8 @@ test.describe('parity: clipboard & selection (#96)', () => {
 
   test('menu.edit.copy-as: in source mode every variant copies the selected source text (#116)', async ({ page, context, browserName }) => {
     if (browserName === 'chromium') await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-    const SRC = 'Some **bold** text\n';
-    await open(page, SRC, '&blocks=0');
-    // enter source mode and select "Some **bo" (raw markdown, markers included)
+    await open(page, 'Some **bold** text\n', '&blocks=0');
+    // enter source mode and select "Some **bol" (raw markdown, markers included)
     await page.evaluate(() => {
       window.__core.ed.setSourceMode(true);
       const ta = document.querySelector<HTMLTextAreaElement>('.md-source-fallback')!;
@@ -365,7 +364,7 @@ test.describe('parity: clipboard & selection (#96)', () => {
     });
     for (const format of ['markdown', 'html', 'plain'] as const) {
       expect(await run(page, { kind: 'copyAs', format })).toBe(true);
-      expect((await clipboard(page))['text/plain']).toBe('Some **bo');
+      expect((await clipboard(page))['text/plain']).toBe('Some **bol');
     }
     // collapsed selection: nothing to copy
     await page.evaluate(() => {
@@ -377,8 +376,14 @@ test.describe('parity: clipboard & selection (#96)', () => {
 
   test('menu.edit.paste-plain: in source mode it is the system plain paste (#116)', async ({ page, context, browserName }) => {
     if (browserName === 'chromium') await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-    await open(page, 'one two three\n', '&blocks=0');
-    await page.evaluate(() => navigator.clipboard.writeText('X Y'));
+    await open(page, 'one two three\n', '&blocks=0' + (browserName === 'webkit' ? '&clipread' : ''));
+    await page.evaluate(
+      ([t, native]) => {
+        if (native) window.__core.clip = { plain: t, html: null, rtfHtml: null };
+        else void navigator.clipboard.writeText(t);
+      },
+      ['X Y' as string, browserName === 'webkit'],
+    );
     await page.evaluate(() => {
       window.__core.ed.setSourceMode(true);
       const ta = document.querySelector<HTMLTextAreaElement>('.md-source-fallback')!;

@@ -367,7 +367,7 @@ export class App {
       storeImage: (input) => this.storeImage(input),
       openLink: (href) => void this.openLink(href),
       ...(this.platform.writeClipboardNative ? { writeClipboardNative: (d) => this.platform.writeClipboardNative!(d) } : {}),
-      docUrl: fileUrl(tab?.doc.path),
+      docUrl: fileUrl(tab?.doc?.path),
       ...(this.platform.readClipboard ? { readClipboard: () => this.platform.readClipboard!() } : {}),
       spellcheck: this.settings.spellcheck,
       focusMode: this.settings.focusMode,

@@ -1,5 +1,5 @@
 {
- "evidence_id": "ev_97aedb318e155220006093fe21f1908697fca104210623525a00f04245476357",
+ "evidence_id": "ev_c8f2d44f2e2f4872e7e7ff8604eca8ee8d8bf6e004c1c4dd13524308ad7e5ffc",
  "subject": null,
  "provider": {
   "id": "rea-javascript-application-workflows",
@@ -10,14 +10,14 @@
  "predicate_type": "rea.reconstruction-obligation-ledger",
  "operation": "build_reconstruction_obligation_ledger",
  "parameters": {
-  "ledger_id": "rol_89459f52199da740b0ceade93948afdb4eacff8c2d14b15ff7165a5cb5f0c118",
-  "closure_digest": "44e534bee801b1c4452a0186f1e3a21b4b453daf4f97a35b5f4ce7c4be8ce235"
+  "ledger_id": "rol_1772c2626fc1b87fabcd1f7cb841f663df47db9e658cb3b62ef13a8d786572b1",
+  "closure_digest": "3a440bc20f27d6727c50d2306bc690b7a073d5ee05389a0b64865bfdf7ee11f4"
  },
  "raw_result": null,
  "normalized_result": {
   "schema": "ReconstructionObligationLedger",
-  "ledger_id": "rol_89459f52199da740b0ceade93948afdb4eacff8c2d14b15ff7165a5cb5f0c118",
-  "closure_digest": "44e534bee801b1c4452a0186f1e3a21b4b453daf4f97a35b5f4ce7c4be8ce235",
+  "ledger_id": "rol_1772c2626fc1b87fabcd1f7cb841f663df47db9e658cb3b62ef13a8d786572b1",
+  "closure_digest": "3a440bc20f27d6727c50d2306bc690b7a073d5ee05389a0b64865bfdf7ee11f4",
   "status": "unknown",
   "coverage": {
    "status": "complete"
@@ -2036,7 +2036,7 @@
      "owner": {
       "module_path": "src/editor/core/input.ts",
       "symbol": "compositionend",
-      "owner_sha256": "f3a29f4ad35dc57d4e42e5e174a50cb7cd52f0733aae32c49f05e7caa10776a9"
+      "owner_sha256": "8fc840381159e18db075ff2ff1538a1f35ce3613e699fb663b47d88ff4d76152"
      },
      "parser_type": null,
      "original_cases": [
@@ -2244,7 +2244,7 @@
      "owner": {
       "module_path": "src/editor/core/input.ts",
       "symbol": "beforeinput",
-      "owner_sha256": "f3a29f4ad35dc57d4e42e5e174a50cb7cd52f0733aae32c49f05e7caa10776a9"
+      "owner_sha256": "8fc840381159e18db075ff2ff1538a1f35ce3613e699fb663b47d88ff4d76152"
      },
      "parser_type": null,
      "original_cases": [
@@ -7758,7 +7758,7 @@
      "owner": {
       "module_path": "src/app/prefs/editor-md.ts",
       "symbol": "'Check spelling while typing'",
-      "owner_sha256": "2e877e36cec6c8be43664de7d7d9a05819c88796937c9bb7467fa170ed9d3be3"
+      "owner_sha256": "9d7c5f2c81ac24ba14eb69e70e9a4a21914796d9fc9dc1dfba2fb2397277ff87"
      },
      "parser_type": null,
      "original_cases": [
@@ -12067,7 +12067,7 @@
      "owner": {
       "module_path": "src/editor/core/input.ts",
       "symbol": "Tab",
-      "owner_sha256": "f3a29f4ad35dc57d4e42e5e174a50cb7cd52f0733aae32c49f05e7caa10776a9"
+      "owner_sha256": "8fc840381159e18db075ff2ff1538a1f35ce3613e699fb663b47d88ff4d76152"
      },
      "parser_type": null,
      "original_cases": [
@@ -14522,7 +14522,7 @@
      "owner": {
       "module_path": "src/app/settings.ts",
       "symbol": "textColumnWidth",
-      "owner_sha256": "e05834acf99a8b4a1dc53a3e4d9f59618f5adbd22ab5699845a70e8857cb11b2"
+      "owner_sha256": "226224e728010c1d5e7bf56d2563cdbc64749e66e42fff95d625884f674f460c"
      },
      "parser_type": null,
      "original_cases": [
@@ -14604,7 +14604,7 @@
      "owner": {
       "module_path": "src/editor/core/input.ts",
       "symbol": "const autoPair",
-      "owner_sha256": "f3a29f4ad35dc57d4e42e5e174a50cb7cd52f0733aae32c49f05e7caa10776a9"
+      "owner_sha256": "8fc840381159e18db075ff2ff1538a1f35ce3613e699fb663b47d88ff4d76152"
      },
      "parser_type": null,
      "original_cases": [
@@ -14789,7 +14789,7 @@
      "owner": {
       "module_path": "src/app/settings.ts",
       "symbol": "export function newFileEol",
-      "owner_sha256": "e05834acf99a8b4a1dc53a3e4d9f59618f5adbd22ab5699845a70e8857cb11b2"
+      "owner_sha256": "226224e728010c1d5e7bf56d2563cdbc64749e66e42fff95d625884f674f460c"
      },
      "parser_type": null,
      "original_cases": [
@@ -14997,7 +14997,7 @@
      "owner": {
       "module_path": "src/app/settings.ts",
       "symbol": "export function launchPlan",
-      "owner_sha256": "e05834acf99a8b4a1dc53a3e4d9f59618f5adbd22ab5699845a70e8857cb11b2"
+      "owner_sha256": "226224e728010c1d5e7bf56d2563cdbc64749e66e42fff95d625884f674f460c"
      },
      "parser_type": null,
      "original_cases": [
@@ -15206,7 +15206,7 @@
      "owner": {
       "module_path": "src/app/settings.ts",
       "symbol": "DEFAULT_SETTINGS",
-      "owner_sha256": "e05834acf99a8b4a1dc53a3e4d9f59618f5adbd22ab5699845a70e8857cb11b2"
+      "owner_sha256": "226224e728010c1d5e7bf56d2563cdbc64749e66e42fff95d625884f674f460c"
      },
      "parser_type": null,
      "original_cases": [
@@ -15287,7 +15287,7 @@
      "owner": {
       "module_path": "src/app/settings.ts",
       "symbol": "DEFAULT_SETTINGS",
-      "owner_sha256": "e05834acf99a8b4a1dc53a3e4d9f59618f5adbd22ab5699845a70e8857cb11b2"
+      "owner_sha256": "226224e728010c1d5e7bf56d2563cdbc64749e66e42fff95d625884f674f460c"
      },
      "parser_type": null,
      "original_cases": [
@@ -16119,7 +16119,7 @@
      "owner": {
       "module_path": "src/editor/core/parser/options.ts",
       "symbol": "PARSER_KEYS",
-      "owner_sha256": "12e486c14eda14f7825f74dd6eda8f7d94f94fbe0d394ee9921363dca917b56c"
+      "owner_sha256": "8c2f093b63d6492555e9637b6d858d4cdf3f979aa65846523b9e7053b2a8a3a9"
      },
      "parser_type": null,
      "original_cases": [
@@ -16305,7 +16305,7 @@
      "owner": {
       "module_path": "src/editor/core/parser/starts.ts",
       "symbol": "outside Strict Mode",
-      "owner_sha256": "cd4f5c9fb8ea02ba52abf6176492de1031afba432c531317ce8a693bb9c6841a"
+      "owner_sha256": "9b50a5bcdd527cc2928b132d6b3353bf316343a496b6e21360c536b170d00434"
      },
      "parser_type": null,
      "original_cases": [

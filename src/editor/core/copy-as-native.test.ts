@@ -57,6 +57,7 @@ const source = (md: string, anchor: number, head: number): Src => {
 
 describe('Copy as … in source mode (#116, fe-contextmenus §1.5)', () => {
   it('every variant copies the selected source text', () => {
+    const ed = fakeEd({ writeClipboardNative: (_d: NativeClipboardData) => Promise.resolve(true) });
     expect(copyAsInSourceMode(ed, source('# Head\n\nbody **bold**\n', 8, 12))).toBe(true);
     expect(lastCopyAs.get(ed)).toEqual({ 'text/plain': 'body' });
   });
@@ -99,6 +100,6 @@ describe('Paste as Plain Text in source mode (#116)', () => {
   });
 
   it('reports false when the source mode cannot replace', () => {
-    expect(pastePlainInSourceMode(fakeEd({}), { getMarkdown: () => '' })).toBe(false);
+    expect(pastePlainInSourceMode(fakeEd({}), { getMarkdown: () => '' } as SourceModeLike)).toBe(false);
   });
 });
