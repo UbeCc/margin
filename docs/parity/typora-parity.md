@@ -9,14 +9,14 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 | | surfaces |
 |---|---|
 | total | 172 |
-| owned (implemented) | 154 (with a named passing test: 141) |
-| partial | 6 |
-| missing | 4 |
+| owned (implemented) | 160 (with a named passing test: 147) |
+| partial | 4 |
+| missing | 0 |
 | out of scope | 8 |
 
-REA ledger `rol_6026325b6947364ccb77a7b431f6a3115bf831e05a0cd6f97f64c5d3e8e8d2fe` (closure `1c6e39fb7de10c33…`): status **unknown**; unowned 4, implemented 160, out-of-scope 8, unknown 5.
+REA ledger `rol_0971bf7b466f6a8c468c6ef5675d428e8c0ce8aeb15915bc5c72ea34ffb59f06` (closure `107281c90c19cbe1…`): status **unknown**; implemented 164, out-of-scope 8, unknown 5.
 
-REA coverage boundary `margin.typora-parity`: status **unknown**; 141/164 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 4, package-proof-missing 1, verifier-missing 18, verifier-unknown 5.
+REA coverage boundary `margin.typora-parity`: status **unknown**; 147/164 claims qualified by controlled-replay verifier Evidence. Reasons: package-proof-missing 1, verifier-missing 13, verifier-unknown 4.
 
 Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): build exit 0, cargo-test exit 0, independence exit 0, playwright exit 0, vitest exit 0. See `rea/summary.json`.
 
@@ -37,12 +37,12 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `export` Export, import & print: image/Pandoc/custom formats, export settings, export-with-previous | P0 | 0 |
 | `clipboard` Clipboard & selection: copy-as / paste-as, selection & delete scopes, jump-to | P0 | 1 |
 | `ctx` Editor & sidebar context menus (text, link, table, image, code, math, diagram, outline, files) | P1 | 1 |
-| `tools` Table, code-fence and math tools | P1 | 1 |
+| `tools` Table, code-fence and math tools | P1 | 0 |
 | `images` Image pipeline: insert-local, copy/move/upload, zoom, syntax switch, image root path | P1 | 0 |
-| `prefs` Preferences completeness (General, Editor, Image, Markdown, Export, Appearance panes) | P1 | 2 |
+| `prefs` Preferences completeness (General, Editor, Image, Markdown, Export, Appearance panes) | P1 | 1 |
 | `sidebar` Sidebar & outline: list view, file search, sort, collapsible outline, filter | P1 | 0 |
 | `syntax` Markdown syntax options & whitespace/line-break settings | P2 | 1 |
-| `chrome` Window chrome & writing aids: status bar, always-on-top, spelling, substitutions, speech, emoji | P2 | 4 |
+| `chrome` Window chrome & writing aids: status bar, always-on-top, spelling, substitutions, speech, emoji | P2 | 0 |
 
 ## Application menu
 
@@ -93,10 +93,10 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `menu.edit.select-scopes` | Edit › Selection: Select Word / Line-Sentence / Paragraph-Block / Styled Scope | owned |  | `src/editor/core/scopes.ts` `export function selectScope` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.select-scopes: Edit › Selection | 5 |
 | `menu.edit.delete-scopes` | Edit › Delete Word / Line-Sentence / Paragraph-Block / Styled Scope / Range | owned |  | `src/editor/core/scopes.ts` `export function deleteScope` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.delete-scopes: Edit › Delete Word | 5 |
 | `menu.edit.jump` | Edit › Jump To: Top / Bottom / Selection | owned |  | `src/editor/core/scopes.ts` `export function jumpTo` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.jump: Edit › Jump To: Top / Bottom / Selection | 4 |
-| `menu.edit.spelling` | Edit › Spelling: check while typing, check now, learn/unlearn, grammar, autocorrect — only the WebView spellcheck toggle | **partial** | P2 | `src/app/prefs/editor-md.ts` `'Check spelling while typing'` | none | 22 |
-| `menu.edit.substitutions` | Edit › Substitutions: smart quotes/dashes/punctuation, text replacement | **missing** | P2 | — | none | 8 |
-| `menu.edit.speech` | Edit › Speech: Start / Stop Speaking | **missing** | P2 | — | none | 3 |
-| `menu.edit.emoji` | Edit › Emoji and Symbols (system picker) and :emoji: autocomplete | **missing** | P2 | — | none | 6 |
+| `menu.edit.spelling` | Edit › Spelling: check while typing, check now, learn/unlearn, grammar, autocorrect — #103: check-now/learn/unlearn/grammar per native-commands §5.2; autocorrect folds smartTextReplacement in (Typora pairs them) | owned |  | `src/app/commands.ts` `spell:toggle` | `tests/e2e/parity-chrome.spec.ts` › menu.edit.spelling: | 22 |
+| `menu.edit.substitutions` | Edit › Substitutions: smart quotes/dashes/punctuation, text replacement — #103: en/em dash rules -- → – and --- → —, smart quotes/closing quotes after letters; toggles push to editors via updateSettings | owned |  | `src/app/writing-aids.ts` `export class` | `tests/e2e/parity-chrome.spec.ts` › menu.edit.substitutions: | 8 |
+| `menu.edit.speech` | Edit › Speech: Start / Stop Speaking — #103: speaks the selection (or the document when nothing is selected) via speechSynthesis; Stop cancels | owned |  | `src/app/writing-aids.ts` `speechSynthesis` | `tests/e2e/parity-chrome.spec.ts` › menu.edit.speech: | 3 |
+| `menu.edit.emoji` | Edit › Emoji and Symbols (system picker) and :emoji: autocomplete — #103: system picker via insertText path; :emoji: autocomplete listens on capture-phase beforeinput and recomputes its trigger at accept time (editor batches DOM renders) | owned |  | `src/app/writing-aids.ts` `export class EmojiComplete` | `tests/e2e/parity-chrome.spec.ts` › menu.edit.emoji: | 6 |
 
 ## Paragraph menu
 
@@ -216,7 +216,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
 | `tools.diagram` | Diagrams: mermaid / sequence / flowchart render + theme | owned |  | `src/editor/blocks/diagram.ts` `createDiagramWidget` | `tests/e2e/blocks-widgets.spec.ts` › mermaid renders SVG, errors are shown, sequence syntax translated | 3 |
-| `tools.diagram.copy-image` | Diagram/math: Copy as Image, Save as PNG | **missing** | P2 | — | none | 3 |
+| `tools.diagram.copy-image` | Diagram/math: Copy as Image, Save as PNG — #127: math block/inline Copy as Image rasterises the rendered KaTeX to the clipboard; Save as PNG writes beside the document | owned |  | `src/app/ctxmenu/items.ts` `math:copyImage` | `tests/e2e/parity-tools.spec.ts` › tools.math.copy-image: | 3 |
 
 ## Images
 
@@ -245,7 +245,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `pref.general.language` | General: UI language — only English strings ship | owned |  | `src/app/prefs/general.ts` `System Language` | `tests/e2e/parity-prefs.spec.ts` › pref.general.language: General: UI language | 1 |
 | `pref.appearance.theme` | Appearance: theme, separate dark theme, follow system | owned |  | `src/app/preferences.ts` `'darkTheme'` | `tests/e2e/app-themes.spec.ts` › preferences: Theme lists light themes, Dark theme lists dark ones | 10 |
 | `pref.appearance.font` | Appearance: font size, custom CSS | owned |  | `src/app/preferences.ts` `'Font size in px'` | `tests/e2e/app-themes.spec.ts` › command palette theme entry and custom CSS | 3 |
-| `pref.appearance.window` | Appearance: window style (seamless/unibody/native), text column width, outline panel — text column width + outline-by-default (Margin extras) live, collapsible outline persisted; window style persisted only | **partial** | P2 | `src/app/settings.ts` `textColumnWidth` | `tests/e2e/parity-prefs.spec.ts` › pref.appearance.window: Appearance: window style (seamless/unibody/native), text column width, outline panel | 13 |
+| `pref.appearance.window` | Appearance: window style (seamless/unibody/native), text column width, outline panel — #134: style stored per settings and applied when each window is created (macOS titlebar bits in window_style.rs; seamless is the fresh-install default per fe-preferences §4.1); native/titlebar path itself is macOS-only by design (Typora 1.5.12 macOS) | owned |  | `src-tauri/src/window_style.rs` `pub fn apply` | `tests/e2e/parity-prefs.spec.ts` › pref.appearance.window: Appearance: window style (seamless/unibody/native), text column width, outline panel | 13 |
 | `pref.editor.general` | Editor: auto pair brackets/markdown, display source on focus, heading style, indent — auto pair (markdown pairing depends on bracket pairing) + display source on focus; Indent Size on Save / Pretty indentation and Heading Style pending (gap issue) | **partial** | P1 | `src/editor/core/input.ts` `const autoPair` | `tests/e2e/parity-prefs.spec.ts` › pref.editor.general: Editor: auto pair brackets/markdown, display source on focus, heading style, indent | 10 |
 | `pref.editor.shortcuts` | Custom shortcut keys — in-app JSON key map for the JS keymap (Typora macOS opens a help page); native menu accelerators unchanged | owned |  | `src/app/commands.ts` `export function setCustomKeys` | `tests/e2e/parity-prefs.spec.ts` › pref.editor.shortcuts: Custom shortcut keys | 2 |
 | `pref.files.defaults` | Files: default line ending, default folder, file extensions — line ending for new files; default folder via On Launch | owned |  | `src/app/settings.ts` `export function newFileEol` | `tests/e2e/parity-prefs.spec.ts` › pref.files.defaults: Files: default line ending | 8 |

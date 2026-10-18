@@ -2,22 +2,22 @@
  "generated_from": {
   "spec": "typora-re/parity-spec.md",
   "prose": "typora-re/sections/*.md",
-  "margin_head": "6bf87447ed3cd7d1f32aa82779ee2c86aeed103e"
+  "margin_head": "950546ad4c5c986207aea8ccfc050da9653da74c"
  },
  "summary": {
-  "head": "6bf87447ed3cd7d1f32aa82779ee2c86aeed103e",
+  "head": "950546ad4c5c986207aea8ccfc050da9653da74c",
   "artifact_sha256": "a8818df6ac7d968d669d275a99c2d2e8653fa388a8b4e20f9da559553e79bdbb",
   "inventory": {
    "total": 172,
-   "owned": 154,
-   "partial": 6,
-   "missing": 4,
+   "owned": 160,
+   "partial": 4,
+   "missing": 0,
    "oos": 8,
-   "verified_by_test": 141
+   "verified_by_test": 147
   },
   "ledger": {
-   "ledger_id": "rol_6026325b6947364ccb77a7b431f6a3115bf831e05a0cd6f97f64c5d3e8e8d2fe",
-   "closure_digest": "1c6e39fb7de10c332d2278f4be20e86a6f405ee4e1d3b53dd408549a2d40a1aa",
+   "ledger_id": "rol_0971bf7b466f6a8c468c6ef5675d428e8c0ce8aeb15915bc5c72ea34ffb59f06",
+   "closure_digest": "107281c90c19cbe165d82d4408fd6708c4d37f57bd479d655030d3542b01e5d3",
    "status": "unknown",
    "summary": {
     "total": 177,
@@ -27,7 +27,7 @@
     "by_status": [
      {
       "key": "unowned",
-      "count": 4
+      "count": 0
      },
      {
       "key": "characterized",
@@ -35,7 +35,7 @@
      },
      {
       "key": "implemented",
-      "count": 160
+      "count": 164
      },
      {
       "key": "verified",
@@ -119,18 +119,17 @@
      }
     ]
    },
-   "evidence_id": "ev_7b98173ab80059f4532ff22019e3249023706f24d5105620ee600d70239352d6"
+   "evidence_id": "ev_39475fb3ebbf5f5e62484183dff845b5269206d4b49cd252beef8ceed33a4171"
   },
   "coverage": {
    "status": "unknown",
    "reason_counts": {
-    "owner-missing": 4,
     "package-proof-missing": 1,
-    "verifier-missing": 18,
-    "verifier-unknown": 5
+    "verifier-missing": 13,
+    "verifier-unknown": 4
    },
    "claims_total": 164,
-   "claims_qualified_by_controlled_replay": 141,
+   "claims_qualified_by_controlled_replay": 147,
    "evidence_ids_cited": 176
   },
   "verifier_runs": {
@@ -1642,15 +1641,19 @@
    "obligation_id": "typora.menu.edit.spelling",
    "id": "menu.edit.spelling",
    "title": "Edit › Spelling: check while typing, check now, learn/unlearn, grammar, autocorrect",
-   "status": "partial",
-   "priority": "P2",
+   "status": "owned",
+   "priority": null,
    "epic": "chrome",
    "owner": {
-    "path": "src/app/prefs/editor-md.ts",
-    "anchor": "'Check spelling while typing'",
-    "sha256": "05e5d53232d683c656817992bfe6df0d27567abf2cb81d2ffbb31bb624dfa604"
+    "path": "src/app/commands.ts",
+    "anchor": "spell:toggle",
+    "sha256": "190d7fcff28d6b8d9347545cf5ad2bb3f42bbca6a3d8a795a9760bf88ddc03e0"
    },
-   "verifier": null,
+   "verifier": {
+    "file": "tests/e2e/parity-chrome.spec.ts",
+    "test": "menu.edit.spelling:",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [
      "Spell Check",
@@ -1684,26 +1687,34 @@
      "editor-core §8.3"
     ]
    },
-   "note": "only the WebView spellcheck toggle",
+   "note": "#103: check-now/learn/unlearn/grammar per native-commands §5.2; autocorrect folds smartTextReplacement in (Typora pairs them)",
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-case",
-    "missing-verifier",
     "static-only",
-    "weak-original-case-authority"
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.menu.edit.substitutions",
    "id": "menu.edit.substitutions",
    "title": "Edit › Substitutions: smart quotes/dashes/punctuation, text replacement",
-   "status": "missing",
-   "priority": "P2",
+   "status": "owned",
+   "priority": null,
    "epic": "chrome",
-   "owner": null,
-   "verifier": null,
+   "owner": {
+    "path": "src/app/writing-aids.ts",
+    "anchor": "export class",
+    "sha256": "2f86a3ce410ad663b6c033556080b186a4647406ad5193ac7a73e61e0d3c4986"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-chrome.spec.ts",
+    "test": "menu.edit.substitutions:",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [
      "Substitutions",
@@ -1721,25 +1732,34 @@
     ],
     "prose": []
    },
-   "note": null,
+   "note": "#103: en/em dash rules -- → – and --- → —, smart quotes/closing quotes after letters; toggles push to editors via updateSettings",
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.menu.edit.speech",
    "id": "menu.edit.speech",
    "title": "Edit › Speech: Start / Stop Speaking",
-   "status": "missing",
-   "priority": "P2",
+   "status": "owned",
+   "priority": null,
    "epic": "chrome",
-   "owner": null,
-   "verifier": null,
+   "owner": {
+    "path": "src/app/writing-aids.ts",
+    "anchor": "speechSynthesis",
+    "sha256": "2f86a3ce410ad663b6c033556080b186a4647406ad5193ac7a73e61e0d3c4986"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-chrome.spec.ts",
+    "test": "menu.edit.speech:",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [
      "Speech",
@@ -1750,25 +1770,34 @@
     "bridge": [],
     "prose": []
    },
-   "note": null,
+   "note": "#103: speaks the selection (or the document when nothing is selected) via speechSynthesis; Stop cancels",
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.menu.edit.emoji",
    "id": "menu.edit.emoji",
    "title": "Edit › Emoji and Symbols (system picker) and :emoji: autocomplete",
-   "status": "missing",
-   "priority": "P2",
+   "status": "owned",
+   "priority": null,
    "epic": "chrome",
-   "owner": null,
-   "verifier": null,
+   "owner": {
+    "path": "src/app/writing-aids.ts",
+    "anchor": "export class EmojiComplete",
+    "sha256": "2f86a3ce410ad663b6c033556080b186a4647406ad5193ac7a73e61e0d3c4986"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-chrome.spec.ts",
+    "test": "menu.edit.emoji:",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [
      "Emoji and Symbols"
@@ -1783,15 +1812,16 @@
     "bridge": [],
     "prose": []
    },
-   "note": null,
+   "note": "#103: system picker via insertText path; :emoji: autocomplete listens on capture-phase beforeinput and recomputes its trigger at accept time (editor batches DOM renders)",
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.menu.para.headings",
@@ -4165,11 +4195,19 @@
    "obligation_id": "typora.tools.diagram.copy-image",
    "id": "tools.diagram.copy-image",
    "title": "Diagram/math: Copy as Image, Save as PNG",
-   "status": "missing",
-   "priority": "P2",
+   "status": "owned",
+   "priority": null,
    "epic": "tools",
-   "owner": null,
-   "verifier": null,
+   "owner": {
+    "path": "src/app/ctxmenu/items.ts",
+    "anchor": "math:copyImage",
+    "sha256": "48873bdc7750656dddabfd7c4f2ab18a8ecd7d26470e0c9b404b6797d03afea3"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-tools.spec.ts",
+    "test": "tools.math.copy-image:",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [
      "Copy as Image"
@@ -4183,15 +4221,16 @@
      "images §4.7"
     ]
    },
-   "note": null,
+   "note": "#127: math block/inline Copy as Image rasterises the rendered KaTeX to the clipboard; Save as PNG writes beside the document",
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.images.paste-drop",
@@ -5011,13 +5050,13 @@
    "obligation_id": "typora.pref.appearance.window",
    "id": "pref.appearance.window",
    "title": "Appearance: window style (seamless/unibody/native), text column width, outline panel",
-   "status": "partial",
-   "priority": "P2",
+   "status": "owned",
+   "priority": null,
    "epic": "prefs",
    "owner": {
-    "path": "src/app/settings.ts",
-    "anchor": "textColumnWidth",
-    "sha256": "be61152e04db49367e419a12e3dfe799db9d807cd18120674327e6109131b9b1"
+    "path": "src-tauri/src/window_style.rs",
+    "anchor": "pub fn apply",
+    "sha256": "ea250449678f960aa9b0fc8ccc9fc38e7dc940bf5c0b2b35f4f975e674ac6726"
    },
    "verifier": {
     "file": "tests/e2e/parity-prefs.spec.ts",
@@ -5045,16 +5084,16 @@
     ],
     "prose": []
    },
-   "note": "text column width + outline-by-default (Margin extras) live, collapsible outline persisted; window style persisted only",
+   "note": "#134: style stored per settings and applied when each window is created (macOS titlebar bits in window_style.rs; seamless is the fresh-install default per fe-preferences §4.1); native/titlebar path itself is macOS-only by design (Typora 1.5.12 macOS)",
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-case",
-    "missing-verifier",
     "static-only",
-    "weak-original-case-authority"
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.pref.editor.general",

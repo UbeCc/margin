@@ -1114,13 +1114,11 @@
    "residual_unknown_ids": [],
    "unavailable_authority": [],
    "required_next_evidence": [
-    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules.",
-    "Add an e2e verifier that enumerates this obligation.",
-    "Implement: only the WebView spellcheck toggle"
+    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules."
    ],
    "disposition": "active",
    "review_evidence_ids": [
-    "ev_66f7e76e64bc4fe44949654243e06bd7cc6eb21a79a3a9849b1df0a7f871f80f"
+    "ev_68145a123f798eedbb29fcdff242eaca627c302fffcd1a48a3defe95d8434bec"
    ]
   },
   {
@@ -1147,13 +1145,11 @@
    "residual_unknown_ids": [],
    "unavailable_authority": [],
    "required_next_evidence": [
-    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules.",
-    "Add an e2e verifier that enumerates this obligation.",
-    "Implement: Edit › Substitutions: smart quotes/dashes/punctuation, text replacement"
+    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules."
    ],
    "disposition": "active",
    "review_evidence_ids": [
-    "ev_f915a919a67e0bd6a4da0d9cc655ad5297aa4a298fed727761388011a0eaa30f"
+    "ev_00a8a5b673277bb633a36c1ea9b59592c34f09080c94204d98b060983668b371"
    ]
   },
   {
@@ -1180,13 +1176,11 @@
    "residual_unknown_ids": [],
    "unavailable_authority": [],
    "required_next_evidence": [
-    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules.",
-    "Add an e2e verifier that enumerates this obligation.",
-    "Implement: Edit › Speech: Start / Stop Speaking"
+    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules."
    ],
    "disposition": "active",
    "review_evidence_ids": [
-    "ev_f9c10eff1055cd2246addd46f5478402628d14660e97906e1be0fb96718d6af3"
+    "ev_80439eb73f0cb85ef7acf1cfe923abb8955b2ac87e3f2fcbddd544cd9f1dcd39"
    ]
   },
   {
@@ -1213,13 +1207,11 @@
    "residual_unknown_ids": [],
    "unavailable_authority": [],
    "required_next_evidence": [
-    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules.",
-    "Add an e2e verifier that enumerates this obligation.",
-    "Implement: Edit › Emoji and Symbols (system picker) and :emoji: autocomplete"
+    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules."
    ],
    "disposition": "active",
    "review_evidence_ids": [
-    "ev_24b85bcb7b6f02107a51c32f3b2ab58f167014f21a3ab7732431d42a5e109e30"
+    "ev_6625dc4b81a220e1b6ee30324d28507ce72cb785f2a0318324b375da26057ddf"
    ]
   },
   {
@@ -3077,13 +3069,11 @@
    "residual_unknown_ids": [],
    "unavailable_authority": [],
    "required_next_evidence": [
-    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules.",
-    "Add an e2e verifier that enumerates this obligation.",
-    "Implement: Diagram/math: Copy as Image, Save as PNG"
+    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules."
    ],
    "disposition": "active",
    "review_evidence_ids": [
-    "ev_6dd1689dda6774d9134d5e23205dfe6d3a7fad3082515a857b7c72d34ae7d13c"
+    "ev_b8b595fa4d26eb90d2da01afe9ed34b628e92447e07f908ed8e106054e8c297f"
    ]
   },
   {
@@ -3666,12 +3656,11 @@
    "residual_unknown_ids": [],
    "unavailable_authority": [],
    "required_next_evidence": [
-    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules.",
-    "Implement: text column width + outline-by-default (Margin extras) live, collapsible outline persisted; window style persisted only"
+    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules."
    ],
    "disposition": "active",
    "review_evidence_ids": [
-    "ev_06a2671f6d3de594723fa6fb8cf2f57bc4b156e28e227f125d6109af377a1de7"
+    "ev_65f27f9ffd8f2cf5013fb7f1a4effa5fc13edefa68912d7a35dc4844cf560e58"
    ]
   },
   {
@@ -6694,20 +6683,166 @@
    {
     "obligation_id": "typora.menu.edit.spelling",
     "owner": {
-     "module_path": "src/app/prefs/editor-md.ts",
-     "symbol": "'Check spelling while typing'",
-     "owner_sha256": "05e5d53232d683c656817992bfe6df0d27567abf2cb81d2ffbb31bb624dfa604"
+     "module_path": "src/app/commands.ts",
+     "symbol": "spell:toggle",
+     "owner_sha256": "190d7fcff28d6b8d9347545cf5ad2bb3f42bbca6a3d8a795a9760bf88ddc03e0"
     },
     "parser_type": null,
     "original_cases": [
      {
       "kind": "positive",
-      "evidence_id": "ev_66f7e76e64bc4fe44949654243e06bd7cc6eb21a79a3a9849b1df0a7f871f80f",
+      "evidence_id": "ev_68145a123f798eedbb29fcdff242eaca627c302fffcd1a48a3defe95d8434bec",
       "location": "editor-core §8.3"
      }
     ],
-    "fixtures": [],
-    "verifier": null
+    "fixtures": [
+     {
+      "fixture_id": "menu.edit.spelling.positive",
+      "case_kind": "positive",
+      "authority": "renderer",
+      "evidence_ids": [
+       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+      ]
+     }
+    ],
+    "verifier": {
+     "verifier_id": "margin.playwright.menu.edit.spelling",
+     "claim_id": "claim.menu.edit.spelling",
+     "command": "npx playwright test tests/e2e/parity-chrome.spec.ts -g \"menu.edit.spelling:\"",
+     "authority": "renderer",
+     "status": "pass",
+     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "enumerated_obligation_ids": [
+      "typora.menu.edit.spelling"
+     ],
+     "nondeterminism": {
+      "mode": "total-order",
+      "specification": "Single deterministic suite run; pass = suite exited 0 with the named test not skipped."
+     }
+    }
+   },
+   {
+    "obligation_id": "typora.menu.edit.substitutions",
+    "owner": {
+     "module_path": "src/app/writing-aids.ts",
+     "symbol": "export class",
+     "owner_sha256": "2f86a3ce410ad663b6c033556080b186a4647406ad5193ac7a73e61e0d3c4986"
+    },
+    "parser_type": null,
+    "original_cases": [
+     {
+      "kind": "positive",
+      "evidence_id": "ev_00a8a5b673277bb633a36c1ea9b59592c34f09080c94204d98b060983668b371",
+      "location": "typora-re/parity-spec.md"
+     }
+    ],
+    "fixtures": [
+     {
+      "fixture_id": "menu.edit.substitutions.positive",
+      "case_kind": "positive",
+      "authority": "renderer",
+      "evidence_ids": [
+       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+      ]
+     }
+    ],
+    "verifier": {
+     "verifier_id": "margin.playwright.menu.edit.substitutions",
+     "claim_id": "claim.menu.edit.substitutions",
+     "command": "npx playwright test tests/e2e/parity-chrome.spec.ts -g \"menu.edit.substitutions:\"",
+     "authority": "renderer",
+     "status": "pass",
+     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "enumerated_obligation_ids": [
+      "typora.menu.edit.substitutions"
+     ],
+     "nondeterminism": {
+      "mode": "total-order",
+      "specification": "Single deterministic suite run; pass = suite exited 0 with the named test not skipped."
+     }
+    }
+   },
+   {
+    "obligation_id": "typora.menu.edit.speech",
+    "owner": {
+     "module_path": "src/app/writing-aids.ts",
+     "symbol": "speechSynthesis",
+     "owner_sha256": "2f86a3ce410ad663b6c033556080b186a4647406ad5193ac7a73e61e0d3c4986"
+    },
+    "parser_type": null,
+    "original_cases": [
+     {
+      "kind": "positive",
+      "evidence_id": "ev_80439eb73f0cb85ef7acf1cfe923abb8955b2ac87e3f2fcbddd544cd9f1dcd39",
+      "location": "typora-re/parity-spec.md"
+     }
+    ],
+    "fixtures": [
+     {
+      "fixture_id": "menu.edit.speech.positive",
+      "case_kind": "positive",
+      "authority": "renderer",
+      "evidence_ids": [
+       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+      ]
+     }
+    ],
+    "verifier": {
+     "verifier_id": "margin.playwright.menu.edit.speech",
+     "claim_id": "claim.menu.edit.speech",
+     "command": "npx playwright test tests/e2e/parity-chrome.spec.ts -g \"menu.edit.speech:\"",
+     "authority": "renderer",
+     "status": "pass",
+     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "enumerated_obligation_ids": [
+      "typora.menu.edit.speech"
+     ],
+     "nondeterminism": {
+      "mode": "total-order",
+      "specification": "Single deterministic suite run; pass = suite exited 0 with the named test not skipped."
+     }
+    }
+   },
+   {
+    "obligation_id": "typora.menu.edit.emoji",
+    "owner": {
+     "module_path": "src/app/writing-aids.ts",
+     "symbol": "export class EmojiComplete",
+     "owner_sha256": "2f86a3ce410ad663b6c033556080b186a4647406ad5193ac7a73e61e0d3c4986"
+    },
+    "parser_type": null,
+    "original_cases": [
+     {
+      "kind": "positive",
+      "evidence_id": "ev_6625dc4b81a220e1b6ee30324d28507ce72cb785f2a0318324b375da26057ddf",
+      "location": "typora-re/parity-spec.md"
+     }
+    ],
+    "fixtures": [
+     {
+      "fixture_id": "menu.edit.emoji.positive",
+      "case_kind": "positive",
+      "authority": "renderer",
+      "evidence_ids": [
+       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+      ]
+     }
+    ],
+    "verifier": {
+     "verifier_id": "margin.playwright.menu.edit.emoji",
+     "claim_id": "claim.menu.edit.emoji",
+     "command": "npx playwright test tests/e2e/parity-chrome.spec.ts -g \"menu.edit.emoji:\"",
+     "authority": "renderer",
+     "status": "pass",
+     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "enumerated_obligation_ids": [
+      "typora.menu.edit.emoji"
+     ],
+     "nondeterminism": {
+      "mode": "total-order",
+      "specification": "Single deterministic suite run; pass = suite exited 0 with the named test not skipped."
+     }
+    }
    },
    {
     "obligation_id": "typora.menu.para.headings",
@@ -8909,6 +9044,47 @@
     }
    },
    {
+    "obligation_id": "typora.tools.diagram.copy-image",
+    "owner": {
+     "module_path": "src/app/ctxmenu/items.ts",
+     "symbol": "math:copyImage",
+     "owner_sha256": "48873bdc7750656dddabfd7c4f2ab18a8ecd7d26470e0c9b404b6797d03afea3"
+    },
+    "parser_type": null,
+    "original_cases": [
+     {
+      "kind": "positive",
+      "evidence_id": "ev_b8b595fa4d26eb90d2da01afe9ed34b628e92447e07f908ed8e106054e8c297f",
+      "location": "images §4.7"
+     }
+    ],
+    "fixtures": [
+     {
+      "fixture_id": "tools.diagram.copy-image.positive",
+      "case_kind": "positive",
+      "authority": "renderer",
+      "evidence_ids": [
+       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+      ]
+     }
+    ],
+    "verifier": {
+     "verifier_id": "margin.playwright.tools.diagram.copy-image",
+     "claim_id": "claim.tools.diagram.copy-image",
+     "command": "npx playwright test tests/e2e/parity-tools.spec.ts -g \"tools.math.copy-image:\"",
+     "authority": "renderer",
+     "status": "pass",
+     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "enumerated_obligation_ids": [
+      "typora.tools.diagram.copy-image"
+     ],
+     "nondeterminism": {
+      "mode": "total-order",
+      "specification": "Single deterministic suite run; pass = suite exited 0 with the named test not skipped."
+     }
+    }
+   },
+   {
     "obligation_id": "typora.images.paste-drop",
     "owner": {
      "module_path": "src/app/images/insert.ts",
@@ -9608,20 +9784,43 @@
    {
     "obligation_id": "typora.pref.appearance.window",
     "owner": {
-     "module_path": "src/app/settings.ts",
-     "symbol": "textColumnWidth",
-     "owner_sha256": "be61152e04db49367e419a12e3dfe799db9d807cd18120674327e6109131b9b1"
+     "module_path": "src-tauri/src/window_style.rs",
+     "symbol": "pub fn apply",
+     "owner_sha256": "ea250449678f960aa9b0fc8ccc9fc38e7dc940bf5c0b2b35f4f975e674ac6726"
     },
     "parser_type": null,
     "original_cases": [
      {
       "kind": "positive",
-      "evidence_id": "ev_06a2671f6d3de594723fa6fb8cf2f57bc4b156e28e227f125d6109af377a1de7",
+      "evidence_id": "ev_65f27f9ffd8f2cf5013fb7f1a4effa5fc13edefa68912d7a35dc4844cf560e58",
       "location": "typora-re/parity-spec.md"
      }
     ],
-    "fixtures": [],
-    "verifier": null
+    "fixtures": [
+     {
+      "fixture_id": "pref.appearance.window.positive",
+      "case_kind": "positive",
+      "authority": "renderer",
+      "evidence_ids": [
+       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+      ]
+     }
+    ],
+    "verifier": {
+     "verifier_id": "margin.playwright.pref.appearance.window",
+     "claim_id": "claim.pref.appearance.window",
+     "command": "npx playwright test tests/e2e/parity-prefs.spec.ts -g \"pref.appearance.window: Appearance: window style (seamless/unibody/native), text column width, outline panel\"",
+     "authority": "renderer",
+     "status": "pass",
+     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "enumerated_obligation_ids": [
+      "typora.pref.appearance.window"
+     ],
+     "nondeterminism": {
+      "mode": "total-order",
+      "specification": "Single deterministic suite run; pass = suite exited 0 with the named test not skipped."
+     }
+    }
    },
    {
     "obligation_id": "typora.pref.editor.general",
