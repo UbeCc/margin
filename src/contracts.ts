@@ -69,7 +69,9 @@ export type EditorCommand =
   | { kind: 'delete'; scope: 'word' | 'line' | 'block' | 'styled' | 'range' }
   | { kind: 'jump'; to: 'top' | 'bottom' | 'selection' }
   | { kind: 'copyAs'; format: CopyAsFormat }
-  | { kind: 'pastePlain' };
+  | { kind: 'pastePlain' }
+  // #97 (additive): copy the block at the caret — markdown source, or the inner text of a code / math fence
+  | { kind: 'copyBlock'; part: 'source' | 'content' };
 
 /**
  * Edit › Copy as (#96). markdown = source only; html = the rendered HTML *source*

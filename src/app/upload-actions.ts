@@ -1,5 +1,4 @@
 import type { EditorHandle, Platform } from '../contracts';
-import { showContextMenu } from './ui/contextmenu';
 import { applyUrls, findImageRefs, localImages, uploadConfig, uploadSettingsOf, type LocalImage, type UploadPlatform } from './upload';
 
 /** What the uploader needs from the shell (kept small so it is easy to fake in tests). */
@@ -72,27 +71,6 @@ export class ImageUploader {
     } finally {
       this.busy = false;
     }
-  }
-
-  /** Right-click on a rendered image in the editor → "Upload Image". Returns a detach function. */
-  attachContextMenu(root: HTMLElement): () => void {
-    const onMenu = (e: MouseEvent): void => {
-      const src = imageSrcAt(e.target);
-      if (src === null) return;
-      e.preventDefault();
-      const local = localImages([{ raw: '', index: 0, src, srcOffset: 0 }], this.host.baseDir()).length > 0;
-      showContextMenu(e.clientX, e.clientY, [
-        {
-          label: 'Upload Image',
-          disabled: !local || this.busy,
-          hint: local ? undefined : 'Not a local image',
-          run: () => void this.uploadSrcs([src]),
-        },
-        { label: 'Upload All Local Images', disabled: this.busy, run: () => void this.uploadAll() },
-      ]);
-    };
-    root.addEventListener('contextmenu', onMenu);
-    return () => root.removeEventListener('contextmenu', onMenu);
   }
 }
 
