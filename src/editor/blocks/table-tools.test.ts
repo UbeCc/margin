@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseTable, prettifyTable, resizeTable, serializeTable } from './table-model';
+import { moveRow, parseTable, prettifyTable, resizeTable, serializeTable } from './table-model';
 import { tableMarkdown } from '../core/block-tools';
 
 describe('table tools (#98)', () => {
@@ -31,6 +31,17 @@ describe('table tools (#98)', () => {
 
   it('Prettify Source Code aligns columns and keeps indent + trailing blank lines', () => {
     const t = parseTable('|a|bbb|\n|:-:|-|\n|cc|d|\n\n');
-    expect(prettifyTable(t, t)).toBe('|  a  | bbb |\n| :-: | --- |\n| cc  | d   |\n\n');
+    expect(prettifyTable(t, t)).toBe('|  a   | bbb  |\n| :--: | ---- |\n|  cc  | d    |\n\n');
+    const wide = parseTable('|' + 'x'.repeat(70) + '|y|\n|-|-|\n|中文|z|\n');
+    const out = prettifyTable(wide, wide).split('\n');
+    expect(out[1]).toBe('| ' + '-'.repeat(60) + ' | ---- |');
+    expect(out[2]).toBe('| 中文' + ' '.repeat(56) + ' | z    |');
+  });
+
+  it('moving a body row above the header makes it the header (header mode only)', () => {
+    const t = parseTable('|h|\n|-|\n|1|\n|2|\n');
+    expect(moveRow(t, 1, 0).rows).toEqual([['h'], ['1'], ['2']]);
+    expect(moveRow(t, 1, 0, true).rows).toEqual([['1'], ['h'], ['2']]);
+    expect(moveRow(t, 2, 3, true).rows).toEqual(t.rows);
   });
 });

@@ -14,7 +14,7 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 | missing | 56 |
 | out of scope | 8 |
 
-REA ledger `rol_1baba9def850f27eb87a7e6be411b816abef99159d7e7c9f468b2fc40a547cda` (closure `4a0c232bb9bdde73…`): status **unknown**; unowned 56, implemented 107, out-of-scope 8, unknown 5.
+REA ledger `rol_46dd7f6fc64dd49d3f3ff88b5acf61a9669ee960c76e46959a9e1dbf5580b324` (closure `b56269fef2a9e259…`): status **unknown**; unowned 56, implemented 107, out-of-scope 8, unknown 5.
 
 REA coverage boundary `margin.typora-parity`: status **unknown**; 77/163 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 56, package-proof-missing 1, verifier-missing 79, verifier-unknown 7.
 
@@ -190,7 +190,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `tools.table.rows-cols` | Table: add row above/below, column before/after, delete row/column — Paragraph › Table submenu + palette + toolbar; ⌘↩ / ⌘⇧⌫ stay cell keys | owned |  | `src/editor/blocks/table.ts` `private runOp` | `tests/e2e/parity-tools.spec.ts` › tools.table.rows-cols: | 6 |
 | `tools.table.move` | Table: Move Row Up/Down, Move Column Left/Right — header row never moves; ⌘⌥ arrows in a cell | owned |  | `src/editor/blocks/table.ts` `case 'moveRowUp'` | `tests/e2e/parity-tools.spec.ts` › tools.table.move: | 6 |
 | `tools.table.align-resize` | Table: column alignment and Resize Table dialog — Width = columns, Height = rows incl. header (typora-re#4) | owned |  | `src/editor/blocks/table.ts` `private buildResize` | `tests/e2e/parity-tools.spec.ts` › tools.table.align-resize: | 6 |
-| `tools.table.copy-delete` | Table: Copy Table / Delete Table — copy = markdown plain + bordered HTML; Prettify Source Code re-formats the table | owned |  | `src/editor/core/block-tools.ts` `export function copyTable` | `tests/e2e/parity-tools.spec.ts` › tools.table.copy-delete: | 3 |
+| `tools.table.copy-delete` | Table: Copy Table / Delete Table — copy = markdown plain + bordered HTML; Prettify Source Code re-formats the table | owned |  | `src/editor/blocks/table.ts` `private copyTable` | `tests/e2e/parity-tools.spec.ts` › tools.table.copy-delete: | 3 |
 | `tools.table.cells` | Table cell editing, Tab/Enter navigation, TSV paste, IME | owned |  | `src/editor/blocks/table.ts` `Table tools` | `tests/e2e/blocks-core.spec.ts` › pasting TSV / CSV fills and grows the grid | 0 |
 
 ## Code tools

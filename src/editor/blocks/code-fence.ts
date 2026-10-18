@@ -205,7 +205,8 @@ class CodeFenceInstance implements WidgetInstance {
   }
 
   private copy() {
-    copyText(this.parts.body);
+    const lang = this.parts.lang ? ` lang="${escapeHtml(this.parts.lang)}"` : '';
+    copyText(this.parts.body, `<pre${lang}><code>${escapeHtml(this.parts.body)}</code></pre>`);
     this.copyBtn.textContent = 'Copied';
     this.copyBtn.classList.add('mb-done');
     setTimeout(() => {

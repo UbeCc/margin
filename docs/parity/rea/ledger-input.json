@@ -3262,7 +3262,7 @@
    ],
    "disposition": "active",
    "review_evidence_ids": [
-    "ev_5ea8b62d7fa0275680fffd007b7a0adc018e64937e88e5bfedc4cff329173298"
+    "ev_b48e88d26349c0ff96d2b1bc93bdafb4a9cd53e2098383cc83304cdcbbf83476"
    ]
   },
   {
@@ -6064,7 +6064,7 @@
     "owner": {
      "module_path": "src/editor/core/commands.ts",
      "symbol": "case 'selectAll'",
-     "owner_sha256": "172f77f296b95febc5145aa37a7b5d8595b55b7d42279a8ad68bee4b3384f066"
+     "owner_sha256": "5986ff16be651ab4fcdfbeb608c2aec0f82b95a63a1d9c527d87bea1586c38a5"
     },
     "parser_type": null,
     "original_cases": [
@@ -6387,7 +6387,7 @@
     "owner": {
      "module_path": "src/editor/core/commands.ts",
      "symbol": "case 'heading'",
-     "owner_sha256": "172f77f296b95febc5145aa37a7b5d8595b55b7d42279a8ad68bee4b3384f066"
+     "owner_sha256": "5986ff16be651ab4fcdfbeb608c2aec0f82b95a63a1d9c527d87bea1586c38a5"
     },
     "parser_type": null,
     "original_cases": [
@@ -6428,7 +6428,7 @@
     "owner": {
      "module_path": "src/editor/core/commands.ts",
      "symbol": "case 'headingLevel'",
-     "owner_sha256": "172f77f296b95febc5145aa37a7b5d8595b55b7d42279a8ad68bee4b3384f066"
+     "owner_sha256": "5986ff16be651ab4fcdfbeb608c2aec0f82b95a63a1d9c527d87bea1586c38a5"
     },
     "parser_type": null,
     "original_cases": [
@@ -6469,7 +6469,7 @@
     "owner": {
      "module_path": "src/app/ui/table-dialog.ts",
      "symbol": "export function insertTableDialog",
-     "owner_sha256": "0e3e7f5d0f5fe0c5859b1bfb50093822685432691ebe631bee84cb0a12b202ce"
+     "owner_sha256": "81f75ac5de18e8b34589d3db715b05651f57e8250e01ecd9b30fd0910356c025"
     },
     "parser_type": null,
     "original_cases": [
@@ -6510,7 +6510,7 @@
     "owner": {
      "module_path": "src/editor/core/commands.ts",
      "symbol": "case 'math'",
-     "owner_sha256": "172f77f296b95febc5145aa37a7b5d8595b55b7d42279a8ad68bee4b3384f066"
+     "owner_sha256": "5986ff16be651ab4fcdfbeb608c2aec0f82b95a63a1d9c527d87bea1586c38a5"
     },
     "parser_type": null,
     "original_cases": [
@@ -6551,7 +6551,7 @@
     "owner": {
      "module_path": "src/editor/core/commands.ts",
      "symbol": "case 'code'",
-     "owner_sha256": "172f77f296b95febc5145aa37a7b5d8595b55b7d42279a8ad68bee4b3384f066"
+     "owner_sha256": "5986ff16be651ab4fcdfbeb608c2aec0f82b95a63a1d9c527d87bea1586c38a5"
     },
     "parser_type": null,
     "original_cases": [
@@ -6592,7 +6592,7 @@
     "owner": {
      "module_path": "src/editor/core/commands.ts",
      "symbol": "case 'html'",
-     "owner_sha256": "172f77f296b95febc5145aa37a7b5d8595b55b7d42279a8ad68bee4b3384f066"
+     "owner_sha256": "5986ff16be651ab4fcdfbeb608c2aec0f82b95a63a1d9c527d87bea1586c38a5"
     },
     "parser_type": null,
     "original_cases": [
@@ -6633,7 +6633,7 @@
     "owner": {
      "module_path": "src/editor/core/commands.ts",
      "symbol": "case 'quote'",
-     "owner_sha256": "172f77f296b95febc5145aa37a7b5d8595b55b7d42279a8ad68bee4b3384f066"
+     "owner_sha256": "5986ff16be651ab4fcdfbeb608c2aec0f82b95a63a1d9c527d87bea1586c38a5"
     },
     "parser_type": null,
     "original_cases": [
@@ -6797,7 +6797,7 @@
     "owner": {
      "module_path": "src/editor/core/commands.ts",
      "symbol": "case 'linkRef'",
-     "owner_sha256": "172f77f296b95febc5145aa37a7b5d8595b55b7d42279a8ad68bee4b3384f066"
+     "owner_sha256": "5986ff16be651ab4fcdfbeb608c2aec0f82b95a63a1d9c527d87bea1586c38a5"
     },
     "parser_type": null,
     "original_cases": [
@@ -6879,7 +6879,7 @@
     "owner": {
      "module_path": "src/editor/core/commands.ts",
      "symbol": "case 'hr'",
-     "owner_sha256": "172f77f296b95febc5145aa37a7b5d8595b55b7d42279a8ad68bee4b3384f066"
+     "owner_sha256": "5986ff16be651ab4fcdfbeb608c2aec0f82b95a63a1d9c527d87bea1586c38a5"
     },
     "parser_type": null,
     "original_cases": [
@@ -6920,7 +6920,7 @@
     "owner": {
      "module_path": "src/editor/core/commands.ts",
      "symbol": "case 'toc'",
-     "owner_sha256": "172f77f296b95febc5145aa37a7b5d8595b55b7d42279a8ad68bee4b3384f066"
+     "owner_sha256": "5986ff16be651ab4fcdfbeb608c2aec0f82b95a63a1d9c527d87bea1586c38a5"
     },
     "parser_type": null,
     "original_cases": [
@@ -6961,7 +6961,7 @@
     "owner": {
      "module_path": "src/editor/core/commands.ts",
      "symbol": "case 'front_matter'",
-     "owner_sha256": "172f77f296b95febc5145aa37a7b5d8595b55b7d42279a8ad68bee4b3384f066"
+     "owner_sha256": "5986ff16be651ab4fcdfbeb608c2aec0f82b95a63a1d9c527d87bea1586c38a5"
     },
     "parser_type": null,
     "original_cases": [
@@ -7002,7 +7002,7 @@
     "owner": {
      "module_path": "src/editor/core/commands.ts",
      "symbol": "case 'mark'",
-     "owner_sha256": "172f77f296b95febc5145aa37a7b5d8595b55b7d42279a8ad68bee4b3384f066"
+     "owner_sha256": "5986ff16be651ab4fcdfbeb608c2aec0f82b95a63a1d9c527d87bea1586c38a5"
     },
     "parser_type": null,
     "original_cases": [
@@ -7043,7 +7043,7 @@
     "owner": {
      "module_path": "src/editor/core/commands.ts",
      "symbol": "underline: ['<u>', '</u>']",
-     "owner_sha256": "172f77f296b95febc5145aa37a7b5d8595b55b7d42279a8ad68bee4b3384f066"
+     "owner_sha256": "5986ff16be651ab4fcdfbeb608c2aec0f82b95a63a1d9c527d87bea1586c38a5"
     },
     "parser_type": null,
     "original_cases": [
@@ -7084,7 +7084,7 @@
     "owner": {
      "module_path": "src/editor/core/commands.ts",
      "symbol": "math: ['$', '$']",
-     "owner_sha256": "172f77f296b95febc5145aa37a7b5d8595b55b7d42279a8ad68bee4b3384f066"
+     "owner_sha256": "5986ff16be651ab4fcdfbeb608c2aec0f82b95a63a1d9c527d87bea1586c38a5"
     },
     "parser_type": null,
     "original_cases": [
@@ -7125,7 +7125,7 @@
     "owner": {
      "module_path": "src/editor/core/commands.ts",
      "symbol": "sub: ['<sub>', '</sub>']",
-     "owner_sha256": "172f77f296b95febc5145aa37a7b5d8595b55b7d42279a8ad68bee4b3384f066"
+     "owner_sha256": "5986ff16be651ab4fcdfbeb608c2aec0f82b95a63a1d9c527d87bea1586c38a5"
     },
     "parser_type": null,
     "original_cases": [
@@ -7166,7 +7166,7 @@
     "owner": {
      "module_path": "src/editor/core/commands.ts",
      "symbol": "comment: ['<!-- ', ' -->']",
-     "owner_sha256": "172f77f296b95febc5145aa37a7b5d8595b55b7d42279a8ad68bee4b3384f066"
+     "owner_sha256": "5986ff16be651ab4fcdfbeb608c2aec0f82b95a63a1d9c527d87bea1586c38a5"
     },
     "parser_type": null,
     "original_cases": [
@@ -7207,7 +7207,7 @@
     "owner": {
      "module_path": "src/editor/core/commands.ts",
      "symbol": "case 'mark'",
-     "owner_sha256": "172f77f296b95febc5145aa37a7b5d8595b55b7d42279a8ad68bee4b3384f066"
+     "owner_sha256": "5986ff16be651ab4fcdfbeb608c2aec0f82b95a63a1d9c527d87bea1586c38a5"
     },
     "parser_type": null,
     "original_cases": [
@@ -7289,7 +7289,7 @@
     "owner": {
      "module_path": "src/editor/core/commands.ts",
      "symbol": "case 'insertImage'",
-     "owner_sha256": "172f77f296b95febc5145aa37a7b5d8595b55b7d42279a8ad68bee4b3384f066"
+     "owner_sha256": "5986ff16be651ab4fcdfbeb608c2aec0f82b95a63a1d9c527d87bea1586c38a5"
     },
     "parser_type": null,
     "original_cases": [
@@ -7597,7 +7597,7 @@
     "owner": {
      "module_path": "src/editor/blocks/table.ts",
      "symbol": "private runOp",
-     "owner_sha256": "c127d88cacc4c1e0bd53558b5cf2957d2d256993489da084d5f7182d3b8486c0"
+     "owner_sha256": "37679a344757a8394d62f63539005e4e4edfccd963339c30aea7649bf8520279"
     },
     "parser_type": null,
     "original_cases": [
@@ -7638,7 +7638,7 @@
     "owner": {
      "module_path": "src/editor/blocks/table.ts",
      "symbol": "case 'moveRowUp'",
-     "owner_sha256": "c127d88cacc4c1e0bd53558b5cf2957d2d256993489da084d5f7182d3b8486c0"
+     "owner_sha256": "37679a344757a8394d62f63539005e4e4edfccd963339c30aea7649bf8520279"
     },
     "parser_type": null,
     "original_cases": [
@@ -7679,7 +7679,7 @@
     "owner": {
      "module_path": "src/editor/blocks/table.ts",
      "symbol": "private buildResize",
-     "owner_sha256": "c127d88cacc4c1e0bd53558b5cf2957d2d256993489da084d5f7182d3b8486c0"
+     "owner_sha256": "37679a344757a8394d62f63539005e4e4edfccd963339c30aea7649bf8520279"
     },
     "parser_type": null,
     "original_cases": [
@@ -7718,9 +7718,9 @@
    {
     "obligation_id": "typora.tools.table.copy-delete",
     "owner": {
-     "module_path": "src/editor/core/block-tools.ts",
-     "symbol": "export function copyTable",
-     "owner_sha256": "638cef6c084a0e484cc9e3bb9aca3ea1d0aadecdccf57a80e1facb4cdf39bae9"
+     "module_path": "src/editor/blocks/table.ts",
+     "symbol": "private copyTable",
+     "owner_sha256": "37679a344757a8394d62f63539005e4e4edfccd963339c30aea7649bf8520279"
     },
     "parser_type": null,
     "original_cases": [
@@ -7761,7 +7761,7 @@
     "owner": {
      "module_path": "src/editor/blocks/table.ts",
      "symbol": "Table tools",
-     "owner_sha256": "c127d88cacc4c1e0bd53558b5cf2957d2d256993489da084d5f7182d3b8486c0"
+     "owner_sha256": "37679a344757a8394d62f63539005e4e4edfccd963339c30aea7649bf8520279"
     },
     "parser_type": null,
     "original_cases": [
@@ -7802,7 +7802,7 @@
     "owner": {
      "module_path": "src/editor/blocks/code-fence.ts",
      "symbol": "mount",
-     "owner_sha256": "982505fa9d6579000a1eba8265d91fd6461bc4db7efe9d719725637647c35e51"
+     "owner_sha256": "cea87070675748155c3cb3bbfd4a95a91fbdb7254654030cc9c09c4286d449f9"
     },
     "parser_type": null,
     "original_cases": [
@@ -7843,7 +7843,7 @@
     "owner": {
      "module_path": "src/editor/blocks/code-fence.ts",
      "symbol": "command(op: string)",
-     "owner_sha256": "982505fa9d6579000a1eba8265d91fd6461bc4db7efe9d719725637647c35e51"
+     "owner_sha256": "cea87070675748155c3cb3bbfd4a95a91fbdb7254654030cc9c09c4286d449f9"
     },
     "parser_type": null,
     "original_cases": [
@@ -7884,7 +7884,7 @@
     "owner": {
      "module_path": "src/editor/blocks/code-fence.ts",
      "symbol": "onRemove",
-     "owner_sha256": "982505fa9d6579000a1eba8265d91fd6461bc4db7efe9d719725637647c35e51"
+     "owner_sha256": "cea87070675748155c3cb3bbfd4a95a91fbdb7254654030cc9c09c4286d449f9"
     },
     "parser_type": null,
     "original_cases": [
@@ -7943,7 +7943,7 @@
     "owner": {
      "module_path": "src/editor/core/block-tools.ts",
      "symbol": "export function mathTool",
-     "owner_sha256": "638cef6c084a0e484cc9e3bb9aca3ea1d0aadecdccf57a80e1facb4cdf39bae9"
+     "owner_sha256": "e4498e4b1e1f99625958afae0ab9242d5ae63db81d8a04f0baa5c585dd278ac5"
     },
     "parser_type": null,
     "original_cases": [
@@ -7984,7 +7984,7 @@
     "owner": {
      "module_path": "src/editor/core/block-tools.ts",
      "symbol": "export function refreshMath",
-     "owner_sha256": "638cef6c084a0e484cc9e3bb9aca3ea1d0aadecdccf57a80e1facb4cdf39bae9"
+     "owner_sha256": "e4498e4b1e1f99625958afae0ab9242d5ae63db81d8a04f0baa5c585dd278ac5"
     },
     "parser_type": null,
     "original_cases": [
@@ -8131,7 +8131,7 @@
     "original_cases": [
      {
       "kind": "positive",
-      "evidence_id": "ev_5ea8b62d7fa0275680fffd007b7a0adc018e64937e88e5bfedc4cff329173298",
+      "evidence_id": "ev_b48e88d26349c0ff96d2b1bc93bdafb4a9cd53e2098383cc83304cdcbbf83476",
       "location": "images §4.5"
      }
     ],

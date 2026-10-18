@@ -14,15 +14,30 @@ export function insertTableDialog(init = last): Promise<{ rows: number; cols: nu
       h('input.text-input.table-dim', { type: 'number', min: '1', max: String(max), value: String(v), name, 'aria-label': name }) as HTMLInputElement;
     const cols = num('Columns', init.cols, TABLE_MAX.cols);
     const rows = num('Rows', init.rows, TABLE_MAX.rows);
-    const err = h('div.dialog-error');
+    // digits only, clamped to 1..max; an emptied field reverts to 2 columns / 1 row on blur
+    const value = (el: HTMLInputElement, max: number, empty: number) => {
+      const n = parseInt(el.value.replace(/\D+/g, ''), 10);
+      return Number.isFinite(n) ? Math.min(max, Math.max(1, n)) : empty;
+    };
+    const bind = (el: HTMLInputElement, max: number, empty: number) => {
+      el.addEventListener('keydown', (e) => {
+        if (e.key.length === 1 && !/\d/.test(e.key) && !e.metaKey && !e.ctrlKey) e.preventDefault();
+      });
+      el.addEventListener('blur', () => (el.value = String(value(el, max, empty))));
+    };
+    bind(cols, TABLE_MAX.cols, 2);
+    bind(rows, TABLE_MAX.rows, 1);
+    // Enter in Columns moves to Rows; Enter in Rows confirms
+    cols.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter') return;
+      e.preventDefault();
+      rows.focus();
+      rows.select();
+    });
     const finish = (ok: boolean): void => {
       if (done) return;
-      const c = Math.floor(+cols.value);
-      const r = Math.floor(+rows.value);
-      if (ok && !(c >= 1 && c <= TABLE_MAX.cols && r >= 1 && r <= TABLE_MAX.rows)) {
-        err.textContent = `Columns must be between 1 and ${TABLE_MAX.cols}, rows between 1 and ${TABLE_MAX.rows}`;
-        return;
-      }
+      const c = value(cols, TABLE_MAX.cols, 2);
+      const r = value(rows, TABLE_MAX.rows, 1);
       if (ok) last = { rows: r, cols: c };
       done = true;
       modal.close();
@@ -35,7 +50,6 @@ export function insertTableDialog(init = last): Promise<{ rows: number; cols: nu
       h('h2.dialog-title', { text: 'Insert Table' }),
       field('Columns', cols),
       field('Rows', rows),
-      err,
       h(
         'div.dialog-buttons',
         null,

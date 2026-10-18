@@ -1,15 +1,15 @@
 /**
  * Block tools (#98): Paragraph › Table / Code Tools / Math Tools. The core finds
  * the widget block with the caret (or the last known caret) and hands the op to
- * `WidgetInstance.command`; clipboard ops that need core helpers (Copy Table,
- * Copy Math) and removals (Delete Table / Delete Math) are done here.
+ * `WidgetInstance.command`; Copy Math (core copy-as) and removals (Delete Table /
+ * Delete Math) are done here.
  */
 import type { CodeOp, MathOp, TableOp, WidgetBlockType, WidgetInstance } from '../../contracts';
 import type { EditorCore } from './editor';
 import type { Leaf } from './types';
-import { widgetRaw } from './model';
-import { isTextLeaf, widgetToParagraph } from './edit';
-import { copyAs, lastCopyAs, writePayload } from './copy-as';
+import { leafContent } from './model';
+import { isTextLeaf, widgetToParagraph, type Caret } from './edit';
+import { copyAs } from './copy-as';
 
 /** Markdown of an empty `rows`×`cols` table (rows include the header row; both clamped to 1…200). */
 export function tableMarkdown(rows: number, cols: number): string {
@@ -45,31 +45,35 @@ export function widgetAtCaret(ed: EditorCore, types: WidgetBlockType[]): Hit | n
   return f ? ok(doc.indexOf(f)) : null;
 }
 
+/**
+ * Delete Table / Delete Math: remove the block; the caret goes to the start of the
+ * next block (or the end of the previous one). The only block becomes an empty paragraph.
+ */
 function removeBlock(ed: EditorCore, id: string): void {
+  const doc = ed.doc;
   ed.hist.break();
-  ed.change(() => ed.withLeaf(id, (i) => widgetToParagraph(ed.doc, i)), null);
+  ed.change(() =>
+    ed.withLeaf(id, (i): Caret => {
+      if (doc.leaves.length === 1) return widgetToParagraph(doc, i);
+      const text = doc.text();
+      const from = doc.start(i);
+      const to = doc.start(i + 1);
+      const last = to >= text.length;
+      // removing the last block drops the separator before it but keeps the final line ending
+      const a = last && from > 0 ? text.slice(0, from).replace(/(?:\r?\n|\r)+$/, '').length : from;
+      doc.replace(a, to, last && a < from ? (/(\r\n|\n|\r)$/.exec(text)?.[0] ?? '') : '');
+      const j = Math.min(doc.locate(a).i, doc.leaves.length - 1);
+      const nl = doc.leaves[j];
+      if (!isTextLeaf(nl)) return { widget: nl.id, at: last ? 'end' : 'start' };
+      return { pos: doc.docPos(j, last ? leafContent(nl).length : 0) };
+    }),
+  );
   ed.hist.break();
-}
-
-const BORDER = 'border:1px solid #c8c8c8;padding:4px 8px';
-
-/** Copy Table: markdown source as plain text, the rendered table (inline borders) as HTML. */
-export function copyTable(ed: EditorCore, hit: Hit): boolean {
-  const md = widgetRaw(hit.leaf).replace(/(\r?\n)+$/, '');
-  let html = hit.inst?.renderHTML() ?? '';
-  html = html
-    .replace(/<table>/g, '<table style="border-collapse:collapse">')
-    .replace(/<(th|td)( style="([^"]*)")?>/g, (_m, tag: string, _s, st?: string) => `<${tag} style="${BORDER}${st ? ';' + st : ''}">`);
-  const p = { 'text/plain': md, 'text/html': html };
-  lastCopyAs.set(ed, p);
-  void writePayload(p);
-  return true;
 }
 
 export function tableTool(ed: EditorCore, op: TableOp, args: { rows?: number; cols?: number }): boolean {
   const hit = widgetAtCaret(ed, ['table']);
   if (!hit) return false;
-  if (op === 'copy') return copyTable(ed, hit);
   if (op === 'delete') {
     removeBlock(ed, hit.leaf.id);
     return true;
@@ -78,7 +82,7 @@ export function tableTool(ed: EditorCore, op: TableOp, args: { rows?: number; co
 }
 
 export function codeTool(ed: EditorCore, op: CodeOp): boolean {
-  const hit = widgetAtCaret(ed, ['code_fence']);
+  const hit = widgetAtCaret(ed, ['code_fence', 'math_block', 'html_block']);
   return hit?.inst?.command?.(op) ?? false;
 }
 

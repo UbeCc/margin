@@ -172,8 +172,8 @@ function delim(width: number, a: Align): string {
   return '-'.repeat(w);
 }
 
-function formatWidths(rows: string[][], ncol: number): number[] {
-  return Array.from({ length: ncol }, (_, c) => Math.max(3, ...rows.map((r) => strWidth(r[c] ?? ''))));
+function formatWidths(rows: string[][], ncol: number, min = 3, max = Infinity): number[] {
+  return Array.from({ length: ncol }, (_, c) => Math.min(max, Math.max(min, ...rows.map((r) => strWidth(r[c] ?? '')))));
 }
 
 function escapedRow(r: string[], ncol: number): string[] {
@@ -183,10 +183,10 @@ function escapedRow(r: string[], ncol: number): string[] {
 }
 
 /** Format a model as an aligned pipe table (no trailing newline). */
-export function formatTable(model: TableModel, indent = ''): string {
+export function formatTable(model: TableModel, indent = '', width?: { min: number; max: number }): string {
   const ncol = model.align.length;
   const rows = model.rows.map((r) => escapedRow(r, ncol));
-  const widths = formatWidths(rows, ncol);
+  const widths = formatWidths(rows, ncol, width?.min, width?.max);
   const line = (cells: string[]) => indent + '| ' + cells.join(' | ') + ' |';
   const out: string[] = [];
   rows.forEach((r, i) => {
@@ -282,9 +282,11 @@ export function deleteCol(m: TableModel, at: number): TableModel {
   return n;
 }
 
-export function moveRow(m: TableModel, from: number, to: number): TableModel {
+/** Move a row; with `header`, the header row takes part (a body row moved above it becomes the header). */
+export function moveRow(m: TableModel, from: number, to: number, header = false): TableModel {
   const n = cloneModel(m);
-  if (from < 1 || to < 1 || to >= n.rows.length) return n;
+  const lo = header ? 0 : 1;
+  if (from < lo || to < lo || from >= n.rows.length || to >= n.rows.length) return n;
   const [r] = n.rows.splice(from, 1);
   n.rows.splice(to, 0, r);
   if (n.src) {
@@ -330,9 +332,12 @@ export function resizeTable(m: TableModel, rows: number, cols: number): TableMod
   return n;
 }
 
-/** Prettify Source Code (#98): the table re-formatted with aligned columns, keeping indent and trailing blank lines. */
+/**
+ * Prettify Source Code (#98): regenerate the table with aligned columns — width = widest
+ * cell in display columns (CJK = 2), min 4, max 60 — keeping indent and trailing blank lines.
+ */
 export function prettifyTable(orig: ParsedTable, model: TableModel): string {
-  return formatTable(model, orig.indent) + (orig.tail || '\n');
+  return formatTable(model, orig.indent, { min: 4, max: 60 }) + (orig.tail || '\n');
 }
 
 /** A fresh empty table with given size (rows includes header). */

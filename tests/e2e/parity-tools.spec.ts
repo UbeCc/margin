@@ -7,7 +7,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import type { EditorCommand } from '../../src/contracts';
 import { open, md, mod, caret } from './core-shared';
-import { boot, editorValue } from './app-helpers';
+import { boot, caretAtText, editorValue } from './app-helpers';
 
 async function run(page: Page, cmd: EditorCommand): Promise<boolean> {
   await page.evaluate((c) => {
@@ -77,14 +77,29 @@ test.describe('parity: table, code and math tools (#98)', () => {
     await expect(dlg).toHaveCount(0);
     await expect.poll(() => editorValue(page)).toContain('|   |   |   |   |\n| --- | --- | --- | --- |\n|   |   |   |   |');
     expect(await page.locator('.mb-table tr').count()).toBe(2);
-    // the dialog remembers the last size; out-of-range sizes (cols 1..40, rows 1..99) are refused
+    // the dialog remembers the last size; values clamp to 1..40 columns / 1..99 rows;
+    // an emptied field reverts to 2 columns / 1 row; Enter in Columns moves to Rows
     void page.evaluate(() => window.__margin!.run('table:insert'));
-    await expect(dlg.locator('input[name=Columns]')).toHaveValue('4');
-    await expect(dlg.locator('input[name=Rows]')).toHaveValue('2');
-    await dlg.locator('input[name=Columns]').fill('41');
-    await page.keyboard.press('Enter');
-    await expect(dlg.locator('.dialog-error')).toContainText('between 1 and 40');
+    const cols = dlg.locator('input[name=Columns]');
+    const rows = dlg.locator('input[name=Rows]');
+    await expect(cols).toHaveValue('4');
+    await expect(rows).toHaveValue('2');
+    await cols.fill('');
+    await cols.press('Enter');
+    await expect(cols).toHaveValue('2');
+    await expect(rows).toBeFocused();
+    await rows.fill('500');
+    await rows.blur();
+    await expect(rows).toHaveValue('99');
     await page.keyboard.press('Escape');
+    // inserted at the caret: a paragraph is split around the new table
+    await page.evaluate(() => window.__margin!.editor.setMarkdown('abcdef\n'));
+    await caretAtText(page, 'abcdef', 3);
+    void page.evaluate(() => window.__margin!.run('block:table'));
+    await cols.fill('1');
+    await rows.fill('1');
+    await rows.press('Enter');
+    await expect.poll(() => editorValue(page)).toBe('abc\n\n|   |\n| --- |\n\ndef\n');
   });
 
   test('tools.table.rows-cols: Table: add row above/below, column before/after, delete row/column', async ({ page }) => {
@@ -97,6 +112,7 @@ test.describe('parity: table, code and math tools (#98)', () => {
     await cell(page, 1, 0).click();
     await run(page, { kind: 'table', op: 'rowAbove' });
     expect(await md(page)).toContain('| --- | --- |\n|  |  |\n| 1 | 2 |');
+    await expect(cell(page, 1, 0)).toBeFocused(); // caret to the new row's first cell
     await undo(page);
     await cell(page, 2, 1).click();
     await run(page, { kind: 'table', op: 'colBefore' });
@@ -110,6 +126,13 @@ test.describe('parity: table, code and math tools (#98)', () => {
     await cell(page, 2, 0).click();
     await run(page, { kind: 'table', op: 'deleteRow' });
     expect(await md(page)).not.toContain('| 3 | 4 |');
+    // edge: Delete Row / Delete Column are no-ops on a one-row / one-column table
+    await open(page, '|x|\n|-|\n');
+    await cell(page, 0, 0).click();
+    await run(page, { kind: 'table', op: 'deleteRow' });
+    await run(page, { kind: 'table', op: 'deleteCol' });
+    expect(await md(page)).toBe('|x|\n|-|\n');
+    await open(page, TABLE);
     // negative: caret outside a table → not handled, document unchanged
     const before = await md(page);
     await caret(page, 0, 2);
@@ -128,11 +151,15 @@ test.describe('parity: table, code and math tools (#98)', () => {
     expect(await md(page)).toContain('| b | a |');
     await undo(page);
     await undo(page);
-    // edge: the header row never moves; moving the first column left is a no-op
+    // a body row moved above the header becomes the header; blocked at the edges
+    await cell(page, 1, 0).click();
+    await run(page, { kind: 'table', op: 'moveRowUp' });
+    expect(await md(page)).toMatch(/\| 1 +\| 2 +\|\n\| -+ \| -+ \|\n\| a +\| b +\|/);
+    await undo(page);
     await cell(page, 0, 0).click();
-    expect(await run(page, { kind: 'table', op: 'moveRowDown' })).toBe(true);
+    expect(await run(page, { kind: 'table', op: 'moveRowUp' })).toBe(true);
     expect(await run(page, { kind: 'table', op: 'moveColLeft' })).toBe(true);
-    expect(await md(page)).toContain('| a | b |\n| --- | --- |\n| 1 | 2 |');
+    expect(await md(page)).toBe(TABLE);
   });
 
   test('tools.table.align-resize: Table: column alignment and Resize Table dialog', async ({ page }) => {
@@ -145,6 +172,14 @@ test.describe('parity: table, code and math tools (#98)', () => {
     await run(page, { kind: 'table', op: 'alignLeft' });
     expect(await md(page)).toMatch(/\| :-+ \|/);
     expect(await page.locator('.mb-table td').nth(1).evaluate((td) => (td as HTMLElement).style.textAlign)).toBe('left');
+    await expect(page.locator('.mb-align[data-align="left"]')).toHaveClass(/mb-on/);
+    // choosing the active alignment again resets the column
+    await run(page, { kind: 'table', op: 'alignLeft' });
+    expect(await page.locator('.mb-table td').nth(1).evaluate((td) => (td as HTMLElement).style.textAlign)).toBe('');
+    // toolbar order matches Typora
+    expect(await page.locator('.mb-table-tools > * ').evaluateAll((els) => els.map((e) => (e.querySelector('button') ?? e).getAttribute('title')))).toEqual([
+      'Resize Table', 'Align Left', 'Align Center', 'Align Right', 'Delete Table', 'More Actions',
+    ]);
     // Resize Table popover: Width x Height = columns × rows (incl. header)
     await page.locator('.mb-table-resize').click();
     const pop = page.locator('.mb-grid-pop');
@@ -152,6 +187,10 @@ test.describe('parity: table, code and math tools (#98)', () => {
     await expect(pop.locator('.mb-grid-label')).toHaveText('Width x Height');
     await expect(pop.locator('.mb-grid-width')).toHaveValue('2');
     await expect(pop.locator('.mb-grid-height')).toHaveValue('3');
+    // hovering the preview grid previews a size
+    await pop.locator('.mb-grid-cell[data-r="5"][data-c="7"]').hover();
+    await expect(pop.locator('.mb-grid-width')).toHaveValue('7');
+    await expect(pop.locator('.mb-grid-cell.mb-on')).toHaveCount(35);
     await pop.locator('.mb-grid-width').fill('3');
     await pop.locator('.mb-grid-height').fill('2');
     await pop.locator('.mb-grid-height').press('Enter');
@@ -174,14 +213,13 @@ test.describe('parity: table, code and math tools (#98)', () => {
     const c = await clipboard(page);
     expect(c['text/plain']).toBe('| a | **b** |\n|:--|---|\n| 1 | 2 |');
     expect(c['text/html']).toContain('<strong>b</strong>');
-    expect(c['text/html']).toMatch(/<td style="border:1px solid/);
+    expect(c['text/html']).toMatch(/<td style="border:1px solid #ccc/);
     await cell(page, 1, 0).click();
     await run(page, { kind: 'table', op: 'prettify' });
-    expect(await md(page)).toContain('| a   | **b** |\n| :-- | ----- |');
+    expect(await md(page)).toContain('| a    | **b** |\n| :--- | ----- |');
     expect(await run(page, { kind: 'table', op: 'delete' })).toBe(true);
     await expect(page.locator('.mb-table')).toHaveCount(0);
-    expect(await md(page)).not.toContain('|');
-    expect(await md(page)).toContain('After');
+    expect(await md(page)).toBe('After\n'); // removed, not left as an empty paragraph
     await undo(page);
     await expect(page.locator('.mb-table')).toHaveCount(1);
   });
