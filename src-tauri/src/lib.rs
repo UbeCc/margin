@@ -5,12 +5,14 @@ mod clipboard_macos;
 mod clipboard_read;
 mod commands;
 mod export_cmds;
+mod export_custom;
 mod fsops;
 #[cfg(unix)]
 mod fsops_unix;
 mod images;
 mod menu;
 mod pandoc;
+mod pandoc_import;
 #[cfg(target_os = "macos")]
 mod pdf_macos;
 #[cfg(target_os = "macos")]
@@ -305,6 +307,8 @@ pub fn run() {
             commands::reveal_path,
             export_cmds::export_binary,
             export_cmds::open_exported_file,
+            pandoc_import::pandoc_import,
+            export_custom::run_export_command,
             upload::upload_images,
             clipboard_macos::clipboard_write_rich,
             clipboard_read::clipboard_read,

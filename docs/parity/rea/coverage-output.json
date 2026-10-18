@@ -4,7 +4,7 @@
  "summary": {
   "required_surfaces": 171,
   "required_claims": 163,
-  "reasons": 144
+  "reasons": 138
  },
  "reasons": [
   {
@@ -55,21 +55,6 @@
   {
    "code": "owner-missing",
    "subject_id": "ctx.text",
-   "detail": "Required surface has no reconstructed owner or explicit disposition."
-  },
-  {
-   "code": "owner-missing",
-   "subject_id": "export.custom",
-   "detail": "Required surface has no reconstructed owner or explicit disposition."
-  },
-  {
-   "code": "owner-missing",
-   "subject_id": "export.import",
-   "detail": "Required surface has no reconstructed owner or explicit disposition."
-  },
-  {
-   "code": "owner-missing",
-   "subject_id": "export.pandoc",
    "detail": "Required surface has no reconstructed owner or explicit disposition."
   },
   {
@@ -350,21 +335,6 @@
   {
    "code": "verifier-missing",
    "subject_id": "claim.ctx.text",
-   "detail": "No verifier contract covers this claim."
-  },
-  {
-   "code": "verifier-missing",
-   "subject_id": "claim.export.custom",
-   "detail": "No verifier contract covers this claim."
-  },
-  {
-   "code": "verifier-missing",
-   "subject_id": "claim.export.import",
-   "detail": "No verifier contract covers this claim."
-  },
-  {
-   "code": "verifier-missing",
-   "subject_id": "claim.export.pandoc",
    "detail": "No verifier contract covers this claim."
   },
   {
@@ -781,21 +751,6 @@
   },
   {
    "operation": "reconcile_reconstruction_owner",
-   "subject_id": "export.custom",
-   "rationale": "Required surface has no reconstructed owner or explicit disposition."
-  },
-  {
-   "operation": "reconcile_reconstruction_owner",
-   "subject_id": "export.import",
-   "rationale": "Required surface has no reconstructed owner or explicit disposition."
-  },
-  {
-   "operation": "reconcile_reconstruction_owner",
-   "subject_id": "export.pandoc",
-   "rationale": "Required surface has no reconstructed owner or explicit disposition."
-  },
-  {
-   "operation": "reconcile_reconstruction_owner",
    "subject_id": "images.copy-move-all",
    "rationale": "Required surface has no reconstructed owner or explicit disposition."
   },
@@ -1072,21 +1027,6 @@
   {
    "operation": "run_reconstruction_verifier",
    "subject_id": "claim.ctx.text",
-   "rationale": "No verifier contract covers this claim."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.export.custom",
-   "rationale": "No verifier contract covers this claim."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.export.import",
-   "rationale": "No verifier contract covers this claim."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.export.pandoc",
    "rationale": "No verifier contract covers this claim."
   },
   {
@@ -1499,7 +1439,6 @@
   "ev_381646d18f6aa5aaf9ee14b5cb5db8ba5dfcb16f30f529e1796330e05bc7dd7a",
   "ev_3884ad2bb7ad085952a8e7e3397ce7b70ed4f265d7ce21254d8dad24de4ea733",
   "ev_391cc84ed55b4e709a481b8ea9fa2d41219c67af1bc7f85c1e9072919493911c",
-  "ev_3e25944b9a7347293992d75e4d4b743294b4af36e5d2b03324da011810779920",
   "ev_3eeb5727be91775859549b34d8c14c25a2224a330d230d8ccfe7c7423a099184",
   "ev_3f6cecf0497ef114e31557e49d950d4a6eb65c9c2d74b0aed4ab4dc6e73fc2d6",
   "ev_3fbe31f3ef6900d203bcee50d9cbdc5c4cd443e27852a297b7e2e66538779d7d",
@@ -1563,6 +1502,7 @@
   "ev_9032119ff0893db58a0df603e6446c95ef5af97bfec8373fa8f7402d21f04525",
   "ev_9042c18ac986e3c1a3922635c73123a83054fca295ed68494324079277b171a6",
   "ev_908d33fa44e4e12fd676b14d274dcc4d9875c54c0c5fc6b80f6bbb5d2aecd452",
+  "ev_91b5e0b93b24925f0286dc64a13fbddb801a94bb81ef79620ba096e353339609",
   "ev_91edc524940cfebcbd14b4bfe4fe18749c85e90df2892616a05f03788146c3cf",
   "ev_92331c595d4fa9159747e59dbdd112cc1f1ea4c74e9c212ce86f660c0ddfb5fe",
   "ev_92ec16f3d5328426784c86c507d30f93af6a745d21dc96aeb9af45f0419e8a69",
@@ -1575,7 +1515,6 @@
   "ev_9978957139b62790328ce143f76f1bc27e60267da374644b4a4f1c811e0e1800",
   "ev_9a0e7d95519047851d43316964853f6eb023f03b5de2bda197dd72006a1fa013",
   "ev_9a1f668957617a753e914df1c0a91d4357c25b0e580651d1c7ab7490e92269b3",
-  "ev_9d67164deb564f20c23f604b0fb5aaf5b58dd1c2c8277fa6572cc0479ec92a0e",
   "ev_a0a7f9dda9d20c065da1245a39262ad4003405c6d8c836be4ea6cb1abee41e7c",
   "ev_a10fefa399e629e8db7878f6b264fcff2d472b9ac67f7e9802643c5238272e9a",
   "ev_a218c2f678ee74a5dfe9f6c09b49991d9ec929b874b98c3828ea54cd3c253e5d",
@@ -1587,17 +1526,18 @@
   "ev_abf7e04633fba2df9e5297aca7b1890a3fe18925082eb900518ebfed66eb4645",
   "ev_b0fef3dc15507fab320ae8c0e128b72c9aa7d26e2717c872411267aae628ee36",
   "ev_b19d9eb86f0e77e7e75a625d00887acf3b9f68b22561ac3bf9e237ba417e8b31",
+  "ev_b20611cf4ada7071507dbdcac0ad0c8a7800a8b31ba76fd010a9d70f51130a24",
   "ev_b57d89025063b32dd50efae5f801519ea9bbece2a2a4861b6051efe3621d02e0",
   "ev_b714e54765b06a1decf46258c2ea7c906be6ae4b8b6fd4995febbcf396691a1b",
   "ev_bba0319f1204764cb88c514bd77d4f4c3cd0ddf7b0c7e77c889d3e70d78e0c61",
   "ev_bc06d84531b88fcd1b9404abb7f6781e00646fe2a355ef01c9b24bd05304281e",
-  "ev_be267631b065b146e9aaea94bd9d658b9985bae8408ca71e81f3813183e29593",
   "ev_bee3f21b3c5b52f74c968e276e9406cac8669aabc7261f91c9a984930eb8c448",
   "ev_c0e554d6ff5eb0aa899fe93d25bd061e26a23f2062de7c33a773b805170c2ec4",
   "ev_c327a668b61c112fa85df30637cc48cc8ebf58987bed8664ebd73322decf07d8",
   "ev_c5ced5a7972e70ba61e5fa4dda8b054bc58edf39bf3309b9dc463772be1c96c2",
   "ev_c5d303aaf82229194c41d7c12cbb1849147cf64cfefa71bff3ed4dd7bd478be9",
   "ev_c82563a3fab5e9e34a7f17eaa66d2fb5fd7a230f8beccc5dda9b24d31c967a3b",
+  "ev_c96959e07acab5d4688aac45beb395972c54a7041ecd41eb092b158fde2a6680",
   "ev_cb2ae3ddcbce14d18a76639ddaf6654ea2203594f56d697c3aa82b518f447902",
   "ev_cb7b3d8e5bae24cf65f49b82b7c65c79c6a3d7333a029bf49ab6f3b5a62341f6",
   "ev_cbbff2fa81f950a2655e36d98f87416ad3d06f3aa614f4cd1ddf8a7dbfa0d952",

@@ -199,6 +199,7 @@ export type MenuAction =
   | 'exportHtml' | 'exportPdf' | 'print'
   | 'exportHtmlPlain' | 'exportImage' | 'exportPrevious' | 'exportOverwrite' | 'exportSettings' | 'pageSetup'
   | 'exportDocx' | 'exportLatex' | 'exportEpub'
+  | 'exportOdt' | 'exportRtf' | 'exportMediawiki' | 'exportRst' | 'exportTextile' | 'exportOpml' | 'exportCustom' | 'import'
   | 'undo' | 'redo' | 'find' | 'replace'
   | 'toggleSidebar' | 'toggleSource' | 'toggleFocus' | 'toggleTypewriter' | 'quickOpen'
   | 'zoomIn' | 'zoomOut' | 'zoomReset'
@@ -248,7 +249,8 @@ export interface Platform {
     rule: ImageRule,
     input: { bytes?: Uint8Array; mime?: string; path?: string; name?: string },
   ): Promise<string>;
-  openFileDialog(opts?: { directory?: boolean }): Promise<string | null>;
+  /** `filters` (#95, optional): file-type filters for the open panel (default: Markdown). */
+  openFileDialog(opts?: { directory?: boolean; filters?: { name: string; extensions: string[] }[] }): Promise<string | null>;
   saveFileDialog(opts?: { defaultPath?: string; filters?: { name: string; extensions: string[] }[] }): Promise<string | null>;
   /** Write HTML, or print given HTML to PDF at outPath. */
   exportHtml(html: string, outPath: string): Promise<void>;

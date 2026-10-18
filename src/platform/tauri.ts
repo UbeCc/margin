@@ -99,8 +99,8 @@ export class TauriPlatform implements Platform {
     throw new Error('storeImage: need bytes or path');
   }
 
-  openFileDialog(opts?: { directory?: boolean }): Promise<string | null> {
-    return call('open_dialog', { directory: !!opts?.directory });
+  openFileDialog(opts?: { directory?: boolean; filters?: { name: string; extensions: string[] }[] }): Promise<string | null> {
+    return call('open_dialog', { directory: !!opts?.directory, filters: opts?.filters ?? null });
   }
 
   saveFileDialog(opts?: { defaultPath?: string; filters?: { name: string; extensions: string[] }[] }): Promise<string | null> {
@@ -156,6 +156,14 @@ export class TauriPlatform implements Platform {
         throw e instanceof Error ? e : new Error(String(e));
       },
     );
+  }
+
+  pandocImport(inputPath: string, pandocPath: string | null, timeoutMs: number): Promise<string> {
+    return call('pandoc_import', { inputPath, pandocPath, timeoutMs });
+  }
+
+  runExportCommand(command: string, vars: Record<string, string>, stdin: string | null, cwd: string | null, timeoutMs: number): Promise<{ stdout: string; stderr: string }> {
+    return call('run_export_command', { command, vars, stdin, cwd, timeoutMs });
   }
 
   /** Open a file exported in this session with its default application. */

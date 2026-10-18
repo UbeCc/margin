@@ -29,7 +29,11 @@ export interface ExportSettings {
     allowYamlOverrides: boolean;
     /** Skip the confirmation before "Export and Overwrite with Previous". */
     noOverwriteWarning: boolean;
+    /** Command run after every successful export ('' = none); `${outputPath}` etc. expanded per argv token. */
+    runAfterExport: string;
   };
+  /** User-defined export commands (File › Export › Custom). */
+  custom: CustomExport[];
   pdf: {
     page: PageSetup;
     /** Theme used for the export ('' = current theme). */
@@ -45,6 +49,27 @@ export interface ExportSettings {
   htmlPlain: { appendHead: string; appendBody: string };
   image: { width: number; quality: ImageQuality; format: ImageFormat; theme: string; fontSize: number };
 }
+
+export interface CustomExport {
+  id: string;
+  name: string;
+  /** Command line; tokenized to argv (no shell), then `${vars}` expanded per token. */
+  command: string;
+  /** Output extension for the save panel ('' with saveDialog=false). */
+  extension: string;
+  /** What the command receives on stdin. */
+  input: 'markdown' | 'html';
+  /** Ask for an output path first (`${outputPath}`); false = the command decides. */
+  saveDialog: boolean;
+}
+
+/** "Add From a Template" presets for custom exports. */
+export const CUSTOM_EXPORT_TEMPLATES: Omit<CustomExport, 'id'>[] = [
+  { name: 'PDF via Pandoc (xelatex)', command: 'pandoc -f markdown -o ${outputPath} --pdf-engine=xelatex --resource-path ${currentFolder}', extension: 'pdf', input: 'markdown', saveDialog: true },
+  { name: 'PDF via wkhtmltopdf', command: 'wkhtmltopdf --enable-local-file-access - ${outputPath}', extension: 'pdf', input: 'html', saveDialog: true },
+  { name: 'Markdown copy', command: 'tee ${outputPath}', extension: 'md', input: 'markdown', saveDialog: true },
+  { name: 'Pandoc (custom format)', command: 'pandoc -f markdown -t asciidoc -s -o ${outputPath}', extension: 'adoc', input: 'markdown', saveDialog: true },
+];
 
 export const PAPER_SIZES: Record<Exclude<PaperName, 'custom'>, [number, number]> = {
   A3: [297, 420],
@@ -75,7 +100,8 @@ export const DEFAULT_PAGE: Readonly<PageSetup> = Object.freeze({
 });
 
 export const DEFAULT_EXPORT: Readonly<ExportSettings> = Object.freeze({
-  general: { folder: 'same', customFolder: '', afterExport: 'none', allowYamlOverrides: true, noOverwriteWarning: false },
+  general: { folder: 'same', customFolder: '', afterExport: 'none', allowYamlOverrides: true, noOverwriteWarning: false, runAfterExport: '' },
+  custom: [],
   pdf: { page: DEFAULT_PAGE, theme: '', pageBreaks: 'none', header: '', footer: '', outline: true, author: '' },
   html: { theme: '', appendHead: '', appendBody: '' },
   htmlPlain: { appendHead: '', appendBody: '' },
@@ -110,6 +136,27 @@ export function migratePageSetup(input: unknown): PageSetup {
   };
 }
 
+export function migrateCustomExports(v: unknown): CustomExport[] {
+  if (!Array.isArray(v)) return [];
+  const seen = new Set<string>();
+  const out: CustomExport[] = [];
+  for (const x of v.slice(0, 50)) {
+    const c = obj(x);
+    let id = typeof c.id === 'string' && /^[\w-]{1,40}$/.test(c.id) ? c.id : '';
+    if (!id || seen.has(id)) id = `c${out.length + 1}-${Math.random().toString(36).slice(2, 8)}`;
+    seen.add(id);
+    out.push({
+      id,
+      name: s(c.name, '').trim() || 'Custom export',
+      command: s(c.command, ''),
+      extension: s(c.extension, '').replace(/^\.+/, '').replace(/[^\w.-]/g, '').slice(0, 16),
+      input: oneOf(c.input, ['markdown', 'html'] as const, 'markdown'),
+      saveDialog: b(c.saveDialog, true),
+    });
+  }
+  return out;
+}
+
 /** Validate + default the persisted `export` settings object. Never throws. */
 export function migrateExportSettings(input: unknown): ExportSettings {
   const r = obj(input);
@@ -126,7 +173,9 @@ export function migrateExportSettings(input: unknown): ExportSettings {
       afterExport: oneOf(g.afterExport, ['none', 'open', 'reveal'] as const, d.general.afterExport),
       allowYamlOverrides: b(g.allowYamlOverrides, d.general.allowYamlOverrides),
       noOverwriteWarning: b(g.noOverwriteWarning, false),
+      runAfterExport: s(g.runAfterExport, ''),
     },
+    custom: migrateCustomExports(r.custom),
     pdf: {
       page: migratePageSetup(p.page),
       theme: s(p.theme, ''),

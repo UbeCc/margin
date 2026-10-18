@@ -396,7 +396,7 @@ export class WebPlatform implements Platform {
     return this.opts.useFileSystemAccess && typeof window !== 'undefined' ? (window as FsaWindow) : null;
   }
 
-  async openFileDialog(opts?: { directory?: boolean }): Promise<string | null> {
+  async openFileDialog(opts?: { directory?: boolean; filters?: { name: string; extensions: string[] }[] }): Promise<string | null> {
     const kind = opts?.directory ? 'openFolder' : 'open';
     const hook = this.hook();
     if (hook) return hook(kind, opts);

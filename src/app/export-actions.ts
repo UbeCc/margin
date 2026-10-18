@@ -39,6 +39,8 @@ export interface Exporter {
   run(target: string): Promise<void>;
   /** Preflight: a reason the exporter cannot run here (checked before the save panel). */
   unavailable?(): string | null;
+  /** No save panel / output path (the exporter decides where output goes). */
+  noTarget?: boolean;
 }
 
 export interface LastExport {
@@ -140,10 +142,41 @@ export class ExportController {
           run: (t) => this.runImage(t, s),
         };
       default: {
+        if (kind.startsWith('custom:')) return this.customExporter(kind.slice(7), s);
         const make = this.custom.get(kind);
         return make ? make(h) : null;
       }
     }
+  }
+
+  /** Variables for custom commands: document/output paths plus title/author. */
+  commandVars(target: string | null, s = this.host.exportSettings()): Record<string, string> {
+    const meta = this.meta(s);
+    return { ...this.vars(target), title: meta.title, author: meta.author };
+  }
+
+  private customExporter(id: string, s: ExportSettings): Exporter | null {
+    const c = s.custom.find((x) => x.id === id);
+    if (!c) return null;
+    const h = this.host;
+    const run = extras(h.platform).runExportCommand;
+    return {
+      label: c.name,
+      extensions: c.extension ? [c.extension] : ['*'],
+      noTarget: !c.saveDialog,
+      unavailable: () => (!run ? 'Custom export commands need the desktop app.' : c.command.trim() ? null : `“${c.name}” has no command configured.`),
+      run: async (t) => {
+        let stdin: string;
+        if (c.input === 'html') {
+          const body = this.body(t ? dirname(t) : null);
+          stdin = buildExportHtml({ title: this.meta(s).title, body, themeCss: h.themeCss(s.html.theme), extraCss: await h.extraCss(body) });
+        } else stdin = h.markdown();
+        const doc = h.docPath();
+        const out = await run!.call(h.platform, c.command, this.commandVars(t || null, s), stdin, doc ? dirname(doc) : h.folder(), 120_000);
+        const w = out.stderr.trim();
+        if (w) h.notify(`${c.name}: ${w.split('\n')[0]}`, 'warning');
+      },
+    };
   }
 
   /** The PDF payload (HTML + native options), exposed for tests. */
@@ -236,7 +269,9 @@ export class ExportController {
     }
     const s = this.host.exportSettings();
     let target: string | null;
-    if (mode === 'overwrite') {
+    if (ex.noTarget) {
+      target = '';
+    } else if (mode === 'overwrite') {
       target = this.last!.path;
       if (!s.general.noOverwriteWarning && (await this.exists(target))) {
         const r = await this.host.confirmOverwrite(target);
@@ -249,15 +284,16 @@ export class ExportController {
       const stem = doc ? stripExt(basename(doc)) : documentTitle(this.host.markdown(), null);
       const prev = mode === 'previous' ? this.last!.path : null;
       const dir = prev ? dirname(prev) : this.defaultDir(s);
-      const name = prev ? basename(prev) : `${stem}.${ex.extensions[0]}`;
+      const any = ex.extensions[0] === '*';
+      const name = prev ? basename(prev) : any ? stem : `${stem}.${ex.extensions[0]}`;
       target = await this.host.platform.saveFileDialog({
         defaultPath: dir ? join(dir, name) : name,
-        filters: [{ name: ex.label, extensions: ex.extensions }],
+        filters: any ? undefined : [{ name: ex.label, extensions: ex.extensions }],
       });
     }
-    if (!target) return false;
+    if (target === null || (!target && !ex.noTarget)) return false;
     // Panels on some platforms return the bare name: add the format's extension.
-    if (!ex.extensions.some((e) => target!.toLowerCase().endsWith(`.${e}`))) target = `${target}.${ex.extensions[0]}`;
+    if (target && ex.extensions[0] !== '*' && !ex.extensions.some((e) => target!.toLowerCase().endsWith(`.${e}`))) target = `${target}.${ex.extensions[0]}`;
     try {
       await ex.run(target);
     } catch (e) {
@@ -266,9 +302,24 @@ export class ExportController {
       return false;
     }
     this.last = { kind, path: target };
-    this.lastDir = dirname(target);
-    this.afterExport(target, s);
+    if (target) this.lastDir = dirname(target);
+    if (target) this.afterExport(target, s);
+    else this.host.notify(`${ex.label}: done`, 'success');
+    void this.runAfterExport(target, s);
     return true;
+  }
+
+  /** Export settings › "Run command after export". */
+  private async runAfterExport(target: string, s: ExportSettings): Promise<void> {
+    const cmd = s.general.runAfterExport.trim();
+    const run = extras(this.host.platform).runExportCommand;
+    if (!cmd || !run) return;
+    const doc = this.host.docPath();
+    try {
+      await run.call(this.host.platform, cmd, this.commandVars(target || null, s), null, doc ? dirname(doc) : this.host.folder(), 120_000);
+    } catch (e) {
+      this.host.notify(`Command after export failed: ${e instanceof Error ? e.message : String(e)}`, 'error');
+    }
   }
 
   private afterExport(target: string, s: ExportSettings): void {
