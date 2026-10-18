@@ -172,9 +172,20 @@ test.describe('parity: context menus (#97)', () => {
     await page.locator('.md-editor .md-math .md-math-render').click({ button: 'right', force: true });
     expect(await labels(page)).toEqual(['Copy Math', 'Cut', 'Copy', 'Paste', 'Copy / Paste As…']);
     await item(page, 'Copy Math').hover();
-    await item(page, 'Copy as Tex').click();
-    expect(await clipboardText(page)).toBe('a^2+b^2');
-    // #139: a rendered :emoji: gets "Copy '<char>'" before the system items
+    await item(page, 'Copy as Image').click();
+    // #138: rasterized KaTeX PNG lands on the clipboard (89 50 4E 47 magic)
+    await expect
+      .poll(() =>
+        page.evaluate(async () => {
+          const items = await navigator.clipboard.read();
+          const png = items.flatMap((i) => i.types).find((t) => t === 'image/png');
+          if (!png) return null;
+          const blob = await (await items[0].getType('image/png')).arrayBuffer();
+          const b = new Uint8Array(blob.slice(0, 4));
+          return b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47 ? 'png' : 'other';
+        }),
+      )
+      .toBe('png');
     await page.evaluate((m) => window.__margin!.editor.setMarkdown(m), 'Smile :smile: now\n');
     await page.locator('.md-editor .md-entity-char').click({ button: 'right', force: true });
     expect(await labels(page)).toEqual(["Copy '😄'", 'Cut', 'Copy', 'Paste', 'Copy / Paste As…']);

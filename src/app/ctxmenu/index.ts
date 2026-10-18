@@ -14,7 +14,7 @@ import { closeContextMenu, showContextMenu } from '../ui/contextmenu';
 import { localImages } from '../upload';
 import { basename } from '../util/path';
 import { buildItems, type CtxActions, type ImageCtxOps, type TableAction } from './items';
-import { saveMathAs } from './mathimg';
+import { copyMathAsImage, saveMathAs } from './mathimg';
 import { contextTarget, type CtxTarget } from './targets';
 import { copySvgAsPng, svgSource } from './svg';
 
@@ -319,6 +319,13 @@ export class EditorContextMenu {
         void saveMathAs(p, el).catch((e) => this.host.notify(`Could not save the math: ${String(e)}`, 'error'));
       },
       saveVideoAs: this.host.saveVideoAs,
+      copyMathImage: t.math
+        ? () => {
+            const el = t.math!.querySelector('.katex');
+            if (!el) return this.host.notify('The math has not been rendered yet.', 'info');
+            void copyMathAsImage(el).then((ok) => ok || this.host.notify('Could not copy the math image.', 'error'));
+          }
+        : undefined,
       tableAction: (a) => this.tableAction(a),
       editBlock: () => {
         const pv = t.block?.querySelector('.mb-preview');

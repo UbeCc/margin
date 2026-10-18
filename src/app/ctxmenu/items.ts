@@ -37,6 +37,8 @@ export interface CtxActions {
   /** "Save … As…" downloads (#138). */
   saveImageAs?(src: string): void;
   saveMathAs?(): void;
+  /** Inline math "Copy as Image" (#138): rasterize the rendered KaTeX node. */
+  copyMathImage?(): void;
   saveVideoAs?(src: string): void;
   /** Widget actions (table tools, edit, diagram image). */
   tableAction(action: TableAction): void;
@@ -152,7 +154,7 @@ function codeTools(a: CtxActions): MenuItem {
 function copyMath(a: CtxActions, inline: boolean): MenuItem {
   const c = (id: CommandId, label: string): MenuItem => ({ id, label, run: () => (a.restore(), a.run(id)) });
   const items = [c('copyAs:tex', 'Copy as Tex'), c('copyAs:mathml', 'Copy as MathML')];
-  if (inline) items.push({ id: 'copyAsImageInline', label: 'Copy as Image', disabled: true, run: () => {} });
+  if (inline) items.push({ id: 'copyAsImageInline', label: 'Copy as Image', disabled: !a.copyMathImage, run: () => a.copyMathImage?.() });
   return { id: inline ? 'copyMathInline' : 'copyMathBlock', label: 'Copy Math', submenu: items };
 }
 

@@ -134,3 +134,16 @@ export async function saveMathAs(platform: Platform, el: Element): Promise<void>
   const out = await platform.saveFileDialog({ defaultPath: 'math.png', filters: [{ name: 'PNG', extensions: ['png'] }] });
   if (out) await extras(platform).exportBinary!(bytes, out);
 }
+
+/** Inline-math "Copy as Image" (#138): PNG bytes onto the clipboard. */
+export async function copyMathAsImage(el: Element): Promise<boolean> {
+  const bytes = await katexPng(el);
+  if (!bytes) return false;
+  try {
+    const blob = new Blob([bytes as BlobPart], { type: 'image/png' });
+    await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+    return true;
+  } catch {
+    return false;
+  }
+}
