@@ -15,15 +15,14 @@ fn escape_quotes_and_wildcards() {
 }
 
 #[test]
-fn predicate_is_subsequence_and_markdown_only() {
-    let p = md_predicate("r d*");
-    assert!(p.starts_with(r#"kMDItemFSName == "*r*d*\**"cd && ("#), "{p}");
-    assert!(p.contains(r#"kMDItemFSName == "*.md"c"#));
-    assert!(p.contains(r#"kMDItemFSName == "*.markdown"c"#));
-    assert!(p.ends_with(')'));
+fn predicate_is_escaped_subsequence() {
+    assert_eq!(md_predicate("r d*").unwrap(), r#"kMDItemFSName == "*r*d*\**"cd"#);
     // a quote in the query cannot terminate the string literal
-    let p = md_predicate(r#"x" || kMDItemFSName == "*"#);
+    let p = md_predicate(r#"x" || kMDItemFSName == "*"#).unwrap();
     assert!(p.starts_with(r#"kMDItemFSName == "*x*\"*|*|*k*"#), "{p}");
+    assert!(p.ends_with(r#"*\"*\**"cd"#), "{p}");
+    // empty query: no predicate (a lone "*" matches nothing in MDQuery)
+    assert_eq!(md_predicate("  "), None);
 }
 
 #[test]
@@ -56,6 +55,7 @@ fn filter_applies_walker_rules() {
         ".hidden/h.md",
         "node_modules/p/r.md",
         "ok.markdown",
+        "img/pic.png",
     ]
     .iter()
     .map(|p| root.join(p))
@@ -91,6 +91,19 @@ fn spotlight_enabled_search_falls_back_on_unindexed_folder() {
     let qo = QuickOpen::with_spotlight(true);
     let r = qo.search(root, "alp", 10, true);
     assert_eq!(r, vec![root.join("alpha.md").to_string_lossy().into_owned()]);
+}
+
+#[test]
+fn spotlight_only_for_slow_walking_roots() {
+    let root = Path::new("/r");
+    let qo = QuickOpen { spotlight_after: Some(SPOTLIGHT_MIN_WALK), ..QuickOpen::with_spotlight(false) };
+    assert!(!qo.wants_spotlight(root), "unwalked root: walk first");
+    qo.walk_times.lock().unwrap().insert(root.into(), Duration::from_millis(60));
+    assert!(!qo.wants_spotlight(root));
+    qo.walk_times.lock().unwrap().insert(root.into(), Duration::from_millis(900));
+    assert!(qo.wants_spotlight(root));
+    assert!(QuickOpen::with_spotlight(true).wants_spotlight(root), "forced");
+    assert!(!QuickOpen::with_spotlight(false).wants_spotlight(root));
 }
 
 #[cfg(target_os = "macos")]

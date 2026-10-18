@@ -1,16 +1,16 @@
 //! Quick Open: a cached file index per root (built with the `ignore` walker, so
 //! `.gitignore`/hidden files are respected) plus a small fuzzy scorer.
 //!
-//! On macOS a Spotlight fast path (`spotlight_macos.rs`) answers queries while
-//! the walker index is missing or stale (cold open of a huge folder), and adds
-//! hits beyond the walker's `MAX_INDEX` cap. Spotlight results are filtered with
-//! the walker's rules, merged/deduped with any cached index, ranked by the same
-//! scorer, and a background walk refreshes the cache. Unindexed folders, query
-//! errors and timeouts fall back to the synchronous walk.
+//! On macOS a Spotlight fast path (`spotlight_macos.rs`) races a background
+//! re-walk when the index is stale and the root is slow to walk (last walk ≥
+//! `SPOTLIGHT_MIN_WALK`). Spotlight hits are filtered with the walker's rules,
+//! merged/deduped with the stale index, and ranked by the same scorer; if the
+//! walk finishes first, or the folder is unindexed / the query fails, the fresh
+//! walker index answers instead.
 
 use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, mpsc};
 use std::time::{Duration, Instant};
 
 #[cfg(target_os = "macos")]
@@ -66,45 +66,97 @@ pub struct QuickOpen {
     indexes: Arc<Mutex<HashMap<PathBuf, Index>>>,
     /// Roots with a background walk in flight.
     building: Arc<Mutex<HashSet<PathBuf>>>,
-    /// Try the Spotlight fast path (macOS only; ignored elsewhere).
-    pub spotlight: bool,
+    /// Duration of the last completed walk per root.
+    walk_times: Arc<Mutex<HashMap<PathBuf, Duration>>>,
+    /// Race Spotlight against a stale-index re-walk when the root's last walk
+    /// took at least this long (an unwalked root counts as zero). `None`
+    /// disables Spotlight; ignored off macOS.
+    pub spotlight_after: Option<Duration>,
 }
+
+/// Default `spotlight_after`: an indexed MDQuery costs ~200 ms on this class of
+/// machine regardless of folder size, while warm walks of a 20k-file folder take
+/// ~60 ms (see `quick_open_bench.rs`), so only slow-walking roots benefit.
+pub const SPOTLIGHT_MIN_WALK: Duration = Duration::from_millis(250);
 
 impl Default for QuickOpen {
     fn default() -> Self {
-        Self::with_spotlight(cfg!(target_os = "macos"))
+        let mut qo = Self::with_spotlight(false);
+        if cfg!(target_os = "macos") {
+            qo.spotlight_after = Some(SPOTLIGHT_MIN_WALK);
+        }
+        qo
     }
 }
 
 impl QuickOpen {
+    /// `true` races Spotlight on every stale search (tests/benchmarks).
     pub fn with_spotlight(spotlight: bool) -> Self {
-        Self { indexes: Default::default(), building: Default::default(), spotlight }
+        Self {
+            indexes: Default::default(),
+            building: Default::default(),
+            walk_times: Default::default(),
+            spotlight_after: spotlight.then_some(Duration::ZERO),
+        }
+    }
+
+    fn timed_walk(walk_times: &Mutex<HashMap<PathBuf, Duration>>, root: &Path) -> Vec<String> {
+        let t = Instant::now();
+        let files = walk(root);
+        walk_times.lock().unwrap().insert(root.to_path_buf(), t.elapsed());
+        files
+    }
+
+    fn wants_spotlight(&self, root: &Path) -> bool {
+        let last = self.walk_times.lock().unwrap().get(root).copied().unwrap_or_default();
+        self.spotlight_after.is_some_and(|min| last >= min)
+    }
+
+    fn is_stale(&self, root: &Path, watched: bool) -> bool {
+        match self.indexes.lock().unwrap().get(root) {
+            None => true,
+            Some(ix) => ix.dirty || (!watched && ix.built.elapsed() > UNWATCHED_TTL),
+        }
+    }
+
+    fn walking(&self, root: &Path) -> bool {
+        self.building.lock().unwrap().contains(root)
     }
 
     pub fn search(&self, root: &Path, query: &str, limit: usize, watched: bool) -> Vec<String> {
-        let mut map = self.indexes.lock().unwrap();
-        let (stale, truncated) = match map.get(root) {
-            None => (true, false),
-            Some(ix) => (ix.dirty || (!watched && ix.built.elapsed() > UNWATCHED_TTL), ix.files.len() >= MAX_INDEX),
-        };
         let fuzzy = query.chars().any(|c| !c.is_whitespace());
-        if self.spotlight && fuzzy && (stale || truncated) {
-            let cached: Vec<String> = map.get(root).map(|ix| ix.files.clone()).unwrap_or_default();
-            drop(map);
-            if let Some(hits) = spotlight_hits(root, query) {
-                if stale {
-                    self.refresh_in_background(root);
+        if fuzzy && self.is_stale(root, watched) && self.wants_spotlight(root) {
+            if let Some(rx) = spotlight_spawn(root, query) {
+                // Race Spotlight against a background re-walk; take whichever
+                // answers first. Never slower than walking, faster on huge or
+                // cold trees.
+                self.refresh_in_background(root);
+                loop {
+                    match rx.recv_timeout(Duration::from_millis(5)) {
+                        Ok(Some(hits)) => {
+                            let cached = self.indexes.lock().unwrap().get(root).map(|ix| ix.files.clone());
+                            return rank(&merge(&cached.unwrap_or_default(), hits), query, limit)
+                                .into_iter()
+                                .map(|rel| root.join(rel).to_string_lossy().into_owned())
+                                .collect();
+                        }
+                        Err(mpsc::RecvTimeoutError::Timeout) if self.walking(root) => {}
+                        _ => break, // Spotlight declined/failed, or the walk finished first
+                    }
                 }
-                return rank(&merge(&cached, hits), query, limit)
-                    .into_iter()
-                    .map(|rel| root.join(rel).to_string_lossy().into_owned())
-                    .collect();
+                while self.walking(root) {
+                    std::thread::sleep(Duration::from_millis(5));
+                }
             }
-            map = self.indexes.lock().unwrap();
         }
+        let mut map = self.indexes.lock().unwrap();
+        let stale = match map.get(root) {
+            None => true,
+            Some(ix) => ix.dirty || (!watched && ix.built.elapsed() > UNWATCHED_TTL),
+        };
         if stale {
             drop(map);
-            let files = walk(root); // walk without holding the lock
+            let files = Self::timed_walk(&self.walk_times, root); // walk without holding the lock
             map = self.indexes.lock().unwrap();
             map.insert(root.to_path_buf(), Index { files, built: Instant::now(), dirty: false });
         }
@@ -141,8 +193,9 @@ impl QuickOpen {
             return;
         }
         let (indexes, building, owned) = (self.indexes.clone(), self.building.clone(), root.to_path_buf());
+        let walk_times = self.walk_times.clone();
         let spawned = std::thread::Builder::new().name("quick-open-walk".into()).spawn(move || {
-            let files = walk(&owned);
+            let files = Self::timed_walk(&walk_times, &owned);
             indexes.lock().unwrap().insert(owned.clone(), Index { files, built: Instant::now(), dirty: false });
             building.lock().unwrap().remove(&owned);
         });
@@ -170,11 +223,8 @@ impl QuickOpen {
 
 // ------------------------------------------------------------ spotlight glue
 
-/// Extensions Spotlight is asked for (mirrors `is_markdown`).
-const MD_EXTS: &[&str] = &["md", "markdown", "mdown", "mkd", "mkdn", "txt"];
 /// Cap on raw Spotlight hits per query; the scorer ranks within these.
-pub const SPOTLIGHT_MAX: usize = 5_000;
-pub const SPOTLIGHT_TIMEOUT: Duration = Duration::from_millis(400);
+pub const SPOTLIGHT_MAX: usize = 20_000;
 /// How long an "is this folder indexed?" probe answer is trusted.
 const PROBE_TTL: Duration = Duration::from_secs(60);
 
@@ -192,22 +242,28 @@ pub fn md_escape(s: &str) -> String {
 }
 
 /// MDQuery predicate: file name contains the query's characters in order
-/// (`*a*b*c*`, case/diacritic-insensitive) — the substring `*abc*` is a subset,
-/// and this matches what the fuzzy scorer accepts inside a file name — and the
-/// name has a markdown extension. Whitespace is ignored like in `rank`.
-pub fn md_predicate(query: &str) -> String {
+/// (`*a*b*c*`, case/diacritic-insensitive). The substring `*abc*` is a subset,
+/// and this is what the fuzzy scorer accepts inside a file name. Whitespace is
+/// ignored like in `rank`; `None` for an empty query (a lone `*` name pattern
+/// matches nothing in MDQuery).
+///
+/// Markdown extensions are enforced afterwards by `filter_hits` rather than
+/// with `kMDItemFSName == "*.md"c || …` clauses: each suffix clause is another
+/// scan of the volume-wide name index (measured: six of them double the query
+/// time, ~200 ms → ~420 ms on a 20k-file folder).
+pub fn md_predicate(query: &str) -> Option<String> {
     let mut pat = String::from("*");
     for c in query.chars().filter(|c| !c.is_whitespace()) {
         pat.push_str(&md_escape(&c.to_string()));
         pat.push('*');
     }
-    let exts: Vec<String> = MD_EXTS.iter().map(|e| format!("kMDItemFSName == \"*.{e}\"c")).collect();
-    format!("kMDItemFSName == \"{pat}\"cd && ({})", exts.join(" || "))
+    (pat != "*").then(|| format!("kMDItemFSName == \"{pat}\"cd"))
 }
 
 /// Predicate used to probe whether a folder is in the Spotlight index at all:
-/// any item at all under the scope.
-pub const PROBE_PREDICATE: &str = "kMDItemFSName == \"*\"";
+/// any item at all under the scope. (A bare `kMDItemFSName == "*"` matches
+/// nothing in MDQuery, so use the content-type tree.)
+pub const PROBE_PREDICATE: &str = "kMDItemContentTypeTree == \"public.item\"";
 
 /// Map absolute Spotlight paths to root-relative forward-slash paths, keeping
 /// only files the walker would also index (no hidden components, no skipped
@@ -221,6 +277,7 @@ pub fn filter_hits(root: &Path, hits: Vec<PathBuf>) -> Vec<String> {
         let Ok(rel) = hit.strip_prefix(&canon).or_else(|_| hit.strip_prefix(root)) else { continue };
         let rel_s = rel.to_string_lossy().replace('\\', "/");
         if rel_s.is_empty()
+            || !is_markdown(&rel_s)
             || rel_s.split('/').any(|c| c.starts_with('.') || SKIP_DIRS.contains(&c))
             || ignores.ignored(&canon, rel)
         {
@@ -296,32 +353,48 @@ pub fn merge(cached: &[String], hits: Vec<String>) -> Vec<String> {
 }
 
 #[cfg(target_os = "macos")]
-fn folder_indexed(root: &Path) -> bool {
-    static PROBES: std::sync::OnceLock<Mutex<HashMap<PathBuf, (bool, Instant)>>> = std::sync::OnceLock::new();
-    let probes = PROBES.get_or_init(Default::default);
-    if let Some((ok, at)) = probes.lock().unwrap().get(root) {
-        if at.elapsed() < PROBE_TTL {
-            return *ok;
-        }
-    }
-    let ok = spotlight_macos::query(root, PROBE_PREDICATE, 1, SPOTLIGHT_TIMEOUT).is_some_and(|v| !v.is_empty());
-    probes.lock().unwrap().insert(root.to_path_buf(), (ok, Instant::now()));
-    ok
-}
+static UNINDEXED: std::sync::OnceLock<Mutex<HashMap<PathBuf, Instant>>> = std::sync::OnceLock::new();
 
-/// Filtered, root-relative Spotlight hits, or `None` → use the walker.
+/// Filtered, root-relative Spotlight hits (blocking), or `None` → use the
+/// walker. An empty answer is ambiguous (no match vs. folder not indexed), so it
+/// is also `None`; a probe then decides whether to skip Spotlight for this
+/// folder for `PROBE_TTL`.
 #[cfg(target_os = "macos")]
 pub fn spotlight_hits(root: &Path, query: &str) -> Option<Vec<String>> {
     let canon = root.canonicalize().ok()?;
-    if !folder_indexed(&canon) {
+    let hits = spotlight_macos::query_blocking(&canon, &md_predicate(query)?, SPOTLIGHT_MAX)?;
+    if hits.is_empty() {
+        let indexed = spotlight_macos::query_blocking(&canon, PROBE_PREDICATE, 1).is_some_and(|v| !v.is_empty());
+        if !indexed {
+            UNINDEXED.get_or_init(Default::default).lock().unwrap().insert(canon, Instant::now());
+        }
         return None;
     }
-    let hits = spotlight_macos::query(&canon, &md_predicate(query), SPOTLIGHT_MAX, SPOTLIGHT_TIMEOUT)?;
     Some(filter_hits(root, hits))
+}
+
+/// Start `spotlight_hits` on a helper thread. `None` (no thread) when the
+/// folder recently probed as unindexed, the query is empty, or too many
+/// earlier queries are still running.
+#[cfg(target_os = "macos")]
+fn spotlight_spawn(root: &Path, query: &str) -> Option<mpsc::Receiver<Option<Vec<String>>>> {
+    md_predicate(query)?;
+    let canon = root.canonicalize().ok()?;
+    let unindexed = UNINDEXED.get_or_init(Default::default);
+    if unindexed.lock().unwrap().get(&canon).is_some_and(|t| t.elapsed() < PROBE_TTL) {
+        return None;
+    }
+    let (root, query) = (root.to_path_buf(), query.to_string());
+    spotlight_macos::spawn(move || spotlight_hits(&root, &query))
 }
 
 #[cfg(not(target_os = "macos"))]
 pub fn spotlight_hits(_root: &Path, _query: &str) -> Option<Vec<String>> {
+    None
+}
+
+#[cfg(not(target_os = "macos"))]
+fn spotlight_spawn(_root: &Path, _query: &str) -> Option<mpsc::Receiver<Option<Vec<String>>>> {
     None
 }
 
@@ -490,3 +563,7 @@ mod tests {
 #[cfg(test)]
 #[path = "quick_open_spotlight_tests.rs"]
 mod spotlight_tests;
+
+#[cfg(test)]
+#[path = "quick_open_bench.rs"]
+mod bench;

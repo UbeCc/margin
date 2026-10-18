@@ -2,14 +2,13 @@
 //!
 //! Raw CoreServices/CoreFoundation FFI (no extra crates): a synchronous
 //! `MDQueryExecute` scoped to one folder via `MDQuerySetSearchScope`, run on a
-//! helper thread so callers can bound it with a timeout. Every failure maps to
+//! helper thread so callers can race it against the walker. Every failure maps to
 //! `None` so the caller falls back to the directory walker.
 
 use std::ffi::c_void;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::mpsc;
-use std::time::Duration;
 
 type CFTypeRef = *const c_void;
 type CFStringRef = *const c_void;
@@ -121,35 +120,41 @@ pub fn query_blocking(scope: &Path, query: &str, max: usize) -> Option<Vec<PathB
     }
 }
 
-/// At most this many query threads may be outstanding (a timed-out query keeps
-/// its thread until Spotlight answers; this stops them from piling up).
-const MAX_IN_FLIGHT: usize = 2;
+/// At most this many query threads may be outstanding (an abandoned query
+/// keeps its thread until Spotlight answers; this stops them piling up).
+const MAX_IN_FLIGHT: usize = 1;
 static IN_FLIGHT: AtomicUsize = AtomicUsize::new(0);
 
-struct InFlight;
+/// Slot for one outstanding query thread; released on drop.
+pub struct InFlight(());
+
+impl InFlight {
+    pub fn acquire() -> Option<InFlight> {
+        if IN_FLIGHT.fetch_add(1, Ordering::SeqCst) >= MAX_IN_FLIGHT {
+            IN_FLIGHT.fetch_sub(1, Ordering::SeqCst);
+            return None;
+        }
+        Some(InFlight(()))
+    }
+}
+
 impl Drop for InFlight {
     fn drop(&mut self) {
         IN_FLIGHT.fetch_sub(1, Ordering::SeqCst);
     }
 }
 
-/// `query_blocking` bounded by `timeout`. `None` on timeout, error, or when too
-/// many earlier queries are still running.
-pub fn query(scope: &Path, query: &str, max: usize, timeout: Duration) -> Option<Vec<PathBuf>> {
-    if IN_FLIGHT.fetch_add(1, Ordering::SeqCst) >= MAX_IN_FLIGHT {
-        IN_FLIGHT.fetch_sub(1, Ordering::SeqCst);
-        return None;
-    }
-    let guard = InFlight;
+/// Run `job` on a helper thread holding an in-flight slot; the receiver gets
+/// its result. `None` when no slot is free or the thread cannot be spawned.
+pub fn spawn<T: Send + 'static>(job: impl FnOnce() -> T + Send + 'static) -> Option<mpsc::Receiver<T>> {
+    let slot = InFlight::acquire()?;
     let (tx, rx) = mpsc::channel();
-    let scope = scope.to_path_buf();
-    let query = query.to_string();
     std::thread::Builder::new()
         .name("spotlight-query".into())
         .spawn(move || {
-            let _g = guard;
-            let _ = tx.send(query_blocking(&scope, &query, max));
+            let _slot = slot;
+            let _ = tx.send(job());
         })
         .ok()?;
-    rx.recv_timeout(timeout).ok().flatten()
+    Some(rx)
 }
