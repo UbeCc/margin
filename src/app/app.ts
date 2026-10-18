@@ -18,6 +18,7 @@ import { StatusBar } from './statusbar';
 import { ThemeManager } from './themes';
 import { themeLabel } from '../themes';
 import { ask } from './ui/modal';
+import { insertTableDialog } from './ui/table-dialog';
 import { closePalette, isPaletteOpen, openPalette, type PaletteItem } from './ui/palette';
 import { toast } from './ui/toast';
 import { PANDOC_ACTIONS, type PandocFormat } from './export-pandoc';
@@ -554,12 +555,24 @@ export class App {
     void this.run(action);
   }
 
+  /** Paragraph › Table › Insert Table… (#98): rows × columns dialog, then insert. */
+  private async insertTable(): Promise<boolean> {
+    const size = await insertTableDialog();
+    if (!size) return false;
+    this.editor.focus();
+    return this.editor.exec({ kind: 'insertTable', rows: size.rows, cols: size.cols });
+  }
+
   /** Dispatch any MenuAction / app command. Returns false when unhandled. */
   async run(id: CommandId): Promise<boolean> {
     closeContextMenu();
     const ed = this.editor;
     if (id.startsWith('heading:')) return ed.exec({ kind: 'heading', level: Number(id.slice(8)) as 0 });
     if (id.startsWith('mark:')) return ed.exec({ kind: 'mark', mark: id.slice(5) as 'strong' });
+    if (id === 'block:table' || id === 'table:insert') return this.insertTable();
+    if (id.startsWith('table:')) return ed.exec({ kind: 'table', op: id.slice(6) as 'copy' });
+    if (id.startsWith('code:')) return ed.exec({ kind: 'code', op: id.slice(5) as 'copy' });
+    if (id.startsWith('math:')) return ed.exec({ kind: 'math', op: id.slice(5) as 'copyTex' });
     if (id.startsWith('block:')) return ed.exec({ kind: 'block', block: id.slice(6) as 'quote' });
     if (id.startsWith('task:')) return ed.exec({ kind: 'task', op: id.slice(5) as 'toggle' });
     if (id === 'para:headingUp' || id === 'para:headingDown') return ed.exec({ kind: 'headingLevel', delta: id === 'para:headingUp' ? 1 : -1 });
