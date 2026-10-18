@@ -141,6 +141,8 @@ export class App {
       return ok;
     });
     window.addEventListener('blur', () => void this.doc.flushAutoSave());
+    // Don't lose a just-changed preference to the save debounce on reload / quit (#100).
+    window.addEventListener('pagehide', () => this.saveSettingsSoon.flush());
 
     // Initial content — General › On Launch (#100)
     const { folder, file } = launchPlan(this.settings, opts);
