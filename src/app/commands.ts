@@ -11,6 +11,7 @@ export type AppCommand =
   | 'reloadFromDisk'
   | 'openThemesFolder'
   | 'toggleLineEnding'
+  | 'toggleFinalNewline'
   | 'uploadAllImages'
   | 'wordCount';
 
@@ -48,11 +49,41 @@ export const COMMANDS: CommandSpec[] = [
   { id: 'saveAs', label: 'Save As…', category: 'File', keys: ['Mod+Shift+S'] },
   { id: 'close', label: 'Close File', category: 'File', keys: ['Mod+W'] },
   { id: 'reloadFromDisk', label: 'Reload From Disk', category: 'File' },
+  // File lifecycle (#94)
+  { id: 'newTab', label: 'New Tab', category: 'File', keys: ['Mod+T'] },
+  { id: 'newWindow', label: 'New Window', category: 'File', keys: ['Mod+Shift+N'] },
+  { id: 'nextTab', label: 'Next Tab', category: 'File', keys: ['Mod+Shift+]', 'Ctrl+Tab'] },
+  { id: 'prevTab', label: 'Previous Tab', category: 'File', keys: ['Mod+Shift+[', 'Ctrl+Shift+Tab'] },
+  { id: 'reopenClosed', label: 'Reopen Closed File', category: 'File', keys: ['Mod+Shift+T'] },
+  { id: 'saveAll', label: 'Save All', category: 'File', keys: ['Mod+Alt+S'] },
+  { id: 'duplicate', label: 'Duplicate', category: 'File' },
+  { id: 'renameFile', label: 'Rename…', category: 'File' },
+  { id: 'moveTo', label: 'Move To…', category: 'File' },
+  { id: 'revealInFinder', label: isMac ? 'Reveal in Finder' : 'Open File Location', category: 'File' },
+  { id: 'copyFilePath', label: 'Copy File Path', category: 'File' },
+  { id: 'browseVersions', label: 'Browse All Versions…', category: 'File' },
+  { id: 'reopenWithEncoding', label: 'Reopen with Encoding…', category: 'File' },
+  { id: 'properties', label: 'Properties…', category: 'File' },
+  { id: 'recoverDrafts', label: 'Recover Unsaved Drafts…', category: 'File' },
   { id: 'exportHtml', label: 'Export as HTML…', category: 'File' },
   { id: 'exportPdf', label: 'Export as PDF…', category: 'File', keys: ['Mod+Alt+E'] },
+  { id: 'exportHtmlPlain', label: 'Export as HTML (without Styles)…', category: 'File' },
+  { id: 'exportImage', label: 'Export as Image…', category: 'File' },
+  { id: 'exportPrevious', label: 'Export with Previous', category: 'File' },
+  { id: 'exportOverwrite', label: 'Export and Overwrite with Previous', category: 'File' },
+  { id: 'exportSettings', label: 'Export Settings…', category: 'File' },
+  { id: 'pageSetup', label: 'Page Setup…', category: 'File' },
   { id: 'exportDocx', label: 'Export as Word (.docx)…', category: 'File' },
   { id: 'exportLatex', label: 'Export as LaTeX…', category: 'File' },
   { id: 'exportEpub', label: 'Export as EPUB…', category: 'File' },
+  { id: 'exportOdt', label: 'Export as OpenOffice (.odt)…', category: 'File' },
+  { id: 'exportRtf', label: 'Export as RTF…', category: 'File' },
+  { id: 'exportMediawiki', label: 'Export as MediaWiki…', category: 'File' },
+  { id: 'exportRst', label: 'Export as reStructuredText…', category: 'File' },
+  { id: 'exportTextile', label: 'Export as Textile…', category: 'File' },
+  { id: 'exportOpml', label: 'Export as OPML…', category: 'File' },
+  { id: 'exportCustom', label: 'Export with Custom Command…', category: 'File' },
+  { id: 'import', label: 'Import…', category: 'File' },
   { id: 'print', label: 'Print…', category: 'File', keys: ['Mod+Shift+P'] },
   { id: 'preferences', label: 'Preferences…', category: 'App', keys: ['Mod+,'] },
   { id: 'commandPalette', label: 'Command Palette…', category: 'App', keys: ['Mod+Shift+A'] },
@@ -96,6 +127,34 @@ export const COMMANDS: CommandSpec[] = [
   { id: 'block:code', label: 'Code Block', category: 'Paragraph', keys: ['Mod+Alt+C'], scope: 'editor' },
   { id: 'block:math', label: 'Math Block', category: 'Paragraph', keys: ['Mod+Alt+B'], scope: 'editor' },
   { id: 'block:table', label: 'Table', category: 'Paragraph', keys: ['Mod+Alt+T'], scope: 'editor' },
+  // #98 Paragraph › Table / Code Tools / Math Tools (act on the block with the caret)
+  ...([
+    ['table:insert', 'Insert Table…'],
+    ['table:rowAbove', 'Table: Add Row Above'],
+    ['table:rowBelow', 'Table: Add Row Below'],
+    ['table:colBefore', 'Table: Add Column Before'],
+    ['table:colAfter', 'Table: Add Column After'],
+    ['table:moveRowUp', 'Table: Move Row Up'],
+    ['table:moveRowDown', 'Table: Move Row Down'],
+    ['table:moveColLeft', 'Table: Move Column Left'],
+    ['table:moveColRight', 'Table: Move Column Right'],
+    ['table:deleteRow', 'Table: Delete Row'],
+    ['table:deleteCol', 'Table: Delete Column'],
+    ['table:alignLeft', 'Table: Align Left'],
+    ['table:alignCenter', 'Table: Align Center'],
+    ['table:alignRight', 'Table: Align Right'],
+    ['table:resize', 'Table: Resize Table…'],
+    ['table:copy', 'Table: Copy Table'],
+    ['table:prettify', 'Table: Prettify Source Code'],
+    ['table:delete', 'Table: Delete Table'],
+    ['code:copy', 'Code Tools: Copy Code Content'],
+    ['code:indentAll', 'Code Tools: Auto Indent Whole Code'],
+    ['code:indentSelected', 'Code Tools: Auto Indent Selected Code'],
+    ['math:copyTex', 'Math Tools: Copy as Tex'],
+    ['math:copyMathML', 'Math Tools: Copy as MathML'],
+    ['math:delete', 'Math Tools: Delete Math'],
+    ['math:refresh', 'Math Tools: Refresh All Math Expressions'],
+  ] as const).map(([id, label]): CommandSpec => ({ id, label, category: 'Paragraph', scope: 'editor' })),
   { id: 'block:hr', label: 'Horizontal Rule', category: 'Paragraph', keys: ['Mod+Alt+-'], scope: 'editor' },
   { id: 'block:toc', label: 'Table of Contents', category: 'Paragraph', scope: 'editor' },
   { id: 'block:html', label: 'HTML Block', category: 'Paragraph', scope: 'editor' },
@@ -122,6 +181,8 @@ export const COMMANDS: CommandSpec[] = [
   { id: 'toggleSidebar', label: 'Toggle Sidebar', category: 'View', keys: ['Mod+\\', 'Mod+Shift+L'] },
   { id: 'showOutline', label: 'Show Outline', category: 'View', keys: ['Mod+Shift+1'] },
   { id: 'showFiles', label: 'Show Files', category: 'View', keys: ['Mod+Shift+3'] },
+  { id: 'showArticles', label: 'Show Articles (List View)', category: 'View', keys: ['Mod+Shift+2'] },
+  { id: 'sidebarSearch', label: 'Search in Folder', category: 'View', keys: ['Mod+Shift+F'] },
   { id: 'revealActiveFile', label: 'Reveal Active File in Sidebar', category: 'View' },
   { id: 'toggleSource', label: 'Toggle Source Code Mode', category: 'View', keys: ['Mod+/'] },
   { id: 'toggleFocus', label: 'Focus Mode', category: 'View', keys: ['F8'] },
@@ -141,13 +202,37 @@ export const COMMANDS: CommandSpec[] = [
   { id: 'speech:stop', label: 'Stop Speaking', category: 'Edit' },
   { id: 'wordCount', label: 'Word Count', category: 'View' },
   { id: 'toggleLineEnding', label: 'Toggle Line Endings (LF / CRLF)', category: 'View' },
+  { id: 'toggleFinalNewline', label: 'Insert Final New Line On Save', category: 'Edit' },
   { id: 'openThemesFolder', label: 'Open Themes Folder', category: 'Theme' },
   { id: 'uploadAllImages', label: 'Upload All Local Images', category: 'Format' },
+  // #99 Format › Image (per-image entries act on the image at the caret)
+  ...(
+    [
+      ['insert', 'Insert Image'],
+      ['insertLocal', 'Insert Local Images…'],
+      ['openLocation', 'Open Image Location…'],
+      ['copyContent', 'Copy Image Content'],
+      ['syntaxMarkdown', 'Switch Image Syntax: Markdown Style'],
+      ['syntaxHtml', 'Switch Image Syntax: HTML Style'],
+      ['deleteFile', 'Delete Image File'],
+      ['copyTo', 'Copy Image to…'],
+      ['moveTo', 'Rename or Move Image to…'],
+      ['upload', 'Upload Image'],
+      ['copyAll', 'Copy All Images to…'],
+      ['moveAll', 'Move All Images to…'],
+      ['reloadAll', 'Reload All Images'],
+      ['insertCopyToFolder', 'When Insert Local Image: Copy Image File to Folder…'],
+      ['insertUpload', 'When Insert Local Image: Upload Image'],
+      ['rootPath', 'Use Image Root Path'],
+      ['settings', 'Global Image Settings…'],
+    ] as const
+  ).map(([a, label]): CommandSpec => ({ id: `image:${a}`, label, category: 'Format', scope: a === 'settings' ? 'global' : 'editor' })),
+  ...([25, 33, 50, 67, 80, 100, 150, 200] as const).map((z): CommandSpec => ({ id: `image:zoom-${z}`, label: `Zoom Image to ${z}%`, category: 'Format', scope: 'editor' })),
 ];
 
 /** 'Mod+Shift+S' form of a native menu accelerator (src/platform/shortcuts.ts). */
 export function nativeKey(s: Shortcut): string {
-  const key = s.code.replace(/^Key|^Digit/, '').replace('Backslash', '\\').replace('Slash', '/').replace('Equal', '=').replace('Minus', '-').replace('Comma', ',');
+  const key = s.code.replace(/^Key|^Digit/, '').replace('Backslash', '\\').replace('Slash', '/').replace('Equal', '=').replace('Minus', '-').replace('Comma', ',').replace('BracketRight', ']').replace('BracketLeft', '[');
   return [s.mod === false ? null : 'Mod', s.alt ? 'Alt' : null, s.shift ? 'Shift' : null, key].filter(Boolean).join('+');
 }
 
@@ -170,13 +255,37 @@ const PARSED: { spec: CommandSpec; keys: ParsedShortcut[] }[] = COMMANDS.filter(
   keys: spec.keys!.map(parseShortcut),
 }));
 
+let CUSTOM: { spec: CommandSpec; keys: ParsedShortcut[] }[] = [];
+
+/**
+ * Preferences › Custom Shortcut Keys (#100): `{ "<command id or label>": "Mod+Shift+K" }`
+ * (several keys separated by ","). Custom keys win over built-in ones; an empty string
+ * leaves the default. Returns the entries that could not be resolved.
+ */
+export function setCustomKeys(map: Record<string, string>): string[] {
+  const bad: string[] = [];
+  CUSTOM = [];
+  for (const [name, accel] of Object.entries(map)) {
+    if (!accel.trim()) continue;
+    const spec = BY_ID.get(name as CommandId) ?? COMMANDS.find((c) => c.label.toLowerCase() === name.trim().toLowerCase());
+    const keys = accel.split(',').map((k) => k.trim()).filter(Boolean);
+    if (!spec || !keys.length) {
+      bad.push(name);
+      continue;
+    }
+    CUSTOM.push({ spec, keys: keys.map(parseShortcut) });
+  }
+  return bad;
+}
+
 /** Find the command bound to a key event, if any. */
 export function commandForKey(e: KeyLike, mac = isMac): CommandSpec | null {
+  for (const { spec, keys } of CUSTOM) if (keys.some((k) => matchShortcut(e, k, mac))) return { ...spec, passthrough: false };
   for (const { spec, keys } of PARSED) if (keys.some((k) => matchShortcut(e, k, mac))) return spec;
   return null;
 }
 
 /** Validate a string coming from native menus / IPC. */
 export function isCommandId(s: string): s is CommandId {
-  return BY_ID.has(s as CommandId) || s.startsWith('theme:') || /^heading:[0-6]$/.test(s);
+  return BY_ID.has(s as CommandId) || s.startsWith('theme:') || /^heading:[0-6]$/.test(s) || s === 'image:uploadAll';
 }

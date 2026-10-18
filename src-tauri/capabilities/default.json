@@ -1,9 +1,10 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Least-privilege capability for the main editor window. File access goes through Margin's own commands (no fs plugin); dialogs and the opener are invoked from Rust, so no plugin permissions are granted to JS.",
+  "description": "Least-privilege capability for the editor windows (main + File › New Window ones, `window-N`). File access goes through Margin's own commands (no fs plugin); dialogs and the opener are invoked from Rust, so no plugin permissions are granted to JS.",
   "windows": [
-    "main"
+    "main",
+    "window-*"
   ],
   "permissions": [
     "core:event:allow-listen",
@@ -21,6 +22,10 @@
     "allow-save-dialog",
     "allow-export-html",
     "allow-export-pdf",
+    "allow-export-binary",
+    "allow-open-exported-file",
+    "allow-pandoc-import",
+    "allow-run-export-command",
     "allow-print-window",
     "allow-load-settings",
     "allow-save-settings",
@@ -43,6 +48,8 @@
     "allow-pandoc-detect",
     "allow-pandoc-export",
     "allow-clipboard-write-rich",
+    "allow-open-window",
+    "allow-read-file-bytes",
     "allow-clipboard-read"
   ]
 }

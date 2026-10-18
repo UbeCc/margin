@@ -5,10 +5,12 @@ import { leafContent, leafRaw, contPrefix } from './model';
 import * as E from './edit';
 import { splitBlockMeta } from './render-inline';
 import { find, replace } from './find';
-import { insertMarkdown } from './clipboard';
+import { insertMarkdown, insertAtPoint } from './clipboard';
+import { copyBlock } from './block-copy';
 import { nextHeadingLevel, insertParagraph, taskStatus, clearFormat, insertFootnote } from './para-cmds';
 import { selectScope, deleteScope, jumpTo } from './scopes';
 import { copyAs, pastePlain } from './copy-as';
+import { tableMarkdown, tableTool, codeTool, mathTool } from './block-tools';
 
 export function undo(ed: EditorCore): boolean {
   const e = ed.hist.popUndo();
@@ -102,7 +104,10 @@ function mark(ed: EditorCore, m: string): boolean {
 /** Toggle quote / list on the text leaves of the selection. */
 function containerBlock(ed: EditorCore, kind: 'quote' | 'ul' | 'ol' | 'task'): boolean {
   const { from, to } = ed.sel();
-  if (!ed.doc.leaves.length) return insertBlock(ed, kind === 'quote' ? '> ' : kind === 'ul' ? '- ' : kind === 'ol' ? '1. ' : '- [ ] ', false);
+  // #102: list markers created from the menu follow Preferences › Markdown (existing lists are untouched).
+  const { ulStyle: ul, olStyle } = ed.md();
+  const ol = '.';
+  if (!ed.doc.leaves.length) return insertBlock(ed, kind === 'quote' ? '> ' : kind === 'ul' ? `${ul} ` : kind === 'ol' ? `1${ol} ` : `${ul} [ ] `, false);
   const i0 = ed.doc.locate(from).i;
   const i1 = ed.doc.locate(to).i;
   const first = ed.doc.leaves[i0];
@@ -125,7 +130,7 @@ function containerBlock(ed: EditorCore, kind: 'quote' | 'ul' | 'ol' | 'task'): b
         continue;
       }
       const n = i - i0 + 1;
-      const mk = kind === 'quote' ? '> ' : kind === 'ul' ? '- ' : kind === 'ol' ? `${n}. ` : '- [ ] ';
+      const mk = kind === 'quote' ? '> ' : kind === 'ul' ? `${ul} ` : kind === 'ol' ? `${olStyle === 'ones' ? 1 : n}${ol} ` : `${ul} [ ] `;
       const cont = kind === 'quote' ? '> ' : ' '.repeat(kind === 'task' ? 2 : mk.length);
       const s = ed.doc.start(i);
       const lines = l.lines.map((ln, k) => ({ ...ln, prefix: ln.prefix + (k === 0 ? mk : k < l.n ? cont : '') }));
@@ -143,6 +148,36 @@ function containerBlock(ed: EditorCore, kind: 'quote' | 'ul' | 'ol' | 'task'): b
 }
 
 /** Insert a block after the current leaf (or into it when it is an empty paragraph). */
+/**
+ * Insert Table (#98): like Typora, a top-level paragraph / heading is split at the caret
+ * and the table goes between the halves (a selection is deleted first); otherwise the
+ * table is inserted like any other block.
+ */
+function insertTableAtCaret(ed: EditorCore, md: string): boolean {
+  const doc = ed.doc;
+  let { from, to } = ed.sel();
+  if (from !== to && doc.leaves.length) {
+    ed.hist.break();
+    ed.replaceRange(from, to, '', null);
+    to = from;
+  }
+  if (!doc.leaves.length) return insertBlock(ed, md, true);
+  const { i, off } = doc.locate(from);
+  const l = doc.leaves[i];
+  const len = l && E.isTextLeaf(l) ? leafContent(l).length : 0;
+  if (!l || !(l.type === 'paragraph' || l.type === 'heading') || l.chain.length || off <= 0 || off >= len) return insertBlock(ed, md, true);
+  const EOL = doc.eol;
+  ed.hist.break();
+  ed.change(() => {
+    const at = doc.docPos(i, off);
+    doc.replace(at, at, EOL + EOL + md + EOL + EOL);
+    const nl = doc.leaves[doc.locate(at + 2 * EOL.length).i];
+    return nl && !E.isTextLeaf(nl) ? { widget: nl.id, at: 'start' as const } : { pos: at };
+  });
+  ed.hist.break();
+  return true;
+}
+
 function insertBlock(ed: EditorCore, md: string, focusWidget: boolean, caretOff?: number): boolean {
   const doc = ed.doc;
   const i = curLeaf(ed);
@@ -233,6 +268,21 @@ export function execCommand(ed: EditorCore, cmd: EditorCommand): boolean {
     case 'insertText':
       insertMarkdown(ed, cmd.text);
       return true;
+    case 'replaceDocument': {
+      // #89: replace only the changed middle so the caret keeps its place (mapped
+      // across the edit) and the whole replace is one undo step.
+      const md = cmd.markdown;
+      const old = ed.doc.text();
+      if (md === old) return true;
+      const { from, to, text } = diffRange(old, md);
+      const map = (p: number) => (p <= from ? p : p >= to ? p + text.length - (to - from) : from + text.length);
+      const caret = map(ed.sel().to);
+      ed.change(() => {
+        ed.doc.replace(from, to, text);
+        return { pos: caret };
+      }, null);
+      return true;
+    }
     case 'insertImage':
       insertMarkdown(ed, `![${cmd.alt ?? ''}](${cmd.src.replace(/ /g, '%20')})`);
       return true;
@@ -262,5 +312,38 @@ export function execCommand(ed: EditorCore, cmd: EditorCommand): boolean {
       return copyAs(ed, cmd.format);
     case 'pastePlain':
       return pastePlain(ed);
+    case 'insertMarkdownAt':
+      return insertAtPoint(ed, cmd.markdown, cmd.x, cmd.y);
+    case 'replaceRange': {
+      const n = ed.doc.text().length;
+      if (!(cmd.from >= 0 && cmd.from <= cmd.to && cmd.to <= n)) return false;
+      ed.replaceRange(cmd.from, cmd.to, cmd.text, null);
+      return true;
+    }
+    case 'copyBlock':
+      return copyBlock(ed, cmd.part);
+    case 'insertTable':
+      return insertTableAtCaret(ed, tableMarkdown(cmd.rows, cmd.cols));
+    case 'table':
+      return tableTool(ed, cmd.op, { rows: cmd.rows, cols: cmd.cols });
+    case 'code':
+      return codeTool(ed, cmd.op);
+    case 'math':
+      return mathTool(ed, cmd.op);
   }
 }
+
+/** Smallest `old[from, to)` → `text` replacement turning `old` into `next` (never splits a surrogate pair). */
+export function diffRange(old: string, next: string): { from: number; to: number; text: string } {
+  const max = Math.min(old.length, next.length);
+  let a = 0;
+  while (a < max && old.charCodeAt(a) === next.charCodeAt(a)) a++;
+  if (a > 0 && a < max && isHigh(old.charCodeAt(a - 1))) a--;
+  let b = 0;
+  while (b < max - a && old.charCodeAt(old.length - 1 - b) === next.charCodeAt(next.length - 1 - b)) b++;
+  if (b > 0 && isLow(old.charCodeAt(old.length - b)) && old.length - b > a) b--;
+  return { from: a, to: old.length - b, text: next.slice(a, next.length - b) };
+}
+
+const isHigh = (c: number) => c >= 0xd800 && c <= 0xdbff;
+const isLow = (c: number) => c >= 0xdc00 && c <= 0xdfff;

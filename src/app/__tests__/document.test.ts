@@ -16,7 +16,7 @@ function fakeEditor(): EditorHandle & { type(s: string): void } {
     getOutline: () => [],
     getActiveHeadingId: () => null,
     scrollToHeading: () => undefined,
-    exec: () => false,
+    exec: (c) => (c.kind === 'replaceDocument' ? ((md = c.markdown), cbs.forEach((cb) => cb()), true) : false),
     getStats: () => countStats(md),
     setSourceMode: () => undefined,
     isSourceMode: () => false,
@@ -89,7 +89,8 @@ describe('DocumentController', () => {
     expect(doc.dirty).toBe(true);
     expect(platform.documentEdited).toBe(false); // setDocumentEdited is the app's job via onState
     await doc.save();
-    expect(await platform.read('/n/a.md')).toBe('# A\nmore');
+    // a.md ended with a newline → Insert Final New Line On Save is on for it (#102)
+    expect(await platform.read('/n/a.md')).toBe('# A\nmore\n');
     expect(doc.dirty).toBe(false);
   });
 
@@ -98,7 +99,21 @@ describe('DocumentController', () => {
     expect(editor.getMarkdown()).toBe('B\nline\n');
     editor.type('x');
     await doc.save();
-    expect(await platform.read('/n/b.md')).toBe('B\r\nline\r\nx');
+    expect(await platform.read('/n/b.md')).toBe('B\r\nline\r\nx\r\n');
+  });
+
+  it('Insert Final New Line On Save is per document and follows the opened file (#102)', async () => {
+    await platform.writeTextFile('/n/c.md', 'no newline');
+    await doc.open('/n/c.md');
+    expect(doc.finalNewline).toBe(false);
+    editor.type('!');
+    await doc.save();
+    expect(await platform.read('/n/c.md')).toBe('no newline!');
+    doc.setFinalNewline(true);
+    editor.type('?');
+    await doc.save();
+    expect(await platform.read('/n/c.md')).toBe('no newline!?\n');
+    expect(editor.getMarkdown()).toBe('no newline!?'); // the document text is unchanged
   });
 
   it('undoing back to the saved text clears dirty', async () => {
@@ -184,7 +199,7 @@ describe('DocumentController', () => {
     await doc.open('/n/a.md');
     editor.type('auto');
     await flush();
-    expect(await platform.read('/n/a.md')).toBe('# A\nauto');
+    expect(await platform.read('/n/a.md')).toBe('# A\nauto\n');
     expect(doc.dirty).toBe(false);
   });
 

@@ -18,12 +18,22 @@ export interface Heading {
   text: string;
 }
 
+/** OS file drop onto a window (#23). */
+export interface FileDrop {
+  paths: string[];
+  x: number;
+  y: number;
+}
+
 export interface EditorSettings {
   /** Base directory used to resolve relative image / link paths. null = unsaved doc. */
   baseDir: string | null;
   /** Resolve a document-relative src to something the webview can load. */
   resolveAsset(src: string): string;
-  /** Called when the user pastes / drops image data or files. Returns the markdown src to insert. */
+  /**
+   * Called when the user pastes / drops image data or files. Returns the markdown src to insert,
+   * or (#99) a complete image snippet (`![alt](src)` / `<img …>`) that is inserted verbatim.
+   */
   storeImage?(input: { bytes?: Uint8Array; mime?: string; path?: string; name?: string }): Promise<string | null>;
   /** Open an external link. */
   openLink?(href: string): void;
@@ -37,7 +47,72 @@ export interface EditorSettings {
   typewriterMode: boolean;
   /** "light" | "dark" — widgets (code highlight, mermaid) follow it. */
   colorScheme: 'light' | 'dark';
+  /** Optional (#100/#102): Markdown syntax / editing preferences. Missing keys = `DEFAULT_MARKDOWN_OPTIONS`. */
+  markdown?: Partial<MarkdownOptions>;
 }
+
+/** Preferences › Markdown / Editor options consumed by the editing core and widgets (#100, #102). */
+export interface MarkdownOptions {
+  /** Syntax Support: `==mark==`, `~sub~`, `^sup^`, `$inline math$`; `:emoji:` shortcodes (always on in Typora). */
+  highlight: boolean;
+  subscript: boolean;
+  superscript: boolean;
+  inlineMath: boolean;
+  emoji: boolean;
+  /** Strict Mode (more strict to GFM spec): when false, `#Heading` without a space is a heading. */
+  strict: boolean;
+  /** Markers written by menu commands / hybrid view (existing source is never rewritten). */
+  ulStyle: '-' | '*' | '+';
+  /** Ordered List: `1. 2. 3.` (increment) or `1. 1. 1.` (ones). */
+  olStyle: 'increment' | 'ones';
+  /** Whitespace and Line Breaks: false = "Ignore whitespace and single line break" (soft breaks render as spaces). */
+  preserveLineBreak: boolean;
+  /** Visible <br/>: show `<br>` tags as a visible marker (off = hidden, they still break the line). */
+  visibleBr: boolean;
+  indentFirstLine: boolean;
+  /** Editor › Auto Pair. */
+  autoPairBrackets: boolean;
+  autoPairMarkdown: boolean;
+  /** Display source (e.g. `#`) of simple blocks such as headings when the caret is in them. */
+  expandSimpleBlock: boolean;
+  /** Code Fences. */
+  codeLineNumbers: boolean;
+  codeLineWrap: boolean;
+  /** Spaces per tab in code fences; 0 = Preserve tabs. */
+  codeIndentSize: 0 | 2 | 3 | 4;
+  /** Math: equation numbering, physics macros, "Apply Line Break at \\ and \newline" in display math. */
+  mathNumbering: 'all' | 'ams' | 'none';
+  mathPhysics: boolean;
+  mathLineBreaks: boolean;
+}
+
+/**
+ * Core defaults when an editor is created without `markdown` (tests, embedders): everything
+ * Margin rendered before #102. The app applies Typora's fresh-install defaults instead
+ * (`TYPORA_MARKDOWN_DEFAULTS` in src/app/settings.ts).
+ */
+export const DEFAULT_MARKDOWN_OPTIONS: Readonly<MarkdownOptions> = Object.freeze({
+  highlight: true,
+  subscript: false,
+  superscript: false,
+  inlineMath: true,
+  emoji: false,
+  strict: true,
+  ulStyle: '-',
+  olStyle: 'increment',
+  preserveLineBreak: true,
+  visibleBr: true,
+  indentFirstLine: false,
+  autoPairBrackets: true,
+  autoPairMarkdown: false,
+  expandSimpleBlock: true,
+  codeLineNumbers: false,
+  codeLineWrap: true,
+  codeIndentSize: 4,
+  mathNumbering: 'ams',
+  mathPhysics: false,
+  mathLineBreaks: true,
+});
 
 /** Inline formats toggled by Format menu commands (`underline`/`sub`/`sup` = `<u>`/`<sub>`/`<sup>`, `math` = `$…$`, `comment` = `<!-- … -->`). */
 export type InlineMark = 'strong' | 'em' | 'code' | 'strike' | 'highlight' | 'link' | 'underline' | 'sub' | 'sup' | 'math' | 'comment';
@@ -58,6 +133,8 @@ export type EditorCommand =
   /** Remove inline formatting markers in the selection (whole block when collapsed). */
   | { kind: 'clearFormat' }
   | { kind: 'insertText'; text: string }
+  /** Replace the whole document as ONE undoable edit (reload from disk / restore a version). */
+  | { kind: 'replaceDocument'; markdown: string }
   | { kind: 'insertImage'; src: string; alt?: string }
   | { kind: 'undo' }
   | { kind: 'redo' }
@@ -69,7 +146,31 @@ export type EditorCommand =
   | { kind: 'delete'; scope: 'word' | 'line' | 'block' | 'styled' | 'range' }
   | { kind: 'jump'; to: 'top' | 'bottom' | 'selection' }
   | { kind: 'copyAs'; format: CopyAsFormat }
-  | { kind: 'pastePlain' };
+  | { kind: 'pastePlain' }
+  // #99 (additive): replace markdown offsets [from, to) of getMarkdown() with text, as one undo step.
+  | { kind: 'replaceRange'; from: number; to: number; text: string }
+  // #97 (additive): copy the block at the caret — markdown source, or the inner text of a code / math fence
+  | { kind: 'copyBlock'; part: 'source' | 'content' }
+  // #98 (additive): block tools — Paragraph › Table / Code Tools / Math Tools
+  /** Insert a `rows`×`cols` table (rows include the header row). */
+  | { kind: 'insertTable'; rows: number; cols: number }
+  /** Table tools on the table with the caret (`resize` takes rows/cols, rows incl. header). */
+  | { kind: 'table'; op: TableOp; rows?: number; cols?: number }
+  | { kind: 'code'; op: CodeOp }
+  | { kind: 'math'; op: MathOp }
+  // #23 (additive): files dropped from Finder — insert markdown at the drop point
+  // (viewport CSS px, like MouseEvent.clientX/Y); falls back to the selection.
+  | { kind: 'insertMarkdownAt'; markdown: string; x: number; y: number };
+
+/** Table submenu / toolbar operations (#98). `prettify` = re-format the table source (aligned columns). */
+export type TableOp =
+  | 'rowAbove' | 'rowBelow' | 'colBefore' | 'colAfter' | 'deleteRow' | 'deleteCol'
+  | 'moveRowUp' | 'moveRowDown' | 'moveColLeft' | 'moveColRight'
+  | 'alignLeft' | 'alignCenter' | 'alignRight' | 'resize' | 'copy' | 'prettify' | 'delete';
+/** Code Tools (#98): copy the fence body; re-indent the whole body / the selected lines. */
+export type CodeOp = 'copy' | 'indentAll' | 'indentSelected';
+/** Math Tools (#98): copy the math at the caret as TeX / MathML, delete it, re-render all math. */
+export type MathOp = 'copyTex' | 'copyMathML' | 'delete' | 'refresh';
 
 /**
  * Edit › Copy as (#96). markdown = source only; html = the rendered HTML *source*
@@ -151,6 +252,11 @@ export interface WidgetInstance {
    * the whole widget as before).
    */
   select?(from: number, to: number): boolean;
+  /**
+   * Block tools (#98): run a table/code/math op (`TableOp` | `CodeOp` | `'refresh'`) on
+   * this widget. Return false when the op does not apply; the core may then fall back.
+   */
+  command?(op: string, args?: { rows?: number; cols?: number }): boolean;
   destroy(): void;
 }
 
@@ -170,6 +276,8 @@ export interface DirEntry {
   isDir: boolean;
   /** ms since epoch */
   mtime: number;
+  /** Creation (birth) time, ms since epoch, when the platform knows it (#101 sort). */
+  ctime?: number;
   size: number;
 }
 
@@ -197,11 +305,17 @@ export interface AppSettings {
 export type MenuAction =
   | 'new' | 'open' | 'openFolder' | 'save' | 'saveAs' | 'close'
   | 'exportHtml' | 'exportPdf' | 'print'
+  | 'exportHtmlPlain' | 'exportImage' | 'exportPrevious' | 'exportOverwrite' | 'exportSettings' | 'pageSetup'
   | 'exportDocx' | 'exportLatex' | 'exportEpub'
+  | 'exportOdt' | 'exportRtf' | 'exportMediawiki' | 'exportRst' | 'exportTextile' | 'exportOpml' | 'exportCustom' | 'import'
   | 'undo' | 'redo' | 'find' | 'replace'
   | 'toggleSidebar' | 'toggleSource' | 'toggleFocus' | 'toggleTypewriter' | 'quickOpen'
   | 'zoomIn' | 'zoomOut' | 'zoomReset'
-  | 'clearRecent' | 'commandPalette' | 'showOutline' | 'showFiles' | 'revealActiveFile' | 'reloadFromDisk' | 'toggleLineEnding'
+  | 'clearRecent' | 'commandPalette' | 'showOutline' | 'showFiles' | 'showArticles' | 'sidebarSearch' | 'revealActiveFile' | 'reloadFromDisk' | 'toggleLineEnding'
+  // File lifecycle (#94): tabs / windows / file operations on the current document
+  | 'newTab' | 'newWindow' | 'nextTab' | 'prevTab' | 'reopenClosed' | 'saveAll' | 'duplicate'
+  | 'renameFile' | 'moveTo' | 'revealInFinder' | 'copyFilePath' | 'browseVersions' | 'reopenWithEncoding'
+  | 'properties' | 'recoverDrafts'
   | `heading:${0 | 1 | 2 | 3 | 4 | 5 | 6}`
   | `mark:${InlineMark}`
   | `block:${BlockKind}`
@@ -215,9 +329,38 @@ export type MenuAction =
   | `select:${'word' | 'line' | 'block' | 'styled'}`
   | `delete:${'word' | 'line' | 'block' | 'styled' | 'range'}`
   | `jump:${'top' | 'bottom' | 'selection'}`
+  // #98 (additive): Paragraph › Table (Insert Table… opens the rows×columns dialog) / Code Tools / Math Tools
+  | 'table:insert'
+  | `table:${TableOp}`
+  | `code:${CodeOp}`
+  | `math:${MathOp}`
+  // #99 (additive): Format › Image submenu
+  | `image:${ImageMenuAction}`
   // #103 (additive): window chrome & writing aids
   | 'toggleStatusBar' | 'alwaysOnTop' | 'toggleDevtools' | 'toggleMagnification'
   | 'spell:toggle' | 'subst:quotes' | 'subst:dashes' | 'speech:start' | 'speech:stop';
+
+/** Format › Image entries (#99), in Typora's menu order; per-image ones act on the image at the caret. */
+export type ImageMenuAction =
+  | 'insert' | 'insertLocal' | 'openLocation' | 'copyContent'
+  | `zoom-${25 | 33 | 50 | 67 | 80 | 100 | 150 | 200}`
+  | 'syntaxMarkdown' | 'syntaxHtml' | 'deleteFile' | 'copyTo' | 'moveTo' | 'upload'
+  | 'copyAll' | 'moveAll' | 'uploadAll' | 'reloadAll'
+  | 'insertCopyToFolder' | 'insertUpload' | 'rootPath' | 'settings';
+
+/** PDF export options (#18 baseDir; #95 page geometry, header/footer, bookmarks, metadata). All optional. */
+export interface PdfExportOptions {
+  baseDir?: string;
+  /** Paper size and margins in points. */
+  paper?: { width: number; height: number; margins: { top: number; right: number; bottom: number; left: number } };
+  /** Running header / footer text; `${pageNo}` and `${totalPages}` are replaced per page. */
+  header?: string;
+  footer?: string;
+  /** Headings in document order: PDF bookmarks + targets for internal `#id` links. */
+  outline?: { level: number; text: string; id: string }[];
+  /** Document info dictionary. */
+  meta?: { title: string; author: string; subject: string; keywords: string };
+}
 
 export interface Platform {
   readonly kind: 'tauri' | 'web';
@@ -236,12 +379,13 @@ export interface Platform {
     rule: ImageRule,
     input: { bytes?: Uint8Array; mime?: string; path?: string; name?: string },
   ): Promise<string>;
-  openFileDialog(opts?: { directory?: boolean }): Promise<string | null>;
+  /** `filters` (#95, optional): file-type filters for the open panel (default: Markdown). */
+  openFileDialog(opts?: { directory?: boolean; filters?: { name: string; extensions: string[] }[] }): Promise<string | null>;
   saveFileDialog(opts?: { defaultPath?: string; filters?: { name: string; extensions: string[] }[] }): Promise<string | null>;
   /** Write HTML, or print given HTML to PDF at outPath. */
   exportHtml(html: string, outPath: string): Promise<void>;
   /** baseDir: directory relative srcs resolve against (default: outPath's directory). */
-  exportPdf(html: string, outPath: string, opts?: { baseDir?: string }): Promise<void>;
+  exportPdf(html: string, outPath: string, opts?: PdfExportOptions): Promise<void>;
   /** Print the current window (system print dialog). */
   print(): Promise<void>;
   /** Allow the webview to load assets from dir (non-recursive), e.g. images outside the opened folder. */
@@ -259,6 +403,11 @@ export interface Platform {
   onMenu(cb: (action: MenuAction) => void): () => void;
   /** Files opened via Finder / CLI args / drag onto dock. */
   onOpenFiles(cb: (paths: string[]) => void): () => void;
+  /**
+   * Optional (#23): files / folders dragged onto the window from the OS, with absolute
+   * paths and the drop point in viewport CSS px. Platforms without native drop paths omit it.
+   */
+  onFileDrop?(cb: (drop: FileDrop) => void): () => void;
   /** Return false from cb to cancel closing (e.g. unsaved changes). */
   onCloseRequested(cb: () => Promise<boolean>): () => void;
   /**

@@ -16,7 +16,7 @@ function fakeEditor(): EditorHandle & { type(s: string): void; set(s: string): v
     getOutline: () => [],
     getActiveHeadingId: () => null,
     scrollToHeading: () => undefined,
-    exec: () => false,
+    exec: (c) => (c.kind === 'replaceDocument' ? ((md = c.markdown), cbs.forEach((cb) => cb()), true) : false),
     getStats: () => countStats(md),
     setSourceMode: () => undefined,
     isSourceMode: () => false,
@@ -97,7 +97,7 @@ describe('external change prompt (#82)', () => {
     expect(shown.length).toBe(n);
 
     await doc.save();
-    expect(await platform.readTextFile('/n/a.md')).toBe('# A\nmine');
+    expect(await platform.readTextFile('/n/a.md')).toBe('# A\nmine\n');
     await wait();
     expect(shown.length).toBe(n); // own write ignored
   });
@@ -189,6 +189,6 @@ describe('external change prompt (#82)', () => {
     last()!.keepMine();
     editor.type('?');
     await wait(100);
-    expect(await platform.readTextFile('/n/a.md')).toBe('# A\nmine!?');
+    expect(await platform.readTextFile('/n/a.md')).toBe('# A\nmine!?\n');
   });
 });

@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { boot, diskFile, editorValue, MOD, ROOT, typeInEditor } from './app-helpers';
+import { boot, caretAtText, diskFile, editorValue, MOD, ROOT, typeInEditor } from './app-helpers';
 
 const FILE = `${ROOT}/Welcome.md`;
 const extWrite = (page: Page, text: string) => page.evaluate(([p, t]) => window.__MARGIN_WEB__!.externalWrite(p, t), [FILE, text]);
@@ -90,4 +90,17 @@ test('deleted on disk: warns, hides the prompt, keeps the buffer dirty', async (
   await expect(page.locator('.extchange-banner')).toBeHidden();
   await expect(page.locator('.app')).toHaveClass(/doc-dirty/);
   await expect.poll(() => editorValue(page)).toContain('mine');
+});
+
+test('clean reload keeps the caret and is one undo step (#89)', async ({ page }) => {
+  await caretAtText(page, 'Simplicity', 3);
+  const before = await editorValue(page);
+  await extWrite(page, before.replace('# Welcome to Margin', '# Welcome back'));
+  await expect.poll(() => editorValue(page)).toContain('# Welcome back');
+  await page.keyboard.type('X');
+  await expect.poll(() => editorValue(page)).toContain('SimXplicity');
+  await page.keyboard.press(`${MOD}+z`);
+  await expect.poll(() => editorValue(page)).not.toContain('SimXplicity');
+  await page.keyboard.press(`${MOD}+z`);
+  await expect.poll(() => editorValue(page)).toBe(before);
 });

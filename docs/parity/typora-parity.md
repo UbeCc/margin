@@ -8,17 +8,17 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 
 | | surfaces |
 |---|---|
-| total | 171 |
-| owned (implemented) | 82 (with a named passing test: 69) |
-| partial | 20 |
-| missing | 61 |
+| total | 172 |
+| owned (implemented) | 145 (with a named passing test: 132) |
+| partial | 10 |
+| missing | 9 |
 | out of scope | 8 |
 
-REA ledger `rol_fe89516b35388868f919ee54f7f71e883a6cfbd1b4db2d1a650f71b935f88403` (closure `aa012a43129121c1…`): status **unknown**; unowned 61, implemented 102, out-of-scope 8, unknown 5.
+REA ledger `rol_b53a85d8633d2df3539b45ed910480e1fc50b8309193c619dda80e2753bdff0a` (closure `d7770d97eefb9a99…`): status **unknown**; unowned 9, implemented 155, out-of-scope 8, unknown 5.
 
-REA coverage boundary `margin.typora-parity`: status **unknown**; 69/163 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 61, package-proof-missing 1, verifier-missing 85, verifier-unknown 9.
+REA coverage boundary `margin.typora-parity`: status **unknown**; 132/164 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 9, package-proof-missing 1, verifier-missing 25, verifier-unknown 7.
 
-Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): build exit 0, cargo-test exit 101, independence exit 0, playwright exit 0, vitest exit 0. See `rea/summary.json`.
+Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): build exit 0, cargo-test exit 0, independence exit 0, playwright exit 0, vitest exit 0. See `rea/summary.json`.
 
 ### Why nothing is REA-"verified" (and what would change that)
 
@@ -33,15 +33,15 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | epic | priority | open surfaces |
 |---|---|---|
 | `core-cmds` Paragraph & Format menu commands (headings, inline styles, insert/convert blocks) | P0 | 0 |
-| `files` File lifecycle: tabs/windows, recent, duplicate/move/rename, encoding, versions, recovery | P0 | 16 |
-| `export` Export, import & print: image/Pandoc/custom formats, export settings, export-with-previous | P0 | 9 |
+| `files` File lifecycle: tabs/windows, recent, duplicate/move/rename, encoding, versions, recovery | P0 | 0 |
+| `export` Export, import & print: image/Pandoc/custom formats, export settings, export-with-previous | P0 | 0 |
 | `clipboard` Clipboard & selection: copy-as / paste-as, selection & delete scopes, jump-to | P0 | 2 |
-| `ctx` Editor & sidebar context menus (text, link, table, image, code, math, diagram, outline, files) | P1 | 7 |
-| `tools` Table, code-fence and math tools | P1 | 9 |
-| `images` Image pipeline: insert-local, copy/move/upload, zoom, syntax switch, image root path | P1 | 10 |
-| `prefs` Preferences completeness (General, Editor, Image, Markdown, Export, Appearance panes) | P1 | 8 |
-| `sidebar` Sidebar & outline: list view, file search, sort, collapsible outline, filter | P1 | 6 |
-| `syntax` Markdown syntax options & whitespace/line-break settings | P2 | 5 |
+| `ctx` Editor & sidebar context menus (text, link, table, image, code, math, diagram, outline, files) | P1 | 3 |
+| `tools` Table, code-fence and math tools | P1 | 1 |
+| `images` Image pipeline: insert-local, copy/move/upload, zoom, syntax switch, image root path | P1 | 0 |
+| `prefs` Preferences completeness (General, Editor, Image, Markdown, Export, Appearance panes) | P1 | 2 |
+| `sidebar` Sidebar & outline: list view, file search, sort, collapsible outline, filter | P1 | 1 |
+| `syntax` Markdown syntax options & whitespace/line-break settings | P2 | 1 |
 | `chrome` Window chrome & writing aids: status bar, always-on-top, spelling, substitutions, speech, emoji | P2 | 9 |
 
 ## Application menu
@@ -57,27 +57,27 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
 | `menu.file.new` | File › New (untitled document) | owned |  | `src/app/app.ts` `case 'new'` | `tests/e2e/app-files.spec.ts` › new untitled document → Save As writes file | 5 |
-| `menu.file.new-window` | File › New Window / Open in New Window — one document per window today (#16, #23) | **missing** | P0 | — | none | 6 |
-| `menu.file.tabs` | Tabs: New Tab, switch between opened documents, next/previous tab — #23 | **missing** | P0 | — | none | 5 |
+| `menu.file.new-window` | File › New Window / Open in New Window | owned |  | `src/app/app.ts` `private async newWindow(` | `tests/e2e/parity-files.spec.ts` › menu.file.new-window: File › New Window / Open in New Window | 6 |
+| `menu.file.tabs` | Tabs: New Tab, switch between opened documents, next/previous tab | owned |  | `src/app/doctabs.ts` `export class DocTabs` | `tests/e2e/parity-files.spec.ts` › menu.file.tabs: Tabs: New Tab, switch between opened documents, next/previous tab | 5 |
 | `menu.file.open` | File › Open… (file dialog) | owned |  | `src/app/app.ts` `case 'open'` | `tests/e2e/app-files.spec.ts` › file tree lazily expands folders and opens files | 10 |
 | `menu.file.open-folder` | File › Open Folder… | owned |  | `src/app/app.ts` `case 'openFolder'` | `tests/e2e/app-files.spec.ts` › file tree lazily expands folders and opens files | 10 |
-| `menu.file.quick-open` | File › Open Quickly (fuzzy file finder) | owned |  | `src/app/app.ts` `quickOpen(): void` | `tests/e2e/app-navigation.spec.ts` › quick open fuzzy-finds files with highlights | 8 |
+| `menu.file.quick-open` | File › Open Quickly (fuzzy file finder) — deliberate deviations from Typora (native-commands §3, #119): every file type is searchable (Markdown ranked first), extension and name matching are case-insensitive, query text is escaped, an empty/unindexed/stale Spotlight answer falls back to the walker, deleted entries are pruned | owned |  | `src/app/app.ts` `quickOpen(): void` | `tests/e2e/app-navigation.spec.ts` › quick open fuzzy-finds files with highlights | 9 |
 | `menu.file.recent` | File › Open Recent (files + folders, clear) | owned |  | `src-tauri/src/recent.rs` `No Recent Items` | `src/app/__tests__/settings.test.ts` › dedupes and caps recent lists | 8 |
-| `menu.file.reopen-closed` | File › Reopen Closed File | **missing** | P1 | — | none | 1 |
+| `menu.file.reopen-closed` | File › Reopen Closed File | owned |  | `src/app/doctabs.ts` `async reopenClosed()` | `tests/e2e/parity-files.spec.ts` › menu.file.reopen-closed: File › Reopen Closed File | 1 |
 | `menu.file.save` | File › Save (dirty tracking, atomic write) | owned |  | `src/app/app.ts` `case 'save'` | `tests/e2e/app-files.spec.ts` › editing marks dirty, Cmd+S saves to disk | 8 |
 | `menu.file.save-as` | File › Save As… | owned |  | `src/app/app.ts` `case 'saveAs'` | `tests/e2e/app-files.spec.ts` › new untitled document → Save As writes file | 4 |
-| `menu.file.save-all` | File › Save All — needs multi-document (tabs/windows) | **missing** | P1 | — | none | 1 |
-| `menu.file.duplicate` | File › Duplicate | **missing** | P1 | — | none | 2 |
-| `menu.file.rename-move` | File › Rename… / Move To… for the current document — sidebar rename exists; no File-menu Rename/Move To for the open document | **partial** | P1 | `src/app/sidebar/filetree.ts` `'Rename…'` | `tests/e2e/app-files.spec.ts` › context menu: new file, rename (open doc follows) | 16 |
-| `menu.file.revert-versions` | File › Revert To / Browse All Versions (version history) — only "Revert to Saved"; no version browser | **partial** | P1 | `src/app/app.ts` `case 'reloadFromDisk'` | none | 2 |
-| `menu.file.encoding` | File › Reopen with Encoding | **missing** | P1 | — | none | 2 |
+| `menu.file.save-all` | File › Save All | owned |  | `src/app/doctabs.ts` `async saveAll()` | `tests/e2e/parity-files.spec.ts` › menu.file.save-all: File › Save All | 1 |
+| `menu.file.duplicate` | File › Duplicate | owned |  | `src/app/fileops.ts` `duplicate(): boolean` | `tests/e2e/parity-files.spec.ts` › menu.file.duplicate: File › Duplicate | 2 |
+| `menu.file.rename-move` | File › Rename… / Move To… for the current document | owned |  | `src/app/fileops.ts` `async moveTo()` | `tests/e2e/parity-files.spec.ts` › menu.file.rename-move: File › Rename… / Move To… for the current document | 16 |
+| `menu.file.revert-versions` | File › Revert To / Browse All Versions (version history) | owned |  | `src/app/versions.ts` `export class VersionStore` | `tests/e2e/parity-files.spec.ts` › menu.file.revert-versions: File › Revert To / Browse All Versions (version history) | 2 |
+| `menu.file.encoding` | File › Reopen with Encoding | owned |  | `src/app/encoding.ts` `export function detectEncoding` | `tests/e2e/parity-files.spec.ts` › menu.file.encoding: File › Reopen with Encoding | 2 |
 | `menu.file.line-endings` | File › Line Endings (LF / CRLF), preserved on save | owned |  | `src/app/app.ts` `case 'toggleLineEnding'` | `src/app/__tests__/document.test.ts` › toggling EOL marks dirty and toggling back cleans | 3 |
-| `menu.file.properties` | File › Properties / Get Info (word count, size, dates) | **missing** | P2 | — | none | 3 |
-| `menu.file.reveal` | File › Reveal in Finder / Open File Location / Copy File Path (current doc) — only from the sidebar context menu | **partial** | P1 | `src/app/sidebar/filetree.ts` `'Reveal in Finder'` | none | 8 |
-| `menu.file.page-setup` | File › Page Setup (paper size for print/PDF) | **missing** | P1 | — | none | 1 |
+| `menu.file.properties` | File › Properties / Get Info (word count, size, dates) | owned |  | `src/app/fileops.ts` `async properties()` | `tests/e2e/parity-files.spec.ts` › menu.file.properties: File › Properties / Get Info (word count, size, dates) | 3 |
+| `menu.file.reveal` | File › Reveal in Finder / Open File Location / Copy File Path (current doc) | owned |  | `src/app/fileops.ts` `async copyPath()` | `tests/e2e/parity-files.spec.ts` › menu.file.reveal: File › Reveal in Finder / Open File Location / Copy File Path (current doc) | 8 |
+| `menu.file.page-setup` | File › Page Setup (paper size for print/PDF) | owned |  | `src/app/export-ui.ts` `export function openPageSetup` | `tests/e2e/parity-export.spec.ts` › menu.file.page-setup: File › Page Setup | 1 |
 | `menu.file.print` | File › Print | owned |  | `src/app/app.ts` `case 'print'` | none | 2 |
 | `menu.file.close` | File › Close (asks to save dirty docs) | owned |  | `src/app/app.ts` `case 'close'` | `tests/e2e/app-files.spec.ts` › close request with unsaved changes can be cancelled | 4 |
-| `menu.file.errors` | Open/save error reporting (missing file, open failed, create prompt) | **partial** | P1 | `src/app/document.ts` `missing` | `src/app/__tests__/document.test.ts` › marks missing on delete and follows renames | 17 |
+| `menu.file.errors` | Open/save error reporting (missing file, open failed, create prompt) | owned |  | `src/app/document.ts` `askCreateMissing` | `tests/e2e/parity-files.spec.ts` › menu.file.errors: Open/save error reporting (missing file, open failed, create prompt) | 17 |
 
 ## Edit menu
 
@@ -86,14 +86,14 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `menu.edit.undo-redo` | Edit › Undo / Redo | owned |  | `src/app/app.ts` `case 'undo'` | `tests/e2e/core-cases.ts` › typing, Enter split, heading shortcut, undo/redo | 7 |
 | `menu.edit.cut-copy-paste` | Edit › Cut / Copy / Paste (markdown + HTML round-trip) | owned |  | `src/editor/core/clipboard.ts` `export function onPaste` | `tests/e2e/core-cases.ts` › paste HTML becomes markdown; copy gives markdown | 5 |
 | `menu.edit.delete-select-all` | Edit › Delete / Select All | owned |  | `src/editor/core/commands.ts` `case 'selectAll'` | `tests/e2e/blocks-core.spec.ts` › Cmd/Ctrl+A in a table cell selects the cell | 2 |
-| `menu.edit.find-replace` | Edit › Find / Find Next / Previous / Replace / Replace Next | owned |  | `src/app/findbar.ts` `caseSensitive` | `tests/e2e/app-navigation.spec.ts` › find keeps focus in the bar, counts and cycles matches | 14 |
+| `menu.edit.find-replace` | Edit › Find / Find Next / Previous / Replace / Replace Next | owned |  | `src/app/findbar.ts` `caseSensitive` | `tests/e2e/app-navigation.spec.ts` › find keeps focus in the bar, counts and cycles matches | 15 |
 | `menu.edit.find-options` | Find options: whole word and regular expression — Match Case / Whole Word / Regular Expression ($1 replacement) done; no In Selection | **partial** | P1 | `src/editor/core/query.ts` `export function compileQuery` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.find-options: Find options: whole word and regular expression | 3 |
 | `menu.edit.copy-as` | Edit › Copy as Markdown / HTML Code / Plain Text / without Theme Styling / to MS Word | owned |  | `src/editor/core/copy-as.ts` `export function copyAs` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.copy-as: Edit › Copy as Markdown / HTML Code / Plain Text / without Theme Styling / to MS Word | 11 |
 | `menu.edit.paste-plain` | Edit › Paste as Plain Text | owned |  | `src/editor/core/copy-as.ts` `export function pastePlain` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.paste-plain: Edit › Paste as Plain Text | 2 |
 | `menu.edit.select-scopes` | Edit › Selection: Select Word / Line-Sentence / Paragraph-Block / Styled Scope | owned |  | `src/editor/core/scopes.ts` `export function selectScope` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.select-scopes: Edit › Selection | 5 |
 | `menu.edit.delete-scopes` | Edit › Delete Word / Line-Sentence / Paragraph-Block / Styled Scope / Range | owned |  | `src/editor/core/scopes.ts` `export function deleteScope` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.delete-scopes: Edit › Delete Word | 5 |
 | `menu.edit.jump` | Edit › Jump To: Top / Bottom / Selection | owned |  | `src/editor/core/scopes.ts` `export function jumpTo` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.jump: Edit › Jump To: Top / Bottom / Selection | 4 |
-| `menu.edit.spelling` | Edit › Spelling: check while typing, check now, learn/unlearn, grammar, autocorrect — only the WebView spellcheck toggle | **partial** | P2 | `src/app/preferences.ts` `'Check spelling while typing'` | none | 22 |
+| `menu.edit.spelling` | Edit › Spelling: check while typing, check now, learn/unlearn, grammar, autocorrect — only the WebView spellcheck toggle | **partial** | P2 | `src/app/prefs/editor-md.ts` `'Check spelling while typing'` | none | 22 |
 | `menu.edit.substitutions` | Edit › Substitutions: smart quotes/dashes/punctuation, text replacement | **missing** | P2 | — | none | 8 |
 | `menu.edit.speech` | Edit › Speech: Start / Stop Speaking | **missing** | P2 | — | none | 3 |
 | `menu.edit.emoji` | Edit › Emoji and Symbols (system picker) and :emoji: autocomplete | **missing** | P2 | — | none | 6 |
@@ -104,7 +104,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 |---|---|---|---|---|---|---|
 | `menu.para.headings` | Paragraph › Heading 1–6 / Paragraph | owned |  | `src/editor/core/commands.ts` `case 'heading'` | `tests/e2e/app-navigation.spec.ts` › keyboard shortcuts drive editor commands | 8 |
 | `menu.para.heading-level` | Paragraph › Increase / Decrease Heading Level | owned |  | `src/editor/core/commands.ts` `case 'headingLevel'` | `tests/e2e/parity-core-cmds.spec.ts` › menu.para.heading-level: | 2 |
-| `menu.para.table` | Paragraph › Table / Insert Table (with rows×columns dialog) — inserts a fixed 2×2 table; no size dialog | **partial** | P1 | `src/editor/core/commands.ts` `case 'table'` | `tests/e2e/core-cases.ts` › table shortcut mounts the table widget | 7 |
+| `menu.para.table` | Paragraph › Table / Insert Table (with rows×columns dialog) — 3 columns × 4 rows incl. header, remembers the last size, 1–40 cols / 1–99 rows (typora-re#4); inserts after the caret block instead of splitting the paragraph; no Touch Bar | owned |  | `src/app/ui/table-dialog.ts` `export function insertTableDialog` | `tests/e2e/parity-tools.spec.ts` › menu.para.table: | 7 |
 | `menu.para.math-block` | Paragraph › Math Block | owned |  | `src/editor/core/commands.ts` `case 'math'` | `tests/e2e/blocks-widgets.spec.ts` › renders KaTeX, edits source, shows errors | 4 |
 | `menu.para.code-fence` | Paragraph › Code Fences (with language box) | owned |  | `src/editor/core/commands.ts` `case 'code'` | `tests/e2e/core-cases.ts` › ``` + Enter mounts a code widget | 4 |
 | `menu.para.html-block` | Paragraph › HTML Block (insert) | owned |  | `src/editor/core/commands.ts` `case 'html'` | `tests/e2e/parity-core-cmds.spec.ts` › menu.para.html-block: | 1 |
@@ -129,7 +129,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `menu.format.comment` | Format › Comment (<!-- -->) | owned |  | `src/editor/core/commands.ts` `comment: ['<!-- ', ' -->']` | `tests/e2e/parity-core-cmds.spec.ts` › menu.format.comment: | 1 |
 | `menu.format.hyperlink` | Format › Hyperlink | owned |  | `src/editor/core/commands.ts` `case 'mark'` | `tests/e2e/core-cases.ts` › Cmd+click opens links | 1 |
 | `menu.format.clear` | Format › Clear Format | owned |  | `src/editor/core/para-cmds.ts` `export function clearFormat` | `tests/e2e/parity-core-cmds.spec.ts` › menu.format.clear: | 1 |
-| `menu.format.image` | Format › Image › Insert Image / Insert Local Images… — insertImage command + paste/drop; no menu/dialog | **partial** | P0 | `src/editor/core/commands.ts` `case 'insertImage'` | none | 6 |
+| `menu.format.image` | Format › Image › Insert Image / Insert Local Images… — full Format › Image submenu in Typora order (native menu + palette); per-image entries act on the image at the caret | owned |  | `src/app/images/tools.ts` `async insertLocal()` | `tests/e2e/parity-images.spec.ts` › menu.format.image: Format › Image › Insert Image / Insert Local Images… | 6 |
 
 ## View menu
 
@@ -176,21 +176,21 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
-| `ctx.framework` | Context-menu framework: target-aware item lists for the editor — only the sidebar has a context menu (src/app/ui/contextmenu.ts) | **missing** | P1 | — | none | 1 |
-| `ctx.text` | Text context menu: cut/copy/paste, copy-as, insert, format, paragraph submenus, search with… | **missing** | P1 | — | none | 4 |
-| `ctx.link` | Link context menu: Open Link / Copy Link Address / Hyperlink Actions | **missing** | P1 | — | none | 4 |
-| `ctx.block-generic` | Block context menu: Insert Paragraph Before/After, Delete (atomic blocks) | **missing** | P1 | — | none | 1 |
-| `ctx.emoji` | Emoji/inline-math context entries (copy emoji, copy inline math) | **missing** | P2 | — | none | 0 |
+| `ctx.framework` | Context-menu framework: target-aware item lists for the editor — in-app menu (no native NSMenu merge): key lists per target, actions bound to the right-clicked element | owned |  | `src/app/ctxmenu/targets.ts` `export function contextTarget` | `tests/e2e/parity-ctx.spec.ts` › ctx.framework: | 1 |
+| `ctx.text` | Text context menu: cut/copy/paste, copy-as, insert, format, paragraph submenus, search with… — Cut/Copy/Paste + Copy / Paste As… + Search with Google; WebKit spelling suggestions, Look Up, Speech, Substitutions are not reproduced by the in-app menu | **partial** | P1 | `src/app/ctxmenu/items.ts` `label: 'Copy / Paste As…'` | `tests/e2e/parity-ctx.spec.ts` › ctx.text: | 4 |
+| `ctx.link` | Link context menu: Open Link / Copy Link Address / Hyperlink Actions | owned |  | `src/app/ctxmenu/items.ts` `label: 'Copy Link Address'` | `tests/e2e/parity-ctx.spec.ts` › ctx.link: | 4 |
+| `ctx.block-generic` | Block context menu: Insert Paragraph Before/After, Delete (atomic blocks) — table/HTML/math/diagram/code/atomic lists; Save Math/Image As… not yet (gap) | owned |  | `src/app/ctxmenu/items.ts` `block('para:insertBefore', 'Insert Paragraph Before')` | `tests/e2e/parity-ctx.spec.ts` › ctx.block-generic: | 9 |
+| `ctx.emoji` | Emoji/inline-math context entries (copy emoji, copy inline math) — inline math Copy Math ▸ Tex/MathML; Margin renders no :emoji: shortcodes, inline Copy as Image disabled | **partial** | P2 | `src/app/ctxmenu/items.ts` `function copyMath` | `tests/e2e/parity-ctx.spec.ts` › ctx.emoji: | 4 |
 | `ctx.media` | Media context entries: play / pause / download video | **missing** | P2 | — | none | 6 |
 
 ## Table tools
 
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
-| `tools.table.rows-cols` | Table: add row above/below, column before/after, delete row/column — toolbar ops exist; no menu/context entries | **partial** | P1 | `src/editor/blocks/table.ts` `Table tools` | `tests/e2e/blocks-widgets.spec.ts` › Tab at last cell adds a row; Enter moves down; toolbar ops | 6 |
-| `tools.table.move` | Table: Move Row Up/Down, Move Column Left/Right | **missing** | P1 | — | none | 6 |
-| `tools.table.align-resize` | Table: column alignment and Resize Table dialog — alignment via toolbar; no resize dialog | **partial** | P1 | `src/editor/blocks/table.ts` `Table tools` | none | 6 |
-| `tools.table.copy-delete` | Table: Copy Table / Delete Table | **missing** | P1 | — | none | 3 |
+| `tools.table.rows-cols` | Table: add row above/below, column before/after, delete row/column — Paragraph › Table submenu + palette + toolbar; ⌘↩ / ⌘⇧⌫ stay cell keys | owned |  | `src/editor/blocks/table.ts` `private runOp` | `tests/e2e/parity-tools.spec.ts` › tools.table.rows-cols: | 6 |
+| `tools.table.move` | Table: Move Row Up/Down, Move Column Left/Right — header row never moves; ⌘⌥ arrows in a cell | owned |  | `src/editor/blocks/table.ts` `case 'moveRowUp'` | `tests/e2e/parity-tools.spec.ts` › tools.table.move: | 6 |
+| `tools.table.align-resize` | Table: column alignment and Resize Table dialog — Width = columns, Height = rows incl. header (typora-re#4) | owned |  | `src/editor/blocks/table.ts` `private buildResize` | `tests/e2e/parity-tools.spec.ts` › tools.table.align-resize: | 6 |
+| `tools.table.copy-delete` | Table: Copy Table / Delete Table — copy = markdown plain + bordered HTML; Prettify Source Code re-formats the table | owned |  | `src/editor/blocks/table.ts` `private copyTable` | `tests/e2e/parity-tools.spec.ts` › tools.table.copy-delete: | 3 |
 | `tools.table.cells` | Table cell editing, Tab/Enter navigation, TSV paste, IME | owned |  | `src/editor/blocks/table.ts` `Table tools` | `tests/e2e/blocks-core.spec.ts` › pasting TSV / CSV fills and grows the grid | 0 |
 
 ## Code tools
@@ -198,18 +198,18 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
 | `tools.code.language` | Code fence language box + syntax highlight + copy button | owned |  | `src/editor/blocks/code-fence.ts` `mount` | `tests/e2e/blocks-widgets.spec.ts` › language box edits info string, copy button works | 4 |
-| `tools.code.indent-prettify` | Code tools: Auto Indent Selected/Whole Code, Prettify Source Code | **missing** | P2 | — | none | 4 |
-| `tools.code.delete` | Code tools: Delete Code Block — backspace in empty fence only | **partial** | P2 | `src/editor/blocks/code-fence.ts` `onRemove` | `tests/e2e/blocks-widgets.spec.ts` › arrow keys exit at edges; backspace in empty removes | 1 |
-| `tools.code.line-numbers` | Code fences: line numbers, line wrap, indent size | **missing** | P1 | — | none | 8 |
+| `tools.code.indent-prettify` | Code tools: Auto Indent Selected/Whole Code, Prettify Source Code — Paragraph › Code Tools (Copy Code Content / Auto Indent); Prettify Source Code is the Table op; Shift+Tab pref not wired | owned |  | `src/editor/blocks/code-fence.ts` `command(op: string)` | `tests/e2e/parity-tools.spec.ts` › tools.code.indent-prettify: | 4 |
+| `tools.code.delete` | Code tools: Delete Code Block — deliberate fix: Typora requests "delete-fences" but its native table is keyed "deleteFences", so the item never shows on macOS; Margin shows it | owned |  | `src/app/ctxmenu/items.ts` `'Delete Code Block'` | `tests/e2e/parity-ctx.spec.ts` › tools.code.delete: | 3 |
+| `tools.code.line-numbers` | Code fences: line numbers, line wrap, indent size | owned |  | `src/editor/blocks/code-fence.ts` `private applyCodePrefs` | `tests/e2e/parity-prefs.spec.ts` › tools.code.line-numbers: Code fences: line numbers, line wrap, indent size | 8 |
 
 ## Math tools
 
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
 | `tools.math.render` | Math blocks/inline: KaTeX render, errors, \tag/\eqref | owned |  | `src/editor/blocks/math.ts` `createMathBlockWidget` | `tests/e2e/blocks-core.spec.ts` › follows the referenced | 0 |
-| `tools.math.copy` | Math tools: Copy Math / Copy as TeX / Copy as MathML / Delete Math | **missing** | P1 | — | none | 7 |
-| `tools.math.refresh` | Math tools: Refresh All Math Expressions | **missing** | P2 | — | none | 1 |
-| `tools.math.numbering` | Math numbering options (auto-number, AMS rules, physics package) | **missing** | P2 | — | none | 6 |
+| `tools.math.copy` | Math tools: Copy Math / Copy as TeX / Copy as MathML / Delete Math — copy: block + inline; Delete Math: blocks only (typora-re#4); Copy as Image and Use LaTeX Source / Use Rendered SVG → #127 | owned |  | `src/editor/core/block-tools.ts` `export function mathTool` | `tests/e2e/parity-tools.spec.ts` › tools.math.copy: | 7 |
+| `tools.math.refresh` | Math tools: Refresh All Math Expressions | owned |  | `src/editor/core/block-tools.ts` `export function refreshMath` | `tests/e2e/parity-tools.spec.ts` › tools.math.refresh: | 1 |
+| `tools.math.numbering` | Math numbering options (auto-number, AMS rules, physics package) — none (default) / AMS / all; physics = KaTeX macro subset; Apply Line Break at \\ and \newline | owned |  | `src/editor/blocks/math.ts` `export function autoNumbered` | `tests/e2e/parity-syntax.spec.ts` › tools.math.numbering: Math numbering options (auto-number, AMS rules, physics package) | 6 |
 
 ## Diagrams
 
@@ -222,16 +222,16 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
-| `images.paste-drop` | Paste/drop images: copy into target folder by rule, unique names | owned |  | `src/app/app.ts` `private async storeImage(` | `src/platform/web.test.ts` › copies (never moves) an existing image and dedupes names | 12 |
-| `images.rules-scope` | Image rule options: apply to local/online images, relative path, ./ prefix, escape URL, YAML override — rule kinds exist; YAML typora-copy-images-to and per-scope toggles missing | **partial** | P1 | `src/app/settings.ts` `migrateImageRule` | `src/app/__tests__/settings.test.ts` › image rule forms | 12 |
-| `images.root-path` | Image root path (typora-root-url) | **missing** | P1 | — | none | 2 |
-| `images.remote-download` | Download remote images into the target folder — #17 | **partial** | P1 | `src-tauri/src/remote_images.rs` `fn ` | none | 0 |
-| `images.copy-move-all` | Image Tools: Copy / Move All Images to… (and per-image copy/move/rename) | **missing** | P1 | — | none | 15 |
-| `images.delete` | Image context: Delete Image / Delete Image File (undoable) | **missing** | P1 | — | none | 9 |
-| `images.reveal-open` | Image context: Open Image Location / Open in Browser / Copy Image Content | **missing** | P1 | — | none | 5 |
-| `images.zoom` | Image zoom (Zoom Image to N%) and switch Markdown/HTML image syntax | **missing** | P1 | — | none | 6 |
-| `images.reload` | Image Tools: Reload All Images | **missing** | P2 | — | none | 1 |
-| `images.upload` | Image upload: custom command (argv) / PicGo; upload one / all local images; test uploader — #80; use argv, never shell-concatenate (prose §6.3 risk) | **missing** | P1 | — | none | 32 |
+| `images.paste-drop` | Paste/drop images: copy into target folder by rule, unique names | owned |  | `src/app/images/insert.ts` `export async function insertImage(` | `src/platform/web.test.ts` › copies (never moves) an existing image and dedupes names | 12 |
+| `images.rules-scope` | Image rule options: apply to local/online images, relative path, ./ prefix, escape URL, YAML override — front matter typora-copy-images-to (${filename}; upload/ipic gated by Allow upload…) overrides Preferences; scope toggles, relative / ./, escape, Preferred Image Syntax | owned |  | `src/app/images/rules.ts` `export function imageTarget` | `tests/e2e/parity-images.spec.ts` › images.rules-scope: Image rule options: apply to local/online images, relative path, ./ prefix, escape URL, YAML override | 12 |
+| `images.root-path` | Image root path (typora-root-url) — Use Image Root Path toggles typora-root-url (written relative to the document); srcs written site-root style and rendered from the root | owned |  | `src/app/images/rules.ts` `export function rootDirOf` | `tests/e2e/parity-images.spec.ts` › images.root-path: Image root path (typora-root-url) | 2 |
+| `images.remote-download` | Download remote images into the target folder — downloaded natively (curl, with timeout) only when Apply above rules to online images is on (Typora default off) | owned |  | `src/app/images/insert.ts` `shouldApplyRule(input.path, opts)` | `tests/e2e/parity-images.spec.ts` › images.remote-download: Download remote images into the target folder | 0 |
+| `images.copy-move-all` | Image Tools: Copy / Move All Images to… (and per-image copy/move/rename) — duplicate names get Typora stem-<last 7 digits of unix seconds>.ext; Margin deviation: identical bytes reuse the existing copy and explicit names never clobber | owned |  | `src/app/images/tools.ts` `async copyAll(move: boolean` | `tests/e2e/parity-images.spec.ts` › images.copy-move-all: Image Tools: Copy / Move All Images to… (and per-image copy/move/rename) | 15 |
+| `images.delete` | Image context: Delete Image / Delete Image File (undoable) — Delete Image File moves the file to the Trash after confirmation; removing the reference is one undo step | owned |  | `src/app/images/tools.ts` `async deleteImageFile(` | `tests/e2e/parity-images.spec.ts` › images.delete: Image context: Delete Image / Delete Image File (undoable) | 9 |
+| `images.reveal-open` | Image context: Open Image Location / Open in Browser / Copy Image Content — Open Image in Browser only for remote images (desktop openExternal allows http(s) only) | owned |  | `src/app/images/context-menu.ts` `Open Image Location` | `tests/e2e/parity-images.spec.ts` › images.reveal-open: Image context: Open Image Location / Open in Browser / Copy Image Content | 5 |
+| `images.zoom` | Image zoom (Zoom Image to N%) and switch Markdown/HTML image syntax — Typora presets 25-200% plus 1/scale (PNG pHYs / JPEG JFIF density); inline <img> renders as an image | owned |  | `src/app/images/syntax.ts` `export function setZoom` | `tests/e2e/parity-images.spec.ts` › images.zoom: Image zoom (Zoom Image to N%) and switch Markdown/HTML image syntax | 6 |
+| `images.reload` | Image Tools: Reload All Images | owned |  | `src/app/images/tools.ts` `reloadAll(root: HTMLElement)` | `tests/e2e/parity-images.spec.ts` › images.reload: Image Tools: Reload All Images | 1 |
+| `images.upload` | Image upload: custom command (argv) / PicGo; upload one / all local images; test uploader — DELIBERATE DEVIATION (security): the command is tokenized to argv and run without a shell (Typora runs bash -c with only backslash and double quote escaped, so $() or backticks in file names execute); success also needs exit status 0. Same as Typora: 20 s per image, 60 s batch cap (child killed), URL lines http(s)/ftp/file/host.tld scanned from the tail, last URL for one image, exactly n for a batch, Test Uploader needs exactly 2 URLs; upload-on-insert keeps the local image on failure; Cancel kills the run | owned |  | `src-tauri/src/upload.rs` `pub fn test_upload(` | `tests/e2e/parity-images.spec.ts` › images.upload: Image upload: custom command (argv) / PicGo; upload one / all local images; test uploader | 32 |
 | `images.ipic` | iPic uploader (third-party macOS app, private pasteboard protocol) — Proprietary third-party integration with an undocumented pasteboard protocol; command/PicGo uploaders cover the use case. | out-of-scope |  | — | none | 4 |
 
 ## Preferences
@@ -239,16 +239,16 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
 | `pref.storage` | Settings storage: defaults, validation, migration, unknown keys kept | owned |  | `src/app/settings.ts` `DEFAULT_SETTINGS` | `src/app/__tests__/settings.test.ts` › keeps unknown keys for forward compatibility | 5 |
-| `pref.advanced` | Advanced settings: open/reset config file, reset dialog warnings — #63 corrupt settings handling | **missing** | P2 | — | none | 14 |
-| `pref.general.launch` | General: On Launch (restore files/folders, open new file, default folder) — only "Reopen last folder" | **partial** | P1 | `src/app/preferences.ts` `'restoreLastFolder'` | none | 8 |
-| `pref.general.save` | General: Auto Save, save-on-switch, recover unsaved drafts — auto-save exists; draft recovery missing | **partial** | P0 | `src/app/document.ts` `autoSave` | `src/app/__tests__/document.test.ts` › auto-saves after the delay when enabled | 9 |
-| `pref.general.language` | General: UI language | **missing** | P2 | — | none | 1 |
+| `pref.advanced` | Advanced settings: open/reset config file, reset dialog warnings — advanced settings JSON editor + reset (Typora: Windows/Linux only); Reset All Dialog Warnings | owned |  | `src/app/prefs/general.ts` `Reset All Dialog Warnings` | `tests/e2e/parity-prefs.spec.ts` › pref.advanced: Advanced settings: open/reset config file, reset dialog warnings | 14 |
+| `pref.general.launch` | General: On Launch (restore files/folders, open new file, default folder) — quit-on-last-window persisted only (desktop native, applied after restart) | owned |  | `src/app/settings.ts` `export function launchPlan` | `tests/e2e/parity-prefs.spec.ts` › pref.general.launch: General: On Launch | 8 |
+| `pref.general.save` | General: Auto Save, save-on-switch, recover unsaved drafts | owned |  | `src/app/drafts.ts` `export class DraftStore` | `tests/e2e/parity-files.spec.ts` › pref.general.save: General: Auto Save, save-on-switch, recover unsaved drafts | 9 |
+| `pref.general.language` | General: UI language — only English strings ship | owned |  | `src/app/prefs/general.ts` `System Language` | `tests/e2e/parity-prefs.spec.ts` › pref.general.language: General: UI language | 1 |
 | `pref.appearance.theme` | Appearance: theme, separate dark theme, follow system | owned |  | `src/app/preferences.ts` `'darkTheme'` | `tests/e2e/app-themes.spec.ts` › preferences: Theme lists light themes, Dark theme lists dark ones | 10 |
 | `pref.appearance.font` | Appearance: font size, custom CSS | owned |  | `src/app/preferences.ts` `'Font size'` | `tests/e2e/app-themes.spec.ts` › command palette theme entry and custom CSS | 3 |
-| `pref.appearance.window` | Appearance: window style (seamless/unibody/native), text column width, outline panel | **missing** | P2 | — | none | 13 |
-| `pref.editor.general` | Editor: auto pair brackets/markdown, display source on focus, heading style, indent | **missing** | P1 | — | none | 10 |
-| `pref.editor.shortcuts` | Custom shortcut keys | **missing** | P2 | — | none | 2 |
-| `pref.files.defaults` | Files: default line ending, default folder, file extensions — LF/CRLF per file only | **partial** | P1 | `src/app/preferences.ts` `'autoSave'` | none | 8 |
+| `pref.appearance.window` | Appearance: window style (seamless/unibody/native), text column width, outline panel — text column width + outline-by-default (Margin extras) live, collapsible outline persisted; window style persisted only | **partial** | P2 | `src/app/settings.ts` `textColumnWidth` | `tests/e2e/parity-prefs.spec.ts` › pref.appearance.window: Appearance: window style (seamless/unibody/native), text column width, outline panel | 13 |
+| `pref.editor.general` | Editor: auto pair brackets/markdown, display source on focus, heading style, indent — auto pair (markdown pairing depends on bracket pairing) + display source on focus; Indent Size on Save / Pretty indentation and Heading Style pending (gap issue) | **partial** | P1 | `src/editor/core/input.ts` `const autoPair` | `tests/e2e/parity-prefs.spec.ts` › pref.editor.general: Editor: auto pair brackets/markdown, display source on focus, heading style, indent | 10 |
+| `pref.editor.shortcuts` | Custom shortcut keys — in-app JSON key map for the JS keymap (Typora macOS opens a help page); native menu accelerators unchanged | owned |  | `src/app/commands.ts` `export function setCustomKeys` | `tests/e2e/parity-prefs.spec.ts` › pref.editor.shortcuts: Custom shortcut keys | 2 |
+| `pref.files.defaults` | Files: default line ending, default folder, file extensions — line ending for new files; default folder via On Launch | owned |  | `src/app/settings.ts` `export function newFileEol` | `tests/e2e/parity-prefs.spec.ts` › pref.files.defaults: Files: default line ending | 8 |
 | `pref.privacy` | Privacy/security toggles (no telemetry; local-only network) — Margin sends no telemetry by construction | owned |  | `src/app/settings.ts` `DEFAULT_SETTINGS` | none | 1 |
 
 ## Sidebar & outline
@@ -256,36 +256,36 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
 | `sidebar.tree` | File tree: lazy folders, open, watch, new/rename/trash/reveal/copy path | owned |  | `src/app/sidebar/filetree.ts` `'New File…'` | `tests/e2e/app-files.spec.ts` › context menu: new file, rename (open doc follows), new folder, trash | 20 |
-| `sidebar.list-view` | Articles list view (summaries, ≤400 items) and tree/list switch | **missing** | P1 | — | none | 7 |
-| `sidebar.search` | Sidebar full-text search across the folder | **missing** | P1 | — | none | 7 |
-| `sidebar.sort` | File tree sorting (name/natural/created/modified, asc/desc) | **missing** | P1 | — | none | 9 |
+| `sidebar.list-view` | Articles list view (summaries, ≤400 items) and tree/list switch — Margin defaults to the tree view on every OS (Typora macOS defaults to Articles) | owned |  | `src/app/sidebar/filelist.ts` `export class FileList` | `tests/e2e/parity-sidebar.spec.ts` › sidebar.list-view: Articles list view | 7 |
+| `sidebar.search` | Sidebar full-text search across the folder — "Searching"/"Gathering more results" belong to Quick Open and "No Results" to in-document Find (fe-sidebar-statusbar-find §10); "File Results" is unused in 1.5.12 | owned |  | `src/app/sidebar/search.ts` `export class SidebarSearch` | `tests/e2e/parity-sidebar.spec.ts` › sidebar.search: Sidebar full-text search | 4 |
+| `sidebar.sort` | File tree sorting (name/natural/created/modified, asc/desc) — deliberate fix: Typora code −3 serves both natural-desc and creation-desc; Margin keeps all eight orders distinct. Sort menu sits in the files header (Typora: footer menu) | owned |  | `src/app/sidebar/sort.ts` `export const SORT_OPTIONS` | `tests/e2e/parity-sidebar.spec.ts` › sidebar.sort: File tree sorting | 9 |
 | `sidebar.outline` | Outline: headings, jump, highlight current header | owned |  | `src/app/sidebar/outline.ts` `activeId` | `tests/e2e/app-navigation.spec.ts` › outline lists headings and jumps on click | 2 |
-| `sidebar.outline-collapse` | Outline: collapsible/flat outline, expand/collapse all, filter, unpin | **missing** | P1 | — | none | 7 |
-| `sidebar.drag` | Drag files from sidebar into the editor / other apps; drop files to open — #23 | **missing** | P2 | — | none | 1 |
+| `sidebar.outline-collapse` | Outline: collapsible/flat outline, expand/collapse all, filter, unpin — pin/unpin (outline drop-down) not implemented | owned |  | `src/app/sidebar/outline.ts` `export function filterHeadings` | `tests/e2e/parity-sidebar.spec.ts` › sidebar.outline-collapse: Outline: collapsible/flat outline | 7 |
+| `sidebar.drag` | Drag files from sidebar into the editor / other apps; drop files to open — #23 | owned |  | `src/app/sidebar/drag.ts` `export function dropMarkdown` | `tests/e2e/parity-sidebar.spec.ts` › sidebar.drag: Drag files from sidebar | 1 |
 
 ## Export / print / import
 
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
-| `export.html` | Export › HTML (theme inlined, local images relative) | owned |  | `src/app/app.ts` `private async export(` | `tests/e2e/app-themes.spec.ts` › export HTML inlines the theme | 8 |
-| `export.html-plain` | Export › HTML (without Styles) | **missing** | P1 | — | none | 1 |
+| `export.html` | Export › HTML (theme inlined, local images relative) | owned |  | `src/app/app.ts` `private createExports(` | `tests/e2e/app-themes.spec.ts` › export HTML inlines the theme | 8 |
+| `export.html-plain` | Export › HTML (without Styles) | owned |  | `src/app/export.ts` `export function buildPlainHtml` | `tests/e2e/parity-export.spec.ts` › export.html-plain: Export › HTML (without Styles) | 1 |
 | `export.pdf` | Export › PDF — macOS native; #14 for Windows/Linux | owned |  | `src-tauri/src/pdf_macos.rs` `pub async fn export_pdf` | none | 2 |
-| `export.pdf-options` | PDF options: paper size/margins, header/footer, page breaks, bookmarks, internal links — #15 | **missing** | P0 | — | none | 14 |
-| `export.image` | Export › Image (PNG/JPEG of the whole document) | **missing** | P1 | — | none | 8 |
-| `export.pandoc` | Export via Pandoc: docx/odt/rtf/epub/latex/mediawiki/rst/textile/opml — #81; feed pandoc JSON/native AST from the editor model, argv only | **missing** | P1 | — | none | 32 |
-| `export.custom` | Custom export commands and "run command after export" | **missing** | P2 | — | none | 18 |
-| `export.settings` | Export settings pane: per-format options, theme, default folder, after-export action, YAML overrides | **missing** | P0 | — | none | 23 |
-| `export.previous` | Export with Previous / Export and Overwrite with Previous | **missing** | P0 | — | none | 8 |
-| `export.import` | File › Import (docx/html/… via Pandoc) | **missing** | P2 | — | none | 8 |
+| `export.pdf-options` | PDF options: paper size/margins, header/footer, page breaks, bookmarks, internal links — #15; native-commands §4: paper Default (→ Page Setup)/A5/A4/A3/US Letter/US Legal/Tabloid/Custom, margins Default 45/36 pt or Custom, header/footer presets, Page Break Between Top Headings, Append Extra Content | owned |  | `src-tauri/src/pdf_post_macos.rs` `pub fn post_process` | `tests/e2e/parity-export.spec.ts` › export.pdf-options: PDF options | 14 |
+| `export.image` | Export › Image (PNG/JPEG of the whole document) | owned |  | `src/app/export-image.ts` `export async function rasterizeHtml` | `tests/e2e/parity-export.spec.ts` › export.image: Export › Image | 8 |
+| `export.pandoc` | Export via Pandoc: docx/odt/rtf/epub/latex/mediawiki/rst/textile/opml — #81; feed pandoc JSON/native AST from the editor model, argv only; #90 Abort button + per-format Style Reference/Template/Chapter Level/Extra Arguments (verified by export.pandoc-options e2e) | owned |  | `src/app/export-pandoc.ts` `export async function exportWithPandoc` | `tests/e2e/parity-export.spec.ts` › export.pandoc: Export via Pandoc | 32 |
+| `export.custom` | Custom export commands and "run command after export" | owned |  | `src-tauri/src/export_custom.rs` `pub fn run_command` | `tests/e2e/parity-export.spec.ts` › export.custom: Custom export commands | 18 |
+| `export.settings` | Export settings pane: per-format options, theme, default folder, after-export action, YAML overrides | owned |  | `src/app/preferences-export.ts` `export function exportPrefsSection` | `tests/e2e/parity-export.spec.ts` › export.settings: Export settings pane | 23 |
+| `export.previous` | Export with Previous / Export and Overwrite with Previous | owned |  | `src/app/export-actions.ts` `async export(kind` | `tests/e2e/parity-export.spec.ts` › export.previous: Export with Previous | 8 |
+| `export.import` | File › Import (docx/html/… via Pandoc) | owned |  | `src/app/import.ts` `export async function runImport` | `tests/e2e/parity-export.spec.ts` › export.import: File › Import | 8 |
 
 ## Markdown syntax options
 
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
-| `syntax.extensions` | Syntax support toggles: highlight, sub/sup, inline math, emoji shortcodes — highlight/inline math always on; sub/sup/emoji not parsed | **missing** | P2 | — | none | 8 |
-| `syntax.strict` | Strict Mode (closer to GFM) and list/quote style preferences | **missing** | P2 | — | none | 6 |
-| `syntax.whitespace` | Whitespace & line breaks: preserve single line break, visible <br/>, first-line indent, \\ line break | **missing** | P2 | — | none | 9 |
-| `syntax.save-normalize` | On save: insert final newline, remap Unicode punctuation on parse | **missing** | P2 | — | none | 2 |
+| `syntax.extensions` | Syntax support toggles: highlight, sub/sup, inline math, emoji shortcodes — Typora fresh-install defaults (inline math/sub/sup/highlight off, emoji on); pre-#102 installs keep Margin rendering. Deliberate fix: Superscript is independent of Subscript (Typora ties its visibility to the subscript box) | owned |  | `src/editor/core/parser/options.ts` `PARSER_KEYS` | `tests/e2e/parity-syntax.spec.ts` › syntax.extensions: Syntax support toggles: highlight, sub/sup, inline math, emoji shortcodes | 8 |
+| `syntax.strict` | Strict Mode (closer to GFM) and list/quote style preferences — non-strict: `#Heading` without space; list markers for menu-created lists | owned |  | `src/editor/core/parser/starts.ts` `outside Strict Mode` | `tests/e2e/parity-syntax.spec.ts` › syntax.strict: Strict Mode (closer to GFM) and list/quote style preferences | 6 |
+| `syntax.whitespace` | Whitespace & line breaks: preserve single line break, visible <br/>, first-line indent, \\ line break — preserve/ignore single line break, Visible <br/> (default on), first-line indent; Apply Line Break at \\ is the Math option (display math). Deliberate fix: one source of truth for the Preserve check state | owned |  | `src/editor/core/editor.ts` `md-ignore-linebreak` | `tests/e2e/parity-syntax.spec.ts` › syntax.whitespace: Whitespace & line breaks: preserve single line break | 9 |
+| `syntax.save-normalize` | On save: insert final newline, remap Unicode punctuation on parse — Insert Final New Line On Save is per document (follows the opened file; palette command); Remap Unicode Punctuation persisted only, parser remap pending (gap issue) | **partial** | P2 | `src/app/document.ts` `Insert Final New Line On Save` | `tests/e2e/parity-syntax.spec.ts` › syntax.save-normalize: On save: insert final newline, remap Unicode punctuation on parse | 2 |
 
 ## Behaviors — editor core
 
@@ -300,18 +300,19 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `beh.core.widgets-nav` | Caret enter/exit across atomic widgets with arrows; doc start/end keys | owned |  | `src/editor/core/view.ts` `widget` | `tests/e2e/core-nav-keys.spec.ts` › doc start lands after the heading marker | 0 |
 | `beh.core.find-in-widgets` | Find/replace reaches inside code, tables, math; replace-all is one undo step | owned |  | `src/editor/core/find.ts` `export function` | `tests/e2e/core-widget-find.spec.ts` › replace-all across widgets is lossless and one undo step | 0 |
 | `beh.core.html-sanitize` | Raw HTML blocks/inline sanitized in preview, copy and export | owned |  | `src/editor/blocks/sanitize.ts` `export function` | `tests/e2e/core-qa.spec.ts` › export sanitizes inline HTML | 0 |
-| `beh.core.large-file` | Oversize documents: degrade gracefully (warn / source mode) | **missing** | P2 | — | none | 0 |
+| `beh.core.large-file` | Oversize documents: degrade gracefully (warn / source mode) | owned |  | `src/app/app.ts` `private degradeLarge(` | `tests/e2e/parity-files.spec.ts` › beh.core.large-file: Oversize documents: degrade gracefully (warn / source mode) | 0 |
 
 ## Behaviors — files & windows
 
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
 | `beh.files.external-change` | External change: silent reload when clean, prompt when dirty, ignore own save echo | owned |  | `src/app/document.ts` `external` | `tests/e2e/app-files.spec.ts` › external change reloads silently when clean and prompts when dirty | 2 |
-| `beh.files.external-merge` | External change prompt offers Keep mine / Load disk / Show diff — #82 | **missing** | P1 | — | none | 0 |
+| `beh.files.external-merge` | External change prompt offers Keep mine / Load disk / Show diff | owned |  | `src/app/ui/extchange.ts` `export class ExternalChangeBanner` | `tests/e2e/parity-files.spec.ts` › beh.files.external-merge: External change prompt offers Keep mine / Load disk / Show diff | 0 |
 | `beh.files.folder-watch` | Folder watcher: incremental tree updates, rename pairing, hidden/unsupported filtered | owned |  | `src-tauri/src/watch.rs` `fn ` | `src/platform/web.test.ts` › suppresses own modifications but reports creations and external changes | 1 |
 | `beh.files.title-dirty` | Window title shows document name and edited state | owned |  | `src/app/app.ts` `setDocumentEdited` | none | 0 |
-| `beh.files.single-instance` | Single instance: opening files from Finder reuses the running app — #29 Linux | **partial** | P1 | `src-tauri/src/lib.rs` `on_second_instance` | none | 0 |
-| `beh.files.snapshot-undo` | Reopen keeps undo history and caret (per-document snapshot) | **missing** | P2 | — | none | 4 |
+| `beh.files.single-instance` | Single instance: opening files from Finder reuses the running app | owned |  | `src-tauri/src/lib.rs` `on_second_instance` | `tests/e2e/parity-files.spec.ts` › beh.files.single-instance: Single instance: opening files from Finder reuses the running app | 0 |
+| `beh.files.drop` | Drop files from the OS: open Markdown/folders, insert images and links — #23; macOS native paths via src-tauri/src/drop_macos.rs; Linux/Windows drops not intercepted yet | owned |  | `src/app/filedrop.ts` `export async function handleFileDrop(` | `tests/e2e/parity-files.spec.ts` › beh.files.drop: Drop files from the OS: open Markdown/folders, insert images and links | 0 |
+| `beh.files.snapshot-undo` | Reopen keeps undo history and caret (per-document snapshot) | owned |  | `src/app/doctabs.ts` `private async revive(` | `tests/e2e/parity-files.spec.ts` › beh.files.snapshot-undo: Reopen keeps undo history and caret (per-document snapshot) | 4 |
 | `beh.files.quicklook` | Quick Look / preview of a file from the sidebar | **missing** | P2 | — | none | 3 |
 | `beh.files.asset-scope` | Asset access scoped to doc/folder (no whole-disk file:// access) — prose flags Typora granting "/" read access; Margin scopes per folder (#48 open) | owned |  | `src-tauri/src/commands.rs` `allow_asset_dir` | none | 0 |
 

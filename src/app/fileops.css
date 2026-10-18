@@ -1,0 +1,25 @@
+/* File › Properties and Browse All Versions (#94). */
+.file-properties .props {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 16px;
+  margin: 4px 0 16px;
+  font-size: 13px;
+}
+.file-properties dt { color: var(--margin-fg-muted); }
+.file-properties dd { margin: 0; overflow-wrap: anywhere; }
+.versions-main { display: flex; gap: 12px; min-height: 0; flex: 1; }
+.versions-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 220px;
+  flex: none;
+  overflow-y: auto;
+  border-right: 1px solid var(--margin-border);
+}
+.versions-item { display: flex; flex-direction: column; gap: 2px; padding: 7px 10px; font-size: 13px; cursor: default; border-radius: 6px; }
+.versions-item small { color: var(--margin-fg-muted); }
+.versions-item:hover { background: var(--margin-hover); }
+.versions-item[aria-selected='true'] { background: var(--margin-active); }
+.versions-preview { flex: 1; min-width: 0; }

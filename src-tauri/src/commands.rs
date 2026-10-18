@@ -3,7 +3,7 @@
 //! frontend should fall back from.
 
 use crate::images::{self, ImageInput, ImageRule};
-use crate::{AppState, EV_FS, FsEventsPayload, MAIN, allow_assets, allow_assets_for_file, fsops, menu, settings, watch};
+use crate::{AppState, EV_FS, FsEventsPayload, allow_assets, allow_assets_for_file, fsops, menu, settings, watch};
 use serde::Deserialize;
 use serde_json::Value;
 use std::collections::HashMap;
@@ -88,8 +88,15 @@ pub async fn list_dir<Rt: Runtime>(app: AppHandle<Rt>, path: String) -> R<Vec<fs
 }
 
 #[tauri::command]
-pub async fn watch<Rt: Runtime>(app: AppHandle<Rt>, state: State<'_, AppState>, path: String) -> R<u32> {
+pub async fn watch<Rt: Runtime>(
+    app: AppHandle<Rt>,
+    window: WebviewWindow<Rt>,
+    state: State<'_, AppState>,
+    path: String,
+) -> R<u32> {
     let root = abs(&path)?;
+    // Batches go to the window that asked (several windows may watch, #94).
+    let label = window.label().to_string();
     let id = state.next_watch_id.fetch_add(1, Ordering::SeqCst) + 1;
     let qo = state.quick_open.clone();
     let app2 = app.clone();
@@ -109,7 +116,7 @@ pub async fn watch<Rt: Runtime>(app: AppHandle<Rt>, state: State<'_, AppState>, 
                 watch::FsEvent::Modified { .. } => {}
             }
         }
-        let _ = app2.emit_to(MAIN, EV_FS, FsEventsPayload { id, events });
+        let _ = app2.emit_to(label.as_str(), EV_FS, FsEventsPayload { id, events });
     })?;
     state.watchers.lock().unwrap().insert(id, w);
     allow_assets(&app, &root, true);
@@ -328,30 +335,47 @@ pub async fn export_html(state: State<'_, AppState>, html: String, out_path: Str
     let own = state.own_writes.clone();
     blocking(move || {
         let existed = p.exists();
-        fsops::atomic_write(&p, html.as_bytes()).map(|_| own.record(&p, existed))
+        fsops::atomic_write(&p, html.as_bytes()).map(|_| {
+            own.record(&p, existed);
+            crate::export_cmds::record_export(&p);
+        })
     })
     .await?
     .map_err(err)
 }
 
-pub async fn export_pdf_impl<Rt: Runtime>(app: &AppHandle<Rt>, html: String, out: PathBuf, base_dir: Option<PathBuf>) -> R<()> {
+pub async fn export_pdf_impl<Rt: Runtime>(
+    app: &AppHandle<Rt>,
+    html: String,
+    out: PathBuf,
+    base_dir: Option<PathBuf>,
+    options: crate::export_cmds::PdfOptions,
+) -> R<()> {
     #[cfg(target_os = "macos")]
     {
         let base = base_dir.or_else(|| out.parent().map(Path::to_path_buf)).unwrap_or_else(|| PathBuf::from("/"));
         allow_assets(app, &base, true);
-        crate::pdf_macos::export_pdf(app, html, base, out).await
+        crate::pdf_macos::export_pdf(app, html, base, out.clone(), options).await?;
+        crate::export_cmds::record_export(&out);
+        Ok(())
     }
     #[cfg(not(target_os = "macos"))]
     {
-        let _ = (app, html, out, base_dir);
+        let _ = (app, html, out, base_dir, options);
         Err("unsupported: native PDF export is macOS-only; use the print dialog".into())
     }
 }
 
 #[tauri::command]
-pub async fn export_pdf<Rt: Runtime>(app: AppHandle<Rt>, html: String, out_path: String, base_dir: Option<String>) -> R<()> {
+pub async fn export_pdf<Rt: Runtime>(
+    app: AppHandle<Rt>,
+    html: String,
+    out_path: String,
+    base_dir: Option<String>,
+    options: Option<crate::export_cmds::PdfOptions>,
+) -> R<()> {
     let out = abs(&out_path)?;
-    export_pdf_impl(&app, html, out, base_dir.map(PathBuf::from)).await
+    export_pdf_impl(&app, html, out, base_dir.map(PathBuf::from), options.unwrap_or_default()).await
 }
 
 /// Print the main window's current content (system print dialog).
@@ -498,16 +522,41 @@ pub async fn set_document_edited<Rt: Runtime>(window: WebviewWindow<Rt>, edited:
 }
 
 #[tauri::command]
-pub async fn set_close_guard(state: State<'_, AppState>, enabled: bool) -> R<()> {
-    state.close_guard.store(enabled, Ordering::SeqCst);
+pub async fn set_close_guard<Rt: Runtime>(window: WebviewWindow<Rt>, state: State<'_, AppState>, enabled: bool) -> R<()> {
+    let mut g = state.guarded.lock().unwrap();
+    if enabled {
+        g.insert(window.label().to_string());
+    } else {
+        g.remove(window.label());
+    }
     Ok(())
 }
 
 /// Frontend approved closing after a `margin://close-requested` event.
 #[tauri::command]
 pub async fn confirm_close<Rt: Runtime>(window: WebviewWindow<Rt>, state: State<'_, AppState>) -> R<()> {
-    state.close_confirmed.store(true, Ordering::SeqCst);
+    state.confirmed.lock().unwrap().insert(window.label().to_string());
     window.destroy().map_err(err)
+}
+
+/// File › New Window / Open in New Window (#94): another editor window. Its URL carries
+/// `window=new` (no folder restore) and optionally the file to show (`open=`).
+#[tauri::command]
+pub async fn open_window<Rt: Runtime>(app: AppHandle<Rt>, state: State<'_, AppState>, path: Option<String>) -> R<()> {
+    if let Some(p) = &path {
+        let p = abs(p)?;
+        allow_assets_for_file(&app, &p);
+    }
+    let n = state.next_window.fetch_add(1, Ordering::SeqCst) + 1;
+    crate::new_window(&app, &format!("{}{n}", crate::WINDOW_PREFIX), path.as_deref()).map_err(err)
+}
+
+/// Raw bytes of a file, for decoding with a chosen / detected encoding (#94).
+#[tauri::command]
+pub async fn read_file_bytes(path: String) -> R<tauri::ipc::Response> {
+    let p = abs(&path)?;
+    let bytes = blocking(move || std::fs::read(&p)).await?.map_err(|e| format!("{path}: {e}"))?;
+    Ok(tauri::ipc::Response::new(bytes))
 }
 
 #[tauri::command]

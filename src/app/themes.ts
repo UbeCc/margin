@@ -92,8 +92,9 @@ export class ThemeManager {
     return { name, dark };
   }
 
-  /** CSS for exports: current theme + custom CSS. */
-  exportCss(): string {
-    return `${this.themes[this.current] ?? ''}\n${this.customEl.textContent ?? ''}`;
+  /** CSS for exports: current (or the named, if installed) theme + custom CSS. */
+  exportCss(theme?: string): string {
+    const name = theme && this.themes[theme] !== undefined ? theme : this.current;
+    return `${this.themes[name] ?? ''}\n${this.customEl.textContent ?? ''}`;
   }
 }

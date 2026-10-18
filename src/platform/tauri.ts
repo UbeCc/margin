@@ -1,7 +1,8 @@
 import { convertFileSrc, invoke } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
-import type { AppSettings, DirEntry, FsEvent, ImageRule, MenuAction, Platform, RichClipboardData, ClipboardSnapshot, UploadConfig } from '../contracts';
-import { builtinThemes, normalizeSettings, printHtmlInIframe } from './common';
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
+import type { FileDrop, AppSettings, DirEntry, FsEvent, ImageRule, MenuAction, PdfExportOptions, Platform, RichClipboardData, ClipboardSnapshot, UploadConfig } from '../contracts';
+import { builtinThemes, normalizeSettings, printHtmlInIframe, withPrintPageCss } from './common';
 
 /** Event names emitted by `src-tauri/src/lib.rs`. */
 const EV = {
@@ -9,6 +10,7 @@ const EV = {
   fs: 'margin://fs-events',
   openFiles: 'margin://open-files',
   closeRequested: 'margin://close-requested',
+  fileDrop: 'margin://file-drop',
 } as const;
 
 async function call<T>(cmd: string, args?: Record<string, unknown>): Promise<T> {
@@ -19,11 +21,14 @@ async function call<T>(cmd: string, args?: Record<string, unknown>): Promise<T> 
   }
 }
 
-/** `listen()` is async; the contract wants a sync unsubscribe. */
+/**
+ * `listen()` is async; the contract wants a sync unsubscribe. Scoped to this window:
+ * with several windows (#94) menu / open-files / close events go to one of them.
+ */
 function subscribe<T>(event: string, handler: (payload: T) => void): () => void {
   let unlisten: UnlistenFn | null = null;
   let cancelled = false;
-  void listen<T>(event, (e) => handler(e.payload)).then((u) => {
+  void getCurrentWebviewWindow().listen<T>(event, (e) => handler(e.payload)).then((u) => {
     if (cancelled) u();
     else unlisten = u;
   });
@@ -99,8 +104,8 @@ export class TauriPlatform implements Platform {
     throw new Error('storeImage: need bytes or path');
   }
 
-  openFileDialog(opts?: { directory?: boolean }): Promise<string | null> {
-    return call('open_dialog', { directory: !!opts?.directory });
+  openFileDialog(opts?: { directory?: boolean; filters?: { name: string; extensions: string[] }[] }): Promise<string | null> {
+    return call('open_dialog', { directory: !!opts?.directory, filters: opts?.filters ?? null });
   }
 
   saveFileDialog(opts?: { defaultPath?: string; filters?: { name: string; extensions: string[] }[] }): Promise<string | null> {
@@ -116,11 +121,12 @@ export class TauriPlatform implements Platform {
    * `src`s resolve against the output file's directory; asset URLs work as-is.
    * Other platforms: falls back to the system print dialog (user picks "Save as PDF").
    */
-  async exportPdf(html: string, outPath: string, opts?: { baseDir?: string }): Promise<void> {
+  async exportPdf(html: string, outPath: string, opts?: PdfExportOptions): Promise<void> {
     try {
-      await call('export_pdf', { html, outPath, baseDir: opts?.baseDir ?? null });
+      const { baseDir, ...options } = opts ?? {};
+      await call('export_pdf', { html, outPath, baseDir: baseDir ?? null, options });
     } catch (e) {
-      if (String((e as Error).message).startsWith('unsupported')) return printHtmlInIframe(html);
+      if (String((e as Error).message).startsWith('unsupported')) return printHtmlInIframe(withPrintPageCss(html, opts));
       throw e;
     }
   }
@@ -129,13 +135,38 @@ export class TauriPlatform implements Platform {
   pandocExport(
     markdown: string,
     outPath: string,
-    opts: { format: string; docDir: string | null; title: string | null; pandocPath: string | null; timeoutMs: number },
+    opts: { format: string; docDir: string | null; title: string | null; pandocPath: string | null; timeoutMs: number; options?: object; exportId?: string },
   ): Promise<string> {
-    return call('pandoc_export', { markdown, outPath, ...opts });
+    return call('pandoc_export', { markdown, outPath, ...opts, options: opts.options ?? null, exportId: opts.exportId ?? null });
+  }
+
+  pandocAbort(exportId: string): Promise<boolean> {
+    return call('pandoc_abort', { exportId });
   }
 
   pandocDetect(pandocPath: string | null): Promise<{ path: string; version: string }> {
     return call('pandoc_detect', { pandocPath });
+  }
+
+  // ---- optional image tools (PlatformExtras, #99 / #92)
+  copyImage(src: string, dir: string, opts?: { name?: string; move?: boolean }): Promise<string> {
+    return call('copy_image', { src, dir, name: opts?.name ?? null, mv: !!opts?.move });
+  }
+
+  imageScale(path: string): Promise<number> {
+    return call('image_scale', { path });
+  }
+
+  openImagesDialog(): Promise<string[]> {
+    return call('open_images_dialog', {});
+  }
+
+  testUploader(config: UploadConfig): Promise<{ ok: boolean; command: string; stdout: string; stderr: string; urls: string[]; message: string }> {
+    return call('test_uploader', { config });
+  }
+
+  cancelUpload(): Promise<void> {
+    return call('cancel_upload', {});
   }
 
   /**
@@ -145,6 +176,29 @@ export class TauriPlatform implements Platform {
    */
   relocateImages(docPath: string, rule: ImageRule, srcs: string[]): Promise<Record<string, string>> {
     return call('relocate_images', { docPath, rule, srcs });
+  }
+
+  /** Export › Image bytes (#95): raw IPC body, target path in a header. */
+  exportBinary(bytes: Uint8Array, outPath: string): Promise<void> {
+    return invoke('export_binary', bytes, { headers: { 'x-margin-path': encodeURIComponent(outPath) } }).then(
+      () => undefined,
+      (e: unknown) => {
+        throw e instanceof Error ? e : new Error(String(e));
+      },
+    );
+  }
+
+  pandocImport(inputPath: string, pandocPath: string | null, timeoutMs: number): Promise<string> {
+    return call('pandoc_import', { inputPath, pandocPath, timeoutMs });
+  }
+
+  runExportCommand(command: string, vars: Record<string, string>, stdin: string | null, cwd: string | null, timeoutMs: number, exportId?: string): Promise<{ stdout: string; stderr: string }> {
+    return call('run_export_command', { command, vars, stdin, cwd, timeoutMs, exportId: exportId ?? null });
+  }
+
+  /** Open a file exported in this session with its default application. */
+  openExportedFile(path: string): Promise<void> {
+    return call('open_exported_file', { path });
   }
 
   // ---- optional file-tree operations (PlatformExtras, #21)
@@ -223,6 +277,35 @@ export class TauriPlatform implements Platform {
     return call('open_external', { url });
   }
 
+  /** File › New Window / Open in New Window (#94). */
+  openWindow(opts: { path?: string } = {}): Promise<void> {
+    return call('open_window', { path: opts.path ?? null });
+  }
+
+  /** Raw bytes for Reopen with Encoding (#94). */
+  async readFileBytes(path: string): Promise<Uint8Array> {
+    const buf = await call<ArrayBuffer | number[]>('read_file_bytes', { path });
+    return buf instanceof ArrayBuffer ? new Uint8Array(buf) : Uint8Array.from(buf);
+  }
+
+  /** Copy File Path: async clipboard API, falling back to a hidden textarea + execCommand. */
+  async writeClipboardText(text: string): Promise<void> {
+    try {
+      await navigator.clipboard.writeText(text);
+      return;
+    } catch {
+      /* not allowed without a user gesture in some webviews */
+    }
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand('copy');
+    ta.remove();
+    if (!ok) throw new Error('clipboard unavailable');
+  }
+
   setTitle(title: string): Promise<void> {
     return call('set_title', { title });
   }
@@ -237,11 +320,20 @@ export class TauriPlatform implements Platform {
 
   onOpenFiles(cb: (paths: string[]) => void): () => void {
     const off = subscribe<string[]>(EV.openFiles, cb);
+    // "Open in New Window" passes its file in the window URL (#94).
+    const own = new URLSearchParams(location.search).getAll('open');
+    if (own.length) queueMicrotask(() => cb(own));
     // Files passed before the frontend was listening (launch via Finder / CLI).
-    void call<string[]>('take_pending_open_files').then((paths) => {
-      if (paths.length) cb(paths);
-    });
+    else
+      void call<string[]>('take_pending_open_files').then((paths) => {
+        if (paths.length) cb(paths);
+      });
     return off;
+  }
+
+  /** #23: Finder drops, intercepted natively (src-tauri/src/drop_macos.rs) so paths are known. */
+  onFileDrop(cb: (drop: FileDrop) => void): () => void {
+    return subscribe<FileDrop>(EV.fileDrop, cb);
   }
 
   onCloseRequested(cb: () => Promise<boolean>): () => void {

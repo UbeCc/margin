@@ -1,0 +1,66 @@
+{
+  "ok": true,
+  "total_seconds": 280,
+  "cache": [
+    "e2e port: 34751",
+    "node_modules: hit (lock 975215959a357a01)",
+    "cargo debug target: warm",
+    "cargo release target: warm"
+  ],
+  "stages": [
+    {
+      "stage": "npm_ci",
+      "status": "pass",
+      "seconds": 0,
+      "notes": ""
+    },
+    {
+      "stage": "typecheck",
+      "status": "pass",
+      "seconds": 2,
+      "notes": ""
+    },
+    {
+      "stage": "vitest",
+      "status": "pass",
+      "seconds": 4,
+      "notes": "479/479 tests"
+    },
+    {
+      "stage": "e2e",
+      "status": "pass",
+      "seconds": 46,
+      "notes": "chromium 139/140, webkit 137/140"
+    },
+    {
+      "stage": "cargo_test",
+      "status": "pass",
+      "seconds": 20,
+      "notes": "131 passed, 0 failed / 0 passed, 0 failed / 0 passed, 0 failed"
+    },
+    {
+      "stage": "clippy",
+      "status": "pass",
+      "seconds": 26,
+      "notes": "clean"
+    },
+    {
+      "stage": "bundle",
+      "status": "pass",
+      "seconds": 192,
+      "notes": "Margin_0.1.0_amd64.AppImage (81.3 MB), Margin_0.1.0_amd64.deb (6.3 MB)"
+    },
+    {
+      "stage": "smoke",
+      "status": "pass",
+      "seconds": 10,
+      "notes": "window ok, screenshot stddev 0.377865"
+    },
+    {
+      "stage": "native_qa",
+      "status": "pass",
+      "seconds": 32,
+      "notes": "11/13 pass"
+    }
+  ]
+}

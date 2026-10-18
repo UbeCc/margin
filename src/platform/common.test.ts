@@ -18,7 +18,7 @@ describe('paths', () => {
     expect(expandImageDir('${filename}', null)).toBe('untitled');
   });
   it('generates image names', () => {
-    expect(generatedImageName('png', new Date(2026, 0, 2, 3, 4, 5))).toMatch(/^image-20260102-030405-[a-z0-9]{3}\.png$/);
+    expect(generatedImageName('png', new Date(2026, 0, 2, 3, 4, 5, 6))).toBe('image-20260102030405006.png');
   });
 });
 

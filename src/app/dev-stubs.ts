@@ -239,6 +239,9 @@ export const createStubEditor: CreateEditor = (host: HTMLElement, initial: Edito
       case 'insertText':
         replaceRange(s, e, cmd.text);
         return true;
+      case 'replaceDocument':
+        replaceRange(0, value.length, cmd.markdown, 0);
+        return true;
       case 'insertImage': {
         const t = `![${cmd.alt ?? ''}](${/\s/.test(cmd.src) ? `<${cmd.src}>` : cmd.src})`;
         replaceRange(s, e, t);

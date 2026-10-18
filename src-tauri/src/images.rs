@@ -161,37 +161,53 @@ pub fn sniff(data: &[u8]) -> Option<&'static str> {
     }
 }
 
-fn random_suffix() -> String {
-    use rand::Rng;
-    const CHARS: &[u8] = b"abcdefghijklmnopqrstuvwxyz0123456789";
-    let mut rng = rand::thread_rng();
-    (0..3).map(|_| CHARS[rng.gen_range(0..CHARS.len())] as char).collect()
-}
-
-/// `image-YYYYMMDD-HHMMSS-xxx.ext`, unique inside `dir`.
+/// `image-yyyyMMddHHmmssSSS.ext` (Typora's pasted-image name), unique inside `dir`:
+/// on a collision the name gets `-1`, `-2`, … appended.
 pub fn unique_generated_name(dir: &Path, ext: &str) -> PathBuf {
-    let stamp = chrono::Local::now().format("%Y%m%d-%H%M%S");
-    loop {
-        let p = dir.join(format!("image-{stamp}-{}.{ext}", random_suffix()));
-        if !p.exists() {
-            return p;
-        }
+    let stamp = chrono::Local::now().format("%Y%m%d%H%M%S%3f");
+    let base = format!("image-{stamp}");
+    let first = dir.join(format!("{base}.{ext}"));
+    if !first.exists() {
+        return first;
     }
+    (1u32..).map(|i| dir.join(format!("{base}-{i}.{ext}"))).find(|p| !p.exists()).expect("unbounded")
 }
 
-/// Copy `src` into `dir` as `name`, `stem-1.ext`, `stem-2.ext`, … — reusing any of
-/// those that already holds identical bytes, and never overwriting another file
-/// (create-new, so concurrent pastes of same-named images can't clobber each other).
-fn copy_unique(src: &Path, dir: &Path, name: &str) -> std::io::Result<PathBuf> {
+/// Typora's duplicate-name suffix: the last 7 digits of the Unix time in seconds.
+pub fn duplicate_suffix(now_secs: u64) -> String {
+    let s = now_secs.to_string();
+    s[s.len().saturating_sub(7)..].to_string()
+}
+
+fn now_secs() -> u64 {
+    std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0)
+}
+
+/// Candidate names when copying `name` into a folder: `name`, then Typora's
+/// `stem-<7 digits of unix seconds>.ext`, then `stem-<digits>-1.ext`, `-2`, …
+pub fn duplicate_candidates(name: &str, secs: u64) -> impl Iterator<Item = String> {
+    let path = Path::new(name);
+    let stem = path.file_stem().map(|s| s.to_string_lossy().into_owned()).unwrap_or_default();
+    let ext = path.extension().map(|e| format!(".{}", e.to_string_lossy())).unwrap_or_default();
+    let ts = duplicate_suffix(secs);
+    let first = name.to_string();
+    std::iter::once(first).chain((0u32..).map(move |i| if i == 0 { format!("{stem}-{ts}{ext}") } else { format!("{stem}-{ts}-{i}{ext}") }))
+}
+
+/// Copy `src` into `dir` as `name` — on a name clash as `stem-<ts7>.ext` (Typora's
+/// rule) — reusing a same-named file that already holds identical bytes (Margin:
+/// re-inserting the same image never duplicates it), and never overwriting another
+/// file (create-new, so concurrent pastes of same-named images can't clobber each other).
+pub fn copy_unique(src: &Path, dir: &Path, name: &str) -> std::io::Result<PathBuf> {
     let meta = fs::metadata(src)?;
     if meta.is_dir() {
         return Err(std::io::Error::other(format!("{} is a directory", src.display())));
     }
-    let path = Path::new(name);
-    let stem = path.file_stem().map(|s| s.to_string_lossy().into_owned()).unwrap_or_default();
-    let ext = path.extension().map(|e| format!(".{}", e.to_string_lossy())).unwrap_or_default();
-    for i in 0u32.. {
-        let cand = if i == 0 { dir.join(name) } else { dir.join(format!("{stem}-{i}{ext}")) };
+    if let Some(existing) = identical_sibling(src, dir, name, meta.len()) {
+        return Ok(existing);
+    }
+    for cand_name in duplicate_candidates(name, now_secs()) {
+        let cand = dir.join(&cand_name);
         if cand.exists() {
             if same_contents(&cand, src) {
                 return Ok(cand);
@@ -212,6 +228,30 @@ fn copy_unique(src: &Path, dir: &Path, name: &str) -> std::io::Result<PathBuf> {
         return Ok(cand);
     }
     unreachable!()
+}
+
+/// A file in `dir` named `name` or `stem-….ext` (an earlier duplicate) with the same bytes as `src`.
+fn identical_sibling(src: &Path, dir: &Path, name: &str, len: u64) -> Option<PathBuf> {
+    let exact = dir.join(name);
+    if exact.is_file() && same_contents(&exact, src) {
+        return Some(exact);
+    }
+    let path = Path::new(name);
+    let stem = format!("{}-", path.file_stem()?.to_string_lossy());
+    let ext = path.extension().map(|e| format!(".{}", e.to_string_lossy())).unwrap_or_default();
+    let mut hits: Vec<PathBuf> = fs::read_dir(dir)
+        .ok()?
+        .flatten()
+        .filter(|e| {
+            let n = e.file_name().to_string_lossy().into_owned();
+            n.starts_with(&stem) && n.ends_with(&ext) && n.len() > stem.len() + ext.len()
+        })
+        .filter(|e| e.metadata().map(|m| m.is_file() && m.len() == len).unwrap_or(false))
+        .map(|e| e.path())
+        .filter(|p| same_contents(p, src))
+        .collect();
+    hits.sort();
+    hits.into_iter().next()
 }
 
 fn same_contents(a: &Path, b: &Path) -> bool {
@@ -357,6 +397,21 @@ mod tests {
         assert_eq!(to_markdown_src(Path::new("图片/x.png")), "图片/x.png");
     }
 
+    /// `<stem>-<7 digits>(-N)?<ext>`: Typora's duplicate-name rule.
+    fn is_dup(src: &str, stem: &str, ext: &str) -> bool {
+        let Some(mid) = src.strip_prefix(stem).and_then(|r| r.strip_suffix(ext)).and_then(|r| r.strip_prefix('-')) else { return false };
+        let ts = mid.split('-').next().unwrap_or("");
+        ts.len() == 7 && ts.chars().all(|c| c.is_ascii_digit())
+    }
+
+    #[test]
+    fn duplicate_suffix_is_last_seven_digits_of_unix_seconds() {
+        assert_eq!(duplicate_suffix(1_760_000_123), "0000123");
+        assert_eq!(duplicate_suffix(42), "42");
+        let c: Vec<String> = duplicate_candidates("a b.png", 1_760_123_456).take(3).collect();
+        assert_eq!(c, ["a b.png", "a b-0123456.png", "a b-0123456-1.png"]);
+    }
+
     #[test]
     fn stores_bytes_with_generated_name() {
         let dir = tempfile::tempdir().unwrap();
@@ -370,8 +425,10 @@ mod tests {
         assert!(a.src.ends_with(".png"));
         assert_ne!(a.src, b.src);
         let name = a.abs.file_name().unwrap().to_string_lossy().into_owned();
-        // image-YYYYMMDD-HHMMSS-xxx.png
-        assert_eq!(name.len(), "image-20260101-120000-abc.png".len(), "{name}");
+        // image-yyyyMMddHHmmssSSS.png (Typora's pasted-image name), `-N` on a same-ms clash
+        let core = name.trim_end_matches(".png");
+        assert!(core.len() >= "image-20260101120000123".len(), "{name}");
+        assert!(core["image-".len().."image-20260101120000123".len()].chars().all(|c| c.is_ascii_digit()), "{name}");
         assert_eq!(fs::read(&a.abs).unwrap(), png);
     }
 
@@ -393,7 +450,7 @@ mod tests {
         // different content, same name → suffix
         fs::write(&img, b"two").unwrap();
         let r3 = store_image(Some(&doc), &rule, ImageInput::File(&img), dir.path(), None).unwrap();
-        assert_eq!(r3.src, "assets/shot-1.png");
+        assert!(is_dup(&r3.src, "assets/shot", ".png"), "{}", r3.src);
         // parent-relative rule
         let up = ImageRule::Relative { dir: "../shared img".into() };
         let sub = dir.path().join("sub");

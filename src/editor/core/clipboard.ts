@@ -102,7 +102,8 @@ async function storeFiles(ed: EditorCore, files: File[]): Promise<string[]> {
       const path = (f as File & { path?: string }).path;
       src = await ed.settings.storeImage({ bytes, mime: f.type, name: f.name, ...(path ? { path } : {}) });
     } else src = URL.createObjectURL(f);
-    if (src) out.push(`![${f.name.replace(/\.[^.]+$/, '').replace(/[[\]]/g, '')}](${src.replace(/ /g, '%20')})`);
+    if (src && /^(?:!\[|<img\b)/i.test(src)) out.push(src); // #99: complete snippet from the shell
+    else if (src) out.push(`![${f.name.replace(/\.[^.]+$/, '').replace(/[[\]]/g, '')}](${src.replace(/ /g, '%20')})`);
   }
   return out;
 }
@@ -208,6 +209,15 @@ export function onDrop(ed: EditorCore, e: DragEvent): void {
   const at = pos ? ed.pointToPos(pos.node, pos.offset) : null;
   const range = at === null ? ed.sel() : { from: at, to: at };
   void storeFiles(ed, files).then((imgs) => imgs.length && insertMarkdown(ed, imgs.join(' '), range));
+}
+
+/** #23: insert markdown at a viewport point (OS file drop); the selection when the point misses the text. */
+export function insertAtPoint(ed: EditorCore, md: string, x: number, y: number): boolean {
+  if (!md) return false;
+  const pos = caretFromPoint(x, y);
+  const at = pos && ed.root.contains(pos.node) ? ed.pointToPos(pos.node, pos.offset) : null;
+  insertMarkdown(ed, md.replace(/\r\n?/g, ed.doc.eol), at === null ? ed.sel() : { from: at, to: at });
+  return true;
 }
 
 function caretFromPoint(x: number, y: number): { node: Node; offset: number } | null {

@@ -10,6 +10,7 @@ export const S = (id, title, status, owner, verifier, opts = {}) => ({ id, title
 export const T = {
   nav: 'tests/e2e/app-navigation.spec.ts::',
   files: 'tests/e2e/app-files.spec.ts::',
+  pf: 'tests/e2e/parity-files.spec.ts::',
   themes: 'tests/e2e/app-themes.spec.ts::',
   core: 'tests/e2e/core-cases.ts::',
   qa: 'tests/e2e/core-qa.spec.ts::',
@@ -22,7 +23,11 @@ export const T = {
   set: 'src/app/__tests__/settings.test.ts::',
   util: 'src/app/__tests__/util.test.ts::',
   web: 'src/platform/web.test.ts::',
+  pexp: 'tests/e2e/parity-export.spec.ts::',
   pclip: 'tests/e2e/parity-clipboard.spec.ts::',
+  psb: 'tests/e2e/parity-sidebar.spec.ts::',
+  pimg: 'tests/e2e/parity-images.spec.ts::',
+  pctx: 'tests/e2e/parity-ctx.spec.ts::',
 };
 
 // Owner prefixes.
@@ -39,6 +44,8 @@ export const O = {
   table: 'src/editor/blocks/table.ts#',
   fence: 'src/editor/blocks/code-fence.ts#',
   math: 'src/editor/blocks/math.ts#',
+  ctxt: 'src/app/ctxmenu/targets.ts#',
+  ctxi: 'src/app/ctxmenu/items.ts#',
 };
 
 export const EPICS = {

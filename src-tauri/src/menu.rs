@@ -20,15 +20,38 @@ type Item = (&'static str, &'static str, Option<&'static str>);
 
 const FILE_OPEN: &[Item] = &[
     ("new", "New", Some("CmdOrCtrl+N")),
+    ("newTab", "New Tab", Some("CmdOrCtrl+T")),
+    ("newWindow", "New Window", Some("CmdOrCtrl+Shift+N")),
     ("open", "Open…", Some("CmdOrCtrl+O")),
     ("openFolder", "Open Folder…", Some("CmdOrCtrl+Shift+O")),
 ];
+const REVEAL: &str = if cfg!(target_os = "macos") { "Reveal in Finder" } else { "Open File Location" };
 const FILE: &[Item] = &[
+    ("reopenClosed", "Reopen Closed File", Some("CmdOrCtrl+Shift+T")),
     ("quickOpen", "Quick Open…", Some("CmdOrCtrl+P")),
     ("-", "", None),
     ("save", "Save", Some("CmdOrCtrl+S")),
     ("saveAs", "Save As…", Some("CmdOrCtrl+Shift+S")),
+    ("saveAll", "Save All", Some("CmdOrCtrl+Alt+S")),
+    ("duplicate", "Duplicate", None),
+    ("renameFile", "Rename…", None),
+    ("moveTo", "Move To…", None),
+    ("-", "", None),
     ("reloadFromDisk", "Revert to Saved", None),
+    ("browseVersions", "Browse All Versions…", None),
+    ("reopenWithEncoding", "Reopen with Encoding…", None),
+    ("recoverDrafts", "Recover Unsaved Drafts…", None),
+    ("-", "", None),
+    ("revealInFinder", REVEAL, None),
+    ("copyFilePath", "Copy File Path", None),
+    ("properties", "Properties…", None),
+    ("-", "", None),
+    ("import", "Import…", None),
+];
+/// Window menu: document tabs (#94).
+const WINDOW_TABS: &[Item] = &[
+    ("nextTab", "Show Next Tab", Some("CmdOrCtrl+Shift+BracketRight")),
+    ("prevTab", "Show Previous Tab", Some("CmdOrCtrl+Shift+BracketLeft")),
 ];
 const EXPORT: &[Item] = &[
     ("exportHtml", "HTML…", None),
@@ -36,6 +59,23 @@ const EXPORT: &[Item] = &[
     ("exportDocx", "Word (.docx)…", None),
     ("exportLatex", "LaTeX…", None),
     ("exportEpub", "EPUB…", None),
+    ("exportOdt", "OpenOffice…", None),
+    ("exportRtf", "RTF…", None),
+    ("exportMediawiki", "MediaWiki…", None),
+    ("exportRst", "reStructuredText…", None),
+    ("exportTextile", "Textile…", None),
+    ("exportOpml", "OPML…", None),
+];
+/// Export submenu, after the format items (#95).
+const EXPORT_MORE: &[Item] = &[
+    ("exportHtmlPlain", "HTML (without Styles)…", None),
+    ("exportImage", "Image…", None),
+    ("exportCustom", "Custom…", None),
+    ("-", "", None),
+    ("exportPrevious", "Export with Previous", None),
+    ("exportOverwrite", "Export and Overwrite with Previous", None),
+    ("-", "", None),
+    ("exportSettings", "Export Settings…", None),
 ];
 const EDIT_TOP: &[Item] = &[("undo", "Undo", Some("CmdOrCtrl+Z")), ("redo", "Redo", Some("CmdOrCtrl+Shift+Z"))];
 const EDIT_FIND: &[Item] = &[("find", "Find…", Some("CmdOrCtrl+F")), ("replace", "Replace…", Some("CmdOrCtrl+Alt+F"))];
@@ -85,9 +125,11 @@ const PARAGRAPH: &[Item] = &[
     ("para:headingUp", "Increase Heading Level", None),
     ("para:headingDown", "Decrease Heading Level", None),
     ("-", "", None),
-    ("block:table", "Table", Some("CmdOrCtrl+Alt+T")),
+    ("@table", "Table", None),
     ("block:code", "Code Fences", Some("CmdOrCtrl+Alt+C")),
+    ("@codeTools", "Code Tools", None),
     ("block:math", "Math Block", Some("CmdOrCtrl+Alt+B")),
+    ("@mathTools", "Math Tools", None),
     ("block:html", "HTML Block", None),
     ("-", "", None),
     ("block:quote", "Quote", Some("CmdOrCtrl+Alt+Q")),
@@ -108,6 +150,51 @@ const PARAGRAPH: &[Item] = &[
     ("block:toc", "Table of Contents", None),
     ("block:front_matter", "YAML Front Matter", None),
 ];
+// #98 Paragraph › Table / Code Tools / Math Tools (ops act on the block with the caret).
+// Add Row Below (⌘↩) / Delete Row (⌘⇧⌫) stay table-cell keys so they never steal
+// Cmd+Enter / Cmd+Shift+Backspace from other blocks; only the labels mention them.
+const PARA_TABLE: &[Item] = &[
+    ("block:table", "Insert Table…", Some("CmdOrCtrl+Alt+T")),
+    ("-", "", None),
+    ("table:rowAbove", "Add Row Above", None),
+    ("table:rowBelow", "Add Row Below", None),
+    ("-", "", None),
+    ("table:colBefore", "Add Column Before", None),
+    ("table:colAfter", "Add Column After", None),
+    ("-", "", None),
+    ("table:moveRowUp", "Move Row Up", None),
+    ("table:moveRowDown", "Move Row Down", None),
+    ("table:moveColLeft", "Move Column Left", None),
+    ("table:moveColRight", "Move Column Right", None),
+    ("-", "", None),
+    ("table:deleteRow", "Delete Row", None),
+    ("table:deleteCol", "Delete Column", None),
+    ("-", "", None),
+    ("table:alignLeft", "Align Left", None),
+    ("table:alignCenter", "Align Center", None),
+    ("table:alignRight", "Align Right", None),
+    ("table:resize", "Resize Table…", None),
+    ("-", "", None),
+    ("table:copy", "Copy Table", None),
+    ("table:prettify", "Prettify Source Code", None),
+    ("table:delete", "Delete Table", None),
+];
+const PARA_CODE_TOOLS: &[Item] = &[
+    ("code:copy", "Copy Code Content", None),
+    ("code:indentAll", "Auto Indent Whole Code", None),
+    ("code:indentSelected", "Auto Indent Selected Code", None),
+];
+const PARA_MATH_TOOLS: &[Item] = &[
+    ("math:copyTex", "Copy as Tex", None),
+    ("math:copyMathML", "Copy as MathML", None),
+    ("-", "", None),
+    ("math:delete", "Delete Math", None),
+    ("-", "", None),
+    ("math:refresh", "Refresh All Math Expressions", None),
+];
+/// `@name` markers in an item list expand to these submenus.
+const SUBMENUS: &[(&str, &[Item])] = &[("@table", PARA_TABLE), ("@codeTools", PARA_CODE_TOOLS), ("@mathTools", PARA_MATH_TOOLS)];
+
 const FORMAT: &[Item] = &[
     ("mark:strong", "Strong", Some("CmdOrCtrl+B")),
     ("mark:em", "Emphasis", Some("CmdOrCtrl+I")),
@@ -124,12 +211,50 @@ const FORMAT: &[Item] = &[
     ("-", "", None),
     ("clearFormat", "Clear Format", None),
 ];
+// Format › Image (#99): Typora's menu order; per-image entries act on the image at the caret.
+const IMAGE_TOP: &[Item] = &[
+    ("image:insert", "Insert Image", None),
+    ("image:insertLocal", "Insert Local Images…", None),
+    ("-", "", None),
+    ("image:openLocation", "Open Image Location…", None),
+    ("image:copyContent", "Copy Image Content", None),
+];
+const IMAGE_ZOOM: &[Item] = &[
+    ("image:zoom-25", "25%", None),
+    ("image:zoom-33", "33%", None),
+    ("image:zoom-50", "50%", None),
+    ("image:zoom-67", "67%", None),
+    ("image:zoom-80", "80%", None),
+    ("image:zoom-100", "100%", None),
+    ("image:zoom-150", "150%", None),
+    ("image:zoom-200", "200%", None),
+];
+const IMAGE_SYNTAX: &[Item] = &[("image:syntaxMarkdown", "Markdown Style", None), ("image:syntaxHtml", "HTML Style", None)];
+const IMAGE_FILE: &[Item] = &[
+    ("image:deleteFile", "Delete Image File", None),
+    ("image:copyTo", "Copy Image to…", None),
+    ("image:moveTo", "Rename or Move Image to…", None),
+    ("image:upload", "Upload Image", None),
+    ("-", "", None),
+    ("image:copyAll", "Copy All Images to…", None),
+    ("image:moveAll", "Move All Images to…", None),
+    ("image:uploadAll", "Upload All Local Images", None),
+    ("image:reloadAll", "Reload All Images", None),
+    ("-", "", None),
+];
+const IMAGE_WHEN_INSERT: &[Item] = &[("image:insertCopyToFolder", "Copy Image File to Folder…", None), ("image:insertUpload", "Upload Image", None)];
+const IMAGE_BOTTOM: &[Item] = &[("image:rootPath", "Use Image Root Path", None), ("image:settings", "Global Image Settings…", None)];
+#[cfg(test)]
+const IMAGE_ALL: &[&[Item]] = &[IMAGE_TOP, IMAGE_ZOOM, IMAGE_SYNTAX, IMAGE_FILE, IMAGE_WHEN_INSERT, IMAGE_BOTTOM];
+
 const VIEW: &[Item] = &[
     ("commandPalette", "Command Palette…", Some("CmdOrCtrl+Shift+A")),
     ("-", "", None),
     ("toggleSidebar", "Toggle Sidebar", Some("CmdOrCtrl+Backslash")),
     ("showOutline", "Outline", Some("CmdOrCtrl+Shift+1")),
+    ("showArticles", "Articles", Some("CmdOrCtrl+Shift+2")),
     ("showFiles", "Files", Some("CmdOrCtrl+Shift+3")),
+    ("sidebarSearch", "Search", Some("CmdOrCtrl+Shift+F")),
     ("revealActiveFile", "Reveal Active File in Sidebar", None),
     ("toggleSource", "Source Code Mode", Some("CmdOrCtrl+Slash")),
     ("-", "", None),
@@ -146,13 +271,15 @@ const VIEW: &[Item] = &[
 /// Every action the menu can emit (used by tests to keep Rust and TS in sync).
 #[cfg(test)]
 pub fn all_actions() -> Vec<&'static str> {
-    let mut v: Vec<&'static str> = [FILE_OPEN, FILE, EXPORT, EDIT_TOP, EDIT_FIND, PARAGRAPH, FORMAT, VIEW]
+    let mut v: Vec<&'static str> = [FILE_OPEN, FILE, EXPORT, EXPORT_MORE, EDIT_TOP, EDIT_FIND, PARAGRAPH, FORMAT, VIEW, WINDOW_TABS]
         .iter()
         .chain(EDIT_EXTRA.iter())
+        .chain(IMAGE_ALL.iter())
+        .chain(SUBMENUS.iter().map(|(_, items)| items))
         .flat_map(|g| g.iter().map(|i| i.0))
-        .filter(|id| *id != "-")
+        .filter(|id| *id != "-" && !id.starts_with('@'))
         .collect();
-    v.extend(["print", "close", "preferences", crate::recent::ID_CLEAR]);
+    v.extend(["pageSetup", "print", "close", "preferences", crate::recent::ID_CLEAR]);
     v
 }
 
@@ -164,6 +291,8 @@ fn add_items<'a, R: Runtime>(
     for (id, label, accel) in items {
         b = if *id == "-" {
             b.separator()
+        } else if let Some((_, sub)) = SUBMENUS.iter().find(|(m, _)| m == id) {
+            b.item(&add_items(app, SubmenuBuilder::new(app, *label), sub)?.build()?)
         } else {
             b.item(&MenuItem::with_id(app, *id, *label, true, *accel)?)
         };
@@ -231,13 +360,15 @@ pub fn build<R: Runtime>(
         menu = menu.item(&app_menu);
     }
 
-    let export = add_items(app, SubmenuBuilder::new(app, "Export"), EXPORT)?.build()?;
+    let export = add_items(app, SubmenuBuilder::new(app, "Export"), EXPORT)?;
+    let export = add_items(app, export.separator(), EXPORT_MORE)?.build()?;
     let recent_menu = SubmenuBuilder::with_id(app, crate::recent::SUBMENU_ID, "Open Recent").build()?;
     crate::recent::fill(app, &recent_menu, recent)?;
     let file = add_items(app, SubmenuBuilder::new(app, "File"), FILE_OPEN)?.item(&recent_menu);
     let mut file = add_items(app, file, FILE)?
         .separator()
         .item(&export)
+        .item(&MenuItem::with_id(app, "pageSetup", "Page Setup…", true, None::<&str>)?)
         .item(&MenuItem::with_id(app, "print", "Print…", true, Some("CmdOrCtrl+Shift+P"))?)
         .separator()
         .item(&MenuItem::with_id(app, "close", "Close", true, Some("CmdOrCtrl+W"))?);
@@ -263,7 +394,14 @@ pub fn build<R: Runtime>(
     menu = menu.item(&edit);
 
     menu = menu.item(&add_items(app, SubmenuBuilder::new(app, "Paragraph"), PARAGRAPH)?.build()?);
-    menu = menu.item(&add_items(app, SubmenuBuilder::new(app, "Format"), FORMAT)?.build()?);
+    let image = add_items(app, SubmenuBuilder::new(app, "Image"), IMAGE_TOP)?
+        .item(&add_items(app, SubmenuBuilder::new(app, "Zoom Image"), IMAGE_ZOOM)?.build()?)
+        .item(&add_items(app, SubmenuBuilder::new(app, "Switch Image Syntax"), IMAGE_SYNTAX)?.build()?);
+    let image = add_items(app, image.separator(), IMAGE_FILE)?
+        .item(&add_items(app, SubmenuBuilder::new(app, "When Insert Local Image"), IMAGE_WHEN_INSERT)?.build()?);
+    let image = add_items(app, image, IMAGE_BOTTOM)?.build()?;
+    let format = add_items(app, SubmenuBuilder::new(app, "Format"), FORMAT)?.separator().item(&image);
+    menu = menu.item(&format.build()?);
     let view = add_items(app, SubmenuBuilder::new(app, "View"), VIEW)?
         .separator()
         .item(&PredefinedMenuItem::fullscreen(app, None)?)
@@ -279,7 +417,8 @@ pub fn build<R: Runtime>(
     let window = SubmenuBuilder::new(app, "Window")
         .item(&PredefinedMenuItem::minimize(app, None)?)
         .item(&PredefinedMenuItem::maximize(app, if mac { Some("Zoom") } else { None })?)
-        .build()?;
+        .separator();
+    let window = add_items(app, window, WINDOW_TABS)?.build()?;
     menu = menu.item(&window);
 
     let mut help = SubmenuBuilder::new(app, "Help")
@@ -327,7 +466,11 @@ mod tests {
     #[test]
     fn accelerators_are_unique() {
         let mut seen = std::collections::HashSet::new();
-        for g in [FILE_OPEN, FILE, EXPORT, EDIT_TOP, EDIT_FIND, PARAGRAPH, FORMAT, VIEW].iter().chain(EDIT_EXTRA.iter()) {
+        for g in [FILE_OPEN, FILE, EXPORT, EXPORT_MORE, EDIT_TOP, EDIT_FIND, PARAGRAPH, FORMAT, VIEW, WINDOW_TABS]
+            .iter()
+            .chain(EDIT_EXTRA.iter())
+            .chain(SUBMENUS.iter().map(|(_, items)| items))
+        {
             for (_, _, a) in g.iter() {
                 if let Some(a) = a {
                     assert!(seen.insert(*a), "duplicate accelerator {a}");
@@ -344,8 +487,15 @@ mod tests {
                 "new", "open", "openFolder", "save", "saveAs", "close", "exportHtml", "exportPdf", "print", "undo",
                 "redo", "find", "replace", "toggleSidebar", "toggleSource", "toggleFocus", "toggleTypewriter",
                 "quickOpen", "zoomIn", "zoomOut", "zoomReset", "preferences", "clearRecent", "commandPalette", "showOutline",
-                "showFiles", "revealActiveFile", "reloadFromDisk", "toggleLineEnding", "exportDocx", "exportLatex",
-                "exportEpub", "clearFormat",
+                "showFiles", "showArticles", "sidebarSearch", "revealActiveFile", "reloadFromDisk", "toggleLineEnding", "exportHtmlPlain", "exportImage",
+                "exportPrevious", "exportOverwrite", "exportSettings", "pageSetup",
+                "exportDocx", "exportLatex",
+                "exportEpub", "clearFormat", "exportOdt", "exportRtf", "exportMediawiki", "exportRst", "exportTextile", "exportOpml",
+                "exportCustom", "import",
+                // #94 file lifecycle
+                "newTab", "newWindow", "nextTab", "prevTab", "reopenClosed", "saveAll", "duplicate", "renameFile",
+                "moveTo", "revealInFinder", "copyFilePath", "browseVersions", "reopenWithEncoding", "properties",
+                "recoverDrafts",
             ]
             .contains(&a)
                 || a.starts_with("heading:")
@@ -356,7 +506,11 @@ mod tests {
                 || ["pastePlain", "jump:top", "jump:bottom", "jump:selection"].contains(&a)
                 || a.starts_with("copyAs:")
                 || a.starts_with("select:")
-                || a.starts_with("delete:");
+                || a.starts_with("delete:")
+                || a.starts_with("table:")
+                || a.starts_with("code:")
+                || a.starts_with("math:")
+                || a.starts_with("image:");
             assert!(ok, "{a} is not a MenuAction");
         }
     }
@@ -370,6 +524,15 @@ mod tests {
             "mark:math", "mark:sup", "mark:sub", "mark:comment", "clearFormat",
         ] {
             assert!(ids.contains(&want), "missing menu item {want}");
+        }
+    }
+
+    #[test]
+    fn paragraph_tool_submenus_are_wired() {
+        let markers: Vec<&str> = PARAGRAPH.iter().map(|i| i.0).filter(|id| id.starts_with('@')).collect();
+        assert_eq!(markers, ["@table", "@codeTools", "@mathTools"]);
+        for want in ["block:table", "table:moveRowUp", "table:resize", "table:copy", "code:indentAll", "math:copyMathML", "math:refresh"] {
+            assert!(all_actions().contains(&want), "missing menu item {want}");
         }
     }
 }

@@ -1,4 +1,4 @@
-import type { AppSettings, DirEntry, FsEvent, ImageRule, MenuAction, Platform } from '../contracts';
+import type { FileDrop, AppSettings, DirEntry, FsEvent, ImageRule, MenuAction, PdfExportOptions, Platform } from '../contracts';
 import {
   basename,
   builtinThemes,
@@ -6,10 +6,12 @@ import {
   expandImageDir,
   extForImage,
   generatedImageName,
+  duplicateNames,
   joinPath,
   normalizePath,
   normalizeSettings,
   printHtmlInIframe,
+  withPrintPageCss,
   relativePath,
   toMarkdownSrc,
 } from './common';
@@ -30,14 +32,19 @@ import { matchShortcut } from './shortcuts';
 
 interface FileNode {
   kind: 'file';
+  /** Raw bytes (base64) when the file is not UTF-8 text (test hook for encodings). */
+  bytes?: string;
   /** text, or a data: URL when `binary` */
   content: string;
   binary?: boolean;
   mtime: number;
+  /** creation time; absent in older persisted filesystems (falls back to mtime) */
+  ctime?: number;
 }
 interface DirNode {
   kind: 'dir';
   mtime: number;
+  ctime?: number;
 }
 type Node = FileNode | DirNode;
 
@@ -131,7 +138,7 @@ export interface WebPlatformOptions {
   watchDelay?: number;
 }
 
-export type DialogHook = (kind: 'open' | 'openFolder' | 'save', opts?: unknown) => string | null | Promise<string | null>;
+export type DialogHook = (kind: 'open' | 'openFolder' | 'save' | 'openImages', opts?: unknown) => string | null | Promise<string | null>;
 
 export class WebPlatform implements Platform {
   readonly kind = 'web' as const;
@@ -139,6 +146,7 @@ export class WebPlatform implements Platform {
   private watchers = new Set<WatchEntry>();
   private menuCbs = new Set<(a: MenuAction) => void>();
   private openCbs = new Set<(paths: string[]) => void>();
+  private dropCbs = new Set<(drop: FileDrop) => void>();
   private closeCbs = new Set<() => Promise<boolean>>();
   private fileHandles = new Map<string, FsaFileHandle>();
   private dirHandles = new Map<string, FsaDirHandle>();
@@ -148,7 +156,9 @@ export class WebPlatform implements Platform {
   private opts: Required<WebPlatformOptions>;
   /** Overridable dialog (e2e tests): return a path or null. */
   dialogHook: DialogHook | null = null;
-  readonly exports: { kind: 'html' | 'pdf'; path: string; html: string }[] = [];
+  readonly exports: { kind: 'html' | 'pdf' | 'image'; path: string; html: string; bytes?: Uint8Array; opts?: PdfExportOptions }[] = [];
+  /** Files opened via `openExportedFile` (e2e inspection). */
+  readonly openedExports: string[] = [];
   title = '';
 
   constructor(options: WebPlatformOptions = {}) {
@@ -212,7 +222,7 @@ export class WebPlatform implements Platform {
       cur += '/' + part;
       const n = this.nodes.get(cur);
       if (!n) {
-        this.nodes.set(cur, { kind: 'dir', mtime: Date.now() });
+        this.nodes.set(cur, { kind: 'dir', mtime: Date.now(), ctime: Date.now() });
         created.push(cur);
       } else if (n.kind !== 'dir') throw new Error(`ENOTDIR: ${cur}`);
     }
@@ -225,7 +235,8 @@ export class WebPlatform implements Platform {
     const existing = this.nodes.get(p);
     if (existing?.kind === 'dir') throw new Error(`EISDIR: ${p}`);
     const created = this.ensureDir(dirname(p));
-    this.nodes.set(p, { kind: 'file', content, binary: binary || undefined, mtime: Date.now() });
+    const now = Date.now();
+    this.nodes.set(p, { kind: 'file', content, binary: binary || undefined, mtime: now, ctime: existing?.ctime ?? now });
     if (!existing) created.push(p);
     return created;
   }
@@ -255,6 +266,7 @@ export class WebPlatform implements Platform {
       path: p,
       isDir: n.kind === 'dir',
       mtime: n.mtime,
+      ctime: n.ctime ?? n.mtime,
       size: n.kind === 'file' ? (n.binary ? Math.floor((n.content.length - n.content.indexOf(',') - 1) * 0.75) : new Blob([n.content]).size) : 0,
     };
   }
@@ -351,11 +363,8 @@ export class WebPlatform implements Platform {
       const name = basename(input.path);
       dest = joinPath(targetDir, name);
       const existing = this.nodes.get(dest);
-      if (normalizePath(input.path) !== dest && existing && !(existing.kind === 'file' && existing.content === dataUrl)) {
-        const dot = name.lastIndexOf('.');
-        const [stem, ext] = dot > 0 ? [name.slice(0, dot), name.slice(dot)] : [name, ''];
-        for (let i = 1; this.nodes.has(dest); i++) dest = joinPath(targetDir, `${stem}-${i}${ext}`);
-      }
+      if (normalizePath(input.path) !== dest && existing && !(existing.kind === 'file' && existing.content === dataUrl))
+        dest = this.freeImageName(targetDir, name, dataUrl);
     } else {
       const ext = extForImage(input.mime, input.name);
       do dest = joinPath(targetDir, generatedImageName(ext));
@@ -367,6 +376,62 @@ export class WebPlatform implements Platform {
     if (input.bytes) await this.writeThroughBytes(dest, input.bytes);
     const rel = rule.kind === 'absolute' || !docPath ? dest : relativePath(dirname(docPath), dest);
     return toMarkdownSrc(rel);
+  }
+
+  /** Typora's duplicate rule; a same-named earlier duplicate with identical bytes is reused. */
+  private freeImageName(dir: string, name: string, content: string): string {
+    const dot = name.lastIndexOf('.');
+    const stem = (dot > 0 ? name.slice(0, dot) : name) + '-';
+    const ext = dot > 0 ? name.slice(dot) : '';
+    for (const [p, n] of this.nodes) {
+      const b = basename(p);
+      if (dirname(p) === dir && n.kind === 'file' && n.content === content && b.startsWith(stem) && b.endsWith(ext)) return p;
+    }
+    for (const cand of duplicateNames(name)) {
+      const d = joinPath(dir, cand);
+      const n = this.nodes.get(d);
+      if (!n || (n.kind === 'file' && n.content === content)) return d;
+    }
+    throw new Error('unreachable');
+  }
+
+  // ---- optional image tools (PlatformExtras, #99)
+
+  async copyImage(src: string, dir: string, opts?: { name?: string; move?: boolean }): Promise<string> {
+    const s = normalizePath(src);
+    const d = normalizePath(dir);
+    const node = this.nodes.get(s);
+    if (node?.kind !== 'file') throw new Error(`image not found: ${src}`);
+    if (this.nodes.get(d)?.kind === 'file') throw new Error(`${d} is a file, not a directory`);
+    let dest: string;
+    if (opts?.name) {
+      if (/[\\/]/.test(opts.name) || opts.name === '.' || opts.name === '..') throw new Error(`invalid file name: ${opts.name}`);
+      dest = joinPath(d, opts.name);
+      if (dest !== s && this.nodes.has(dest)) throw new Error(`${dest} already exists`);
+    } else if (dirname(s) === d) return s;
+    else dest = this.freeImageName(d, basename(s), node.content);
+    if (dest === s) return s;
+    const events: FsEvent[] = [];
+    if (!this.nodes.has(dest)) for (const c of this.putFile(dest, node.content, !!node.binary)) events.push({ kind: 'created', path: c });
+    if (opts?.move) {
+      this.nodes.delete(s);
+      events.push({ kind: 'removed', path: s });
+    }
+    this.persist();
+    this.emit(events);
+    return dest;
+  }
+
+  /** Scale overrides for tests (path → device pixels per point). */
+  imageScales = new Map<string, number>();
+  async imageScale(path: string): Promise<number> {
+    return this.imageScales.get(normalizePath(path)) ?? 1;
+  }
+
+  async openImagesDialog(): Promise<string[]> {
+    const hook = this.hook();
+    const ans = hook ? await hook('openImages') : globalThis.prompt?.('Insert local images (in-browser paths, comma separated):', '');
+    return ans ? ans.split(',').map((x) => normalizePath(x.trim())).filter(Boolean) : [];
   }
 
   assetUrl(path: string): string {
@@ -393,7 +458,7 @@ export class WebPlatform implements Platform {
     return this.opts.useFileSystemAccess && typeof window !== 'undefined' ? (window as FsaWindow) : null;
   }
 
-  async openFileDialog(opts?: { directory?: boolean }): Promise<string | null> {
+  async openFileDialog(opts?: { directory?: boolean; filters?: { name: string; extensions: string[] }[] }): Promise<string | null> {
     const kind = opts?.directory ? 'openFolder' : 'open';
     const hook = this.hook();
     if (hook) return hook(kind, opts);
@@ -513,9 +578,23 @@ export class WebPlatform implements Platform {
   }
 
   /** Browsers cannot write PDFs: opens the print dialog with the HTML (user picks "Save as PDF"). */
-  async exportPdf(html: string, outPath: string): Promise<void> {
-    this.exports.push({ kind: 'pdf', path: outPath, html });
-    if (!navigatorIsAutomated() && typeof document !== 'undefined') await printHtmlInIframe(html);
+  async exportPdf(html: string, outPath: string, opts?: PdfExportOptions): Promise<void> {
+    this.exports.push({ kind: 'pdf', path: outPath, html, opts });
+    if (!navigatorIsAutomated() && typeof document !== 'undefined') await printHtmlInIframe(withPrintPageCss(html, opts));
+  }
+
+  /** Export › Image: keeps the bytes (as a data: URL file in the memfs) and downloads them. */
+  async exportBinary(bytes: Uint8Array, outPath: string): Promise<void> {
+    const mime = /\.jpe?g$/i.test(outPath) ? 'image/jpeg' : 'image/png';
+    this.exports.push({ kind: 'image', path: outPath, html: '', bytes });
+    let bin = '';
+    for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+    await this.writeTextFile(outPath, `data:${mime};base64,${btoa(bin)}`);
+    if (!navigatorIsAutomated()) downloadBlob(new Blob([bytes as BlobPart], { type: mime }), basename(outPath) || 'export.png');
+  }
+
+  async openExportedFile(path: string): Promise<void> {
+    this.openedExports.push(path);
   }
 
   async allowAssetDir(_path: string): Promise<void> {}
@@ -553,6 +632,43 @@ export class WebPlatform implements Platform {
     const created = this.ensureDir(p);
     this.persist();
     this.emit(created.map((c) => ({ kind: 'created', path: c })));
+  }
+
+  /** File › New Window (#94): a second browser window on the same (localStorage) disk. */
+  openedWindows: string[] = [];
+  async openWindow(opts: { path?: string } = {}): Promise<void> {
+    const q = new URLSearchParams({ window: 'new' });
+    if (opts.path) q.set('open', normalizePath(opts.path));
+    const url = `${location.pathname}?${q}`;
+    this.openedWindows.push(url);
+    this.persist();
+    window.open(url, '_blank');
+  }
+
+  /** Raw bytes (#94 Reopen with Encoding). Text nodes may carry `bytes` seeded via {@link externalWriteBytes}. */
+  async readFileBytes(path: string): Promise<Uint8Array> {
+    const n = this.nodes.get(normalizePath(path));
+    if (!n || n.kind === 'dir') throw new Error(`ENOENT: ${path}`);
+    if (n.bytes) return Uint8Array.from(atob(n.bytes), (c) => c.charCodeAt(0));
+    return new TextEncoder().encode(n.binary ? '' : n.content);
+  }
+
+  /** Test hook: put a non-UTF-8 file on disk (readTextFile decodes it lossily, like the desktop). */
+  externalWriteBytes(path: string, bytes: number[]): void {
+    const p = normalizePath(path);
+    const u8 = Uint8Array.from(bytes);
+    const created = this.putFile(p, new TextDecoder('utf-8').decode(u8), false);
+    const n = this.nodes.get(p);
+    if (n && n.kind === 'file') n.bytes = btoa(String.fromCharCode(...u8));
+    this.persist();
+    this.emit(created.length ? created.map((c) => ({ kind: 'created', path: c })) : [{ kind: 'modified', path: p }]);
+  }
+
+  /** Copy File Path: recorded for tests, and best-effort onto the real clipboard. */
+  clipboardText: string | null = null;
+  async writeClipboardText(text: string): Promise<void> {
+    this.clipboardText = text;
+    await navigator.clipboard?.writeText(text).catch(() => undefined);
   }
 
   /** No file manager in the browser: recorded for tests. */
@@ -647,6 +763,11 @@ export class WebPlatform implements Platform {
     return () => this.openCbs.delete(cb);
   }
 
+  onFileDrop(cb: (drop: FileDrop) => void): () => void {
+    this.dropCbs.add(cb);
+    return () => this.dropCbs.delete(cb);
+  }
+
   onCloseRequested(cb: () => Promise<boolean>): () => void {
     this.closeCbs.add(cb);
     return () => this.closeCbs.delete(cb);
@@ -657,6 +778,11 @@ export class WebPlatform implements Platform {
   /** Dispatch a menu action as if chosen from the native menu. */
   triggerMenu(action: MenuAction): void {
     for (const cb of [...this.menuCbs]) cb(action);
+  }
+
+  /** Simulate dragging files from the OS onto the window at viewport point (x, y) (#23). */
+  dropFiles(paths: string[], x: number, y: number): void {
+    for (const cb of [...this.dropCbs]) cb({ paths: paths.map(normalizePath), x, y });
   }
 
   /** Simulate Finder "Open With" / CLI. */

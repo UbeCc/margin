@@ -34,10 +34,16 @@ const COMMANDS: &[&str] = &[
     "trash_path",
     "create_dir",
     "reveal_path",
+    "export_binary",
+    "open_exported_file",
+    "pandoc_import",
+    "run_export_command",
     "upload_images",
     "pandoc_detect",
     "pandoc_export",
     "clipboard_write_rich",
+    "open_window",
+    "read_file_bytes",
     "clipboard_read",
 ];
 

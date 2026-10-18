@@ -63,7 +63,8 @@ fn filter_applies_walker_rules() {
     .collect();
     let mut got = filter_hits(root, hits);
     got.sort();
-    assert_eq!(got, s(&["docs/a.md", "docs/keep.tmp.md", "ok.markdown"]));
+    // Non-Markdown files are kept like in the walker (#119).
+    assert_eq!(got, s(&["docs/a.md", "docs/keep.tmp.md", "img/pic.png", "ok.markdown"]));
 }
 
 #[cfg(unix)]
@@ -80,6 +81,42 @@ fn filter_maps_canonical_paths_through_symlinked_root() {
     assert_eq!(filter_hits(&link, vec![canon_hit]), s(&["d/n.md"]));
     let merged = merge(&s(&["d/n.md"]), filter_hits(&link, vec![link.join("d/n.md")]));
     assert_eq!(merged.len(), 1);
+}
+
+#[test]
+fn non_markdown_spotlight_hit_is_kept_and_ranked() {
+    let dir = tempfile::tempdir().unwrap();
+    let root = dir.path();
+    fs::create_dir_all(root.join("src")).unwrap();
+    fs::write(root.join("src/main.rs"), "").unwrap();
+    fs::write(root.join("data.json"), "").unwrap();
+    let hits = usable_hits(root, vec![root.join("src/main.rs"), root.join("data.json")]).unwrap();
+    assert_eq!(rank(&merge(&[], hits), "main", 5), s(&["src/main.rs"]));
+}
+
+#[test]
+fn filtered_empty_spotlight_answer_is_a_cache_miss() {
+    let dir = tempfile::tempdir().unwrap();
+    let root = dir.path();
+    // Only hidden / skipped / outside hits: nothing usable -> walker fallback.
+    let hits = vec![root.join(".git/HEAD"), root.join("node_modules/x.md"), PathBuf::from("/elsewhere/a.md")];
+    assert_eq!(usable_hits(root, hits), None);
+    assert_eq!(usable_hits(root, vec![]), None);
+}
+
+#[test]
+fn deleted_cached_entries_are_dropped() {
+    let dir = tempfile::tempdir().unwrap();
+    let root = dir.path();
+    fs::write(root.join("keep.md"), "").unwrap();
+    let ranked = rank(&merge(&s(&["gone.md", "keep.md"]), s(&["also-gone.rs"])), "", usize::MAX);
+    let (found, mut gone) = existing(root, ranked, 10);
+    gone.sort();
+    assert_eq!(found, s(&["keep.md"]));
+    assert_eq!(gone, s(&["also-gone.rs", "gone.md"]));
+    // the limit stops checking early
+    let (found, gone) = existing(root, s(&["keep.md", "gone.md"]), 1);
+    assert_eq!((found, gone.len()), (s(&["keep.md"]), 0));
 }
 
 #[test]
@@ -123,5 +160,5 @@ fn spotlight_live_query_on_indexed_folder() {
     let dir = PathBuf::from(std::env::var("MARGIN_SPOTLIGHT_DIR").expect("set MARGIN_SPOTLIGHT_DIR"));
     let hits = spotlight_hits(&dir, "md").expect("folder should be indexed");
     assert!(!hits.is_empty());
-    assert!(hits.iter().all(|h| is_markdown(h) && !h.starts_with('/')));
+    assert!(hits.iter().all(|h| !h.starts_with('/')));
 }

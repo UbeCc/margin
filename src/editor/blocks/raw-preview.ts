@@ -9,7 +9,9 @@
  */
 import type { BlockWidget, EditorSettings, WidgetBlockType, WidgetContext, WidgetInstance } from '../../contracts';
 import { createCodeEditor, CodeEditor } from './cm/setup';
-import { debounce, h, isolateEvents } from './util/dom';
+import { indentRange } from '@codemirror/language';
+import { indentSelection } from '@codemirror/commands';
+import { copyText, debounce, h, isolateEvents } from './util/dom';
 import { rawRangeToBody, type Envelope } from './util/delimited';
 
 export interface Parsed {
@@ -30,6 +32,8 @@ export interface RawPreviewSpec<P extends Parsed> {
   render(preview: HTMLElement, p: P, settings: EditorSettings, env: RenderEnv): void | Promise<void>;
   /** Static export HTML. */
   renderHTML(p: P, settings: EditorSettings, preview: HTMLElement): string;
+  /** Optional: settings signature; the preview re-renders when it changes (e.g. math numbering, #102). */
+  settingsKey?(settings: EditorSettings): string;
   /** Label shown in the editor header (e.g. "$$", "mermaid"). */
   label?(p: P): string;
   placeholder?: string;
@@ -60,6 +64,7 @@ class RawPreviewInstance<P extends Parsed> implements WidgetInstance {
   private raw: string;
   private parsed: P;
   private settings: EditorSettings;
+  private settingsSig = '';
   private root: HTMLElement;
   private preview: HTMLElement;
   private panel: HTMLElement;
@@ -184,6 +189,29 @@ class RawPreviewInstance<P extends Parsed> implements WidgetInstance {
     this.renderPreview();
   }
 
+  /** `refresh` (#98 Refresh All Math Expressions / diagrams): re-render the preview. */
+  /** Code Tools on math / HTML blocks (#98): Copy Code Content, Auto Indent Whole / Selected Code. */
+  command(op: string): boolean {
+    if (op === 'refresh') {
+      this.renderPreview();
+      return true;
+    }
+    if (op === 'copy') {
+      copyText(this.parsed.body);
+      return true;
+    }
+    if (op !== 'indentAll' && op !== 'indentSelected') return false;
+    if (!this.editing) this.startEditing('end');
+    const { view } = this.ensureEditor();
+    if (op === 'indentSelected') indentSelection(view);
+    else {
+      const changes = indentRange(view.state, 0, view.state.doc.length);
+      if (!changes.empty) view.dispatch({ changes, userEvent: 'indent' });
+    }
+    view.focus();
+    return true;
+  }
+
   focus(at: 'start' | 'end'): void {
     this.startEditing(at);
   }
@@ -202,7 +230,9 @@ class RawPreviewInstance<P extends Parsed> implements WidgetInstance {
 
   updateSettings(settings: EditorSettings): void {
     // compare with the rendered scheme: the core mutates one settings object in place
-    const schemeChanged = settings.colorScheme !== this.root.dataset.scheme;
+    const key = this.spec.settingsKey?.(settings) ?? '';
+    const schemeChanged = settings.colorScheme !== this.root.dataset.scheme || key !== this.settingsSig;
+    this.settingsSig = key;
     this.settings = settings;
     this.applyScheme();
     if (schemeChanged) {

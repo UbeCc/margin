@@ -15,7 +15,7 @@ export interface UploadSettings {
   /** Program and arguments, e.g. `picgo upload` or `'/Applications/uPic.app/Contents/MacOS/uPic' -o url -u`. */
   uploadCommand: string;
   picgoPort: number;
-  /** Seconds per image (the batch budget scales with the image count, capped natively). */
+  /** Seconds per image (Typora: 20; a batch is capped at 60 s natively, or at this value when larger). */
   uploadTimeout: number;
 }
 
@@ -23,7 +23,7 @@ export const UPLOAD_DEFAULTS: Readonly<UploadSettings> = Object.freeze({
   uploader: 'none',
   uploadCommand: '',
   picgoPort: 36677,
-  uploadTimeout: 30,
+  uploadTimeout: 20,
 });
 
 export type { UploadConfig };
