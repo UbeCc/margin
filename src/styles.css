@@ -410,6 +410,9 @@ button { cursor: default; }
 .dialog { padding: 20px 22px 16px; }
 .dialog-title { margin: 0 0 8px; font-size: 14px; font-weight: 600; line-height: 1.4; }
 .dialog-message { margin: 0 0 18px; color: var(--margin-fg-muted); line-height: 1.5; }
+.export-progress .dialog-message { margin-bottom: 4px; color: var(--margin-fg); }
+.export-progress .dialog-detail { margin: 0 0 18px; color: var(--margin-fg-muted); font-size: 0.92em; }
+.export-progress:focus { outline: none; }
 .dialog .text-input { width: 100%; margin: 6px 0 2px; }
 .dialog-error { min-height: 18px; font-size: 12px; color: #d9534f; }
 .dialog-buttons { display: flex; justify-content: flex-end; gap: 8px; }
@@ -516,6 +519,10 @@ button { cursor: default; }
 .context-item.danger:not(:hover):not(:focus) { color: #c9302c; }
 .context-hint { opacity: 0.6; padding-left: 20px; }
 .context-sep { height: 1px; margin: 4px 6px; background: var(--margin-border); }
+.context-item { gap: 4px; align-items: baseline; }
+.context-check { width: 12px; flex: none; }
+.context-label { flex: 1; white-space: nowrap; }
+.context-item[aria-expanded='true'] { background: var(--margin-hover, rgba(127, 127, 127, 0.15)); }
 
 /* ---------------------------------------------------------------- toasts */
 

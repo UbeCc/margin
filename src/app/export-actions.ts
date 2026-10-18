@@ -8,8 +8,8 @@
 import type { PdfExportOptions, Platform } from '../contracts';
 import { buildExportHtml, buildPlainHtml, documentTitle, exportHeadings, linkHeadingAnchors } from './export';
 import { imageFormatForPath, ImageTooLargeError, rasterizeHtml } from './export-image';
-import { expandVars, migrateExportSettings, paperSizeMm, resolveMeta, todayString, MM_TO_PT, type ExportSettings } from './export-settings';
-import { exportWithPandoc, PANDOC_FORMATS, type PandocFormat } from './export-pandoc';
+import { effectivePage, expandVars, migrateExportSettings, paperSizeMm, resolveMeta, todayString, MM_TO_PT, type ExportSettings, type PrintSetup } from './export-settings';
+import { exportWithPandoc, newExportId, PANDOC_FORMATS, type PandocFormat } from './export-pandoc';
 import { extras } from './platform-extras';
 import { basename, dirname, extname, join, stripExt } from './util/path';
 
@@ -27,6 +27,10 @@ export interface ExportHost {
   themeCss(theme: string): string;
   extraCss(body: string): Promise<string>;
   notify(message: string, kind: 'success' | 'error' | 'info' | 'warning', action?: { label: string; run: () => void }): void;
+  /** File › Page Setup (session); export settings' paper wins when not "Default". */
+  printSetup?(): PrintSetup;
+  /** The "Exporting..." sheet for custom commands (#90); returns its close function. */
+  exportProgress?(abort?: () => void): () => void;
   /** Overwrite confirmation; resolves 'overwrite' | 'keep-both' | 'cancel' and whether to stop asking. */
   confirmOverwrite(path: string): Promise<{ choice: 'overwrite' | 'keep-both' | 'cancel'; dontAsk: boolean }>;
 }
@@ -41,6 +45,14 @@ export interface Exporter {
   unavailable?(): string | null;
   /** No save panel / output path (the exporter decides where output goes). */
   noTarget?: boolean;
+}
+
+/** Thrown by an exporter the user stopped (Abort): no error notice, no "previous" update. */
+export class ExportAbortedError extends Error {
+  constructor() {
+    super('Export aborted');
+    this.name = 'ExportAbortedError';
+  }
 }
 
 export interface LastExport {
@@ -172,7 +184,30 @@ export class ExportController {
           stdin = buildExportHtml({ title: this.meta(s).title, body, themeCss: h.themeCss(s.html.theme), extraCss: await h.extraCss(body) });
         } else stdin = h.markdown();
         const doc = h.docPath();
-        const out = await run!.call(h.platform, c.command, this.commandVars(t || null, s), stdin, doc ? dirname(doc) : h.folder(), 120_000);
+        const x = extras(h.platform);
+        const id = x.pandocAbort ? newExportId('cmd') : undefined;
+        let aborted = false;
+        const abort = id
+          ? () => {
+              aborted = true;
+              void x.pandocAbort!.call(h.platform, id).catch(() => undefined);
+            }
+          : undefined;
+        let close: () => void = () => {};
+        try {
+          close = h.exportProgress?.(abort) ?? close;
+        } catch {
+          /* a broken sheet must not block the export */
+        }
+        let out: { stdout: string; stderr: string };
+        try {
+          out = await run!.call(h.platform, c.command, this.commandVars(t || null, s), stdin, doc ? dirname(doc) : h.folder(), 120_000, id);
+        } catch (e) {
+          if (aborted || (e instanceof Error && e.message === 'Export aborted')) throw new ExportAbortedError();
+          throw e;
+        } finally {
+          close();
+        }
         const w = out.stderr.trim();
         if (w) h.notify(`${c.name}: ${w.split('\n')[0]}`, 'warning');
       },
@@ -187,9 +222,17 @@ export class ExportController {
     const vars = { ...this.vars(target), title: meta.title, author: meta.author };
     const brk = s.pdf.pageBreaks;
     const breakCss = brk === 'none' ? '' : `@media print { .margin-doc h1${brk === 'h2' ? ', .margin-doc h2' : ''} { break-before: page; } .margin-doc > :first-child { break-before: auto !important; } }`;
-    const html = buildExportHtml({ title: meta.title, body, themeCss: h.themeCss(s.pdf.theme), extraCss: `${await h.extraCss(body)}\n${breakCss}`, bodyClass: 'margin-export-pdf' });
-    const [w, ht] = paperSizeMm(s.pdf.page);
-    const m = s.pdf.page.margins;
+    const html = buildExportHtml({
+      title: meta.title,
+      body,
+      themeCss: h.themeCss(s.pdf.theme),
+      extraCss: `${await h.extraCss(body)}\n${breakCss}`,
+      bodyClass: 'margin-export-pdf',
+      appendBody: s.pdf.appendBody ? expandVars(s.pdf.appendBody, vars) : undefined,
+    });
+    const page = effectivePage(s.pdf.page, h.printSetup?.());
+    const [w, ht] = paperSizeMm(page);
+    const m = page.margins;
     const pt = (x: number): number => Math.round(x * MM_TO_PT * 100) / 100;
     const doc = h.docPath();
     return {
@@ -297,6 +340,7 @@ export class ExportController {
     try {
       await ex.run(target);
     } catch (e) {
+      if (e instanceof ExportAbortedError) return false;
       const msg = e instanceof ImageTooLargeError ? e.message : `Export failed: ${e instanceof Error ? e.message : String(e)}`;
       this.host.notify(msg, 'error');
       return false;
@@ -337,7 +381,10 @@ export class ExportController {
  * kinds, so they get the default folder, Export with Previous / Overwrite and the
  * after-export action. `exportWithPandoc` keeps its own progress/watchdog logic.
  */
-export function registerPandocExporters(c: ExportController, opts: { pandocPath: () => string; title: () => string; progress: (m: string) => () => void }): void {
+export function registerPandocExporters(
+  c: ExportController,
+  opts: { pandocPath: () => string; title: () => string; progress: (m: string, abort?: () => void) => () => void },
+): void {
   for (const format of Object.keys(PANDOC_FORMATS) as PandocFormat[]) {
     const spec = PANDOC_FORMATS[format];
     c.register(`pandoc:${format}`, (h) => ({
@@ -347,11 +394,17 @@ export function registerPandocExporters(c: ExportController, opts: { pandocPath:
       run: async (target) => {
         const x = extras(h.platform);
         let error = '';
+        let aborted = false;
         const doc = h.docPath();
         const ok = await exportWithPandoc(format, {
           platform: {
             saveFileDialog: async () => target,
             pandocExport: x.pandocExport ? (md, out, o) => x.pandocExport!.call(h.platform, md, out, o) : undefined,
+            pandocAbort: x.pandocAbort ? (id) => x.pandocAbort!.call(h.platform, id) : undefined,
+          },
+          options: migrateExportSettings(h.exportSettings()).pandoc[format],
+          onAborted: () => {
+            aborted = true;
           },
           markdown: h.markdown(),
           name: stripExt(basename(target)),
@@ -365,6 +418,7 @@ export function registerPandocExporters(c: ExportController, opts: { pandocPath:
             else if (kind === 'warning') h.notify(m, 'warning');
           },
         });
+        if (!ok && aborted) throw new ExportAbortedError();
         if (!ok) throw new Error(error.replace(/^Export failed: /, '') || `${spec.label} export failed`);
       },
     }));

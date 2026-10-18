@@ -10,8 +10,8 @@ import { VersionStore } from './versions';
 import { DraftStore, type Draft } from './drafts';
 import { documentTitle, loadKatexCss, needsKatex } from './export';
 import { ExportController, registerPandocExporters } from './export-actions';
-import { pageCss } from './export-settings';
-import { confirmOverwriteDialog, openPageSetup } from './export-ui';
+import { DEFAULT_PRINT_SETUP, effectivePage, pageCss, type PrintSetup } from './export-settings';
+import { confirmOverwriteDialog, openExportingSheet, openPageSetup } from './export-ui';
 import { runImport, type ImportHost } from './import';
 import { FindBar } from './findbar';
 import { extras } from './platform-extras';
@@ -23,11 +23,13 @@ import { StatusBar } from './statusbar';
 import { ThemeManager } from './themes';
 import { themeLabel } from '../themes';
 import { ask } from './ui/modal';
+import { insertTableDialog } from './ui/table-dialog';
 import { closePalette, isPaletteOpen, openPalette, type PaletteItem } from './ui/palette';
 import { toast } from './ui/toast';
 import { handleFileDrop } from './filedrop';
 import { PANDOC_ACTIONS, type PandocFormat } from './export-pandoc';
 import { closeContextMenu } from './ui/contextmenu';
+import { EditorContextMenu } from './ctxmenu';
 import { ImageUploader } from './upload-actions';
 import { debounce, h } from './util/dom';
 import { fuzzyFilter, fuzzyMatch } from './util/fuzzy';
@@ -146,6 +148,19 @@ export class App {
       notify: (m, k) => void toast(m, { kind: k }),
     });
     this.docs.newTab();
+    // #97: editor context menus (text, link, image, table, code, math, diagram, atomic blocks).
+    new EditorContextMenu(
+      {
+        editor: () => this.editor,
+        platform: this.platform,
+        run: (id) => this.run(id),
+        openLink: (href) => void this.openLink(href),
+        baseDir: () => this.doc.dir,
+        uploadImage: (src) => void this.uploader.uploadSrcs([src]),
+        notify: (m, k) => void toast(m, { kind: k }),
+      },
+      this.page, // active tab's editor host lives here (#94)
+    ).attach();
 
     this.installKeys();
     this.platform.onMenu((a) => this.onMenu(a));
@@ -201,7 +216,6 @@ export class App {
   /** One editor per tab; chrome refreshes only follow the active one. */
   private createTabEditor(host: HTMLElement, tab: DocTab): EditorHandle {
     const ed = this.wiring.createEditor(host, this.editorSettings(tab));
-    this.uploader.attachContextMenu(host); // per tab: the editor host is where image menus start
     ed.onChange(() => {
       if (tab.doc?.dirty) this.saveDraftsSoon();
       if (this.docs.active !== tab) return;
@@ -628,6 +642,8 @@ export class App {
 
   /** While rendering an HTML export: directory of the output file (srcs become relative to it). */
   private exportDir: string | null = null;
+  /** File › Page Setup (session only, like Typora's shared print info). */
+  private printSetup: PrintSetup = { ...DEFAULT_PRINT_SETUP };
 
   private resolveAsset(src: string, tab?: DocTab): string {
     const doc = tab?.doc ?? this.docs?.active?.doc;
@@ -745,12 +761,24 @@ export class App {
     void this.run(action);
   }
 
+  /** Paragraph › Table › Insert Table… (#98): rows × columns dialog, then insert. */
+  private async insertTable(): Promise<boolean> {
+    const size = await insertTableDialog();
+    if (!size) return false;
+    this.editor.focus();
+    return this.editor.exec({ kind: 'insertTable', rows: size.rows, cols: size.cols });
+  }
+
   /** Dispatch any MenuAction / app command. Returns false when unhandled. */
   async run(id: CommandId): Promise<boolean> {
     closeContextMenu();
     const ed = this.editor;
     if (id.startsWith('heading:')) return ed.exec({ kind: 'heading', level: Number(id.slice(8)) as 0 });
     if (id.startsWith('mark:')) return ed.exec({ kind: 'mark', mark: id.slice(5) as 'strong' });
+    if (id === 'block:table' || id === 'table:insert') return this.insertTable();
+    if (id.startsWith('table:')) return ed.exec({ kind: 'table', op: id.slice(6) as 'copy' });
+    if (id.startsWith('code:')) return ed.exec({ kind: 'code', op: id.slice(5) as 'copy' });
+    if (id.startsWith('math:')) return ed.exec({ kind: 'math', op: id.slice(5) as 'copyTex' });
     if (id.startsWith('block:')) return ed.exec({ kind: 'block', block: id.slice(6) as 'quote' });
     if (id.startsWith('task:')) return ed.exec({ kind: 'task', op: id.slice(5) as 'toggle' });
     if (id === 'para:headingUp' || id === 'para:headingDown') return ed.exec({ kind: 'headingLevel', delta: id === 'para:headingUp' ? 1 : -1 });
@@ -842,9 +870,12 @@ export class App {
         this.preferences('export');
         return true;
       case 'pageSetup': {
-        const page = await openPageSetup(this.settings.export.pdf.page);
-        if (page) this.updateSettings({ export: { ...this.settings.export, pdf: { ...this.settings.export.pdf, page } } });
-        return !!page;
+        const ps = await openPageSetup(this.printSetup);
+        if (ps) {
+          this.printSetup = ps;
+          this.applyPrintPageCss();
+        }
+        return !!ps;
       }
       case 'exportDocx':
       case 'exportLatex':
@@ -967,6 +998,7 @@ export class App {
       openThemesFolder: () => void this.openThemesFolder(),
       pickFolder: () => this.platform.openFileDialog({ directory: true }),
       recoverDrafts: () => void this.fileOps.recoverDrafts(),
+      pickFile: (name, extensions) => this.platform.openFileDialog({ filters: [{ name, extensions }] }),
       detectPandoc: async (path) => {
         const detect = extras(this.platform).pandocDetect;
         if (!detect) return 'Pandoc export is only available in the desktop app.';
@@ -1137,11 +1169,13 @@ export class App {
       extraCss: async (body) => `${await this.wiring.loadBlocksCss()}\n${needsKatex(body) ? await loadKatexCss() : ''}`,
       notify: (m, kind, action) => void toast(m, { kind, action }),
       confirmOverwrite: (p) => confirmOverwriteDialog(p),
+      exportProgress: (abort) => openExportingSheet(abort),
+      printSetup: () => this.printSetup,
     });
     registerPandocExporters(c, {
       pandocPath: () => this.settings.pandocPath,
       title: () => documentTitle(this.editor.getMarkdown(), this.doc.path ? basename(this.doc.path) : null),
-      progress: (m) => toast(m, { kind: 'info', timeout: 0 }),
+      progress: (_m, abort) => openExportingSheet(abort),
     });
     return c;
   }
@@ -1154,7 +1188,7 @@ export class App {
       el.id = 'margin-print-page';
       document.head.appendChild(el);
     }
-    el.textContent = pageCss(this.settings.export.pdf.page, this.settings.export.pdf.pageBreaks);
+    el.textContent = pageCss(effectivePage(this.settings.export.pdf.page, this.printSetup), this.settings.export.pdf.pageBreaks);
   }
 
   private exportPandoc(format: PandocFormat): Promise<boolean> {

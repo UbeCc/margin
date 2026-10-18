@@ -13,6 +13,8 @@ export interface PreferencesHost {
   isDarkTheme(name: string): boolean;
   openThemesFolder(): void;
   pickFolder(): Promise<string | null>;
+  /** File picker limited to `extensions` (Pandoc Style Reference / Template / Custom CSS). */
+  pickFile?(name: string, extensions: string[]): Promise<string | null>;
   /** Locate pandoc for the given path ('' = auto); resolves to a status line, never rejects. */
   detectPandoc?(path: string): Promise<string>;
   /** General › Recover Unsaved Drafts (#94). */
@@ -244,6 +246,7 @@ export function openPreferences(host: PreferencesHost, initial: Section = 'appea
         set: (next) => set({ export: next }),
         themeNames: () => host.themeNames(),
         pickFolder: () => host.pickFolder(),
+        pickFile: host.pickFile ? (n, e) => host.pickFile!(n, e) : undefined,
       }),
     ],
   };

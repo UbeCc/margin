@@ -6,7 +6,16 @@
  * the platform call throws synchronously, rejects, or never settles (watchdog).
  */
 import type { Platform } from '../contracts';
+import type { PandocFormatOptions } from './export-settings';
 import type { PandocExportOptions, PlatformExtras } from './platform-extras';
+
+/** Id for one abortable export run (`pandocAbort`). */
+export function newExportId(prefix: string): string {
+  return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+/** Backend error text of an aborted export (`pandoc::ABORTED`). */
+export const PANDOC_ABORTED = 'Export aborted';
 
 export type PandocFormat = 'docx' | 'latex' | 'epub' | 'odt' | 'rtf' | 'mediawiki' | 'rst' | 'textile' | 'opml';
 
@@ -57,8 +66,12 @@ export interface PandocExportDeps {
   title: string;
   /** Preferences › Files › Pandoc path ('' = auto-detect). */
   pandocPath: string;
-  /** Show a sticky progress notice; returns its dismiss function. */
-  progress(message: string): () => void;
+  /** Show a sticky progress notice (with an Abort button when `abort` is given); returns its dismiss function. */
+  progress(message: string, abort?: () => void): () => void;
+  /** Preferences › Export › Pandoc options for this format (#90). */
+  options?: PandocFormatOptions;
+  /** Called instead of any notice when the user aborted the export. */
+  onAborted?: () => void;
   notify(message: string, kind: NoticeKind, action?: { label: string; run: () => void }): void;
   /** Optional "Show in Finder" for the success notice. */
   reveal?: (path: string) => void;
@@ -111,9 +124,25 @@ export async function exportWithPandoc(format: PandocFormat, deps: PandocExportD
     pandocPath: deps.pandocPath.trim() || null,
     timeoutMs,
   };
+  if (deps.options) opts.options = { ...deps.options };
+  // Abort (#90): Typora's "Exporting…" sheet has an Abort button that terminates pandoc.
+  let aborted = false;
+  const abortFn = deps.platform.pandocAbort;
+  let abort: (() => void) | undefined;
+  if (typeof abortFn === 'function') {
+    const id = newExportId('pandoc');
+    opts.exportId = id;
+    abort = () => {
+      aborted = true;
+      void Promise.resolve()
+        .then(() => abortFn.call(deps.platform, id))
+        .catch(() => undefined);
+    };
+  }
   let dismiss: () => void = () => {};
   try {
-    dismiss = deps.progress(`Exporting ${basename(target)} with Pandoc…`);
+    // Typora's progress text, verbatim.
+    dismiss = deps.progress('Exporting file using Pandoc. This may take some time.', abort);
   } catch {
     /* a broken notice must not block the export */
   }
@@ -136,6 +165,11 @@ export async function exportWithPandoc(format: PandocFormat, deps: PandocExportD
     return true;
   } catch (e) {
     finish(dismiss);
+    // An aborted export ends silently (Typora shows no "Export Failed" for it).
+    if (aborted || message(e) === PANDOC_ABORTED) {
+      deps.onAborted?.();
+      return false;
+    }
     deps.notify(`${spec.label} export failed: ${message(e)}`, 'error');
     return false;
   } finally {
