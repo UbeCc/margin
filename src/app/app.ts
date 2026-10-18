@@ -139,7 +139,6 @@ export class App {
       notify: (m, k) => void toast(m, { kind: k }),
     });
     this.docs.newTab();
-    this.uploader.attachContextMenu(this.page);
 
     this.installKeys();
     this.platform.onMenu((a) => this.onMenu(a));
@@ -170,6 +169,7 @@ export class App {
   /** One editor per tab; chrome refreshes only follow the active one. */
   private createTabEditor(host: HTMLElement, tab: DocTab): EditorHandle {
     const ed = this.wiring.createEditor(host, this.editorSettings(tab));
+    this.uploader.attachContextMenu(host); // per tab: the editor host is where image menus start
     ed.onChange(() => {
       if (tab.doc?.dirty) this.saveDraftsSoon();
       if (this.docs.active !== tab) return;
