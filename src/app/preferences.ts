@@ -13,6 +13,8 @@ export interface PreferencesHost {
   pickFolder(): Promise<string | null>;
   /** Locate pandoc for the given path ('' = auto); resolves to a status line, never rejects. */
   detectPandoc?(path: string): Promise<string>;
+  /** General › Recover Unsaved Drafts (#94). */
+  recoverDrafts?(): void;
 }
 
 type Section = 'appearance' | 'editor' | 'files' | 'images';
@@ -116,7 +118,15 @@ export function openPreferences(host: PreferencesHost, initial: Section = 'appea
     { 'data-section': 'files' },
     toggle('autoSave', 'Auto save', 'Save documents automatically after you stop typing'),
     row('Auto-save delay', h('span.inline', null, delay, h('span.unit', { text: 's' }))),
+    toggle('saveOnSwitch', 'Save without asking when switching files', 'Switching documents from the sidebar saves the current one'),
     toggle('restoreLastFolder', 'Reopen last folder on launch'),
+    host.recoverDrafts
+      ? row(
+          'Unsaved drafts',
+          h('button.btn', { type: 'button', 'data-pref': 'recoverDrafts', text: 'Recover Unsaved Drafts…', onclick: () => (close(), host.recoverDrafts!()) }),
+          'Drafts of modified documents are kept until the window closes cleanly',
+        )
+      : null,
     row('Pandoc path', h('span.inline', null, pandocPath, pandocDetect), 'Used for Word, LaTeX and EPUB export'),
     h('div.pref-block', null, pandocStatus),
     h(

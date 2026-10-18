@@ -1,5 +1,7 @@
 import type { EditorHandle, FsEvent, ImageRule, Platform } from '../contracts';
 import { localImageSrcs } from './relocate';
+import { decodeBytes, detectEncoding, encodingLabel } from './encoding';
+import { extras } from './platform-extras';
 import { basename, dirname, join } from './util/path';
 import { debounce } from './util/dom';
 
@@ -28,6 +30,8 @@ export interface DocState {
   /** Deleted / moved away on disk while open. */
   missing: boolean;
   savedAt: number | null;
+  /** Encoding the file was read with (#94); saving always writes UTF-8. */
+  encoding: string;
 }
 
 export type UnsavedChoice = 'save' | 'discard' | 'cancel';
@@ -79,6 +83,12 @@ export interface DocumentHost {
   willLoad(path: string | null): void;
   onState(state: DocState): void;
   onOpened(path: string): void;
+  /** The file to open does not exist: offer to create it (#94). true = create. */
+  askCreateMissing?(path: string): Promise<boolean>;
+  /** Saw the document's text right before it is loaded (large-file degrade, #94). */
+  willLoadText?(path: string | null, text: string): void;
+  /** A save reached the disk (version history, #94). */
+  onSaved?(path: string, text: string, quiet: boolean): void;
   /** Folder to suggest in Save As for untitled documents. */
   defaultDir(): string | null;
   /** Current image storage rule (for relocating images on first save). */
@@ -150,8 +160,13 @@ export class DocumentController {
     this.emit();
   }
 
+  /** Encoding the current file was decoded from. */
+  encoding = 'utf-8';
+  /** Save As name suggestion for untitled copies (Duplicate). */
+  private suggested: string | null = null;
+
   state(): DocState {
-    return { path: this.path, name: this.name, dirty: this.dirty, eol: this.eol, missing: this.missing, savedAt: this.savedAt };
+    return { path: this.path, name: this.name, dirty: this.dirty, eol: this.eol, missing: this.missing, savedAt: this.savedAt, encoding: this.encoding };
   }
 
   private emit(): void {
@@ -210,6 +225,7 @@ export class DocumentController {
       this.eol = detectEol(text);
       const md = normalizeEol(text);
       this.host.willLoad(path);
+      this.host.willLoadText?.(path, md);
       this.path = path;
       this.saved = md;
       this.savedEol = this.eol;
@@ -260,20 +276,72 @@ export class DocumentController {
     return true;
   }
 
-  async open(path: string): Promise<boolean> {
-    if (path === this.path) return true;
-    if (!(await this.confirmLeave(`before opening ${basename(path)}`))) return false;
-    let text: string;
-    try {
-      text = await this.host.platform.readTextFile(path);
-    } catch (e) {
-      this.host.notify(`Couldn't open ${basename(path)}: ${errMsg(e)}`, 'error');
+  async open(path: string, opts: { encoding?: string } = {}): Promise<boolean> {
+    if (path === this.path && !opts.encoding) return true;
+    if (path !== this.path && !(await this.confirmLeave(`before opening ${basename(path)}`))) return false;
+    const st = await this.host.platform.stat(path).catch(() => null);
+    if (!st) {
+      if (!this.host.askCreateMissing || !(await this.host.askCreateMissing(path))) return false;
+      try {
+        await this.host.platform.writeTextFile(path, '');
+      } catch (e) {
+        this.host.notify(`Couldn't create ${basename(path)}: ${errMsg(e)}`, 'error');
+        return false;
+      }
+    } else if (st.isDir) {
+      this.host.notify(`Open Failed: ${basename(path)} is a folder.`, 'error');
       return false;
     }
-    this.load(path, text);
+    let read: { text: string; encoding: string };
+    try {
+      read = await this.readDecoded(path, opts.encoding);
+    } catch (e) {
+      this.host.notify(`Open Failed: couldn't open ${basename(path)}: ${errMsg(e)}`, 'error');
+      return false;
+    }
+    this.load(path, read.text);
+    this.encoding = read.encoding;
+    this.suggested = null;
+    this.emit();
+    if (read.encoding !== 'utf-8' && !opts.encoding)
+      this.host.notify(`Opened ${basename(path)} as ${encodingLabel(read.encoding)}; it will be saved as UTF-8.`, 'info');
     await this.rewatch();
     this.host.onOpened(path);
     return true;
+  }
+
+  /**
+   * Read a file as text. Invalid UTF-8 (U+FFFD after a lossy decode) or an explicit
+   * encoding re-reads the raw bytes when the platform can (#94).
+   */
+  private async readDecoded(path: string, encoding?: string): Promise<{ text: string; encoding: string }> {
+    const bytesOf = extras(this.host.platform).readFileBytes;
+    if (encoding && encoding !== 'auto' && bytesOf) return { text: decodeBytes(await bytesOf.call(this.host.platform, path), encoding), encoding };
+    const text = await this.host.platform.readTextFile(path);
+    if ((!text.includes('\uFFFD') && encoding !== 'auto') || !bytesOf) return { text, encoding: 'utf-8' };
+    const bytes = await bytesOf.call(this.host.platform, path);
+    const enc = detectEncoding(bytes);
+    return enc === 'utf-8' ? { text, encoding: enc } : { text: decodeBytes(bytes, enc), encoding: enc };
+  }
+
+  /** File › Reopen with Encoding (#94): re-read the current file's bytes as `encoding`. */
+  async reopenWithEncoding(encoding: string): Promise<boolean> {
+    if (!this.path) return false;
+    if (this.dirty && !(await this.host.askReloadDirty(this.name))) return false;
+    return this.open(this.path, { encoding });
+  }
+
+  /**
+   * Replace the content with unsaved text: an untitled copy (Duplicate) or a recovered
+   * draft (then `path` is the file it belongs to). The document is dirty afterwards.
+   */
+  loadUnsaved(text: string, opts: { suggestedName?: string } = {}): void {
+    this.host.editor.setMarkdown(normalizeEol(text));
+    this.suggested = opts.suggestedName ?? null;
+    this.recomputeDirty.cancel();
+    this.dirty = this.isModified();
+    void this.host.platform.setDocumentEdited(this.dirty);
+    this.emit();
   }
 
   async openDialog(): Promise<boolean> {
@@ -294,7 +362,7 @@ export class DocumentController {
 
   async saveAs(): Promise<boolean> {
     const dir = this.dir ?? this.host.defaultDir();
-    const fname = `${suggestName(this.host.editor.getMarkdown())}.md`;
+    const fname = `${this.suggested ?? suggestName(this.host.editor.getMarkdown())}.md`;
     const def = this.path ?? (dir ? join(dir, fname) : fname);
     const target = await this.host.platform.saveFileDialog({
       defaultPath: def,
@@ -358,7 +426,9 @@ export class DocumentController {
     this.dirty = this.isModified();
     void this.host.platform.setDocumentEdited(this.dirty);
     this.emit();
+    this.encoding = 'utf-8';
     if (!quiet) this.host.notify(`Saved ${basename(path)}`, 'success');
+    this.host.onSaved?.(path, md, quiet);
     return true;
   }
 
@@ -374,11 +444,31 @@ export class DocumentController {
   async reloadFromDisk(): Promise<void> {
     if (!this.path) return;
     if (this.dirty && !(await this.host.askReloadDirty(this.name))) return;
+    let text: string;
     try {
-      this.load(this.path, await this.host.platform.readTextFile(this.path));
+      text = await this.host.platform.readTextFile(this.path);
     } catch (e) {
       this.host.notify(`Couldn't reload: ${errMsg(e)}`, 'error');
+      return;
     }
+    // Revert to Saved is one undoable edit (#94): Undo brings the discarded edits back.
+    this.loading = true;
+    try {
+      this.eol = detectEol(text);
+      const md = normalizeEol(text);
+      this.saved = md;
+      this.savedEol = this.eol;
+      this.diskHash = hashText(text);
+      this.host.editor.exec({ kind: 'replaceDocument', markdown: md });
+    } finally {
+      this.loading = false;
+    }
+    this.missing = false;
+    this.clearPending();
+    this.recomputeDirty.cancel();
+    this.dirty = this.isModified();
+    void this.host.platform.setDocumentEdited(this.dirty);
+    this.emit();
   }
 
   setEol(eol: Eol): void {
