@@ -1,4 +1,5 @@
-import type { EditorHandle, FsEvent, Platform } from '../contracts';
+import type { EditorHandle, FsEvent, ImageRule, Platform } from '../contracts';
+import { localImageSrcs } from './relocate';
 import { basename, dirname, join } from './util/path';
 import { debounce } from './util/dom';
 
@@ -46,6 +47,8 @@ export interface DocumentHost {
   onOpened(path: string): void;
   /** Folder to suggest in Save As for untitled documents. */
   defaultDir(): string | null;
+  /** Current image storage rule (for relocating images on first save). */
+  imageRule(): ImageRule;
 }
 
 /**
@@ -221,7 +224,9 @@ export class DocumentController {
       filters: [{ name: 'Markdown', extensions: ['md', 'markdown', 'txt'] }],
     });
     if (!target) return false;
+    const wasUntitled = !this.path;
     const ok = await this.writeTo(target, false);
+    if (ok && wasUntitled) await this.relocateImages(target);
     if (ok) {
       const changed = target !== this.path;
       this.host.willLoad(target);
@@ -234,6 +239,23 @@ export class DocumentController {
       }
     }
     return ok;
+  }
+
+  /** After the first save, move images pasted into the untitled doc next to it (#17). */
+  private async relocateImages(target: string): Promise<void> {
+    const relocate = (this.host.platform as Platform & {
+      relocateImages?(doc: string, rule: ImageRule, srcs: string[]): Promise<Record<string, string>>;
+    }).relocateImages;
+    const srcs = localImageSrcs(this.host.editor.getMarkdown());
+    if (!relocate || !srcs.length) return;
+    try {
+      const map = await relocate.call(this.host.platform, target, this.host.imageRule(), srcs);
+      const pairs = Object.entries(map).filter(([a, b]) => a !== b);
+      for (const [from, to] of pairs) this.host.editor.exec({ kind: 'replace', query: from, replacement: to, all: true });
+      if (pairs.length) await this.writeTo(target, true);
+    } catch (e) {
+      this.host.notify(`Couldn't move images next to ${basename(target)}: ${errMsg(e)}`, 'warning');
+    }
   }
 
   private async writeTo(path: string, quiet: boolean): Promise<boolean> {

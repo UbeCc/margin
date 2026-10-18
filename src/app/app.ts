@@ -93,6 +93,7 @@ export class App {
       askReloadDirty: (name) => this.askReloadDirty(name),
       notify: (m, k) => void toast(m, { kind: k }),
       autoSave: () => ({ enabled: this.settings.autoSave, delay: this.settings.autoSaveDelay }),
+      imageRule: () => this.settings.imageRule,
       willLoad: (p) => this.editor.updateSettings({ baseDir: p ? dirname(p) : null }),
       onState: (s) => this.onDocState(s),
       onOpened: (p) => this.onOpened(p),
@@ -601,6 +602,9 @@ export class App {
         return true;
       case 'commandPalette':
         this.commandPalette();
+        return true;
+      case 'clearRecent':
+        this.updateSettings({ recentFiles: [], recentFolders: [] });
         return true;
       case 'zoomIn':
       case 'zoomOut':
