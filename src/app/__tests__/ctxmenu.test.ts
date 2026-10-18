@@ -169,9 +169,11 @@ describe('context menu items', () => {
     a.uploadImage = vi.fn();
     a.copyImageTo = vi.fn();
     a.imageTarget = () => ({ label: './assets', canMove: true, run: vi.fn() });
-    a.zoomChoices = () => ({ zoomNow: '50%', presets: ['25%', '33%', '50%', '67%', '100%', '150%', '200%'], set: vi.fn() });
     a.syntaxState = () => ({ isHtml: false, switchTo: vi.fn() });
     a.saveImageAs = vi.fn();
+    const set = vi.fn();
+    // #155: explicit style zoom wins the direct entry
+    a.zoomChoices = () => ({ zoomNow: '50%', direct: '50%', presets: ['25%', '33%', '50%', '67%', '100%', '150%', '200%'], set });
     const items = buildItems(contextTarget(img, root), { selection: '' }, a);
     expect(labels(items)).toEqual([
       'Open Image Location…', 'Copy to ./assets', 'Copy Image to…', 'Move to ./assets', 'Rename or Move Image to…', 'Upload Image',
@@ -185,6 +187,18 @@ describe('context menu items', () => {
     expect((syn.submenu[0] as { checked?: boolean }).checked).toBe(true);
     (items[items.length - 1] as { run(): void }).run();
     expect(a.saveImageAs).toHaveBeenCalledWith('assets/a.png');
+    // #155: no style zoom → the 100/pixel-ratio entry leads (Retina screenshot)
+    a.zoomChoices = () => ({ zoomNow: null, direct: '50%', presets: ['25%', '33%', '50%', '67%', '100%', '150%', '200%'], set });
+    const retina = buildItems(contextTarget(img, root), { selection: '' }, a);
+    const entry = retina.find((i) => 'label' in i && i.label.startsWith('Zoom Image to')) as { label: string; run(): void };
+    expect(entry.label).toBe('Zoom Image to 50%');
+    entry.run();
+    expect(set).toHaveBeenCalledWith('50%');
+    // ratio 1 / unknown → no direct entry (only the preset submenu)
+    a.zoomChoices = () => ({ zoomNow: null, direct: null, presets: ['25%'], set });
+    const plain = labels(buildItems(contextTarget(img, root), { selection: '' }, a));
+    expect(plain).toContain('Zoom Image');
+    expect(plain.some((l) => l.startsWith('Zoom Image to'))).toBe(false);
   });
 });
 

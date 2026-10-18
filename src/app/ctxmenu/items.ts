@@ -32,7 +32,7 @@ export interface CtxActions {
   imageOps?(t: CtxTarget): ImageCtxOps | null;
   /** `Copy to <folder>` target resolved for the clicked image. */
   imageTarget?(): { label: string; canMove: boolean; run(move: boolean): void } | null;
-  zoomChoices?(): { zoomNow: string | null; presets: string[]; set(v: string): void } | null;
+  zoomChoices?(): { zoomNow: string | null; direct?: string | null; presets: string[]; set(v: string): void } | null;
   syntaxState?(): { isHtml: boolean; switchTo(to: 'markdown' | 'html'): void } | null;
   /** "Save … As…" downloads (#138). */
   saveImageAs?(src: string): void;
@@ -50,8 +50,9 @@ export interface ImageCtxOps {
   copyTo(move: boolean): void;
   /** `Copy to <folder>` / `Move to <folder>` quick target (null = none). */
   target(): { label: string; canMove: boolean; run(move: boolean): void } | null;
-  /** Zoom ▸ state for this image (null = not zoomable). */
-  zoom(): { zoomNow: string | null; presets: string[]; set(v: string): void } | null;
+  /** Zoom ▸ state for this image (null = not zoomable). `direct` is the "Zoom Image
+   * to N%" entry: the explicit style zoom, else 100/pixel-ratio (#155, §1.3). */
+  zoom(): { zoomNow: string | null; direct?: string | null; presets: string[]; set(v: string): void } | null;
   /** Switch Image Syntax ▸ state (null = not switchable). */
   syntax(): { isHtml: boolean; switchTo(to: 'markdown' | 'html'): void } | null;
   /** "Save Image As…" */
@@ -221,8 +222,10 @@ export function itemForKey(key: string, t: CtxTarget, s: CtxState, a: CtxActions
         sub.push({ id: `zoomImg:${v}`, label: v, checked: v === z.zoomNow, run: () => z.set(v) });
         if (i === 3) sub.push(sep); // 25 33 50 67 | 100 150 200 (fe-contextmenus-tools §1.2)
       });
+      // §1.2/§1.3: direct entry — current zoom, or 1/scale for Retina images (#155)
+      const direct = z.direct ?? z.zoomNow;
       return [
-        ...(z.zoomNow ? [{ id: 'zoomImg:now', label: `Zoom Image to ${z.zoomNow}`, run: () => z.set(z.zoomNow!) } as MenuItem] : []),
+        ...(direct ? [{ id: 'zoomImg:now', label: `Zoom Image to ${direct}`, run: () => z.set(direct) } as MenuItem] : []),
         { id: key, label: 'Zoom Image', submenu: sub },
       ];
     }

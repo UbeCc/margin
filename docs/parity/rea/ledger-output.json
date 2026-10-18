@@ -1,5 +1,5 @@
 {
- "evidence_id": "ev_39475fb3ebbf5f5e62484183dff845b5269206d4b49cd252beef8ceed33a4171",
+ "evidence_id": "ev_8a22e73197077bd1c3eb268181231a2d52d6181e6b7d24ffa1d975b10a39fee1",
  "subject": null,
  "provider": {
   "id": "rea-javascript-application-workflows",
@@ -10,14 +10,14 @@
  "predicate_type": "rea.reconstruction-obligation-ledger",
  "operation": "build_reconstruction_obligation_ledger",
  "parameters": {
-  "ledger_id": "rol_0971bf7b466f6a8c468c6ef5675d428e8c0ce8aeb15915bc5c72ea34ffb59f06",
-  "closure_digest": "107281c90c19cbe165d82d4408fd6708c4d37f57bd479d655030d3542b01e5d3"
+  "ledger_id": "rol_54d431abd7a8072ff254fca17f318856576d8def44fc3bcc3d82205f0f7fe6f4",
+  "closure_digest": "3dcc184ae0b7000293912b736bbd3d00cd8e4de0a32092f4ab389e7bbc727a8e"
  },
  "raw_result": null,
  "normalized_result": {
   "schema": "ReconstructionObligationLedger",
-  "ledger_id": "rol_0971bf7b466f6a8c468c6ef5675d428e8c0ce8aeb15915bc5c72ea34ffb59f06",
-  "closure_digest": "107281c90c19cbe165d82d4408fd6708c4d37f57bd479d655030d3542b01e5d3",
+  "ledger_id": "rol_54d431abd7a8072ff254fca17f318856576d8def44fc3bcc3d82205f0f7fe6f4",
+  "closure_digest": "3dcc184ae0b7000293912b736bbd3d00cd8e4de0a32092f4ab389e7bbc727a8e",
   "status": "unknown",
   "coverage": {
    "status": "complete"
@@ -3895,7 +3895,7 @@
      "owner": {
       "module_path": "src/app/ctxmenu/items.ts",
       "symbol": "block('para:insertBefore', 'Insert Paragraph Before')",
-      "owner_sha256": "48873bdc7750656dddabfd7c4f2ab18a8ecd7d26470e0c9b404b6797d03afea3"
+      "owner_sha256": "d347329e765b2099243821fdcd7b1008be994b83d23735311953c9348b321924"
      },
      "parser_type": null,
      "original_cases": [
@@ -3999,7 +3999,7 @@
      "owner": {
       "module_path": "src/app/ctxmenu/items.ts",
       "symbol": "function copyMath",
-      "owner_sha256": "48873bdc7750656dddabfd7c4f2ab18a8ecd7d26470e0c9b404b6797d03afea3"
+      "owner_sha256": "d347329e765b2099243821fdcd7b1008be994b83d23735311953c9348b321924"
      },
      "parser_type": null,
      "original_cases": [
@@ -4207,7 +4207,7 @@
      "owner": {
       "module_path": "src/app/ctxmenu/items.ts",
       "symbol": "label: 'Copy Link Address'",
-      "owner_sha256": "48873bdc7750656dddabfd7c4f2ab18a8ecd7d26470e0c9b404b6797d03afea3"
+      "owner_sha256": "d347329e765b2099243821fdcd7b1008be994b83d23735311953c9348b321924"
      },
      "parser_type": null,
      "original_cases": [
@@ -4416,7 +4416,7 @@
      "owner": {
       "module_path": "src/app/ctxmenu/items.ts",
       "symbol": "label: 'Copy / Paste As…'",
-      "owner_sha256": "48873bdc7750656dddabfd7c4f2ab18a8ecd7d26470e0c9b404b6797d03afea3"
+      "owner_sha256": "d347329e765b2099243821fdcd7b1008be994b83d23735311953c9348b321924"
      },
      "parser_type": null,
      "original_cases": [
@@ -6091,7 +6091,7 @@
      "owner": {
       "module_path": "src/app/ctxmenu/items.ts",
       "symbol": "Open Image Location",
-      "owner_sha256": "48873bdc7750656dddabfd7c4f2ab18a8ecd7d26470e0c9b404b6797d03afea3"
+      "owner_sha256": "d347329e765b2099243821fdcd7b1008be994b83d23735311953c9348b321924"
      },
      "parser_type": null,
      "original_cases": [
@@ -17035,7 +17035,7 @@
      "owner": {
       "module_path": "src/app/ctxmenu/items.ts",
       "symbol": "'Delete Code Block'",
-      "owner_sha256": "48873bdc7750656dddabfd7c4f2ab18a8ecd7d26470e0c9b404b6797d03afea3"
+      "owner_sha256": "d347329e765b2099243821fdcd7b1008be994b83d23735311953c9348b321924"
      },
      "parser_type": null,
      "original_cases": [
@@ -17555,7 +17555,7 @@
      "owner": {
       "module_path": "src/app/ctxmenu/items.ts",
       "symbol": "math:copyImage",
-      "owner_sha256": "48873bdc7750656dddabfd7c4f2ab18a8ecd7d26470e0c9b404b6797d03afea3"
+      "owner_sha256": "d347329e765b2099243821fdcd7b1008be994b83d23735311953c9348b321924"
      },
      "parser_type": null,
      "original_cases": [

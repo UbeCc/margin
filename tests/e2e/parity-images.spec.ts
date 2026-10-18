@@ -241,7 +241,29 @@ test('images.zoom: Image zoom (direct entry + presets) and switch Markdown/HTML 
   await page.locator('.context-item[data-key=imgSyntax]').hover();
   await page.locator(".context-item[data-key='imgSyntax:html']").click();
   await expect.poll(() => editorValue(page)).toBe('<img src="/pics/shot.png" alt="s" />\n');
+
+  // #155: device-pixel-ratio 2 (PNG pHYs 144 dpi, Typora's images.getScale) →
+  // "Zoom Image to 50%" with no explicit style zoom; ratio 1 shows no direct entry.
+  await page.evaluate(() => {
+    const w = window as unknown as Win;
+    w.__MARGIN_WEB__.imageScales.set('/pics/retina.png', 2);
+    w.__MARGIN_WEB__.imageScales.set('/pics/plain.png', 1);
+  });
+  await putPng(page, '/pics/retina.png');
+  await putPng(page, '/pics/plain.png');
+  await setDoc(page, '![r](/pics/retina.png)\n\n![p](/pics/plain.png)\n');
+  // the ratio is prefetched async at render; the (synchronous) menu needs it cached
+  await expect
+    .poll(() => page.locator('.md-image img[data-scale-probe]').count())
+    .toBe(2);
+  await rightClickImage(page, 0);
+  await ctxItem(page, 'Zoom Image to 50%').click();
+  await expect.poll(() => editorValue(page)).toBe('<img src="/pics/retina.png" alt="r" style="zoom:50%;" />\n\n![p](/pics/plain.png)\n');
+  await rightClickImage(page, 1);
+  await expect(page.locator('.context-item[data-key=zoomImg]')).toBeVisible();
+  await expect(page.locator('.context-item', { hasText: 'Zoom Image to' })).toHaveCount(0);
 });
+
 
 test('images.upload: Image upload: custom command (argv) / PicGo; upload one / all local images; test uploader', async ({ page }) => {
   await page.evaluate(() => {

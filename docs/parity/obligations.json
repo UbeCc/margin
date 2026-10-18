@@ -2,10 +2,10 @@
  "generated_from": {
   "spec": "typora-re/parity-spec.md",
   "prose": "typora-re/sections/*.md",
-  "margin_head": "950546ad4c5c986207aea8ccfc050da9653da74c"
+  "margin_head": "e2015b1bd685484d704588517e3a27ea99e3635a"
  },
  "summary": {
-  "head": "950546ad4c5c986207aea8ccfc050da9653da74c",
+  "head": "e2015b1bd685484d704588517e3a27ea99e3635a",
   "artifact_sha256": "a8818df6ac7d968d669d275a99c2d2e8653fa388a8b4e20f9da559553e79bdbb",
   "inventory": {
    "total": 172,
@@ -16,8 +16,8 @@
    "verified_by_test": 147
   },
   "ledger": {
-   "ledger_id": "rol_0971bf7b466f6a8c468c6ef5675d428e8c0ce8aeb15915bc5c72ea34ffb59f06",
-   "closure_digest": "107281c90c19cbe165d82d4408fd6708c4d37f57bd479d655030d3542b01e5d3",
+   "ledger_id": "rol_54d431abd7a8072ff254fca17f318856576d8def44fc3bcc3d82205f0f7fe6f4",
+   "closure_digest": "3dcc184ae0b7000293912b736bbd3d00cd8e4de0a32092f4ab389e7bbc727a8e",
    "status": "unknown",
    "summary": {
     "total": 177,
@@ -119,7 +119,7 @@
      }
     ]
    },
-   "evidence_id": "ev_39475fb3ebbf5f5e62484183dff845b5269206d4b49cd252beef8ceed33a4171"
+   "evidence_id": "ev_8a22e73197077bd1c3eb268181231a2d52d6181e6b7d24ffa1d975b10a39fee1"
   },
   "coverage": {
    "status": "unknown",
@@ -3407,7 +3407,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "label: 'Copy / Paste As…'",
-    "sha256": "48873bdc7750656dddabfd7c4f2ab18a8ecd7d26470e0c9b404b6797d03afea3"
+    "sha256": "d347329e765b2099243821fdcd7b1008be994b83d23735311953c9348b321924"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -3449,7 +3449,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "label: 'Copy Link Address'",
-    "sha256": "48873bdc7750656dddabfd7c4f2ab18a8ecd7d26470e0c9b404b6797d03afea3"
+    "sha256": "d347329e765b2099243821fdcd7b1008be994b83d23735311953c9348b321924"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -3492,7 +3492,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "block('para:insertBefore', 'Insert Paragraph Before')",
-    "sha256": "48873bdc7750656dddabfd7c4f2ab18a8ecd7d26470e0c9b404b6797d03afea3"
+    "sha256": "d347329e765b2099243821fdcd7b1008be994b83d23735311953c9348b321924"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -3540,7 +3540,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "function copyMath",
-    "sha256": "48873bdc7750656dddabfd7c4f2ab18a8ecd7d26470e0c9b404b6797d03afea3"
+    "sha256": "d347329e765b2099243821fdcd7b1008be994b83d23735311953c9348b321924"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -3920,7 +3920,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "'Delete Code Block'",
-    "sha256": "48873bdc7750656dddabfd7c4f2ab18a8ecd7d26470e0c9b404b6797d03afea3"
+    "sha256": "d347329e765b2099243821fdcd7b1008be994b83d23735311953c9348b321924"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -4201,7 +4201,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "math:copyImage",
-    "sha256": "48873bdc7750656dddabfd7c4f2ab18a8ecd7d26470e0c9b404b6797d03afea3"
+    "sha256": "d347329e765b2099243821fdcd7b1008be994b83d23735311953c9348b321924"
    },
    "verifier": {
     "file": "tests/e2e/parity-tools.spec.ts",
@@ -4523,7 +4523,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "Open Image Location",
-    "sha256": "48873bdc7750656dddabfd7c4f2ab18a8ecd7d26470e0c9b404b6797d03afea3"
+    "sha256": "d347329e765b2099243821fdcd7b1008be994b83d23735311953c9348b321924"
    },
    "verifier": {
     "file": "tests/e2e/parity-images.spec.ts",
@@ -4588,7 +4588,7 @@
      "images §9"
     ]
    },
-   "note": "Typora presets 25-200% plus 1/scale (PNG pHYs / JPEG JFIF density); inline <img> renders as an image",
+   "note": "presets 25–200%; direct \"Zoom Image to N%\" = explicit style zoom, else 100/pixel-ratio when the DPI hint ≠ 72 (ratio prefetched at render via images.getScale, #155); inline <img> renders as an image",
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
