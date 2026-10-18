@@ -74,6 +74,33 @@ export function editorPane(k: PrefKit): HTMLElement {
 
 export function markdownPane(k: PrefKit): HTMLElement {
   const md = k.cur().markdown;
+  // Smart Punctuation (#133, fe-preferences §7.3): the remap box is forced checked and
+  // disabled while Convert on Input is selected and Smart Quotes or Smart Dashes is on;
+  // the parser applies the same rule via remapOn() (options.ts).
+  const smartSel = k.select(
+    'markdown.smartPunctuation',
+    [['input', 'Convert on Input'], ['rendering', 'Convert on Rendering']],
+    md.smartPunctuation,
+    (v) => k.setMd({ smartPunctuation: v as MarkdownOptions['smartPunctuation'] }),
+  );
+  const quoteRow = k.mdToggle('smartQuote', 'Smart Quotes', 'You could set quote patterns in System Preferences → Keyboard → Text. If it is changed, Typora will need a restart to apply it.');
+  const dashRow = k.mdToggle('smartDash', 'Smart Dashes');
+  const remapRow = k.mdToggle(
+    'remapPunctuation',
+    'Remap Unicode Punctuation on Parse',
+    "Recognize unicode punctuations as ASCII ones when parse markdown, e.g: 》 blockquote → > blockquote; [link](src ’title’) → [link](src 'title'). It will be turned on automatically if smart quotes/dashes will be converted on input.",
+  );
+  const remapBox = remapRow.querySelector('input')!;
+  const syncRemap = () => {
+    const m = k.cur().markdown;
+    const forced = m.smartPunctuation === 'input' && (m.smartQuote || m.smartDash);
+    remapBox.disabled = forced;
+    remapBox.checked = forced || m.remapPunctuation;
+  };
+  smartSel.addEventListener('change', syncRemap);
+  quoteRow.querySelector('input')!.addEventListener('change', syncRemap);
+  dashRow.querySelector('input')!.addEventListener('change', syncRemap);
+  syncRemap();
   return h(
     'section.pref-section',
     { 'data-section': 'markdown' },
@@ -107,18 +134,13 @@ export function markdownPane(k: PrefKit): HTMLElement {
     k.group(
       'Smart Punctuation',
       k.row(
-        'Convert',
-        k.select(
-          'markdown.smartPunctuation',
-          [['input', 'Convert on Input'], ['rendering', 'Convert on Rendering']],
-          md.smartPunctuation,
-          (v) => k.setMd({ smartPunctuation: v as MarkdownOptions['smartPunctuation'] }),
-        ),
-        'Convert on Input: input ASCII dashes or quotes, converted and saved as curly quotes or unicode dashes. Convert on Rendering: input and saved as ASCII, render as curly quotes or unicode dashes.',
+        '',
+        smartSel,
+        'Convert on Input: Input ASCII dashes or quotes, converted and saved as curly quotes or unicode dashes. Convert on Rendering: Input and saved as ASCII dashes or quotes, render as curly quotes or unicode dashes.',
       ),
-      k.mdToggle('smartQuote', 'Smart Quotes'),
-      k.mdToggle('smartDash', 'Smart Dashes'),
-      k.mdToggle('remapPunctuation', 'Remap Unicode Punctuation on Parse', 'Recognize unicode punctuations as ASCII ones when parse markdown, e.g: 》 blockquote → > blockquote'),
+      quoteRow,
+      dashRow,
+      remapRow,
     ),
     k.group(
       'Code Fences',

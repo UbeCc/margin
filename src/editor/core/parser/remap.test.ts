@@ -68,10 +68,11 @@ describe('remap on (#133)', () => {
     expect(chain0('－ a\n')?.kind).toBe('item');
     expect(chain0('＋ b\n')?.kind).toBe('item');
     expect(chain0('＊ c\n')?.kind).toBe('item');
-    const ol = parseBlocks('１．first\n２．second\n');
+    // A space/tab after the marker is still required (strict-mode rule (d), fe-preferences §10).
+    const ol = parseBlocks('１． first\n２． second\n');
     expect(ol[0].chain[0]).toMatchObject({ ordered: true, start: 1 });
     expect((ol[0].chain[0] as ItemContainer).number).toBe(2 - 1);
-    rt('－ a\n＋ b\n＊ c\n１．first\n２．second\n３) paren\n');
+    rt('－ a\n＋ b\n＊ c\n１． first\n２． second\n３) paren\n');
   });
 
   it('【x】/【 】 are task checkboxes', () => {
@@ -101,7 +102,12 @@ describe('remap on (#133)', () => {
 
   it('curly titles stay plain text when remap is off', () => {
     resetSyntaxOptions();
-    expect(parseInline('[a](http://x “t”)', new Map()).some((x) => x.k === 'wrap')).toBe(false);
+    const src = '[a](http://x “t”)';
+    const n = parseInline(src, new Map());
+    // Not a markdown link with a curly-quoted title; the bare URL still autolinks
+    // (pre-existing behaviour, unrelated to remap), so check for a titled link only.
+    expect(n.some((x) => x.k === 'wrap' && x.tag === 'link' && x.title === 't')).toBe(false);
+    expect(inlineSource(n)).toBe(src);
   });
 
   it('forced on by Convert-on-Input smart quotes/dashes', () => {
