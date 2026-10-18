@@ -76,6 +76,8 @@ export interface SourceModeInstance {
   replace(query: string, replacement: string, opts?: SourceModeFindOptions & { all?: boolean }): boolean;
   undo(): boolean;
   redo(): boolean;
+  /** Replace the main selection with text (#116 Paste as Plain Text). */
+  replaceSelection(text: string): void;
   /** Insert markdown at a viewport point (drop), falling back to the caret (#129). */
   insertAt(markdown: string, x?: number, y?: number): boolean;
   /** The CodeMirror view (escape hatch for advanced integrations). */
@@ -199,6 +201,7 @@ export const createSourceMode: SourceModeFactory = (host, opts) => {
     },
     undo: () => undo(view),
     redo: () => redo(view),
+    replaceSelection: (text) => view.dispatch(view.state.replaceSelection(text)),
     insertAt(markdown, x, y) {
       let pos: number | null = null;
       if (x !== undefined && y !== undefined && Number.isFinite(x) && Number.isFinite(y)) {

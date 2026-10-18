@@ -24,6 +24,8 @@ export interface SourceModeLike {
   /** Main selection as markdown offsets (feature-detected). */
   getSelection?(): { anchor: number; head: number };
   setSelection?(anchor: number, head: number): void;
+  /** #116: replace the selection with text (source-mode Paste as Plain Text). */
+  replaceSelection?(text: string): void;
   /** CodeMirror escape hatch (blocks' source mode): used for the selection when the methods above are absent. */
   readonly view?: {
     state: { selection: { main: { anchor: number; head: number } } };

@@ -101,6 +101,19 @@ test.describe('rich clipboard (#79)', () => {
     expect(await md(page)).toBe('x **PRIV**\n');
   });
 
+  test('rich copy carries the document URL as the WebArchive base (#115)', async ({ page }) => {
+    const url = 'file:///Users/ubec/Notes/a%20b.md';
+    await open(page, SRC, `&blocks=0&rich&docurl=${encodeURIComponent(url)}`);
+    await copyAll(page);
+    await expect.poll(() => page.evaluate(() => window.__core.rich.length)).toBe(1);
+    expect(await page.evaluate(() => window.__core.rich[0].baseUrl)).toBe(url);
+    // without a document the base is absent and the native side writes untitled.md
+    await open(page, SRC, '&blocks=0&rich');
+    await copyAll(page);
+    await expect.poll(() => page.evaluate(() => window.__core.rich.length)).toBe(1);
+    expect(await page.evaluate(() => window.__core.rich[0].baseUrl)).toBeUndefined();
+  });
+
   test('macOS rich hook gets RTF + nonce after the copy event', async ({ page }) => {
     await open(page, SRC, '&blocks=0&rich');
     const c = await copyAll(page);

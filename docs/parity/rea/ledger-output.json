@@ -1,5 +1,5 @@
 {
- "evidence_id": "ev_c8f1962bfcd9d4f20a501fe92d5c696f55bec44b38b6c2ae985b92c70d5aad22",
+ "evidence_id": "ev_cd07582ff7fca3164e9a1293244ef992bf77586d8e67490b236b20ff047eb3dd",
  "subject": null,
  "provider": {
   "id": "rea-javascript-application-workflows",
@@ -10,14 +10,14 @@
  "predicate_type": "rea.reconstruction-obligation-ledger",
  "operation": "build_reconstruction_obligation_ledger",
  "parameters": {
-  "ledger_id": "rol_498c4412406d80cfb1fde61e8d1480499e82e4f5d070ed715c12e82104366a40",
-  "closure_digest": "4d28d4a0644c12ae757af573a4d8bf10f129ad1f8930c7d4d4d59dfd0e9cb67e"
+  "ledger_id": "rol_d53ed3f9dd368f42b049bac5627e669d84d66f37213cf43e9ba29619463829fc",
+  "closure_digest": "1a3d6dfded62711fdc6a346c1727c1d171b815bef651c9ad053fbbb1df5db497"
  },
  "raw_result": null,
  "normalized_result": {
   "schema": "ReconstructionObligationLedger",
-  "ledger_id": "rol_498c4412406d80cfb1fde61e8d1480499e82e4f5d070ed715c12e82104366a40",
-  "closure_digest": "4d28d4a0644c12ae757af573a4d8bf10f129ad1f8930c7d4d4d59dfd0e9cb67e",
+  "ledger_id": "rol_d53ed3f9dd368f42b049bac5627e669d84d66f37213cf43e9ba29619463829fc",
+  "closure_digest": "1a3d6dfded62711fdc6a346c1727c1d171b815bef651c9ad053fbbb1df5db497",
   "status": "unknown",
   "coverage": {
    "status": "complete"
@@ -146,7 +146,6 @@
     "typora.tools.diagram.copy-image"
    ],
    "missing_verifier_obligation_ids": [
-    "typora.beh.clip.rtf-paste",
     "typora.beh.files.asset-scope",
     "typora.beh.files.title-dirty",
     "typora.ctx.text",
@@ -1583,7 +1582,7 @@
    {
     "obligation_id": "typora.beh.clip.rich-copy",
     "obligation_version": 1,
-    "title": "Rich copy writes plain + HTML + RTF + private format",
+    "title": "Rich copy writes plain + HTML + RTF + RTFD + WebArchive (doc URL base) + private format",
     "origin": "reviewed",
     "application_layer": "runtime",
     "family": "beh.clip",
@@ -1591,21 +1590,21 @@
      "artifact_sha256": null,
      "application_node_id": null,
      "semantic_node_id": null,
-     "location": "Rich copy writes plain + HTML + RTF + private format"
+     "location": "Rich copy writes plain + HTML + RTF + RTFD + WebArchive (doc URL base) + private format"
     },
     "authority_references": [
      {
-      "evidence_id": "ev_22691ae9e3d81803ca3993a3d3739118156b51e9dab896e5d77de3d7a136cc0e",
+      "evidence_id": "ev_a09d785543035d5f2caf35adc11719504775791c3226564380657d10b75daf91",
       "authority": "analyst-inference",
       "state": "reviewed",
-      "location": "/evidence/ev_22691ae9e3d81803ca3993a3d3739118156b51e9dab896e5d77de3d7a136cc0e"
+      "location": "/evidence/ev_a09d785543035d5f2caf35adc11719504775791c3226564380657d10b75daf91"
      }
     ],
     "source_state": "reviewed",
     "observed_cases": [
      {
       "kind": "positive",
-      "evidence_id": "ev_22691ae9e3d81803ca3993a3d3739118156b51e9dab896e5d77de3d7a136cc0e",
+      "evidence_id": "ev_a09d785543035d5f2caf35adc11719504775791c3226564380657d10b75daf91",
       "location": "clipboard-contextmenu §3.3"
      }
     ],
@@ -1628,13 +1627,13 @@
      "owner": {
       "module_path": "src/editor/core/clipboard.ts",
       "symbol": "export function onCopy",
-      "owner_sha256": "f49ee3ca25b4d4cc41434016ab90e29bce67c37fc73861ebf32fc16d923709be"
+      "owner_sha256": "6f0e36cd40886984240bbad52eb1540fde1df3d042d0a48752ddac75c2b8e11c"
      },
      "parser_type": null,
      "original_cases": [
       {
        "kind": "positive",
-       "evidence_id": "ev_22691ae9e3d81803ca3993a3d3739118156b51e9dab896e5d77de3d7a136cc0e",
+       "evidence_id": "ev_a09d785543035d5f2caf35adc11719504775791c3226564380657d10b75daf91",
        "location": "clipboard-contextmenu §3.3"
       }
      ],
@@ -1699,17 +1698,17 @@
     },
     "authority_references": [
      {
-      "evidence_id": "ev_96c6bcfb9bc2e3243ba76b1914aa49ecd9770781a359993911865ee5b48ac2ec",
+      "evidence_id": "ev_eca825f63f715790f4f8c6d9c5554457f8a5b412d8556fbf8d4f7db36aa02eaa",
       "authority": "analyst-inference",
       "state": "reviewed",
-      "location": "/evidence/ev_96c6bcfb9bc2e3243ba76b1914aa49ecd9770781a359993911865ee5b48ac2ec"
+      "location": "/evidence/ev_eca825f63f715790f4f8c6d9c5554457f8a5b412d8556fbf8d4f7db36aa02eaa"
      }
     ],
     "source_state": "reviewed",
     "observed_cases": [
      {
       "kind": "positive",
-      "evidence_id": "ev_96c6bcfb9bc2e3243ba76b1914aa49ecd9770781a359993911865ee5b48ac2ec",
+      "evidence_id": "ev_eca825f63f715790f4f8c6d9c5554457f8a5b412d8556fbf8d4f7db36aa02eaa",
       "location": "clipboard-contextmenu §3.2"
      }
     ],
@@ -1725,44 +1724,66 @@
     "residual_unknown_ids": [],
     "unavailable_authority": [],
     "required_next_evidence": [
-     "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules.",
-     "Implement: RTF/RTFD text+formatting converted natively (NSAttributedString, macOS); RTFD image attachments not materialized"
+     "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules."
     ],
     "binding": {
      "obligation_id": "typora.beh.clip.rtf-paste",
      "owner": {
       "module_path": "src-tauri/src/clipboard_read.rs",
       "symbol": "pub fn rtf_to_html",
-      "owner_sha256": "88d1e56a773345d9d4e88d43d7f07fe82508514e030e8ba8a25cde698bbe74cf"
+      "owner_sha256": "8efaf3b232f64b0f6b3c8edfdd962dbba7239e726b17e3a21ddeaa1296e2bbec"
      },
      "parser_type": null,
      "original_cases": [
       {
        "kind": "positive",
-       "evidence_id": "ev_96c6bcfb9bc2e3243ba76b1914aa49ecd9770781a359993911865ee5b48ac2ec",
+       "evidence_id": "ev_eca825f63f715790f4f8c6d9c5554457f8a5b412d8556fbf8d4f7db36aa02eaa",
        "location": "clipboard-contextmenu §3.2"
       }
      ],
-     "fixtures": [],
-     "verifier": null
+     "fixtures": [
+      {
+       "fixture_id": "beh.clip.rtf-paste.positive",
+       "case_kind": "positive",
+       "authority": "renderer",
+       "evidence_ids": [
+        "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       ]
+      }
+     ],
+     "verifier": {
+      "verifier_id": "margin.playwright.beh.clip.rtf-paste",
+      "claim_id": "claim.beh.clip.rtf-paste",
+      "command": "npx playwright test tests/e2e/parity-clipboard.spec.ts -g \"beh.clip.rtf-paste: Paste RTF/RTFD from rich apps\"",
+      "authority": "renderer",
+      "status": "pass",
+      "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+      "enumerated_obligation_ids": [
+       "typora.beh.clip.rtf-paste"
+      ],
+      "nondeterminism": {
+       "mode": "total-order",
+       "specification": "Single deterministic suite run; pass = suite exited 0 with the named test not skipped."
+      }
+     }
     },
     "status": "implemented",
     "diagnostics": [
-     {
-      "code": "missing-case",
-      "detail": "Required positive fixture is missing."
-     },
-     {
-      "code": "missing-verifier",
-      "detail": "No verifier claim is bound to this obligation."
-     },
      {
       "code": "static-only",
       "detail": "No static authority characterizes the original finite behavior."
      },
      {
+      "code": "weak-fixture-authority",
+      "detail": "positive fixture lacks renderer authority or authenticated Evidence."
+     },
+     {
       "code": "weak-original-case-authority",
       "detail": "Original positive behavior lacks static Evidence."
+     },
+     {
+      "code": "weak-verifier-authority",
+      "detail": "Verifier authority does not satisfy renderer."
      }
     ]
    },
@@ -2334,7 +2355,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "private degradeLarge(",
-      "owner_sha256": "c7d8c43436e53edfd3d479f7e57da03a948511976d947184775d4a12ba9b6520"
+      "owner_sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
      },
      "parser_type": null,
      "original_cases": [
@@ -3456,7 +3477,7 @@
      "owner": {
       "module_path": "src-tauri/src/lib.rs",
       "symbol": "on_second_instance",
-      "owner_sha256": "38664c04a0870abc4fca61c28b28a924715116817fb59a9443f81836f851fe7c"
+      "owner_sha256": "03250da8052456a774a498ace7a3f6910350ec9558bad8875663f6195f660bd0"
      },
      "parser_type": null,
      "original_cases": [
@@ -3665,7 +3686,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "setDocumentEdited",
-      "owner_sha256": "c7d8c43436e53edfd3d479f7e57da03a948511976d947184775d4a12ba9b6520"
+      "owner_sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
      },
      "parser_type": null,
      "original_cases": [
@@ -3746,7 +3767,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "applyAppearance",
-      "owner_sha256": "c7d8c43436e53edfd3d479f7e57da03a948511976d947184775d4a12ba9b6520"
+      "owner_sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
      },
      "parser_type": null,
      "original_cases": [
@@ -4556,7 +4577,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "private createExports(",
-      "owner_sha256": "c7d8c43436e53edfd3d479f7e57da03a948511976d947184775d4a12ba9b6520"
+      "owner_sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
      },
      "parser_type": null,
      "original_cases": [
@@ -6648,7 +6669,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'preferences'",
-      "owner_sha256": "c7d8c43436e53edfd3d479f7e57da03a948511976d947184775d4a12ba9b6520"
+      "owner_sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
      },
      "parser_type": null,
      "original_cases": [
@@ -6834,7 +6855,7 @@
      "owner": {
       "module_path": "src/editor/core/copy-as.ts",
       "symbol": "export function copyAs",
-      "owner_sha256": "1220ef1fecab71b0f1c694e4fde02df576d105325111926a673925c9f720b249"
+      "owner_sha256": "131ef65b851e5714171944ca7443fd06cb8fe87cbf9f5f9131ca203c5fb8edfc"
      },
      "parser_type": null,
      "original_cases": [
@@ -6938,7 +6959,7 @@
      "owner": {
       "module_path": "src/editor/core/clipboard.ts",
       "symbol": "export function onPaste",
-      "owner_sha256": "f49ee3ca25b4d4cc41434016ab90e29bce67c37fc73861ebf32fc16d923709be"
+      "owner_sha256": "6f0e36cd40886984240bbad52eb1540fde1df3d042d0a48752ddac75c2b8e11c"
      },
      "parser_type": null,
      "original_cases": [
@@ -7596,7 +7617,7 @@
      "owner": {
       "module_path": "src/editor/core/copy-as.ts",
       "symbol": "export function pastePlain",
-      "owner_sha256": "1220ef1fecab71b0f1c694e4fde02df576d105325111926a673925c9f720b249"
+      "owner_sha256": "131ef65b851e5714171944ca7443fd06cb8fe87cbf9f5f9131ca203c5fb8edfc"
      },
      "parser_type": null,
      "original_cases": [
@@ -7999,7 +8020,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'undo'",
-      "owner_sha256": "c7d8c43436e53edfd3d479f7e57da03a948511976d947184775d4a12ba9b6520"
+      "owner_sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
      },
      "parser_type": null,
      "original_cases": [
@@ -8103,7 +8124,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'close'",
-      "owner_sha256": "c7d8c43436e53edfd3d479f7e57da03a948511976d947184775d4a12ba9b6520"
+      "owner_sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
      },
      "parser_type": null,
      "original_cases": [
@@ -8519,7 +8540,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'toggleLineEnding'",
-      "owner_sha256": "c7d8c43436e53edfd3d479f7e57da03a948511976d947184775d4a12ba9b6520"
+      "owner_sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
      },
      "parser_type": null,
      "original_cases": [
@@ -8623,7 +8644,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'new'",
-      "owner_sha256": "c7d8c43436e53edfd3d479f7e57da03a948511976d947184775d4a12ba9b6520"
+      "owner_sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
      },
      "parser_type": null,
      "original_cases": [
@@ -8727,7 +8748,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "private async newWindow(",
-      "owner_sha256": "c7d8c43436e53edfd3d479f7e57da03a948511976d947184775d4a12ba9b6520"
+      "owner_sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
      },
      "parser_type": null,
      "original_cases": [
@@ -8831,7 +8852,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'open'",
-      "owner_sha256": "c7d8c43436e53edfd3d479f7e57da03a948511976d947184775d4a12ba9b6520"
+      "owner_sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
      },
      "parser_type": null,
      "original_cases": [
@@ -8935,7 +8956,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'openFolder'",
-      "owner_sha256": "c7d8c43436e53edfd3d479f7e57da03a948511976d947184775d4a12ba9b6520"
+      "owner_sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
      },
      "parser_type": null,
      "original_cases": [
@@ -9144,7 +9165,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'print'",
-      "owner_sha256": "c7d8c43436e53edfd3d479f7e57da03a948511976d947184775d4a12ba9b6520"
+      "owner_sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
      },
      "parser_type": null,
      "original_cases": [
@@ -9329,7 +9350,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "quickOpen(): void",
-      "owner_sha256": "c7d8c43436e53edfd3d479f7e57da03a948511976d947184775d4a12ba9b6520"
+      "owner_sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
      },
      "parser_type": null,
      "original_cases": [
@@ -9953,7 +9974,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'save'",
-      "owner_sha256": "c7d8c43436e53edfd3d479f7e57da03a948511976d947184775d4a12ba9b6520"
+      "owner_sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
      },
      "parser_type": null,
      "original_cases": [
@@ -10161,7 +10182,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'saveAs'",
-      "owner_sha256": "c7d8c43436e53edfd3d479f7e57da03a948511976d947184775d4a12ba9b6520"
+      "owner_sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
      },
      "parser_type": null,
      "original_cases": [
@@ -13087,7 +13108,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'openThemesFolder'",
-      "owner_sha256": "c7d8c43436e53edfd3d479f7e57da03a948511976d947184775d4a12ba9b6520"
+      "owner_sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
      },
      "parser_type": null,
      "original_cases": [
@@ -13336,7 +13357,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'toggleFocus'",
-      "owner_sha256": "c7d8c43436e53edfd3d479f7e57da03a948511976d947184775d4a12ba9b6520"
+      "owner_sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
      },
      "parser_type": null,
      "original_cases": [
@@ -13578,7 +13599,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'toggleSidebar'",
-      "owner_sha256": "c7d8c43436e53edfd3d479f7e57da03a948511976d947184775d4a12ba9b6520"
+      "owner_sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
      },
      "parser_type": null,
      "original_cases": [
@@ -13682,7 +13703,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'toggleSource'",
-      "owner_sha256": "c7d8c43436e53edfd3d479f7e57da03a948511976d947184775d4a12ba9b6520"
+      "owner_sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
      },
      "parser_type": null,
      "original_cases": [
@@ -13870,7 +13891,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'zoomIn'",
-      "owner_sha256": "c7d8c43436e53edfd3d479f7e57da03a948511976d947184775d4a12ba9b6520"
+      "owner_sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
      },
      "parser_type": null,
      "original_cases": [
@@ -18192,7 +18213,6 @@
    "ev_1fff77de0927975cf6c8e1ae1f4f756642727a508cab1ec65759d425f7ebbded",
    "ev_210b496b7a2ca2b6eac0606fe3a5ed74764fe4084ee04c8729b0bcf59ab89760",
    "ev_21751fb712fd68c7c9d1256ac941429bce6c4996aec755f8f2ba57dc94040a27",
-   "ev_22691ae9e3d81803ca3993a3d3739118156b51e9dab896e5d77de3d7a136cc0e",
    "ev_24b85bcb7b6f02107a51c32f3b2ab58f167014f21a3ab7732431d42a5e109e30",
    "ev_25f3c3dbdf50fedba08b00fb0472f24af2c02c1caddaaa5cbe371074a29e875d",
    "ev_260219b51bfffa0e540e6c3cb4f434b9428d78944c4f727434cc632bc8596fc0",
@@ -18287,13 +18307,13 @@
    "ev_95e424eaec6eda0b0640cc7543ac3325b75ce6e13b48b4e108883f92c819b564",
    "ev_962e103280cb9c80f2be931414b82ef066db1c0dc5cf8b13f923b4b3205207b6",
    "ev_96403b4d39428d03b55c055c1e4b75d07b0e17be7b6a8063f07942f9febf9fd0",
-   "ev_96c6bcfb9bc2e3243ba76b1914aa49ecd9770781a359993911865ee5b48ac2ec",
    "ev_9949c2545d506e24d01a06822e483aab48be38ed5c5d4d7151783ad6a9de951e",
    "ev_9978957139b62790328ce143f76f1bc27e60267da374644b4a4f1c811e0e1800",
    "ev_9a0e7d95519047851d43316964853f6eb023f03b5de2bda197dd72006a1fa013",
    "ev_9a1f668957617a753e914df1c0a91d4357c25b0e580651d1c7ab7490e92269b3",
    "ev_9a69d753f08286af0ef87ca3fe39ec70b7c1ced3183aca26a553d6186b9a8d50",
    "ev_9be74ca8240fbdc5f8b738f0d11756c138b11aac7dee84cafca119f8e261c7d5",
+   "ev_a09d785543035d5f2caf35adc11719504775791c3226564380657d10b75daf91",
    "ev_a0a7f9dda9d20c065da1245a39262ad4003405c6d8c836be4ea6cb1abee41e7c",
    "ev_a17159ad048ad23364cebd9732d3aee1e83eef8222819fe0a916f658ec543dbc",
    "ev_a218c2f678ee74a5dfe9f6c09b49991d9ec929b874b98c3828ea54cd3c253e5d",
@@ -18330,6 +18350,7 @@
    "ev_e82ff7ef94f07ee767d79b6c4d10aaef9fa561b80303555d17775e549ea605a1",
    "ev_eb3e7536ac4c725d6c29f2a9e6971ba1ebc81f1bd0d5a3d05167408c795d3d95",
    "ev_ec77cc8a70689d0ce84dfb86b2ecb05569bfcd9b4880dee6bb06de9479eb750c",
+   "ev_eca825f63f715790f4f8c6d9c5554457f8a5b412d8556fbf8d4f7db36aa02eaa",
    "ev_ed3992c4d909eb7e2ca59f8bba7490f03a0b168e5a0859174907e4395e181c87",
    "ev_ed434c97506d18f834b446e072875525dcee504ad371d8e184fd7217dbbf244c",
    "ev_f4157d50cf77f67ec4ec0148aa5fee7d38203171433309534b5eaeb149724f5d",
@@ -18381,7 +18402,6 @@
   "ev_1fff77de0927975cf6c8e1ae1f4f756642727a508cab1ec65759d425f7ebbded",
   "ev_210b496b7a2ca2b6eac0606fe3a5ed74764fe4084ee04c8729b0bcf59ab89760",
   "ev_21751fb712fd68c7c9d1256ac941429bce6c4996aec755f8f2ba57dc94040a27",
-  "ev_22691ae9e3d81803ca3993a3d3739118156b51e9dab896e5d77de3d7a136cc0e",
   "ev_24b85bcb7b6f02107a51c32f3b2ab58f167014f21a3ab7732431d42a5e109e30",
   "ev_25f3c3dbdf50fedba08b00fb0472f24af2c02c1caddaaa5cbe371074a29e875d",
   "ev_260219b51bfffa0e540e6c3cb4f434b9428d78944c4f727434cc632bc8596fc0",
@@ -18476,13 +18496,13 @@
   "ev_95e424eaec6eda0b0640cc7543ac3325b75ce6e13b48b4e108883f92c819b564",
   "ev_962e103280cb9c80f2be931414b82ef066db1c0dc5cf8b13f923b4b3205207b6",
   "ev_96403b4d39428d03b55c055c1e4b75d07b0e17be7b6a8063f07942f9febf9fd0",
-  "ev_96c6bcfb9bc2e3243ba76b1914aa49ecd9770781a359993911865ee5b48ac2ec",
   "ev_9949c2545d506e24d01a06822e483aab48be38ed5c5d4d7151783ad6a9de951e",
   "ev_9978957139b62790328ce143f76f1bc27e60267da374644b4a4f1c811e0e1800",
   "ev_9a0e7d95519047851d43316964853f6eb023f03b5de2bda197dd72006a1fa013",
   "ev_9a1f668957617a753e914df1c0a91d4357c25b0e580651d1c7ab7490e92269b3",
   "ev_9a69d753f08286af0ef87ca3fe39ec70b7c1ced3183aca26a553d6186b9a8d50",
   "ev_9be74ca8240fbdc5f8b738f0d11756c138b11aac7dee84cafca119f8e261c7d5",
+  "ev_a09d785543035d5f2caf35adc11719504775791c3226564380657d10b75daf91",
   "ev_a0a7f9dda9d20c065da1245a39262ad4003405c6d8c836be4ea6cb1abee41e7c",
   "ev_a17159ad048ad23364cebd9732d3aee1e83eef8222819fe0a916f658ec543dbc",
   "ev_a218c2f678ee74a5dfe9f6c09b49991d9ec929b874b98c3828ea54cd3c253e5d",
@@ -18519,6 +18539,7 @@
   "ev_e82ff7ef94f07ee767d79b6c4d10aaef9fa561b80303555d17775e549ea605a1",
   "ev_eb3e7536ac4c725d6c29f2a9e6971ba1ebc81f1bd0d5a3d05167408c795d3d95",
   "ev_ec77cc8a70689d0ce84dfb86b2ecb05569bfcd9b4880dee6bb06de9479eb750c",
+  "ev_eca825f63f715790f4f8c6d9c5554457f8a5b412d8556fbf8d4f7db36aa02eaa",
   "ev_ed3992c4d909eb7e2ca59f8bba7490f03a0b168e5a0859174907e4395e181c87",
   "ev_ed434c97506d18f834b446e072875525dcee504ad371d8e184fd7217dbbf244c",
   "ev_f4157d50cf77f67ec4ec0148aa5fee7d38203171433309534b5eaeb149724f5d",

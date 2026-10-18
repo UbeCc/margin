@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { fuzzyFilter, fuzzyMatch, highlightSegments } from '../util/fuzzy';
 import {
-  foldFirmlinks, relativeFrom, basename, dirname, displayPath, extname, isInside, isValidFileName, join, normalize, relative, resolveDocPath, stripExt, uniqueName,
+  foldFirmlinks, relativeFrom, basename, dirname, displayPath, extname, fileUrl, isInside, isValidFileName, join, normalize, relative, resolveDocPath, stripExt, uniqueName,
 } from '../util/path';
 import { SHORTCUTS } from '../../platform/shortcuts';
 import { formatShortcut, matchShortcut, parseShortcut } from '../util/keymap';
@@ -44,8 +44,17 @@ describe('path helpers', () => {
     expect(dirname('C:\\x\\y.md')).toBe('C:\\x');
     expect(dirname('C:\\y.md')).toBe('C:\\');
     expect(extname('a/b.test.md')).toBe('.md');
+
     expect(extname('.gitignore')).toBe('');
     expect(stripExt('note.md')).toBe('note');
+  });
+
+  it('fileUrl: percent-encoded file URL; untitled.md without a document (#115)', () => {
+    expect(fileUrl('/Users/ubec/Notes/a b.md')).toBe('file:///Users/ubec/Notes/a%20b.md');
+    expect(fileUrl('/tmp/x#y?z.md')).toBe('file:///tmp/x%23y%3Fz.md');
+    expect(fileUrl('C:\\Docs\\a b.md')).toBe('file:///C:/Docs/a%20b.md');
+    expect(fileUrl('')).toBe('untitled.md');
+    expect(fileUrl(null)).toBe('untitled.md');
   });
   it('normalize and join', () => {
     expect(normalize('/a/./b/../c')).toBe('/a/c');
