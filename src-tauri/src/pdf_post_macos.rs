@@ -295,7 +295,7 @@ mod tests {
 
     /// Two-page PDF: page 1 "Alpha heading" + a link to `#beta`, page 2 "Beta heading".
     fn sample_pdf() -> Vec<u8> {
-        let page = |text: &str, annots: &str, contents: u32| {
+        let page = |_text: &str, annots: &str, contents: u32| {
             format!("<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents {contents} 0 R {annots}>>")
         };
         let stream = |t: &str| {
