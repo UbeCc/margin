@@ -432,6 +432,7 @@ fn spotlight_spawn(root: &Path, query: &str) -> Option<mpsc::Receiver<Option<Vec
 }
 
 #[cfg(not(target_os = "macos"))]
+#[allow(dead_code)] // only the benchmark calls it off macOS
 pub fn spotlight_hits(_root: &Path, _query: &str) -> Option<Vec<String>> {
     None
 }
