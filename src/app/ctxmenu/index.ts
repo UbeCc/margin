@@ -28,6 +28,8 @@ export interface CtxHost {
   uploadImage?(src: string): void;
   imageOps?(t: CtxTarget): ImageCtxOps | null;
   saveVideoAs?(src: string): void;
+  /** #154: true when the image storage target is an uploader (Upload Image leads the menu). */
+  imageUploadFirst?(): boolean;
 }
 
 const TABLE_BUTTONS: Record<TableAction, string> = {
@@ -127,7 +129,13 @@ export class EditorContextMenu {
     if (e.defaultPrevented) return;
     const ed = this.host.editor();
     const source = ed.isSourceMode() ? this.editorHost.querySelector<HTMLElement>('.md-source-host') : null;
-    const t = contextTarget(e.target, ed.isSourceMode() ? null : this.root(), source, { x: e.clientX, y: e.clientY });
+    const t = contextTarget(
+      e.target,
+      ed.isSourceMode() ? null : this.root(),
+      source,
+      { x: e.clientX, y: e.clientY },
+      { uploadFirst: !!this.host.imageUploadFirst?.() },
+    );
     if (t.kind === 'none') return;
     e.preventDefault();
     this.target = t;

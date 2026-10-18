@@ -218,6 +218,20 @@ test('images.reveal-open: Image context: Open Image Location… / Open in Browse
   await expect(ctxItem(page, 'Open Image Location…')).toHaveCount(0);
   await ctxItem(page, /^Open Image in Browser…$/).click();
   expect(await page.evaluate(() => (window as unknown as Win).__calls)).toEqual(['https://x.example/w.png']);
+
+  // #154: storage target = uploader → Upload Image leads (and is not duplicated);
+  // the copy-to-folder quick item disappears (§1.3: target "upload" ≠ copy folder)
+  await settings(page, { imageUploadOnInsert: true });
+  await expect
+    .poll(() => page.locator('.md-editor .md-image img.md-img').evaluateAll((els) => els.every((e) => (e as HTMLImageElement).complete)))
+    .toBe(true);
+  await rightClickImage(page, 0);
+  const labelsUp = page.locator('.context-menu:not(.context-submenu) > .context-item .context-label');
+  await expect(labelsUp).toHaveText([
+    'Upload Image', 'Open Image Location…', 'Copy Image to…', 'Rename or Move Image to…',
+    'Zoom Image', 'Switch Image Syntax', 'Delete Image File',
+    'Cut', 'Copy', 'Copy Image Content', 'Paste', 'Copy / Paste As…', 'Save Image As…',
+  ]);
 });
 
 test('images.zoom: Image zoom (direct entry + presets) and switch Markdown/HTML image syntax', async ({ page }) => {

@@ -237,4 +237,15 @@ export class ImageTools {
     const dir = t.rule.dir.replace(/\$\{filename\}/g, stem);
     return absOfSrc(dir.replace(/\/+$/, '') || '.', docDir);
   }
+
+  /** #154: the storage target resolves to an upload rule (Typora's `getTargetImageStorageFolder` → "upload"). */
+  isUploadTarget(): boolean {
+    return (
+      imageTarget({
+        markdown: this.host.markdown(),
+        globalRule: this.host.settings().imageRule as ImageRule,
+        options: imageOptionsOf(this.host.settings()),
+      }).kind === 'upload'
+    );
+  }
 }

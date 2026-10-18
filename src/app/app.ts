@@ -196,6 +196,7 @@ export class App {
         baseDir: () => this.doc.dir,
         uploadImage: (src) => void this.uploader.uploadSrcs([src]),
         imageOps: (t) => (t.img ? this.images.ctxOps(t.img) : null),
+        imageUploadFirst: () => this.images.uploadLeads(),
         saveVideoAs: (src) => void saveMediaAs({ platform: this.platform, notify: (m, k) => void toast(m, { kind: k }) }, null, src, 'Video'),
         notify: (m, k) => void toast(m, { kind: k }),
       },

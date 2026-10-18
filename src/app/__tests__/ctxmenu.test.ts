@@ -82,6 +82,11 @@ describe('context menu targets (Typora key lists)', () => {
     expect(contextTarget(root.querySelector('#web img'), root).keys).toEqual(['revealImgInBrowser', 'zoomImg', 'imgSyntax', 'deleteImg', '|', 'normal']);
     expect(contextTarget(document.getElementById('field'), root).keys).toEqual(['input']);
     expect(contextTarget(document.body, root).kind).toBe('none');
+    // #154: upload storage → Upload Image leads the list (not duplicated in the group)
+    expect(contextTarget(root.querySelector('img'), root, null, undefined, { uploadFirst: true }).keys).toEqual([
+      'uploadImg', 'revealImgInFinder', 'copyImgToDir', 'copyImgToSelect', 'moveImgToDir', 'moveImgToSelect', '|', 'copyImg',
+      'zoomImg', 'imgSyntax', 'deleteImgFile', '|', 'normal', '|', 'download-image',
+    ]);
   });
 
   it('source mode is a plain text field menu', () => {

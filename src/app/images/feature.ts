@@ -210,6 +210,11 @@ export class ImageFeature {
     };
   }
 
+  /** #154: the storage target is an uploader → "Upload Image" leads the image context menu. */
+  uploadLeads(): boolean {
+    return this.tools.isUploadTarget();
+  }
+
   /** The image at the caret (expanded inline image or the selected / focused rendered image). */
   currentImage(): { img: HTMLImageElement; ref: Located } | null {
     const root = this.host.editorRoot();
