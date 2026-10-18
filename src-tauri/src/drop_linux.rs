@@ -30,10 +30,14 @@ struct DropState {
 /// Percent-decoded path of a `file://` drag URI (non-file URIs are skipped).
 pub fn path_from_uri(uri: &str) -> Option<String> {
     let p = uri.strip_prefix("file://")?;
-    let p = match p.strip_prefix("localhost/") {
-        Some(rest) => rest,
-        None if p.starts_with('/') => p,
-        _ => return None,
+    let owned;
+    let p: &str = if let Some(rest) = p.strip_prefix("localhost/") {
+        owned = format!("/{rest}");
+        &owned
+    } else if p.starts_with('/') {
+        p
+    } else {
+        return None; // authority form (file://host/path) other than localhost
     };
     if p.is_empty() {
         return None;

@@ -12,7 +12,7 @@
 //! bookmarks and PDF metadata (the JS fallback for those is unaffected; see
 //! the parity ledger). Paper size and margins are applied natively.
 
-use webkit2gtk::prelude::*;
+use webkit2gtk::{PrintOperationExt, WebViewExt};
 use std::path::Path;
 use std::sync::mpsc;
 use std::time::{Duration, Instant};
@@ -132,7 +132,7 @@ async fn run(
     tokio_sleep(Duration::from_millis(400)).await;
 
     let _ = std::fs::remove_file(out);
-    print_op(win, &file_url(out), paper.as_ref())?;
+    print_op(win, &file_url(out), paper)?;
     if out.metadata().map(|m| m.len() > 0).unwrap_or(false) {
         Ok(())
     } else {
@@ -146,7 +146,7 @@ async fn run(
 fn print_op(
     win: &WebviewWindow<impl Runtime>,
     out_uri: &str,
-    paper: Option<&crate::export_cmds::Paper>,
+    paper: Option<crate::export_cmds::Paper>,
 ) -> Result<(), String> {
     let out_uri = out_uri.to_string();
     let done = on_main(win, move |w| {
@@ -158,15 +158,15 @@ fn print_op(
 
         let op = webkit2gtk::PrintOperation::new(w);
         op.set_print_settings(&settings);
-        op.set_page_setup(&page_setup(paper));
+        op.set_page_setup(&page_setup(paper.as_ref()));
 
         let (tx, rx) = mpsc::channel::<Result<(), String>>();
+        let tx_ok = tx.clone();
         op.connect_failed(move |_, e| {
             let _ = tx.send(Err(e.to_string()));
         });
-        let tx2 = tx.clone();
         op.connect_finished(move |_| {
-            let _ = tx2.send(Ok(()));
+            let _ = tx_ok.send(Ok(()));
         });
         op.print();
         rx

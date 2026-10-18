@@ -60,6 +60,7 @@ pub fn start_drag<R: Runtime>(win: &WebviewWindow<R>, paths: &[String]) -> bool 
         return false;
     }
     let paths = paths.to_vec();
+    let (tx, rx) = std::sync::mpsc::channel();
     let dispatched = win.with_webview(move |pw| {
         PATHS.with(|p| *p.borrow_mut() = paths.clone());
         let webview = pw.inner();
@@ -91,7 +92,7 @@ pub fn start_drag<R: Runtime>(win: &WebviewWindow<R>, paths: &[String]) -> bool 
             -1,
             -1,
         );
-        ctx.is_some()
+        let _ = tx.send(ctx.is_some());
     });
-    matches!(dispatched, Ok(true))
+    dispatched.is_ok() && rx.recv().unwrap_or(false)
 }

@@ -221,7 +221,7 @@ pub struct FileDrop {
 pub fn emit_file_drop<R: Runtime>(win: &tauri::WebviewWindow<R>, paths: &[String], x: f64, y: f64) {
     let app = win.app_handle();
     for p in paths {
-        allow_assets_for_file(&app, Path::new(p));
+        allow_assets_for_file(app, Path::new(p));
     }
     let _ = win.set_focus();
     let _ = app.emit_to(win.label(), EV_FILE_DROP, FileDrop { paths: paths.to_vec(), x, y });
