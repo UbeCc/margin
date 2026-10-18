@@ -45,6 +45,8 @@ const FILE: &[Item] = &[
     ("revealInFinder", REVEAL, None),
     ("copyFilePath", "Copy File Path", None),
     ("properties", "Properties…", None),
+    ("-", "", None),
+    ("import", "Import…", None),
 ];
 /// Window menu: document tabs (#94).
 const WINDOW_TABS: &[Item] = &[
@@ -57,6 +59,23 @@ const EXPORT: &[Item] = &[
     ("exportDocx", "Word (.docx)…", None),
     ("exportLatex", "LaTeX…", None),
     ("exportEpub", "EPUB…", None),
+    ("exportOdt", "OpenOffice…", None),
+    ("exportRtf", "RTF…", None),
+    ("exportMediawiki", "MediaWiki…", None),
+    ("exportRst", "reStructuredText…", None),
+    ("exportTextile", "Textile…", None),
+    ("exportOpml", "OPML…", None),
+];
+/// Export submenu, after the format items (#95).
+const EXPORT_MORE: &[Item] = &[
+    ("exportHtmlPlain", "HTML (without Styles)…", None),
+    ("exportImage", "Image…", None),
+    ("exportCustom", "Custom…", None),
+    ("-", "", None),
+    ("exportPrevious", "Export with Previous", None),
+    ("exportOverwrite", "Export and Overwrite with Previous", None),
+    ("-", "", None),
+    ("exportSettings", "Export Settings…", None),
 ];
 const EDIT_TOP: &[Item] = &[("undo", "Undo", Some("CmdOrCtrl+Z")), ("redo", "Redo", Some("CmdOrCtrl+Shift+Z"))];
 const EDIT_FIND: &[Item] = &[("find", "Find…", Some("CmdOrCtrl+F")), ("replace", "Replace…", Some("CmdOrCtrl+Alt+F"))];
@@ -167,13 +186,13 @@ const VIEW: &[Item] = &[
 /// Every action the menu can emit (used by tests to keep Rust and TS in sync).
 #[cfg(test)]
 pub fn all_actions() -> Vec<&'static str> {
-    let mut v: Vec<&'static str> = [FILE_OPEN, FILE, EXPORT, EDIT_TOP, EDIT_FIND, PARAGRAPH, FORMAT, VIEW, WINDOW_TABS]
+    let mut v: Vec<&'static str> = [FILE_OPEN, FILE, EXPORT, EXPORT_MORE, EDIT_TOP, EDIT_FIND, PARAGRAPH, FORMAT, VIEW, WINDOW_TABS]
         .iter()
         .chain(EDIT_EXTRA.iter())
         .flat_map(|g| g.iter().map(|i| i.0))
         .filter(|id| *id != "-")
         .collect();
-    v.extend(["print", "close", "preferences", crate::recent::ID_CLEAR]);
+    v.extend(["pageSetup", "print", "close", "preferences", crate::recent::ID_CLEAR]);
     v
 }
 
@@ -252,13 +271,15 @@ pub fn build<R: Runtime>(
         menu = menu.item(&app_menu);
     }
 
-    let export = add_items(app, SubmenuBuilder::new(app, "Export"), EXPORT)?.build()?;
+    let export = add_items(app, SubmenuBuilder::new(app, "Export"), EXPORT)?;
+    let export = add_items(app, export.separator(), EXPORT_MORE)?.build()?;
     let recent_menu = SubmenuBuilder::with_id(app, crate::recent::SUBMENU_ID, "Open Recent").build()?;
     crate::recent::fill(app, &recent_menu, recent)?;
     let file = add_items(app, SubmenuBuilder::new(app, "File"), FILE_OPEN)?.item(&recent_menu);
     let mut file = add_items(app, file, FILE)?
         .separator()
         .item(&export)
+        .item(&MenuItem::with_id(app, "pageSetup", "Page Setup…", true, None::<&str>)?)
         .item(&MenuItem::with_id(app, "print", "Print…", true, Some("CmdOrCtrl+Shift+P"))?)
         .separator()
         .item(&MenuItem::with_id(app, "close", "Close", true, Some("CmdOrCtrl+W"))?);
@@ -349,7 +370,7 @@ mod tests {
     #[test]
     fn accelerators_are_unique() {
         let mut seen = std::collections::HashSet::new();
-        for g in [FILE_OPEN, FILE, EXPORT, EDIT_TOP, EDIT_FIND, PARAGRAPH, FORMAT, VIEW, WINDOW_TABS].iter().chain(EDIT_EXTRA.iter()) {
+        for g in [FILE_OPEN, FILE, EXPORT, EXPORT_MORE, EDIT_TOP, EDIT_FIND, PARAGRAPH, FORMAT, VIEW, WINDOW_TABS].iter().chain(EDIT_EXTRA.iter()) {
             for (_, _, a) in g.iter() {
                 if let Some(a) = a {
                     assert!(seen.insert(*a), "duplicate accelerator {a}");
@@ -366,8 +387,11 @@ mod tests {
                 "new", "open", "openFolder", "save", "saveAs", "close", "exportHtml", "exportPdf", "print", "undo",
                 "redo", "find", "replace", "toggleSidebar", "toggleSource", "toggleFocus", "toggleTypewriter",
                 "quickOpen", "zoomIn", "zoomOut", "zoomReset", "preferences", "clearRecent", "commandPalette", "showOutline",
-                "showFiles", "revealActiveFile", "reloadFromDisk", "toggleLineEnding", "exportDocx", "exportLatex",
-                "exportEpub", "clearFormat",
+                "showFiles", "revealActiveFile", "reloadFromDisk", "toggleLineEnding", "exportHtmlPlain", "exportImage",
+                "exportPrevious", "exportOverwrite", "exportSettings", "pageSetup",
+                "exportDocx", "exportLatex",
+                "exportEpub", "clearFormat", "exportOdt", "exportRtf", "exportMediawiki", "exportRst", "exportTextile", "exportOpml",
+                "exportCustom", "import",
                 // #94 file lifecycle
                 "newTab", "newWindow", "nextTab", "prevTab", "reopenClosed", "saveAll", "duplicate", "renameFile",
                 "moveTo", "revealInFinder", "copyFilePath", "browseVersions", "reopenWithEncoding", "properties",

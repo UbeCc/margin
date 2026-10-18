@@ -1,8 +1,8 @@
 import { convertFileSrc, invoke } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
-import type { AppSettings, DirEntry, FsEvent, ImageRule, MenuAction, Platform, RichClipboardData, ClipboardSnapshot, UploadConfig } from '../contracts';
-import { builtinThemes, normalizeSettings, printHtmlInIframe } from './common';
+import type { AppSettings, DirEntry, FsEvent, ImageRule, MenuAction, PdfExportOptions, Platform, RichClipboardData, ClipboardSnapshot, UploadConfig } from '../contracts';
+import { builtinThemes, normalizeSettings, printHtmlInIframe, withPrintPageCss } from './common';
 
 /** Event names emitted by `src-tauri/src/lib.rs`. */
 const EV = {
@@ -103,8 +103,8 @@ export class TauriPlatform implements Platform {
     throw new Error('storeImage: need bytes or path');
   }
 
-  openFileDialog(opts?: { directory?: boolean }): Promise<string | null> {
-    return call('open_dialog', { directory: !!opts?.directory });
+  openFileDialog(opts?: { directory?: boolean; filters?: { name: string; extensions: string[] }[] }): Promise<string | null> {
+    return call('open_dialog', { directory: !!opts?.directory, filters: opts?.filters ?? null });
   }
 
   saveFileDialog(opts?: { defaultPath?: string; filters?: { name: string; extensions: string[] }[] }): Promise<string | null> {
@@ -120,11 +120,12 @@ export class TauriPlatform implements Platform {
    * `src`s resolve against the output file's directory; asset URLs work as-is.
    * Other platforms: falls back to the system print dialog (user picks "Save as PDF").
    */
-  async exportPdf(html: string, outPath: string, opts?: { baseDir?: string }): Promise<void> {
+  async exportPdf(html: string, outPath: string, opts?: PdfExportOptions): Promise<void> {
     try {
-      await call('export_pdf', { html, outPath, baseDir: opts?.baseDir ?? null });
+      const { baseDir, ...options } = opts ?? {};
+      await call('export_pdf', { html, outPath, baseDir: baseDir ?? null, options });
     } catch (e) {
-      if (String((e as Error).message).startsWith('unsupported')) return printHtmlInIframe(html);
+      if (String((e as Error).message).startsWith('unsupported')) return printHtmlInIframe(withPrintPageCss(html, opts));
       throw e;
     }
   }
@@ -149,6 +150,29 @@ export class TauriPlatform implements Platform {
    */
   relocateImages(docPath: string, rule: ImageRule, srcs: string[]): Promise<Record<string, string>> {
     return call('relocate_images', { docPath, rule, srcs });
+  }
+
+  /** Export › Image bytes (#95): raw IPC body, target path in a header. */
+  exportBinary(bytes: Uint8Array, outPath: string): Promise<void> {
+    return invoke('export_binary', bytes, { headers: { 'x-margin-path': encodeURIComponent(outPath) } }).then(
+      () => undefined,
+      (e: unknown) => {
+        throw e instanceof Error ? e : new Error(String(e));
+      },
+    );
+  }
+
+  pandocImport(inputPath: string, pandocPath: string | null, timeoutMs: number): Promise<string> {
+    return call('pandoc_import', { inputPath, pandocPath, timeoutMs });
+  }
+
+  runExportCommand(command: string, vars: Record<string, string>, stdin: string | null, cwd: string | null, timeoutMs: number): Promise<{ stdout: string; stderr: string }> {
+    return call('run_export_command', { command, vars, stdin, cwd, timeoutMs });
+  }
+
+  /** Open a file exported in this session with its default application. */
+  openExportedFile(path: string): Promise<void> {
+    return call('open_exported_file', { path });
   }
 
   // ---- optional file-tree operations (PlatformExtras, #21)
