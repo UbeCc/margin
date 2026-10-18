@@ -1,29 +1,94 @@
 /** Copy (markdown as text/plain + HTML), cut, paste (md / HTML→md / images), drop. */
 import type { EditorCore } from './editor';
-import { Doc, contPrefix, leafContent } from './model';
+import { Doc, contPrefix, leafContent, widgetRaw } from './model';
 import { isTextLeaf } from './edit';
 import { docHTML } from './html';
+import { splitBlockMeta } from './render-inline';
 import { htmlToMarkdown } from './paste';
+import { buildCopyFlavors, pickPasteMarkdown, writeFlavors, type CopyFlavors } from './clipboard-flavors';
+import { htmlToRtf } from './clipboard-rtf';
 
-export const MARGIN_HTML_ATTR = 'data-margin-md';
+export { MARGIN_HTML_ATTR, MARGIN_MIME } from './clipboard-flavors';
 
 export function selectionMarkdown(ed: EditorCore): { from: number; to: number; md: string } | null {
   const s = ed.readSel();
   if (!s || s.anchor === s.focus) return null;
-  const from = Math.min(s.anchor, s.focus);
+  const from = expandToBlockStart(ed.doc, Math.min(s.anchor, s.focus), Math.max(s.anchor, s.focus));
   const to = Math.max(s.anchor, s.focus);
   return { from, to, md: ed.doc.text().slice(from, to) };
+}
+
+/**
+ * Hidden block markers (`# `, `- `, `> `) sit before the caret's first
+ * visible position, so a selection made by dragging or select-all starts after
+ * them. When such a selection runs past the end of its first block, widen it to
+ * the start of that line so the copy carries the block syntax (#79).
+ */
+export function expandToBlockStart(doc: Doc, from: number, to: number): number {
+  if (!doc.leaves.length) return from;
+  const a = doc.locate(from);
+  const l = doc.leaves[a.i];
+  if (!l || !isTextLeaf(l)) return from;
+  const lead = splitBlockMeta(l, leafContent(l))[0];
+  if (a.off > lead.length) return from;
+  const text = doc.text();
+  let lineEnd = text.indexOf('\n', from);
+  if (lineEnd < 0) lineEnd = text.length;
+  else if (text[lineEnd - 1] === '\r') lineEnd--;
+  // whole rest of a marked line (heading), or the selection continues onto later lines
+  if (!(to > lineEnd || (lead && to >= lineEnd))) return from;
+  return text.lastIndexOf('\n', from - 1) + 1;
+}
+
+/**
+ * Rendered HTML of the copied markdown. Widgets (tables, code, math…) that are
+ * copied whole render through their mounted instance, matched by exact source.
+ */
+export function selectionHTML(ed: EditorCore, md: string): string {
+  const key = (l: Parameters<typeof widgetRaw>[0]) => widgetRaw(l).replace(/\n+$/, '');
+  const mounted = new Map<string, string>();
+  for (const l of ed.doc.leaves) if (!isTextLeaf(l)) mounted.set(key(l), l.id);
+  return docHTML(new Doc(md), ed.view.inlineCtx(), (l) => {
+    const id = mounted.get(key(l));
+    if (!id) return null;
+    try {
+      return ed.view.widget(id)?.renderHTML() ?? null;
+    } catch {
+      return null;
+    }
+  });
 }
 
 export function onCopy(ed: EditorCore, e: ClipboardEvent, cut: boolean): void {
   const sel = selectionMarkdown(ed);
   if (!sel || !e.clipboardData) return;
   e.preventDefault();
-  const tmp = new Doc(sel.md);
-  const html = docHTML(tmp, ed.view.inlineCtx(), () => null);
-  e.clipboardData.setData('text/plain', sel.md);
-  e.clipboardData.setData('text/html', `<div ${MARGIN_HTML_ATTR}="">${html}</div>`);
+  const html = selectionHTML(ed, sel.md);
+  const rich = ed.settings.writeClipboardRich;
+  const nonce = rich ? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}` : undefined;
+  const flavors = buildCopyFlavors(sel.md, html, nonce);
+  writeFlavors(e.clipboardData, flavors);
+  if (rich && nonce) scheduleRich(rich, flavors, html, nonce);
   if (cut) ed.replaceRange(sel.from, sel.to, '', null);
+}
+
+type RichWriter = NonNullable<EditorCore['settings']['writeClipboardRich']>;
+
+/**
+ * After the copy event returns (WebKit writes the DataTransfer flavours to the
+ * pasteboard then), add RTF natively. The native side waits for the nonce to
+ * appear in public.html before appending, so it never clobbers a newer copy.
+ */
+function scheduleRich(rich: RichWriter, f: CopyFlavors, renderedHtml: string, nonce: string): void {
+  setTimeout(() => {
+    let rtf: string;
+    try {
+      rtf = htmlToRtf(renderedHtml);
+    } catch {
+      return;
+    }
+    rich({ plain: f.plain, html: f.html, rtf, markdown: f.markdown, marker: nonce }).catch(() => undefined);
+  }, 0);
 }
 
 async function storeFiles(ed: EditorCore, files: File[]): Promise<string[]> {
@@ -102,16 +167,7 @@ export function onPaste(ed: EditorCore, e: ClipboardEvent): void {
     void storeFiles(ed, files).then((imgs) => imgs.length && insertMarkdown(ed, imgs.join(' '), range));
     return;
   }
-  const html = dt.getData('text/html');
-  const text = dt.getData('text/plain');
-  let md = text;
-  if (html && !html.includes(MARGIN_HTML_ATTR) && /<(?:p|h[1-6]|ul|ol|li|strong|b|em|i|a|img|pre|code|table|blockquote|br)\b/i.test(html)) {
-    try {
-      md = htmlToMarkdown(html) || text;
-    } catch {
-      md = text;
-    }
-  }
+  let { md } = pickPasteMarkdown((t) => dt.getData(t), htmlToMarkdown);
   md = md.replace(/\r\n?/g, ed.doc.eol);
   if (md) insertMarkdown(ed, md, range);
 }
