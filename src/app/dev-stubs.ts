@@ -342,6 +342,7 @@ export const createStubEditor: CreateEditor = (host: HTMLElement, initial: Edito
       host.classList.toggle('stub-source', on);
     },
     isSourceMode: () => sourceMode,
+    caretBlockType: () => null,
     updateSettings(patch) {
       settings = { ...settings, ...patch };
       ta.spellcheck = settings.spellcheck;

@@ -170,6 +170,7 @@ class CodeFenceInstance implements WidgetInstance {
       lineNumbers: wantsLineNumbers(this.parts.info, this.lineNumbersPref()),
       lineWrapping: this.mdPref().codeLineWrap,
       indentSize: this.mdPref().codeIndentSize,
+      shiftTabAutoIndent: this.mdPref().shiftTabAutoIndent,
       ariaLabel: `code block${this.parts.lang ? ' ' + this.parts.lang : ''}`,
       exit: {
         onExit: (d) => this.ctx.onExit(d),
@@ -275,13 +276,14 @@ class CodeFenceInstance implements WidgetInstance {
   private applyCodePrefs(): void {
     const m = this.mdPref();
     this.root.classList.toggle('mb-wrap', m.codeLineWrap);
-    const sig = `${m.codeLineNumbers}|${m.codeLineWrap}|${m.codeIndentSize}`;
+    const sig = `${m.codeLineNumbers}|${m.codeLineWrap}|${m.codeIndentSize}|${m.shiftTabAutoIndent}`;
     if (sig === this.prefSig) return;
     this.prefSig = sig;
     if (this.editor) {
       this.editor.setLineNumbers(wantsLineNumbers(this.parts.info, this.lineNumbersPref()));
       this.editor.setLineWrapping(m.codeLineWrap);
       this.editor.setIndentSize(m.codeIndentSize);
+      this.editor.setShiftTabAutoIndent(m.shiftTabAutoIndent);
     } else if (this.staticPre) this.renderStatic();
   }
 

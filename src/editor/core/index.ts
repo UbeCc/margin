@@ -7,6 +7,7 @@
  */
 import './editor.css';
 import type { EditorHandle, EditorSettings } from '../../contracts';
+import { widgetAtCaret } from './block-tools';
 import { EditorCore, OUTLINE_EVENT } from './editor';
 import { attachInput } from './input';
 import { execCommand } from './commands';
@@ -212,6 +213,11 @@ export function createEditor(host: HTMLElement, settings: EditorSettings): Edito
     setSourceMode(on) {
       if (on && !source) sourceOn();
       else if (!on && source) sourceOff();
+    },
+    /** #127 menu enable states: widget block type holding the caret (else last caret / focused block). */
+    caretBlockType() {
+      if (source) return null;
+      return widgetAtCaret(ed, ['code_fence', 'math_block', 'diagram', 'table', 'html_block', 'front_matter', 'toc'])?.wtype ?? null;
     },
     isSourceMode: () => !!source,
     updateSettings(patch) {
