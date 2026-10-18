@@ -739,7 +739,11 @@ export class App {
       pick: (it) => {
         if (it.id.startsWith('recent:')) void this.doc.open(it.id.slice(7));
         else if (it.id.startsWith('folder:')) void this.openFolder(it.id.slice(7));
-        else if (isCommandId(it.id)) void this.run(it.id);
+        else if (isCommandId(it.id)) {
+          // the palette took the DOM selection: put the editor's caret/selection back first
+          if (commandSpec(it.id)?.scope === 'editor') this.editor.focus();
+          void this.run(it.id);
+        }
       },
     });
   }
