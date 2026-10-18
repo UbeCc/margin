@@ -18,6 +18,7 @@ Owner: **app**. Vanilla-DOM shell around `EditorHandle` + `Platform` (see `src/c
 | `findbar.ts`, `statusbar.ts`, `sidebar/filetree.ts`, `sidebar/outline.ts` | UI pieces |
 | `ui/` | modal (ask/confirm/prompt), palette, context menu, toasts |
 | `util/` | `path`, `fuzzy`, `keymap`, `dom` helpers (pure, unit-tested) |
+| `upload.ts`, `upload-actions.ts`, `upload-prefs.ts` | image upload (#80): settings, image-ref scanning + src rewrite via undoable replace, "Upload Image" context menu / "Upload All Local Images" command, Preferences › Images uploader fields |
 | `platform-extras.ts` | optional platform methods (#21): `rename`, `remove`, `createDir`, `revealInFolder` |
 
 ## Wiring points for the integrator

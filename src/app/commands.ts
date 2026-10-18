@@ -10,7 +10,8 @@ export type AppCommand =
   | 'revealActiveFile'
   | 'reloadFromDisk'
   | 'openThemesFolder'
-  | 'toggleLineEnding';
+  | 'toggleLineEnding'
+  | 'uploadAllImages';
 
 export type CommandId = MenuAction | AppCommand;
 
@@ -107,6 +108,7 @@ export const COMMANDS: CommandSpec[] = [
   { id: 'zoomReset', label: 'Actual Size', category: 'View', keys: ['Mod+Shift+0'] },
   { id: 'toggleLineEnding', label: 'Toggle Line Endings (LF / CRLF)', category: 'View' },
   { id: 'openThemesFolder', label: 'Open Themes Folder', category: 'Theme' },
+  { id: 'uploadAllImages', label: 'Upload All Local Images', category: 'Format' },
 ];
 
 /** 'Mod+Shift+S' form of a native menu accelerator (src/platform/shortcuts.ts). */
