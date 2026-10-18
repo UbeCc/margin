@@ -169,10 +169,18 @@ impl QuickOpen {
                 match rx.recv_timeout(Duration::from_millis(5)) {
                     Ok(Some(hits)) => {
                         let cached = self.indexes.lock().unwrap().get(root).map(|ix| ix.files.clone());
-                        return rank(&merge(&cached.unwrap_or_default(), hits), query, limit)
-                            .into_iter()
-                            .map(|rel| root.join(rel).to_string_lossy().into_owned())
-                            .collect();
+                        let ranked = rank(&merge(&cached.unwrap_or_default(), hits), query, usize::MAX);
+                        let (found, gone) = existing(root, ranked, limit);
+                        if !gone.is_empty() {
+                            // Stale cache/Spotlight entries: drop them so they don't come back.
+                            if let Some(ix) = self.indexes.lock().unwrap().get_mut(root) {
+                                ix.files.retain(|f| !gone.contains(f));
+                            }
+                        }
+                        if !found.is_empty() {
+                            return found.into_iter().map(|rel| root.join(rel).to_string_lossy().into_owned()).collect();
+                        }
+                        // Everything Spotlight/cache offered is gone: fall back to the walker.
                     }
                     Err(mpsc::RecvTimeoutError::Timeout) if self.walking(root) => {}
                     _ => break, // Spotlight declined/failed, or the walk finished first
@@ -287,10 +295,9 @@ pub fn md_escape(s: &str) -> String {
 /// ignored like in `rank`; `None` for an empty query (a lone `*` name pattern
 /// matches nothing in MDQuery).
 ///
-/// Markdown extensions are enforced afterwards by `filter_hits` rather than
-/// with `kMDItemFSName == "*.md"c || …` clauses: each suffix clause is another
-/// scan of the volume-wide name index (measured: six of them double the query
-/// time, ~200 ms → ~420 ms on a 20k-file folder).
+/// No extension clauses: Quick Open searches every file type (the walker's
+/// universe), and each `kMDItemFSName == "*.md"c` clause would be another scan
+/// of the volume-wide name index anyway.
 #[cfg_attr(not(target_os = "macos"), allow(dead_code))] // pure helper, unit-tested on all OSes
 pub fn md_predicate(query: &str) -> Option<String> {
     let mut pat = String::from("*");
@@ -309,7 +316,8 @@ pub const PROBE_PREDICATE: &str = "kMDItemContentTypeTree == \"public.item\"";
 
 /// Map absolute Spotlight paths to root-relative forward-slash paths, keeping
 /// only files the walker would also index (no hidden components, no skipped
-/// dirs, not git-ignored).
+/// dirs, not git-ignored). Every file type is kept, like the walker (#119);
+/// `rank` puts Markdown first.
 #[cfg_attr(not(target_os = "macos"), allow(dead_code))] // pure helper, unit-tested on all OSes
 pub fn filter_hits(root: &Path, hits: Vec<PathBuf>) -> Vec<String> {
     let canon = root.canonicalize().unwrap_or_else(|_| root.to_path_buf());
@@ -320,7 +328,6 @@ pub fn filter_hits(root: &Path, hits: Vec<PathBuf>) -> Vec<String> {
         let Ok(rel) = hit.strip_prefix(&canon).or_else(|_| hit.strip_prefix(root)) else { continue };
         let rel_s = rel.to_string_lossy().replace('\\', "/");
         if rel_s.is_empty()
-            || !is_markdown(&rel_s)
             || rel_s.split('/').any(|c| c.starts_with('.') || SKIP_DIRS.contains(&c))
             || ignores.ignored(&canon, rel)
         {
@@ -395,6 +402,30 @@ pub fn merge(cached: &[String], hits: Vec<String>) -> Vec<String> {
     out
 }
 
+/// `filter_hits`, or `None` when nothing survives the walker's rules: that is a
+/// cache miss (walk instead), not "no results" (#119).
+#[cfg_attr(not(target_os = "macos"), allow(dead_code))]
+pub fn usable_hits(root: &Path, hits: Vec<PathBuf>) -> Option<Vec<String>> {
+    Some(filter_hits(root, hits)).filter(|v| !v.is_empty())
+}
+
+/// Keep ranked root-relative paths that still exist on disk, up to `limit`;
+/// also return the ones checked and found missing (stale cache/Spotlight rows).
+pub fn existing(root: &Path, ranked: Vec<String>, limit: usize) -> (Vec<String>, Vec<String>) {
+    let (mut found, mut gone) = (Vec::new(), Vec::new());
+    for rel in ranked {
+        if found.len() >= limit {
+            break;
+        }
+        if root.join(&rel).exists() {
+            found.push(rel);
+        } else {
+            gone.push(rel);
+        }
+    }
+    (found, gone)
+}
+
 #[cfg(target_os = "macos")]
 static UNINDEXED: std::sync::OnceLock<Mutex<HashMap<PathBuf, Instant>>> = std::sync::OnceLock::new();
 
@@ -413,7 +444,7 @@ pub fn spotlight_hits(root: &Path, query: &str) -> Option<Vec<String>> {
         }
         return None;
     }
-    Some(filter_hits(root, hits))
+    usable_hits(root, hits)
 }
 
 /// Start `spotlight_hits` on a helper thread. `None` (no thread) when the
