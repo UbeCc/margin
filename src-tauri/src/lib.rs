@@ -30,13 +30,15 @@ mod images_tests;
 mod settings_tests;
 
 use serde::Serialize;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 use std::sync::{Arc, Mutex};
 use tauri::{AppHandle, Emitter, Manager, RunEvent, Runtime, WindowEvent};
 
 pub const MAIN: &str = "main";
+/// Labels of windows opened with File › New Window (#94): `window-1`, `window-2`, …
+pub const WINDOW_PREFIX: &str = "window-";
 pub const EV_MENU: &str = "margin://menu";
 pub const EV_FS: &str = "margin://fs-events";
 pub const EV_OPEN_FILES: &str = "margin://open-files";
@@ -48,10 +50,11 @@ pub struct AppState {
     pub quick_open: Arc<quick_open::QuickOpen>,
     pub watchers: Mutex<HashMap<u32, watch::Watch>>,
     pub next_watch_id: AtomicU32,
-    /// Frontend registered an onCloseRequested handler.
-    pub close_guard: AtomicBool,
-    /// Frontend approved closing; the next close goes through.
-    pub close_confirmed: AtomicBool,
+    /// Windows whose frontend registered an onCloseRequested handler (#94: per window).
+    pub guarded: Mutex<HashSet<String>>,
+    /// Windows whose frontend approved closing; their next close goes through.
+    pub confirmed: Mutex<HashSet<String>>,
+    pub next_window: AtomicU32,
     pub pending_open: Mutex<Vec<String>>,
     pub frontend_ready: AtomicBool,
 }
@@ -107,6 +110,64 @@ pub fn allow_assets_for_file<R: Runtime>(app: &AppHandle<R>, file: &Path) {
 }
 
 /// Queue or emit files to open (Finder / Dock / CLI).
+/// Window that receives menu actions and opened files: the focused one, else main, else any.
+pub fn target_window<R: Runtime>(app: &AppHandle<R>) -> Option<tauri::WebviewWindow<R>> {
+    let all = app.webview_windows();
+    all.values()
+        .find(|w| w.is_focused().unwrap_or(false))
+        .or_else(|| all.get(MAIN))
+        .or_else(|| all.values().next())
+        .cloned()
+}
+
+fn target_label<R: Runtime>(app: &AppHandle<R>) -> String {
+    target_window(app).map(|w| w.label().to_string()).unwrap_or_else(|| MAIN.to_string())
+}
+
+/// Minimal percent-encoding for a query value.
+pub fn query_escape(s: &str) -> String {
+    let mut out = String::new();
+    for b in s.bytes() {
+        match b {
+            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'~' | b'/' => out.push(b as char),
+            _ => out.push_str(&format!("%{b:02X}")),
+        }
+    }
+    out
+}
+
+/// URL of a secondary editor window (`window=new`, optional file to open).
+pub fn window_url(path: Option<&str>) -> String {
+    match path {
+        Some(p) => format!("index.html?window=new&open={}", query_escape(p)),
+        None => "index.html?window=new".to_string(),
+    }
+}
+
+/// Create an editor window like the main one (same size/style, macOS tabbing group).
+pub fn new_window<R: Runtime>(app: &AppHandle<R>, label: &str, path: Option<&str>) -> tauri::Result<()> {
+    let url = tauri::WebviewUrl::App(window_url(path).into());
+    let mut b = tauri::WebviewWindowBuilder::new(app, label, url)
+        .title("Margin")
+        .inner_size(1100.0, 760.0)
+        .min_inner_size(480.0, 360.0)
+        .resizable(true)
+        .disable_drag_drop_handler();
+    #[cfg(target_os = "macos")]
+    {
+        b = b.title_bar_style(tauri::TitleBarStyle::Transparent).tabbing_identifier("margin");
+    }
+    if let Some(cur) = target_window(app)
+        && let Ok(pos) = cur.outer_position()
+    {
+        // cascade from the current window
+        let scale = cur.scale_factor().unwrap_or(1.0);
+        let p = pos.to_logical::<f64>(scale);
+        b = b.position(p.x + 28.0, p.y + 28.0);
+    }
+    b.build().map(|_| ())
+}
+
 pub fn open_files<R: Runtime>(app: &AppHandle<R>, paths: Vec<PathBuf>) {
     let paths: Vec<String> = paths
         .into_iter()
@@ -121,8 +182,9 @@ pub fn open_files<R: Runtime>(app: &AppHandle<R>, paths: Vec<PathBuf>) {
     }
     let state = app.state::<AppState>();
     if state.frontend_ready.load(Ordering::SeqCst) {
-        let _ = app.emit_to(MAIN, EV_OPEN_FILES, paths);
-        if let Some(w) = app.get_webview_window(MAIN) {
+        let label = target_label(app);
+        let _ = app.emit_to(label.as_str(), EV_OPEN_FILES, paths);
+        if let Some(w) = app.get_webview_window(&label) {
             let _ = w.set_focus();
         }
     } else {
@@ -139,7 +201,7 @@ fn cli_paths() -> Vec<PathBuf> {
 /// exits and hands us its arguments.
 fn on_second_instance<R: Runtime>(app: &AppHandle<R>, argv: Vec<String>, cwd: String) {
     let paths = recent::paths_from_args(&argv, Path::new(&cwd), true);
-    if let Some(w) = app.get_webview_window(MAIN) {
+    if let Some(w) = target_window(app) {
         let _ = w.unminimize();
         let _ = w.show();
         let _ = w.set_focus();
@@ -147,25 +209,40 @@ fn on_second_instance<R: Runtime>(app: &AppHandle<R>, argv: Vec<String>, cwd: St
     open_files(app, paths);
 }
 
-fn request_close<R: Runtime>(app: &AppHandle<R>) -> bool {
-    // returns true if the frontend was asked (close must be prevented)
+/// Ask window `label`'s frontend to confirm closing (unsaved changes).
+/// Returns true if the frontend was asked (close must be prevented for now).
+fn request_close<R: Runtime>(app: &AppHandle<R>, label: &str) -> bool {
     let state = app.state::<AppState>();
-    if state.close_guard.load(Ordering::SeqCst) && !state.close_confirmed.load(Ordering::SeqCst) {
-        let _ = app.emit_to(MAIN, EV_CLOSE_REQUESTED, ());
+    let guarded = state.guarded.lock().unwrap().contains(label);
+    if guarded && !state.confirmed.lock().unwrap().contains(label) {
+        let _ = app.emit_to(label, EV_CLOSE_REQUESTED, ());
         true
     } else {
         false
     }
 }
 
+/// Cmd+Q / Dock quit: every window with unsaved changes is asked; true = exit vetoed.
+fn veto_exit<R: Runtime>(app: &AppHandle<R>) -> bool {
+    let labels: Vec<String> = app.webview_windows().into_keys().collect();
+    let mut veto = false;
+    for l in labels {
+        veto |= request_close(app, &l);
+    }
+    veto
+}
+
 fn handle_menu<R: Runtime>(app: &AppHandle<R>, id: &str) {
     match id {
-        menu::ID_QUIT => match app.get_webview_window(MAIN) {
-            Some(w) => {
-                let _ = w.close(); // goes through CloseRequested → frontend veto
+        menu::ID_QUIT => {
+            let windows: Vec<_> = app.webview_windows().into_values().collect();
+            if windows.is_empty() {
+                app.exit(0);
             }
-            None => app.exit(0),
-        },
+            for w in windows {
+                let _ = w.close(); // goes through CloseRequested → each frontend may veto
+            }
+        }
         menu::ID_HELP_MARKDOWN => {
             use tauri_plugin_opener::OpenerExt;
             let _ = app.opener().open_url("https://commonmark.org/help/", None::<&str>);
@@ -178,7 +255,7 @@ fn handle_menu<R: Runtime>(app: &AppHandle<R>, id: &str) {
         }
         recent::ID_CLEAR => {
             let _ = recent::set_menu(app, &[], &[]);
-            let _ = app.emit_to(MAIN, EV_MENU, recent::ID_CLEAR);
+            let _ = app.emit_to(target_label(app).as_str(), EV_MENU, recent::ID_CLEAR);
         }
         other if other.starts_with(recent::ID_PREFIX) => {
             if let Some(p) = recent::path_for(app, other) {
@@ -189,7 +266,7 @@ fn handle_menu<R: Runtime>(app: &AppHandle<R>, id: &str) {
             if let Some(theme) = other.strip_prefix("theme:") {
                 menu::check_theme(app, theme);
             }
-            let _ = app.emit_to(MAIN, EV_MENU, other.to_string());
+            let _ = app.emit_to(target_label(app).as_str(), EV_MENU, other.to_string());
         }
     }
 }
@@ -286,6 +363,8 @@ pub fn run() {
             commands::set_close_guard,
             commands::confirm_close,
             commands::take_pending_open_files,
+            commands::open_window,
+            commands::read_file_bytes,
             commands::allow_asset_dir,
             commands::set_theme_menu,
             commands::relocate_images,
@@ -323,14 +402,18 @@ pub fn run() {
             e2e_driver(&handle);
             Ok(())
         })
-        .on_window_event(|window, event| {
-            if window.label() != MAIN {
-                return;
-            }
-            if let WindowEvent::CloseRequested { api, .. } = event
-                && request_close(window.app_handle()) {
+        .on_window_event(|window, event| match event {
+            WindowEvent::CloseRequested { api, .. } => {
+                if request_close(window.app_handle(), window.label()) {
                     api.prevent_close();
                 }
+            }
+            WindowEvent::Destroyed => {
+                let state = window.app_handle().state::<AppState>();
+                state.guarded.lock().unwrap().remove(window.label());
+                state.confirmed.lock().unwrap().remove(window.label());
+            }
+            _ => {}
         })
         .build(tauri::generate_context!())
         .expect("error while building Margin");
@@ -344,9 +427,36 @@ pub fn run() {
         RunEvent::ExitRequested { code: None, api, .. }
             // User-initiated quit (Cmd+Q, Dock) while the editor is open: let the
             // frontend veto through the same close flow.
-            if app.get_webview_window(MAIN).is_some() && request_close(app) => {
+            if veto_exit(app) => {
                 api.prevent_exit();
             }
         _ => {}
     });
+}
+
+#[cfg(test)]
+mod window_tests {
+    use super::*;
+
+    #[test]
+    fn new_window_url_carries_the_file_escaped() {
+        assert_eq!(window_url(None), "index.html?window=new");
+        assert_eq!(
+            window_url(Some("/Users/me/My Notes/中文 & #1.md")),
+            "index.html?window=new&open=/Users/me/My%20Notes/%E4%B8%AD%E6%96%87%20%26%20%231.md"
+        );
+    }
+
+    #[test]
+    fn close_guards_are_per_window() {
+        let app = tauri::test::mock_app();
+        app.manage(AppState::default());
+        let h = app.handle();
+        let st = h.state::<AppState>();
+        st.guarded.lock().unwrap().insert("window-1".into());
+        assert!(request_close(h, "window-1"), "guarded window asks its frontend");
+        assert!(!request_close(h, MAIN), "unguarded window closes directly");
+        st.confirmed.lock().unwrap().insert("window-1".into());
+        assert!(!request_close(h, "window-1"), "confirmed window closes");
+    }
 }
