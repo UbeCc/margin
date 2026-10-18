@@ -169,3 +169,15 @@ export function foldFirmlinks(p: string): string {
 export function relativeFrom(fromDir: string, to: string): string {
   return relative(foldFirmlinks(fromDir), foldFirmlinks(to));
 }
+
+/**
+ * File URL of a native path (WebArchive base for rich copy, #115); segments
+ * percent-encoded like NSURL fileURLWithPath. Empty path → `untitled.md`
+ * (Typora uses the same default for unsaved documents, §3.4).
+ */
+export function fileUrl(p: string | null | undefined): string {
+  if (!p) return 'untitled.md';
+  const segs = p.split(/[\\/]/);
+  const body = segs.map((s, i) => (/^[A-Za-z]:$/.test(s) && i === 0 ? s : encodeURIComponent(s))).join('/');
+  return 'file:///' + body.replace(/^\/+/, '');
+}

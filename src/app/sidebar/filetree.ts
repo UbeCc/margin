@@ -1,4 +1,5 @@
 import type { DirEntry, FsEvent, Platform } from '../../contracts';
+import { duplicateFile, fileMenu, showInfo, type SideFileOps } from './file-menus';
 import { extras } from '../platform-extras';
 import { h, icon, clearChildren } from '../util/dom';
 import { basename, dirname, isInside, isMarkdownPath, isValidFileName, join, uniqueName, extname } from '../util/path';
@@ -24,6 +25,14 @@ export interface FileTreeHost {
   extraActions?(): (HTMLElement | null)[];
   /** Refresh button outside tree mode (list / search). */
   refreshMode?(): void;
+  /** Open the sidebar folder search (context menu "Search"). */
+  openSidebarSearch?(): void;
+  /** Switch tree / Articles view (context menu view items). */
+  setSidebarView?(mode: 'tree' | 'list'): void;
+  /** True while the sidebar drag-move confirmation is enabled (#131). */
+  moveConfirm?(): boolean;
+  /** User ticked "Do not ask again" on the move confirmation (#131). */
+  onMoveConfirmSuppressed?(): void;
 }
 
 interface DirNode {
@@ -50,8 +59,10 @@ export class FileTree {
   private rows = new Map<string, HTMLElement>();
   private active: string | null = null;
   private order: SortOrder = DEFAULT_SORT;
-  private groupFolders = true;
   mode: FilesMode = 'tree';
+  /** The undoable sidebar file op ("Undo Rename %@" / "Undo Move %@"), one step. */
+  private lastOp: { dir: string; label: string; undo(): Promise<void> } | null = null;
+  private groupFolders = true;
 
   constructor(private host: FileTreeHost) {
     this.header = h('div.tree-header');
@@ -252,7 +263,7 @@ export class FileTree {
       }
     }
     if (entry.path === this.active) row.classList.add('active');
-    makeDraggable(row, entry.path);
+    makeDraggable(row, entry.path, this.host.platform);
     if (entry.isDir) this.dropTarget(row, entry.path);
     row.addEventListener('click', (e) => {
       row.focus({ preventScroll: true });
@@ -391,6 +402,25 @@ export class FileTree {
     }
     this.relocated(entry.path, to);
     await this.refreshDir(dirname(entry.path));
+    // "Undo Rename %@" (fe-sidebar §6).
+    const from = to;
+    const back = entry.path;
+    const label = `Rename ${name}`;
+    this.lastOp = {
+      dir: dirname(back),
+      label,
+      undo: async () => {
+        if (await this.host.platform.stat(back)) return; // don't clobber a recreated original
+        try {
+          await rename.call(this.host.platform, from, back);
+        } catch (e) {
+          this.host.notify(`Couldn't undo rename: ${errMsg(e)}`, 'error');
+          return;
+        }
+        this.relocated(from, back);
+        await this.refreshDir(dirname(back));
+      },
+    };
   }
 
   /** Bookkeeping after `from` became `to` (keeps expansion state of moved folders). */
@@ -411,7 +441,10 @@ export class FileTree {
   async move(src: string, destDir: string): Promise<boolean> {
     const rename = extras(this.host.platform).rename;
     if (!rename || !canMoveInto(src, destDir)) return false;
+    // Typora asks "Are you sure you want to move %@?" first (suppressible).
+    if (!(await this.confirmMove(basename(src)))) return false;
     let to = join(destDir, basename(src));
+    let keptName: string | null = null;
     if (await this.host.platform.stat(to)) {
       const choice = await ask({
         title: 'File/directory already exists at target path.',
@@ -423,9 +456,10 @@ export class FileTree {
         ],
         cancelId: 'cancel',
       });
-      if (choice === 'cancel') return false;
-      if (choice === 'keep') {
+      if (choice.id === 'cancel') return false;
+      if (choice.id === 'keep') {
         while (await this.host.platform.stat(to)) to = join(destDir, copyName(basename(to)));
+        keptName = basename(to);
       } else {
         const remove = extras(this.host.platform).remove;
         if (!remove) return false;
@@ -447,7 +481,45 @@ export class FileTree {
     await this.refreshDir(dirname(src));
     await this.toggle(destDir, true);
     await this.refreshDir(destDir);
+    // "Undo Move %@" — reverse the rename (a Keep Both move also gets its
+    // original name back; a Replace can't resurrect the replaced file).
+    const from = to;
+    const back = src;
+    const label = `Move ${keptName ?? basename(src)}`;
+    this.lastOp = {
+      dir: destDir,
+      label,
+      undo: async () => {
+        let dest = back;
+        if (await this.host.platform.stat(dest)) dest = join(dirname(back), copyName(basename(back)));
+        try {
+          await rename.call(this.host.platform, from, dest);
+        } catch (e) {
+          this.host.notify(`Couldn't undo move: ${errMsg(e)}`, 'error');
+          return;
+        }
+        this.relocated(from, dest);
+        await this.refreshDir(dirname(from));
+        await this.refreshDir(dirname(dest));
+      },
+    };
     return true;
+  }
+
+  /** Suppressible "Are you sure you want to move %@?" (fe-sidebar §5). */
+  private async confirmMove(name: string): Promise<boolean> {
+    if (!this.host.moveConfirm?.()) return true;
+    const r = await ask({
+      title: `Are you sure you want to move ${name}?`,
+      buttons: [
+        { id: 'cancel', label: 'Cancel' },
+        { id: 'move', label: 'Move', primary: true },
+      ],
+      cancelId: 'cancel',
+      checkbox: { label: 'Do not ask again' },
+    });
+    if (r.checked) this.host.onMoveConfirmSuppressed?.();
+    return r.id === 'move';
   }
 
   private dropTarget(el: HTMLElement, dir: string): void {
@@ -501,34 +573,41 @@ export class FileTree {
   }
 
   private showMenu(x: number, y: number, entry: DirEntry | null): void {
-    const p = extras(this.host.platform);
-    const dir = entry ? (entry.isDir ? entry.path : dirname(entry.path)) : this.root!;
-    const items: MenuItem[] = [];
-    if (entry && !entry.isDir) {
-      items.push({ label: 'Open', run: () => this.activate(entry) });
-      const md = isMarkdownPath(entry.name);
-      if (md && this.host.openInNewTab) items.push({ label: 'Open in New Tab', run: () => this.host.openInNewTab!(entry.path) });
-      if (md && this.host.openInNewWindow) items.push({ label: 'Open in New Window', run: () => this.host.openInNewWindow!(entry.path) });
-      items.push({ separator: true });
-    }
-    items.push(
-      { label: 'New File…', run: () => void this.newFile(dir) },
-      { label: 'New Folder…', run: () => void this.newFolder(dir), disabled: !p.createDir },
-    );
-    if (entry) {
-      items.push(
-        { separator: true },
-        { label: 'Rename…', run: () => void this.rename(entry), disabled: !p.rename },
-        { label: 'Move to Trash', run: () => void this.delete(entry), disabled: !p.remove, danger: true },
-      );
-    }
-    items.push(
-      { separator: true },
-      { label: 'Copy Path', run: () => void navigator.clipboard?.writeText(entry?.path ?? this.root!) },
-      { label: 'Reveal in Finder', run: () => void p.revealInFolder?.(entry?.path ?? this.root!), disabled: !p.revealInFolder },
-      { label: 'Refresh', run: () => void (entry?.isDir ? this.refreshDir(entry.path) : this.refreshAll()) },
-    );
-    showContextMenu(x, y, items);
+    showContextMenu(x, y, fileMenu({ ops: this.ops(), entry, view: 'tree', active: this.mode === 'list' ? 'list' : 'tree', rootDir: this.root! }));
+  }
+
+  /** Ops surface shared with the Articles list menu (#142). */
+  ops(): SideFileOps {
+    return {
+      platform: this.host.platform,
+      open: (entry) => this.activate(entry),
+      openInNewWindow: this.host.openInNewWindow,
+      newFile: (dir) => void this.newFile(dir),
+      newFolder: (dir) => void this.newFolder(dir),
+      search: () => (this.host.openSidebarSearch ? this.host.openSidebarSearch() : this.host.notify('Search is not available.', 'info')),
+      setView: (m) => void this.host.setSidebarView?.(m),
+      duplicate: (entry) => void this.takenNames(dirname(entry.path)).then((taken) => duplicateFile(this.host.platform, entry, taken, (m, k) => this.host.notify(m, k), () => void this.refreshDir(dirname(entry.path)))),
+      rename: (entry) => void this.rename(entry),
+      getInfo: (entry) => showInfo(entry),
+      remove: (entry) => void this.delete(entry),
+      copyPath: (path) => void this.copyPath(path),
+      reveal: (path) => void extras(this.host.platform).revealInFolder?.(path),
+      undoFor: (dir) => (this.lastOp && this.lastOp.dir === dir ? this.lastOp : null),
+    };
+  }
+
+  /** "Copy File Path": platform clipboard with a web fallback. */
+  private copyPath(path: string): void {
+    const write = extras(this.host.platform).writeClipboardText;
+    if (write) void write.call(this.host.platform, path).catch(() => navigator.clipboard?.writeText(path));
+    else void navigator.clipboard?.writeText(path).catch(() => this.host.notify('Could not copy the path.', 'error'));
+  }
+
+  /** The "Undo %@" entry (+ its separator); `ops().undoFor` feeds the same step. */
+  leadingMenuItems(dir: string): MenuItem[] {
+    const op = this.ops().undoFor(dir);
+    if (!op) return [];
+    return [{ label: `Undo ${op.label}`, run: () => void op.undo() }, { separator: true }];
   }
 
   // ------------------------------------------------------- keyboard
@@ -560,6 +639,9 @@ export class FileTree {
         break;
       case 'Enter':
         cur?.click();
+        break;
+      case ' ': // Finder-style Quick Look on the focused row (#131).
+        if (path && !isDir) void extras(this.host.platform).quickLook?.(path);
         break;
       default:
         return;

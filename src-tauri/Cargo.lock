@@ -2118,6 +2118,7 @@ version = "0.1.0"
 dependencies = [
  "block2",
  "chrono",
+ "gtk",
  "ignore",
  "libc",
  "log",
@@ -2128,6 +2129,7 @@ dependencies = [
  "objc2-foundation",
  "objc2-web-kit",
  "percent-encoding",
+ "plist",
  "rand",
  "serde",
  "serde_json",
@@ -2138,6 +2140,10 @@ dependencies = [
  "tauri-plugin-single-instance",
  "tempfile",
  "unicode-normalization",
+ "webkit2gtk",
+ "webview2-com",
+ "windows",
+ "windows-core",
 ]
 
 [[package]]

@@ -28,13 +28,37 @@ export interface CtxActions {
   uploadImage?(src: string): void;
   deleteImage(withFile: boolean): void;
   copyImageTo?(src: string, move: boolean): void;
+  /** Image pipeline ops bound to the right-clicked image (see `ImageCtxOps`). */
+  imageOps?(t: CtxTarget): ImageCtxOps | null;
+  /** `Copy to <folder>` target resolved for the clicked image. */
+  imageTarget?(): { label: string; canMove: boolean; run(move: boolean): void } | null;
+  zoomChoices?(): { zoomNow: string | null; presets: string[]; set(v: string): void } | null;
+  syntaxState?(): { isHtml: boolean; switchTo(to: 'markdown' | 'html'): void } | null;
+  /** "Save … As…" downloads (#138). */
+  saveImageAs?(src: string): void;
+  saveMathAs?(): void;
+  saveVideoAs?(src: string): void;
   /** Widget actions (table tools, edit, diagram image). */
   tableAction(action: TableAction): void;
   editBlock(): void;
   copyDiagramImage(): void;
   saveDiagram(): void;
 }
-
+/** Image operations for one right-clicked image, provided by the image feature. */
+export interface ImageCtxOps {
+  /** "Copy Image to…" / "Rename or Move Image to…" save dialogs. */
+  copyTo(move: boolean): void;
+  /** `Copy to <folder>` / `Move to <folder>` quick target (null = none). */
+  target(): { label: string; canMove: boolean; run(move: boolean): void } | null;
+  /** Zoom ▸ state for this image (null = not zoomable). */
+  zoom(): { zoomNow: string | null; presets: string[]; set(v: string): void } | null;
+  /** Switch Image Syntax ▸ state (null = not switchable). */
+  syntax(): { isHtml: boolean; switchTo(to: 'markdown' | 'html'): void } | null;
+  /** "Save Image As…" */
+  saveAs(): void;
+  /** Delete Image / Delete Image File (confirm + Trash) via the image tools. */
+  remove(withFile: boolean): void;
+}
 export type TableAction = 'rowAbove' | 'rowBelow' | 'colBefore' | 'colAfter' | 'deleteRow' | 'deleteCol' | 'deleteTable';
 
 export interface CtxState {
@@ -91,8 +115,15 @@ function editItems(t: CtxTarget, s: CtxState, a: CtxActions): MenuItem[] {
   return out;
 }
 
+/** Table ▸ submenu (#140): every entry is an EditorCommand, so menu, palette and the
+ * native menu share one implementation (ops act on the table with the caret). */
 function tableMenu(a: CtxActions): MenuItem {
-  const t = (id: TableAction, label: string, keys?: string): MenuItem => ({ id: 'table:' + id, label, hint: keys ? formatShortcut(keys) : undefined, run: () => a.tableAction(id) });
+  const t = (op: TableAction, label: string, keys?: string): MenuItem => ({
+    id: 'table:' + op,
+    label,
+    hint: keys ? formatShortcut(keys) : undefined,
+    run: () => (a.restore(), a.exec({ kind: 'table', op: op === 'deleteTable' ? 'delete' : op })),
+  });
   return {
     id: 'table',
     label: 'Table',
@@ -106,29 +137,32 @@ function tableMenu(a: CtxActions): MenuItem {
       t('deleteRow', 'Delete Row', 'Mod+Shift+Backspace'),
       t('deleteCol', 'Delete Column'),
       sep,
-      { id: 'table:copy', label: 'Copy Table', run: () => (a.restore(), a.exec({ kind: 'copyBlock', part: 'source' })) },
-      { id: 'table:prettify', label: 'Prettify Source Code', disabled: true, run: () => {} },
-      { id: 'table:delete', label: 'Delete Table', run: () => a.tableAction('deleteTable') },
+      { id: 'table:copy', label: 'Copy Table', run: () => (a.restore(), a.exec({ kind: 'table', op: 'copy' })) },
+      { id: 'table:prettify', label: 'Prettify Source Code', run: () => (a.restore(), a.exec({ kind: 'table', op: 'prettify' })) },
+      { id: 'table:delete', label: 'Delete Table', run: () => (a.restore(), a.exec({ kind: 'table', op: 'delete' })) },
     ],
   };
 }
 
+/** Code Tools ▸ (#140): Copy Code Content, Auto Indent Whole / Selected Code (fence, math and HTML blocks). */
 function codeTools(a: CtxActions): MenuItem {
+  const c = (op: 'copy' | 'indentAll' | 'indentSelected', label: string): MenuItem => ({
+    id: 'code:' + op,
+    label,
+    run: () => (a.restore(), a.exec({ kind: 'code', op })),
+  });
   return {
     id: 'code-tools',
     label: 'Code Tools',
-    submenu: [
-      { id: 'copyCode', label: 'Copy Code Content', run: () => (a.restore(), a.exec({ kind: 'copyBlock', part: 'content' })) },
-      { id: 'indentAll', label: 'Auto Indent Whole Code', disabled: true, run: () => {} },
-      { id: 'indentSelected', label: 'Auto Indent Selected Code', disabled: true, run: () => {} },
-    ],
+    submenu: [c('copy', 'Copy Code Content'), c('indentAll', 'Auto Indent Whole Code'), c('indentSelected', 'Auto Indent Selected Code')],
   };
 }
 
+/** Copy Math ▸ (#127): Copy as Tex / MathML / Image — block and inline variants share the
+ * caret-based MathOp commands; Copy as Image rasterizes through the app (KaTeX → PNG). */
 function copyMath(a: CtxActions, inline: boolean): MenuItem {
   const c = (id: CommandId, label: string): MenuItem => ({ id, label, run: () => (a.restore(), a.run(id)) });
-  const items = [c('copyAs:tex', 'Copy as Tex'), c('copyAs:mathml', 'Copy as MathML')];
-  if (inline) items.push({ id: 'copyAsImageInline', label: 'Copy as Image', disabled: true, run: () => {} });
+  const items = [c('copyAs:tex', 'Copy as Tex'), c('copyAs:mathml', 'Copy as MathML'), c('math:copyImage', 'Copy as Image')];
   return { id: inline ? 'copyMathInline' : 'copyMathBlock', label: 'Copy Math', submenu: items };
 }
 
@@ -162,8 +196,11 @@ export function itemForKey(key: string, t: CtxTarget, s: CtxState, a: CtxActions
     case 'download-diagram':
       return { id: key, label: 'Save Diagram As…', run: () => a.saveDiagram() };
     case 'download-math':
+      return a.saveMathAs ? { id: key, label: 'Save Math As…', run: () => a.saveMathAs!() } : null;
     case 'download-image':
-      return null; // not supported yet (#97 gap)
+      return a.saveImageAs ? { id: key, label: 'Save Image As…', run: () => a.saveImageAs!(src) } : null;
+    case 'download-video':
+      return a.saveVideoAs ? { id: key, label: 'Save Video As…', run: () => a.saveVideoAs!(src) } : null;
     case 'insertParagraphBefore':
       return block('para:insertBefore', 'Insert Paragraph Before');
     case 'insertParagraphAfter':
@@ -176,19 +213,48 @@ export function itemForKey(key: string, t: CtxTarget, s: CtxState, a: CtxActions
       return a.revealImage ? { id: key, label: 'Open Image Location…', run: () => a.revealImage!(src) } : null;
     case 'revealImgInBrowser':
       return { id: key, label: 'Open Image in Browser…', run: () => a.openExternal(src) };
+    case 'zoomImg': {
+      const z = a.zoomChoices?.();
+      if (!z) return null;
+      const sub: MenuItem[] = [];
+      z.presets.forEach((v, i) => {
+        sub.push({ id: `zoomImg:${v}`, label: v, checked: v === z.zoomNow, run: () => z.set(v) });
+        if (i === 3) sub.push(sep); // 25 33 50 67 | 100 150 200 (fe-contextmenus-tools §1.2)
+      });
+      return [
+        ...(z.zoomNow ? [{ id: 'zoomImg:now', label: `Zoom Image to ${z.zoomNow}`, run: () => z.set(z.zoomNow!) } as MenuItem] : []),
+        { id: key, label: 'Zoom Image', submenu: sub },
+      ];
+    }
+    case 'imgSyntax': {
+      const s = a.syntaxState?.();
+      if (!s) return null;
+      return { id: key, label: 'Switch Image Syntax', submenu: [
+        { id: 'imgSyntax:md', label: 'Markdown Style', checked: !s.isHtml, run: () => s.switchTo('markdown') },
+        { id: 'imgSyntax:html', label: 'HTML Style', checked: s.isHtml, run: () => s.switchTo('html') },
+      ] };
+    }
+    case 'copyImgToDir': {
+      const target = a.imageTarget?.() ?? null;
+      return target ? { id: key, label: `Copy to ${target.label}`, run: () => target.run(false) } : null;
+    }
     case 'copyImgToSelect':
       return a.copyImageTo ? { id: key, label: 'Copy Image to…', run: () => a.copyImageTo!(src, false) } : null;
+    case 'moveImgToDir': {
+      const target = a.imageTarget?.() ?? null;
+      return target?.canMove ? { id: key, label: `Move to ${target.label}`, run: () => target.run(true) } : null;
+    }
     case 'moveImgToSelect':
       return a.copyImageTo ? { id: key, label: 'Rename or Move Image to…', run: () => a.copyImageTo!(src, true) } : null;
     case 'uploadImg':
       return a.uploadImage ? { id: key, label: 'Upload Image', run: () => a.uploadImage!(src) } : null;
-    case 'zoomImg':
-    case 'imgSyntax':
-      return null; // image zoom / syntax switch: image pipeline (#99)
     case 'deleteImg':
       return { id: key, label: 'Delete Image', run: () => a.deleteImage(false) };
     case 'deleteImgFile':
       return { id: key, label: 'Delete Image File', run: () => a.deleteImage(true) };
+    default:
+      if (key.startsWith('copyEmoji-')) return { id: 'copyEmoji', label: `Copy '${key.slice(10)}'`, run: () => a.writeText(key.slice(10)) };
+      break;
   }
   return null;
 }

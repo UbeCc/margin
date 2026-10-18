@@ -99,21 +99,24 @@ export function contextTarget(
   const blockType = block?.dataset.type ?? null;
   const base: CtxTarget = { ...none, kind: 'text', keys: ['normal'], block, blockType };
 
+  // §1.2 Video: the innermost element wins over its HTML block (system items | Save Video As…).
+  const vid = (target as Element).closest?.('video');
+  if (vid) return { ...base, kind: 'text', src: vid.getAttribute('src') ?? '', keys: ['normal', '|', 'download-video'] };
+
   const w = blockType ? blockKeys(blockType) : null;
   if (w) {
     const t: CtxTarget = { ...base, kind: w.kind, keys: ['normal', ...w.keys] };
     if (w.kind === 'table') t.cell = target.closest<HTMLElement>('.mb-cell') ?? undefined;
     return t;
   }
-
-  // Rendered inline objects may not be hit-testable (pointer-events: none): fall back to geometry.
   let el: Element = target;
   if (point && block && !el.closest('.md-wrap')) el = wrapAt(block, point.x, point.y) ?? el;
 
   const img = el.closest('img');
-  const imageWrap = img?.closest<HTMLElement>('.md-image') ?? undefined;
-  if (img && imageWrap) {
-    const src = imageMarkdownSrc(imageWrap.querySelector('.md-src')?.textContent ?? '') ?? img.getAttribute('src') ?? '';
+  if (img) {
+    const imageWrap = img.closest<HTMLElement>('.md-image') ?? undefined;
+    // Markdown image: exact source from .md-src; HTML-block <img>: its src attribute.
+    const src = imageMarkdownSrc(imageWrap?.querySelector('.md-src')?.textContent ?? '') ?? img.getAttribute('src') ?? '';
     const loaded = img.complete && img.naturalWidth > 0;
     const local = !/^([a-z][\w+.-]*:|\/\/)/i.test(src) || /^file:/i.test(src);
     return {
@@ -126,7 +129,7 @@ export function contextTarget(
       loaded,
       keys: [
         local ? (loaded ? 'revealImgInFinder' : '') : /^https?:/i.test(src) ? 'revealImgInBrowser' : '',
-        ...(loaded ? ['copyImgToSelect', ...(local ? ['moveImgToSelect'] : []), 'uploadImg', 'copyImg'] : []),
+        ...(loaded ? ['copyImgToDir', 'copyImgToSelect', ...(local ? ['moveImgToDir', 'moveImgToSelect'] : []), 'uploadImg', '|', 'copyImg'] : []),
         'zoomImg',
         'imgSyntax',
         local ? 'deleteImgFile' : 'deleteImg',
@@ -139,6 +142,14 @@ export function contextTarget(
 
   const link = el.closest<HTMLElement>('.md-link');
   if (link && link.dataset.href !== undefined) return { ...base, kind: 'link', href: link.dataset.href, keys: ['openLink', 'copyLink', '|', 'normal'] };
+
+  const emoji = el.closest<HTMLElement>('.md-entity');
+  if (emoji) {
+    // §1.2 Emoji (:smile: rendered): "Copy '<char>'" before the system items (#139).
+    const code = emoji.querySelector('.md-meta')?.textContent ?? '';
+    const ch = emoji.querySelector('.md-entity-char')?.textContent ?? '';
+    if (/^:[\w+-]+:$/.test(code) && ch) return { ...base, kind: 'text', src: ch, keys: [`copyEmoji-${ch}`, '|', 'normal'] };
+  }
 
   const math = el.closest<HTMLElement>('.md-math');
   if (math) return { ...base, kind: 'mathInline', math, keys: ['copyMathInline', '|', 'normal'] };

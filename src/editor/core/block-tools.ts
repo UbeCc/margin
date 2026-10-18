@@ -9,7 +9,7 @@ import type { EditorCore } from './editor';
 import type { Leaf } from './types';
 import { leafContent } from './model';
 import { isTextLeaf, widgetToParagraph, type Caret } from './edit';
-import { copyAs } from './copy-as';
+import { copyAs, mathAtCaret } from './copy-as';
 
 /** Markdown of an empty `rows`×`cols` table (rows include the header row; both clamped to 1…200). */
 export function tableMarkdown(rows: number, cols: number): string {
@@ -25,6 +25,7 @@ export function tableMarkdown(rows: number, cols: number): string {
 interface Hit {
   i: number;
   leaf: Leaf;
+  wtype: WidgetBlockType;
   inst: WidgetInstance | undefined;
 }
 
@@ -37,7 +38,7 @@ export function widgetAtCaret(ed: EditorCore, types: WidgetBlockType[]): Hit | n
     if (!l || isTextLeaf(l)) return null;
     const rec = ed.view.recs.get(l.id);
     if (!rec?.wtype || !types.includes(rec.wtype)) return null;
-    return { i, leaf: l, inst: rec.inst };
+    return { i, leaf: l, wtype: rec.wtype, inst: rec.inst };
   };
   const s = ed.readSel() ?? ed.lastSel;
   if (s) return ok(doc.locate(s.focus).i);
@@ -88,6 +89,13 @@ export function codeTool(ed: EditorCore, op: CodeOp): boolean {
 
 export function mathTool(ed: EditorCore, op: MathOp): boolean {
   if (op === 'copyTex' || op === 'copyMathML') return copyAs(ed, op === 'copyTex' ? 'tex' : 'mathml');
+  if (op === 'copyImage') {
+    // #127 Copy Math ▸ Copy as Image: the app rasterizes the TeX (KaTeX CSS is app-side).
+    const m = mathAtCaret(ed);
+    if (!m || !ed.settings.copyMathImage) return false;
+    void ed.settings.copyMathImage(m.tex, m.display);
+    return true;
+  }
   if (op === 'refresh') return refreshMath(ed);
   // delete: the math block with the caret (Typora has no Delete Math for inline $…$, typora-re#4)
   const hit = widgetAtCaret(ed, ['math_block']);

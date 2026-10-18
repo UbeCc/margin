@@ -40,6 +40,9 @@ const rightClickImage = (page: Page, i = 0) => page.locator('.md-editor .md-imag
 const ctxItem = (page: Page, label: string | RegExp) => page.locator('.context-item', { hasText: label });
 
 test.beforeEach(async ({ page }) => {
+  // Fake hosts: fail fast so webkit/chromium don't sit on pending requests through a
+  // live proxy (breaks click actionability); never touch the localhost dev server.
+  await page.route(/^(https?:\/\/(x\.example|cdn\.example|example\.com)\b.*)$/, (r) => r.fulfill({ status: 404, body: '' }));
   await boot(page);
   await putPng(page, '/pics/shot.png');
 });
@@ -155,28 +158,43 @@ test('images.copy-move-all: Image Tools: Copy / Move All Images to… (and per-i
 });
 
 test('images.delete: Image context: Delete Image / Delete Image File (undoable)', async ({ page }) => {
-  await setDoc(page, 'a ![s](/pics/shot.png) b\n');
+  await setDoc(page, 'a ![s](https://x.example/s.png) b\n');
   await rightClickImage(page);
+  // remote image: reference-only "Delete Image" (no file on disk)
   await ctxItem(page, /^Delete Image$/).click();
   await expect.poll(() => editorValue(page)).toBe('a  b\n');
   await page.locator('.md-editor').click();
   await page.keyboard.press(`${MOD}+z`);
-  await expect.poll(() => editorValue(page)).toBe('a ![s](/pics/shot.png) b\n');
+  await expect.poll(() => editorValue(page)).toBe('a ![s](https://x.example/s.png) b\n');
+
+  // A 24×24 PNG: a 1×1 image at a fractional inline offset rounds to a 0-width
+  // hit box on Linux WebKit and cannot be clicked (app renders natural size).
+  await page.evaluate(
+    (b64) => {
+      const w = window as unknown as Win;
+      const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+      void w.__MARGIN_WEB__.storeImage(null, { kind: 'absolute', dir: '/pics' }, { bytes, mime: 'image/png' }).then(async (made) => {
+        await w.__MARGIN_WEB__.rename(decodeURI(made), '/pics/del.png');
+      });
+    },
+    'iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAIAAABvFaqvAAAAH0lEQVR4nGOYcOADVRDDqEGjBo0aNGrQqEGjBg28QQDyphBMTK0GVQAAAABJRU5ErkJggg==',
+  );
+  await setDoc(page, 'a ![s](/pics/del.png) b\n');
 
   await rightClickImage(page);
   await ctxItem(page, 'Delete Image File').click();
   const dlg = page.locator('.dialog');
-  await expect(dlg).toContainText('Are you sure you want to delete shot.png?');
+  await expect(dlg).toContainText('Are you sure you want to delete del.png?');
   await dlg.locator('button[data-id=cancel]').click();
-  expect(await exists(page, '/pics/shot.png')).toBe(true);
+  expect(await exists(page, '/pics/del.png')).toBe(true);
   await rightClickImage(page);
   await ctxItem(page, 'Delete Image File').click();
   await page.locator('.dialog button[data-id=ok]').click();
   await expect.poll(() => editorValue(page)).toBe('a  b\n');
-  expect(await exists(page, '/pics/shot.png')).toBe(false);
+  expect(await exists(page, '/pics/del.png')).toBe(false);
 });
 
-test('images.reveal-open: Image context: Open Image Location / Open in Browser / Copy Image Content', async ({ page }) => {
+test('images.reveal-open: Image context: Open Image Location… / Open in Browser… / Copy Image Content', async ({ page }) => {
   await page.evaluate(() => {
     const w = window as unknown as Win;
     w.__calls = [];
@@ -184,31 +202,44 @@ test('images.reveal-open: Image context: Open Image Location / Open in Browser /
   });
   await setDoc(page, '![s](/pics/shot.png)\n\n![w](https://x.example/w.png)\n');
   await rightClickImage(page, 0);
-  await expect(ctxItem(page, 'Copy Image Content')).toBeVisible();
+  // §1.2 order: reveal / copy-move / upload | zoom, syntax, delete | system items | Save Image As…
+  const labels = page.locator('.context-menu:not(.context-submenu) > .context-item .context-label');
+  await expect(labels).toHaveText([
+    'Open Image Location…', 'Copy to /Users/demo/Notes/assets', 'Copy Image to…',
+    'Move to /Users/demo/Notes/assets', 'Rename or Move Image to…', 'Upload Image',
+    'Zoom Image', 'Switch Image Syntax', 'Delete Image File',
+    'Cut', 'Copy', 'Copy Image Content', 'Paste', 'Copy / Paste As…', 'Save Image As…',
+  ]);
+  await expect(page.locator('.context-sep', { hasText: '' })).not.toHaveCount(0); // separators preserved
   await expect(ctxItem(page, 'Open Image in Browser')).toHaveCount(0);
-  await ctxItem(page, 'Open Image Location').click();
+  await ctxItem(page, /^Open Image Location…$/).click();
   expect(await page.evaluate(() => (window as unknown as Win).__MARGIN_WEB__.revealed)).toEqual(['/pics/shot.png']);
   await rightClickImage(page, 1);
-  await expect(ctxItem(page, 'Open Image Location')).toHaveCount(0);
-  await ctxItem(page, 'Open Image in Browser').click();
+  await expect(ctxItem(page, 'Open Image Location…')).toHaveCount(0);
+  await ctxItem(page, /^Open Image in Browser…$/).click();
   expect(await page.evaluate(() => (window as unknown as Win).__calls)).toEqual(['https://x.example/w.png']);
 });
 
-test('images.zoom: Image zoom (Zoom Image to N%) and switch Markdown/HTML image syntax', async ({ page }) => {
-  await page.evaluate(() => (window as unknown as Win).__MARGIN_WEB__.imageScales.set('/pics/shot.png', 2));
+test('images.zoom: Image zoom (direct entry + presets) and switch Markdown/HTML image syntax', async ({ page }) => {
   await setDoc(page, '![s](/pics/shot.png)\n');
   await rightClickImage(page);
-  await ctxItem(page, 'Zoom Image').click();
-  // Retina image (2 px / pt): 50% comes first, then Typora's presets
-  await expect(page.locator('.context-item').first()).toHaveText('Zoom Image to 50%');
-  await expect(page.locator('.context-item')).toHaveCount(8);
-  await page.locator('.context-item').first().click();
+  // no zoom set: only the submenu (25 33 50 67 | 100 150 200), nothing checked
+  await page.locator('.context-item[data-key=zoomImg]').hover();
+  await expect(page.locator('.context-submenu .context-label')).toHaveText(['25%', '33%', '50%', '67%', '100%', '150%', '200%']);
+  await page.getByRole('menuitemcheckbox', { name: '50%', exact: true }).click();
   await expect.poll(() => editorValue(page)).toBe('<img src="/pics/shot.png" alt="s" style="zoom:50%;" />\n');
+  // zoomed: the direct "Zoom Image to N%" entry appears and the preset is checked
   await rightClickImage(page);
-  await ctxItem(page, 'Markdown Style').click();
+  await expect(ctxItem(page, 'Zoom Image to 50%')).toBeVisible();
+  await page.locator('.context-item[data-key=zoomImg]').hover();
+  await expect(page.locator('.context-submenu .context-item[aria-checked=true] .context-label')).toHaveText(['50%']);
+  await page.locator('.context-item[data-key=imgSyntax]').hover();
+  await expect(page.locator('.context-submenu .context-item[aria-checked=true] .context-label')).toHaveText(['HTML Style']);
+  await page.locator(".context-item[data-key='imgSyntax:md']").click();
   await expect.poll(() => editorValue(page)).toBe('![s](/pics/shot.png)\n');
   await rightClickImage(page);
-  await ctxItem(page, 'HTML Style').click();
+  await page.locator('.context-item[data-key=imgSyntax]').hover();
+  await page.locator(".context-item[data-key='imgSyntax:html']").click();
   await expect.poll(() => editorValue(page)).toBe('<img src="/pics/shot.png" alt="s" />\n');
 });
 

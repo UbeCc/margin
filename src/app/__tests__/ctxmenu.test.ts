@@ -69,7 +69,7 @@ describe('context menu targets (Typora key lists)', () => {
     );
     for (const img of root.querySelectorAll('img')) Object.defineProperties(img, { naturalWidth: { value: 10, configurable: true }, complete: { value: true } });
     const local = contextTarget(root.querySelector('img'), root);
-    expect(local.keys).toEqual(['revealImgInFinder', 'copyImgToSelect', 'moveImgToSelect', 'uploadImg', 'copyImg', 'zoomImg', 'imgSyntax', 'deleteImgFile', '|', 'normal', '|', 'download-image']);
+    expect(local.keys).toEqual(['revealImgInFinder', 'copyImgToDir', 'copyImgToSelect', 'moveImgToDir', 'moveImgToSelect', 'uploadImg', '|', 'copyImg', 'zoomImg', 'imgSyntax', 'deleteImgFile', '|', 'normal', '|', 'download-image']);
     expect(local.kind).toBe('image');
     expect(local.src).toBe('assets/a.png');
     expect(local.keys[0]).toBe('revealImgInFinder');
@@ -132,13 +132,59 @@ describe('context menu items', () => {
     expect(a.run).toHaveBeenCalledWith('delete:block');
     const tools = items.find((i) => 'submenu' in i && i.label === 'Code Tools') as { submenu: { label: string; run(): void }[] };
     tools.submenu[0].run();
-    expect(a.exec).toHaveBeenCalledWith({ kind: 'copyBlock', part: 'content' });
+    expect(a.exec).toHaveBeenCalledWith({ kind: 'code', op: 'copy' });
   });
 
   it('input menu has only Cut / Copy / Paste', () => {
     doc('');
     const t = contextTarget(document.getElementById('field'), document.querySelector('.md-editor'));
     expect(labels(buildItems(t, { selection: 'x' }, acts()))).toEqual(['Cut', 'Copy', 'Paste']);
+  });
+
+  it('video and emoji targets: Save Video As… after system items; Copy <char> for :emoji:', () => {
+    const root = doc(
+      '<div data-bid="h" data-type="html_block"><div class="inner"><video src="assets/v.mp4" controls></video></div></div>' +
+        '<p data-bid="p" data-type="paragraph"><span class="md-wrap md-entity"><span class="md-meta">:smile:</span><span class="md-entity-char">😄</span></span></p>',
+    );
+    const a = acts();
+    a.saveVideoAs = vi.fn();
+    const v = buildItems(contextTarget(root.querySelector('video'), root), { selection: '' }, a);
+    expect(labels(v)).toEqual(['Cut', 'Copy', 'Paste', 'Copy / Paste As…', '|', 'Save Video As…']);
+    (v[v.length - 1] as { run(): void }).run();
+    expect(a.saveVideoAs).toHaveBeenCalledWith('assets/v.mp4');
+    const e = buildItems(contextTarget(root.querySelector('.md-entity-char'), root), { selection: '' }, a);
+    expect(labels(e)[0]).toBe("Copy '😄'");
+    (e[0] as { run(): void }).run();
+    expect(a.writeText).toHaveBeenCalledWith('😄');
+  });
+
+  it('image menu: folder targets, zoom presets grouped, syntax switch checked, Save Image As…', () => {
+    const root = doc(
+      '<p data-bid="p" data-type="paragraph"><span class="md-wrap md-image"><span class="md-src">![a](assets/a.png)</span><img class="md-img" src="blob:x"></span></p>',
+    );
+    const img = root.querySelector('img')!;
+    Object.defineProperties(img, { naturalWidth: { value: 10, configurable: true }, complete: { value: true } });
+    const a = acts();
+    a.revealImage = vi.fn();
+    a.uploadImage = vi.fn();
+    a.copyImageTo = vi.fn();
+    a.imageTarget = () => ({ label: './assets', canMove: true, run: vi.fn() });
+    a.zoomChoices = () => ({ zoomNow: '50%', presets: ['25%', '33%', '50%', '67%', '100%', '150%', '200%'], set: vi.fn() });
+    a.syntaxState = () => ({ isHtml: false, switchTo: vi.fn() });
+    a.saveImageAs = vi.fn();
+    const items = buildItems(contextTarget(img, root), { selection: '' }, a);
+    expect(labels(items)).toEqual([
+      'Open Image Location…', 'Copy to ./assets', 'Copy Image to…', 'Move to ./assets', 'Rename or Move Image to…', 'Upload Image',
+      '|', 'Zoom Image to 50%', 'Zoom Image', 'Switch Image Syntax', 'Delete Image File', '|',
+      'Cut', 'Copy', 'Copy Image Content', 'Paste', 'Copy / Paste As…', '|', 'Save Image As…',
+    ]);
+    const zoom = items.find((i) => 'label' in i && i.label === 'Zoom Image') as { submenu: MenuItem[] };
+    expect(labels(zoom.submenu)).toEqual(['25%', '33%', '50%', '67%', '|', '100%', '150%', '200%']);
+    const syn = items.find((i) => 'label' in i && i.label === 'Switch Image Syntax') as { submenu: MenuItem[] };
+    expect(labels(syn.submenu)).toEqual(['Markdown Style', 'HTML Style']);
+    expect((syn.submenu[0] as { checked?: boolean }).checked).toBe(true);
+    (items[items.length - 1] as { run(): void }).run();
+    expect(a.saveImageAs).toHaveBeenCalledWith('assets/a.png');
   });
 });
 

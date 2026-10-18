@@ -3,6 +3,7 @@ import { h, clearChildren } from '../util/dom';
 import { basename, dirname, extname, relative, stripExt } from '../util/path';
 import { showContextMenu } from '../ui/contextmenu';
 import { extras } from '../platform-extras';
+import { fileMenu, type SideFileOps } from './file-menus';
 import { compareBy, DEFAULT_SORT, type SortOrder } from './sort';
 import { collectDocs, dateLabel, LIST_LIMIT, summarize } from './walk';
 import { makeDraggable } from './drag';
@@ -10,6 +11,10 @@ import { makeDraggable } from './drag';
 export interface FileListHost {
   platform: Platform;
   openFile(path: string): void;
+  /** Shared sidebar ops (the tree implements them); absent = item disabled. */
+  ops(): SideFileOps;
+  /** The sidebar view currently shown (check mark on the view items). */
+  view(): 'tree' | 'list' | 'search';
 }
 
 /**
@@ -129,20 +134,14 @@ export class FileList {
       h('div.list-summary', { text: this.summaries.get(d.path) ?? '' }),
     );
     if (d.path === this.active) row.classList.add('active');
-    makeDraggable(row, d.path);
+    makeDraggable(row, d.path, this.host.platform);
     row.addEventListener('click', () => {
       row.focus({ preventScroll: true });
       this.host.openFile(d.path);
     });
     row.addEventListener('contextmenu', (e) => {
       e.preventDefault();
-      const p = extras(this.host.platform);
-      showContextMenu(e.clientX, e.clientY, [
-        { label: 'Open', run: () => this.host.openFile(d.path) },
-        { separator: true },
-        { label: 'Copy Path', run: () => void navigator.clipboard?.writeText(d.path) },
-        { label: 'Reveal in Finder', run: () => void p.revealInFolder?.(d.path), disabled: !p.revealInFolder },
-      ]);
+      showContextMenu(e.clientX, e.clientY, fileMenu({ ops: this.host.ops(), entry: d, view: 'list', active: this.host.view() === 'list' ? 'list' : 'tree', rootDir: this.root ?? '' }));
     });
     this.rows.set(d.path, row);
     return row;
@@ -155,6 +154,7 @@ export class FileList {
     if (e.key === 'ArrowDown') rows[Math.min(rows.length - 1, i + 1)].focus();
     else if (e.key === 'ArrowUp') rows[Math.max(0, i - 1)].focus();
     else if (e.key === 'Enter' && i >= 0) rows[i].click();
+    else if (e.key === ' ' && i >= 0) void extras(this.host.platform).quickLook?.(rows[i].dataset.path ?? '');
     else return;
     e.preventDefault();
   }

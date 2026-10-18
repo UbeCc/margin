@@ -677,6 +677,12 @@ export class WebPlatform implements Platform {
     this.revealed.push(normalizePath(path));
   }
 
+  /** No Quick Look in the browser: recorded for tests (#131). */
+  quickLooked: string[] = [];
+  async quickLook(path: string): Promise<void> {
+    this.quickLooked.push(normalizePath(path));
+  }
+
   async print(): Promise<void> {
     if (!navigatorIsAutomated()) window.print();
   }

@@ -19,9 +19,13 @@ export interface SourceModeLike {
   /** Optional caret / scroll hand-off (#35): 0-based line at the viewport top, scroll a line to the top. */
   getTopLine?(): number;
   scrollToLine?(line: number): void;
+  /** Insert markdown at a viewport point (falling back to the caret) — OS drops in source mode (#129). */
+  insertAt?(markdown: string, x?: number, y?: number): boolean;
   /** Main selection as markdown offsets (feature-detected). */
   getSelection?(): { anchor: number; head: number };
   setSelection?(anchor: number, head: number): void;
+  /** #116: replace the selection with text (source-mode Paste as Plain Text). */
+  replaceSelection?(text: string): void;
   /** CodeMirror escape hatch (blocks' source mode): used for the selection when the methods above are absent. */
   readonly view?: {
     state: { selection: { main: { anchor: number; head: number } } };

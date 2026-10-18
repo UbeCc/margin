@@ -9,14 +9,14 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 | | surfaces |
 |---|---|
 | total | 172 |
-| owned (implemented) | 145 (with a named passing test: 132) |
-| partial | 10 |
-| missing | 9 |
+| owned (implemented) | 149 (with a named passing test: 136) |
+| partial | 8 |
+| missing | 7 |
 | out of scope | 8 |
 
-REA ledger `rol_b53a85d8633d2df3539b45ed910480e1fc50b8309193c619dda80e2753bdff0a` (closure `d7770d97eefb9a99…`): status **unknown**; unowned 9, implemented 155, out-of-scope 8, unknown 5.
+REA ledger `rol_d96a5c7b5813ba68e8532bf8e9ffa716ae1776a65969518fc9b075cf9abcab06` (closure `eb52c32289f5a028…`): status **unknown**; unowned 7, implemented 157, out-of-scope 8, unknown 5.
 
-REA coverage boundary `margin.typora-parity`: status **unknown**; 132/164 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 9, package-proof-missing 1, verifier-missing 25, verifier-unknown 7.
+REA coverage boundary `margin.typora-parity`: status **unknown**; 136/164 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 7, package-proof-missing 1, verifier-missing 23, verifier-unknown 5.
 
 Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): build exit 0, cargo-test exit 0, independence exit 0, playwright exit 0, vitest exit 0. See `rea/summary.json`.
 
@@ -35,12 +35,12 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `core-cmds` Paragraph & Format menu commands (headings, inline styles, insert/convert blocks) | P0 | 0 |
 | `files` File lifecycle: tabs/windows, recent, duplicate/move/rename, encoding, versions, recovery | P0 | 0 |
 | `export` Export, import & print: image/Pandoc/custom formats, export settings, export-with-previous | P0 | 0 |
-| `clipboard` Clipboard & selection: copy-as / paste-as, selection & delete scopes, jump-to | P0 | 2 |
-| `ctx` Editor & sidebar context menus (text, link, table, image, code, math, diagram, outline, files) | P1 | 3 |
+| `clipboard` Clipboard & selection: copy-as / paste-as, selection & delete scopes, jump-to | P0 | 1 |
+| `ctx` Editor & sidebar context menus (text, link, table, image, code, math, diagram, outline, files) | P1 | 1 |
 | `tools` Table, code-fence and math tools | P1 | 1 |
 | `images` Image pipeline: insert-local, copy/move/upload, zoom, syntax switch, image root path | P1 | 0 |
 | `prefs` Preferences completeness (General, Editor, Image, Markdown, Export, Appearance panes) | P1 | 2 |
-| `sidebar` Sidebar & outline: list view, file search, sort, collapsible outline, filter | P1 | 1 |
+| `sidebar` Sidebar & outline: list view, file search, sort, collapsible outline, filter | P1 | 0 |
 | `syntax` Markdown syntax options & whitespace/line-break settings | P2 | 1 |
 | `chrome` Window chrome & writing aids: status bar, always-on-top, spelling, substitutions, speech, emoji | P2 | 9 |
 
@@ -88,8 +88,8 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `menu.edit.delete-select-all` | Edit › Delete / Select All | owned |  | `src/editor/core/commands.ts` `case 'selectAll'` | `tests/e2e/blocks-core.spec.ts` › Cmd/Ctrl+A in a table cell selects the cell | 2 |
 | `menu.edit.find-replace` | Edit › Find / Find Next / Previous / Replace / Replace Next | owned |  | `src/app/findbar.ts` `caseSensitive` | `tests/e2e/app-navigation.spec.ts` › find keeps focus in the bar, counts and cycles matches | 15 |
 | `menu.edit.find-options` | Find options: whole word and regular expression — Match Case / Whole Word / Regular Expression ($1 replacement) done; no In Selection | **partial** | P1 | `src/editor/core/query.ts` `export function compileQuery` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.find-options: Find options: whole word and regular expression | 3 |
-| `menu.edit.copy-as` | Edit › Copy as Markdown / HTML Code / Plain Text / without Theme Styling / to MS Word | owned |  | `src/editor/core/copy-as.ts` `export function copyAs` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.copy-as: Edit › Copy as Markdown / HTML Code / Plain Text / without Theme Styling / to MS Word | 11 |
-| `menu.edit.paste-plain` | Edit › Paste as Plain Text | owned |  | `src/editor/core/copy-as.ts` `export function pastePlain` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.paste-plain: Edit › Paste as Plain Text | 2 |
+| `menu.edit.copy-as` | Edit › Copy as Markdown / HTML Code / Plain Text / without Theme Styling / to MS Word — source mode: every variant copies the selected source text (#116); WKWebView execCommand refusal falls back to clipboard_write_payload | owned |  | `src/editor/core/copy-as.ts` `export function copyAs` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.copy-as: Edit › Copy as Markdown / HTML Code / Plain Text / without Theme Styling / to MS Word | 11 |
+| `menu.edit.paste-plain` | Edit › Paste as Plain Text — source mode: the system plain paste — native read + replaceSelection (#116) | owned |  | `src/editor/core/copy-as.ts` `export function pastePlain` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.paste-plain: Edit › Paste as Plain Text | 2 |
 | `menu.edit.select-scopes` | Edit › Selection: Select Word / Line-Sentence / Paragraph-Block / Styled Scope | owned |  | `src/editor/core/scopes.ts` `export function selectScope` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.select-scopes: Edit › Selection | 5 |
 | `menu.edit.delete-scopes` | Edit › Delete Word / Line-Sentence / Paragraph-Block / Styled Scope / Range | owned |  | `src/editor/core/scopes.ts` `export function deleteScope` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.delete-scopes: Edit › Delete Word | 5 |
 | `menu.edit.jump` | Edit › Jump To: Top / Bottom / Selection | owned |  | `src/editor/core/scopes.ts` `export function jumpTo` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.jump: Edit › Jump To: Top / Bottom / Selection | 4 |
@@ -180,8 +180,8 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `ctx.text` | Text context menu: cut/copy/paste, copy-as, insert, format, paragraph submenus, search with… — Cut/Copy/Paste + Copy / Paste As… + Search with Google; WebKit spelling suggestions, Look Up, Speech, Substitutions are not reproduced by the in-app menu | **partial** | P1 | `src/app/ctxmenu/items.ts` `label: 'Copy / Paste As…'` | `tests/e2e/parity-ctx.spec.ts` › ctx.text: | 4 |
 | `ctx.link` | Link context menu: Open Link / Copy Link Address / Hyperlink Actions | owned |  | `src/app/ctxmenu/items.ts` `label: 'Copy Link Address'` | `tests/e2e/parity-ctx.spec.ts` › ctx.link: | 4 |
 | `ctx.block-generic` | Block context menu: Insert Paragraph Before/After, Delete (atomic blocks) — table/HTML/math/diagram/code/atomic lists; Save Math/Image As… not yet (gap) | owned |  | `src/app/ctxmenu/items.ts` `block('para:insertBefore', 'Insert Paragraph Before')` | `tests/e2e/parity-ctx.spec.ts` › ctx.block-generic: | 9 |
-| `ctx.emoji` | Emoji/inline-math context entries (copy emoji, copy inline math) — inline math Copy Math ▸ Tex/MathML; Margin renders no :emoji: shortcodes, inline Copy as Image disabled | **partial** | P2 | `src/app/ctxmenu/items.ts` `function copyMath` | `tests/e2e/parity-ctx.spec.ts` › ctx.emoji: | 4 |
-| `ctx.media` | Media context entries: play / pause / download video | **missing** | P2 | — | none | 6 |
+| `ctx.emoji` | Emoji/inline-math context entries (copy emoji, copy inline math, copy as image) — :smile: renders (EMOJI map); inline Copy as Image rasterizes the KaTeX node to PNG (mathimg.ts) | owned |  | `src/app/ctxmenu/items.ts` `function copyMath` | `tests/e2e/parity-ctx.spec.ts` › ctx.emoji: | 5 |
+| `ctx.media` | Video context entries: Save Video As… after the system items — §1.2 video menu = system items \| Save Video As…; no Play/Pause context items in Typora (spec A labels accounted, not shown); download-progress strings not reproduced | owned |  | `src/app/ctxmenu/targets.ts` `closest?.('video')` | `src/app/__tests__/ctxmenu.test.ts` › video and emoji targets | 6 |
 
 ## Table tools
 
@@ -228,8 +228,8 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `images.remote-download` | Download remote images into the target folder — downloaded natively (curl, with timeout) only when Apply above rules to online images is on (Typora default off) | owned |  | `src/app/images/insert.ts` `shouldApplyRule(input.path, opts)` | `tests/e2e/parity-images.spec.ts` › images.remote-download: Download remote images into the target folder | 0 |
 | `images.copy-move-all` | Image Tools: Copy / Move All Images to… (and per-image copy/move/rename) — duplicate names get Typora stem-<last 7 digits of unix seconds>.ext; Margin deviation: identical bytes reuse the existing copy and explicit names never clobber | owned |  | `src/app/images/tools.ts` `async copyAll(move: boolean` | `tests/e2e/parity-images.spec.ts` › images.copy-move-all: Image Tools: Copy / Move All Images to… (and per-image copy/move/rename) | 15 |
 | `images.delete` | Image context: Delete Image / Delete Image File (undoable) — Delete Image File moves the file to the Trash after confirmation; removing the reference is one undo step | owned |  | `src/app/images/tools.ts` `async deleteImageFile(` | `tests/e2e/parity-images.spec.ts` › images.delete: Image context: Delete Image / Delete Image File (undoable) | 9 |
-| `images.reveal-open` | Image context: Open Image Location / Open in Browser / Copy Image Content — Open Image in Browser only for remote images (desktop openExternal allows http(s) only) | owned |  | `src/app/images/context-menu.ts` `Open Image Location` | `tests/e2e/parity-images.spec.ts` › images.reveal-open: Image context: Open Image Location / Open in Browser / Copy Image Content | 5 |
-| `images.zoom` | Image zoom (Zoom Image to N%) and switch Markdown/HTML image syntax — Typora presets 25-200% plus 1/scale (PNG pHYs / JPEG JFIF density); inline <img> renders as an image | owned |  | `src/app/images/syntax.ts` `export function setZoom` | `tests/e2e/parity-images.spec.ts` › images.zoom: Image zoom (Zoom Image to N%) and switch Markdown/HTML image syntax | 6 |
+| `images.reveal-open` | Image context: Open Image Location / Open in Browser / Copy Image Content — Open Image in Browser only for remote images (desktop openExternal allows http(s) only) | owned |  | `src/app/ctxmenu/items.ts` `Open Image Location` | `tests/e2e/parity-images.spec.ts` › images.reveal-open: Image context: Open Image Location… / Open in Browser… / Copy Image Content | 5 |
+| `images.zoom` | Image zoom (Zoom Image to N%) and switch Markdown/HTML image syntax — Typora presets 25-200% plus 1/scale (PNG pHYs / JPEG JFIF density); inline <img> renders as an image | owned |  | `src/app/images/syntax.ts` `export function setZoom` | `tests/e2e/parity-images.spec.ts` › images.zoom: Image zoom (direct entry + presets) and switch Markdown/HTML image syntax | 6 |
 | `images.reload` | Image Tools: Reload All Images | owned |  | `src/app/images/tools.ts` `reloadAll(root: HTMLElement)` | `tests/e2e/parity-images.spec.ts` › images.reload: Image Tools: Reload All Images | 1 |
 | `images.upload` | Image upload: custom command (argv) / PicGo; upload one / all local images; test uploader — DELIBERATE DEVIATION (security): the command is tokenized to argv and run without a shell (Typora runs bash -c with only backslash and double quote escaped, so $() or backticks in file names execute); success also needs exit status 0. Same as Typora: 20 s per image, 60 s batch cap (child killed), URL lines http(s)/ftp/file/host.tld scanned from the tail, last URL for one image, exactly n for a batch, Test Uploader needs exactly 2 URLs; upload-on-insert keeps the local image on failure; Cancel kills the run | owned |  | `src-tauri/src/upload.rs` `pub fn test_upload(` | `tests/e2e/parity-images.spec.ts` › images.upload: Image upload: custom command (argv) / PicGo; upload one / all local images; test uploader | 32 |
 | `images.ipic` | iPic uploader (third-party macOS app, private pasteboard protocol) — Proprietary third-party integration with an undocumented pasteboard protocol; command/PicGo uploaders cover the use case. | out-of-scope |  | — | none | 4 |
@@ -255,13 +255,13 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
-| `sidebar.tree` | File tree: lazy folders, open, watch, new/rename/trash/reveal/copy path | owned |  | `src/app/sidebar/filetree.ts` `'New File…'` | `tests/e2e/app-files.spec.ts` › context menu: new file, rename (open doc follows), new folder, trash | 20 |
+| `sidebar.tree` | File tree: lazy folders, open, watch, new/rename/trash/reveal/copy path | owned |  | `src/app/sidebar/file-menus.ts` `'New File'` | `tests/e2e/app-files.spec.ts` › context menu: new file, rename (open doc follows), new folder, trash | 20 |
 | `sidebar.list-view` | Articles list view (summaries, ≤400 items) and tree/list switch — Margin defaults to the tree view on every OS (Typora macOS defaults to Articles) | owned |  | `src/app/sidebar/filelist.ts` `export class FileList` | `tests/e2e/parity-sidebar.spec.ts` › sidebar.list-view: Articles list view | 7 |
 | `sidebar.search` | Sidebar full-text search across the folder — "Searching"/"Gathering more results" belong to Quick Open and "No Results" to in-document Find (fe-sidebar-statusbar-find §10); "File Results" is unused in 1.5.12 | owned |  | `src/app/sidebar/search.ts` `export class SidebarSearch` | `tests/e2e/parity-sidebar.spec.ts` › sidebar.search: Sidebar full-text search | 4 |
 | `sidebar.sort` | File tree sorting (name/natural/created/modified, asc/desc) — deliberate fix: Typora code −3 serves both natural-desc and creation-desc; Margin keeps all eight orders distinct. Sort menu sits in the files header (Typora: footer menu) | owned |  | `src/app/sidebar/sort.ts` `export const SORT_OPTIONS` | `tests/e2e/parity-sidebar.spec.ts` › sidebar.sort: File tree sorting | 9 |
 | `sidebar.outline` | Outline: headings, jump, highlight current header | owned |  | `src/app/sidebar/outline.ts` `activeId` | `tests/e2e/app-navigation.spec.ts` › outline lists headings and jumps on click | 2 |
-| `sidebar.outline-collapse` | Outline: collapsible/flat outline, expand/collapse all, filter, unpin — pin/unpin (outline drop-down) not implemented | owned |  | `src/app/sidebar/outline.ts` `export function filterHeadings` | `tests/e2e/parity-sidebar.spec.ts` › sidebar.outline-collapse: Outline: collapsible/flat outline | 7 |
-| `sidebar.drag` | Drag files from sidebar into the editor / other apps; drop files to open — #23 | owned |  | `src/app/sidebar/drag.ts` `export function dropMarkdown` | `tests/e2e/parity-sidebar.spec.ts` › sidebar.drag: Drag files from sidebar | 1 |
+| `sidebar.outline-collapse` | Outline: collapsible/flat outline, expand/collapse all, filter, pin/unpin (drop-down outline) — #131: unpin hides the sidebar for a floating drop-down outline (Escape/outside click closes, View ▸ Outline reopens); pin restores the sidebar Outline tab | owned |  | `src/app/sidebar/outline.ts` `export function filterHeadings` | `tests/e2e/parity-sidebar.spec.ts` › sidebar.outline-collapse: Outline: collapsible/flat outline, expand/collapse all, filter, unpin | 7 |
+| `sidebar.drag` | Drag files from sidebar into the editor / other apps; drop files to open — #23; #131: drag-move asks 'Are you sure you want to move %@?' (suppressible) and offers Undo Move / Undo Rename %@ | owned |  | `src/app/sidebar/drag.ts` `export function dropMarkdown` | `tests/e2e/parity-sidebar.spec.ts` › sidebar.drag: Drag files from sidebar | 1 |
 
 ## Export / print / import
 
@@ -311,9 +311,9 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `beh.files.folder-watch` | Folder watcher: incremental tree updates, rename pairing, hidden/unsupported filtered | owned |  | `src-tauri/src/watch.rs` `fn ` | `src/platform/web.test.ts` › suppresses own modifications but reports creations and external changes | 1 |
 | `beh.files.title-dirty` | Window title shows document name and edited state | owned |  | `src/app/app.ts` `setDocumentEdited` | none | 0 |
 | `beh.files.single-instance` | Single instance: opening files from Finder reuses the running app | owned |  | `src-tauri/src/lib.rs` `on_second_instance` | `tests/e2e/parity-files.spec.ts` › beh.files.single-instance: Single instance: opening files from Finder reuses the running app | 0 |
-| `beh.files.drop` | Drop files from the OS: open Markdown/folders, insert images and links — #23; macOS native paths via src-tauri/src/drop_macos.rs; Linux/Windows drops not intercepted yet | owned |  | `src/app/filedrop.ts` `export async function handleFileDrop(` | `tests/e2e/parity-files.spec.ts` › beh.files.drop: Drop files from the OS: open Markdown/folders, insert images and links | 0 |
+| `beh.files.drop` | Drop files from the OS: open Markdown/folders, insert images and links — #23 #129; native paths on all platforms (src-tauri/src/drop_macos.rs, drop_linux.rs, drop_windows.rs); source mode inserts at the drop point (source-mode.ts insertAt) | owned |  | `src/app/filedrop.ts` `export async function handleFileDrop(` | `tests/e2e/parity-files.spec.ts` › beh.files.drop: Drop files from the OS: open Markdown/folders, insert images and links | 0 |
 | `beh.files.snapshot-undo` | Reopen keeps undo history and caret (per-document snapshot) | owned |  | `src/app/doctabs.ts` `private async revive(` | `tests/e2e/parity-files.spec.ts` › beh.files.snapshot-undo: Reopen keeps undo history and caret (per-document snapshot) | 4 |
-| `beh.files.quicklook` | Quick Look / preview of a file from the sidebar | **missing** | P2 | — | none | 3 |
+| `beh.files.quicklook` | Quick Look / preview of a file from the sidebar — #131: shared QLPreviewPanel via main-thread bridge; Space on a focused row, tree + Articles menus | owned |  | `src-tauri/src/quicklook_macos.rs` `pub fn quick_look_file` | `tests/e2e/parity-sidebar-r3.spec.ts` › sidebar.quicklook: Quick Look in tree/list menus and Space on a focused row | 3 |
 | `beh.files.asset-scope` | Asset access scoped to doc/folder (no whole-disk file:// access) — prose flags Typora granting "/" read access; Margin scopes per folder (#48 open) | owned |  | `src-tauri/src/commands.rs` `allow_asset_dir` | none | 0 |
 
 ## Behaviors — settings
@@ -327,8 +327,8 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
 | `beh.clip.paste-priority` | Paste priority: private lossless > HTML > files > image > text; HTML→markdown; markdown heuristic | owned |  | `src/editor/core/paste.ts` `export function htmlToMarkdown` | `tests/e2e/core-qa.spec.ts` › paste Google Docs HTML and markdown blocks mid-paragraph | 0 |
-| `beh.clip.rich-copy` | Rich copy writes plain + HTML + RTF + private format — RTF on macOS via clipboard_write_rich (#79); RTFD / webarchive flavours not written | owned |  | `src/editor/core/clipboard.ts` `export function onCopy` | `tests/e2e/parity-clipboard.spec.ts` › beh.clip.rich-copy: Rich copy writes plain + HTML + RTF + private format | 0 |
-| `beh.clip.rtf-paste` | Paste RTF/RTFD from rich apps (attachments materialized) — RTF/RTFD text+formatting converted natively (NSAttributedString, macOS); RTFD image attachments not materialized | **partial** | P2 | `src-tauri/src/clipboard_read.rs` `pub fn rtf_to_html` | `tests/e2e/parity-clipboard.spec.ts` › beh.clip.rtf-paste: Paste RTF/RTFD from rich apps | 0 |
+| `beh.clip.rich-copy` | Rich copy writes plain + HTML + RTF + RTFD + WebArchive (doc URL base) + private format — postCopy order (webarchive → RTFD → RTF) via clipboard_write_rich with the document file URL as base, untitled.md default (#79 #115); no-WebKit fallback writes every flavour itself | owned |  | `src/editor/core/clipboard.ts` `export function onCopy` | `tests/e2e/parity-clipboard.spec.ts` › beh.clip.rich-copy: Rich copy writes plain + HTML + RTF + private format | 0 |
+| `beh.clip.rtf-paste` | Paste RTF/RTFD from rich apps (attachments materialized) — RTF/RTFD text+formatting converted natively (NSAttributedString, macOS); RTFD image attachments materialized as data: URIs and stored through the image rule (#114) | owned |  | `src-tauri/src/clipboard_read.rs` `pub fn rtf_to_html` | `tests/e2e/parity-clipboard.spec.ts` › beh.clip.rtf-paste: Paste RTF/RTFD from rich apps | 0 |
 
 ## Generic UI
 

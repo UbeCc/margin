@@ -1,3 +1,4 @@
+import { saveMediaAs } from './images/context-menu';
 import { ExternalChangeBanner } from './ui/extchange';
 import type { EditorHandle, EditorSettings, ImageMenuAction, MenuAction, Platform } from '../contracts';
 import type { Wiring } from './wiring';
@@ -13,6 +14,7 @@ import { ExportController, registerPandocExporters } from './export-actions';
 import { DEFAULT_PRINT_SETUP, effectivePage, pageCss, type PrintSetup } from './export-settings';
 import { confirmOverwriteDialog, openExportingSheet, openPageSetup } from './export-ui';
 import { runImport, type ImportHost } from './import';
+import { copyMathAsImage } from './math-image';
 import { FindBar } from './findbar';
 import type { FindOpts } from './findmatches';
 import { extras } from './platform-extras';
@@ -37,11 +39,12 @@ import { closeContextMenu } from './ui/contextmenu';
 import { EditorContextMenu } from './ctxmenu';
 import { ImageUploader } from './upload-actions';
 import { ImageFeature } from './images/feature';
+import { takePicture } from './images/take-picture';
 import { debounce, h } from './util/dom';
 import { fuzzyFilter, fuzzyMatch } from './util/fuzzy';
 import { formatShortcut, isMac } from './util/keymap';
 import { matchShortcut as nativeShortcut } from '../platform/shortcuts';
-import { basename, dirname, displayPath, isAbsolute, isInside, isMarkdownPath, isUrlLike, relative, relativeFrom, resolveDocPath, stripExt } from './util/path';
+import { basename, dirname, displayPath, fileUrl, isAbsolute, isInside, isMarkdownPath, isUrlLike, relative, relativeFrom, resolveDocPath, stripExt } from './util/path';
 
 const ZOOM_STEPS = [0.5, 0.67, 0.75, 0.8, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2, 2.5, 3];
 
@@ -90,6 +93,7 @@ export class App {
   private findbar!: FindBar;
   private status!: StatusBar;
   private tabs: Record<'files' | 'outline', HTMLButtonElement> = {} as never;
+  private outlineDropdown: HTMLElement | null = null;
 
   private unwatchFolder: (() => void) | null = null;
   /** Non-blocking "changed on disk" prompt (#82). */
@@ -189,6 +193,7 @@ export class App {
       saveAs: () => void this.doc.saveAs(),
       openImagePreferences: () => this.preferences('images'),
       resolveAsset: (src) => this.resolveAsset(src),
+      assetsChanged: () => this.assetsChanged(),
     });
     this.images.attach(this.page); // tab hosts live in the page (#94)
     this.docs.newTab();
@@ -201,6 +206,8 @@ export class App {
         openLink: (href) => void this.openLink(href),
         baseDir: () => this.doc.dir,
         uploadImage: (src) => void this.uploader.uploadSrcs([src]),
+        imageOps: (t) => (t.img ? this.images.ctxOps(t.img) : null),
+        saveVideoAs: (src) => void saveMediaAs({ platform: this.platform, notify: (m, k) => void toast(m, { kind: k }) }, null, src, 'Video'),
         notify: (m, k) => void toast(m, { kind: k }),
       },
       this.page, // active tab's editor host lives here (#94)
@@ -282,7 +289,7 @@ export class App {
       notify: (m, k) => void toast(m, { kind: k }),
       autoSave: () => ({ enabled: this.settings.autoSave, delay: this.settings.autoSaveDelay }),
       imageRule: () => this.settings.imageRule,
-      willLoad: (p) => tab.editor.updateSettings({ baseDir: p ? dirname(p) : null }),
+      willLoad: (p) => tab.editor.updateSettings({ baseDir: p ? dirname(p) : null, docUrl: fileUrl(p) }),
       onState: (s) => {
         if (this.docs.active === tab) this.onDocState(s);
         this.renderTabs();
@@ -319,10 +326,10 @@ export class App {
       ],
       cancelId: 'cancel',
     });
-    if (r !== 'create' && this.settings.recentFiles.includes(path)) {
+    if (r.id !== 'create' && this.settings.recentFiles.includes(path)) {
       this.updateSettings({ recentFiles: this.settings.recentFiles.filter((x) => x !== path) });
     }
-    return r === 'create';
+    return r.id === 'create';
   }
 
   /** Oversize documents open in source code mode (#94, Typora's "oversize" mode). */
@@ -383,10 +390,19 @@ export class App {
   private editorSettings(tab?: DocTab): EditorSettings {
     return {
       baseDir: null,
+      assetKey: this.assetKey,
       resolveAsset: (src) => this.resolveAsset(src, tab),
       storeImage: (input) => this.storeImage(input),
       openLink: (href) => void this.openLink(href),
+      ...(this.platform.writeClipboardNative ? { writeClipboardNative: (d) => this.platform.writeClipboardNative!(d) } : {}),
+      docUrl: fileUrl(tab?.doc?.path),
       ...(this.platform.writeClipboardRich ? { writeClipboardRich: (d) => this.platform.writeClipboardRich!(d) } : {}),
+      // #127 Copy Math ▸ Copy as Image: rasterize KaTeX → PNG on the clipboard.
+      copyMathImage: async (tex, display) => {
+        const ok = await copyMathAsImage(tex, display);
+        if (!ok) toast('Could not copy the math image.', { timeout: 3000 });
+        return ok;
+      },
       ...(this.platform.readClipboard ? { readClipboard: () => this.platform.readClipboard!() } : {}),
       spellcheck: this.settings.spellcheck,
       autocorrect: this.settings.spellAutocorrect || this.settings.smartTextReplacement,
@@ -420,6 +436,8 @@ export class App {
       openFolderDialog: () => void this.run('openFolder'),
       openFolder: (p) => void this.openFolder(p),
       recentFolders: () => this.settings.recentFolders,
+      moveConfirm: () => this.settings.confirmSidebarMove,
+      onMoveConfirmSuppressed: () => this.updateSettings({ confirmSidebarMove: false }),
     });
     this.tree = this.files.tree;
     this.outline = new OutlineView(
@@ -428,7 +446,12 @@ export class App {
         this.editor.scrollToHeading(id);
         this.outline.setActive(id);
       },
-      { collapsible: this.settings.outlineCollapsible, onCollapsibleChange: (on) => this.updateSettings({ outlineCollapsible: on }) },
+      {
+        collapsible: this.settings.outlineCollapsible,
+        onCollapsibleChange: (on) => this.updateSettings({ outlineCollapsible: on }),
+        pinned: this.settings.outlinePinned,
+        onPinnedChange: (on) => this.setOutlinePinned(on),
+      },
     );
 
     const tab = (id: 'files' | 'outline', label: string): HTMLButtonElement =>
@@ -587,8 +610,55 @@ export class App {
   }
 
   private showSidebarTab(id: 'files' | 'outline'): void {
+    this.closeOutlineDropdown();
     this.updateSettings({ sidebarTab: id, sidebarVisible: true });
     if (id === 'outline') this.refreshOutline();
+  }
+
+  /**
+   * Outline pin/unpin (#131, fe-sidebar §10): unpinning hides the sidebar and
+   * shows the outline as a floating drop-down; pinning restores the sidebar
+   * "Outline" tab. The drop-down closes on Escape / outside click and reopens
+   * from View ▸ Outline (or the status-bar toggle) while unpinned.
+   */
+  private setOutlinePinned(on: boolean): void {
+    if (on) {
+      this.closeOutlineDropdown();
+      this.updateSettings({ outlinePinned: true, sidebarTab: 'outline', sidebarVisible: true });
+      this.refreshOutline();
+    } else {
+      this.updateSettings({ outlinePinned: false, sidebarVisible: false });
+      this.openOutlineDropdown();
+    }
+  }
+
+  private openOutlineDropdown(): void {
+    if (!this.outlineDropdown) {
+      this.outlineDropdown = h('div.outline-dropdown', { 'aria-label': 'Outline' });
+      const onDocClick = (e: MouseEvent): void => {
+        if (this.outlineDropdown?.contains(e.target as Node)) return;
+        this.closeOutlineDropdown();
+      };
+      const onKey = (e: KeyboardEvent): void => {
+        if (e.key !== 'Escape') return;
+        e.stopPropagation();
+        this.closeOutlineDropdown();
+      };
+      document.addEventListener('mousedown', onDocClick, true);
+      document.addEventListener('keydown', onKey, true);
+    }
+    this.outlineDropdown.replaceChildren(this.outline.el);
+    this.root.appendChild(this.outlineDropdown);
+    this.refreshOutline();
+  }
+
+  private closeOutlineDropdown(): void {
+    const dd = this.outlineDropdown;
+    if (!dd) return;
+    this.outlineDropdown = null;
+    // Put the outline back into its sidebar panel (hidden while the sidebar is).
+    this.root.querySelector('.sidebar-panel[data-panel="outline"]')?.appendChild(this.outline.el);
+    dd.remove();
   }
 
   private refreshOutline(): void {
@@ -707,7 +777,7 @@ export class App {
         { id: 'save', label: 'Save', primary: true },
       ],
       cancelId: 'cancel',
-    });
+    }).then((r) => r.id);
   }
 
   private async askReloadDirty(name: string): Promise<boolean> {
@@ -720,7 +790,7 @@ export class App {
       ],
       cancelId: 'keep',
     });
-    return r === 'reload';
+    return r.id === 'reload';
   }
 
   /**
@@ -749,6 +819,14 @@ export class App {
   private exportDir: string | null = null;
   /** File › Page Setup (session only, like Typora's shared print info). */
   private printSetup: PrintSetup = { ...DEFAULT_PRINT_SETUP };
+
+  /** Bumped whenever image asset resolution changes (#136: typora-root-url). */
+  private assetKey = '0';
+
+  private assetsChanged(): void {
+    this.assetKey = String(Number(this.assetKey) + 1);
+    for (const e of this.docs.editors()) e.updateSettings({ assetKey: this.assetKey });
+  }
 
   private resolveAsset(src: string, tab?: DocTab): string {
     const doc = tab?.doc ?? this.docs?.active?.doc;
@@ -1045,8 +1123,15 @@ export class App {
         this.updateSettings({ sidebarVisible: !this.settings.sidebarVisible });
         return true;
       case 'showFiles':
+      case 'showFiles':
       case 'showOutline': {
         const tab = id === 'showFiles' ? 'files' : 'outline';
+        if (tab === 'outline' && !this.settings.outlinePinned) {
+          // Unpinned: the drop-down outline replaces the sidebar tab (#131).
+          if (this.outlineDropdown) this.closeOutlineDropdown();
+          else this.openOutlineDropdown();
+          return true;
+        }
         if (this.settings.sidebarVisible && this.settings.sidebarTab === tab) this.updateSettings({ sidebarVisible: false });
         else this.showSidebarTab(tab);
         return true;
@@ -1120,6 +1205,12 @@ export class App {
       case 'openThemesFolder':
         await this.openThemesFolder();
         return true;
+      case 'takePicture':
+        return takePicture({
+          editor: () => this.editor,
+          store: (input) => this.images.store(input),
+          notify: (m, k) => void toast(m, { kind: k }),
+        });
       case 'uploadAllImages':
         return (await this.uploader.uploadAll()).ok;
     }
@@ -1242,9 +1333,13 @@ export class App {
   }
 
   commandPalette(): void {
-    const items: { id: string; text: string; label: string; detail: string; hint?: string }[] = [];
+    // #127 menu enable state: Code Tools items run only inside a code fence / math / HTML block
+    // (Typora Paragraph › Code Tools, fe-contextmenus-tools §7).
+    const block = this.editor.caretBlockType();
+    const codeToolsOk = block === 'code_fence' || block === 'diagram' || block === 'math_block' || block === 'html_block';
+    const items: { id: string; text: string; label: string; detail: string; hint?: string; disabled?: boolean }[] = [];
     for (const c of COMMANDS) {
-      items.push({ id: c.id, text: `${c.category}: ${c.label}`, label: `${c.category}: ${c.label}`, detail: '', hint: c.keys?.[0] ? formatShortcut(c.keys[0]) : undefined });
+      items.push({ id: c.id, text: `${c.category}: ${c.label}`, label: `${c.category}: ${c.label}`, detail: '', hint: c.keys?.[0] ? formatShortcut(c.keys[0]) : undefined, disabled: c.id.startsWith('code:') ? !codeToolsOk : undefined });
     }
     for (const n of this.themes.names()) {
       const active = this.themes.current === n;
@@ -1270,6 +1365,7 @@ export class App {
           detail: item.detail || undefined,
           hint: item.hint,
           kind: 'command',
+          disabled: item.disabled,
         })),
       pick: (it) => {
         if (it.id.startsWith('custom:')) void this.exports.export(it.id);

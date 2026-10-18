@@ -34,14 +34,32 @@ tempfile = "3"
 log = "0.4"
 libc = "0.2"
 unicode-normalization = "0.1"
+plist = "1"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 objc2 = "0.6"
 objc2-foundation = { version = "0.3", features = ["NSArray", "NSData", "NSError", "NSString", "NSURL", "NSGeometry", "NSDictionary", "NSObject", "NSFileManager"] }
-objc2-app-kit = { version = "0.3", features = ["NSWindow", "NSResponder", "NSView", "NSPrintInfo", "NSPrintOperation", "NSGraphics"] }
+objc2-app-kit = { version = "0.3", features = ["NSWindow", "NSResponder", "NSView", "NSPrintInfo", "NSPrintOperation", "NSGraphics", "NSApplication", "NSDragging", "NSDraggingItem", "NSDraggingSession", "NSEvent", "NSImage", "NSPasteboard", "NSWorkspace"] }
 objc2-web-kit = { version = "0.3", features = ["WKWebView", "WKPDFConfiguration", "WKNavigationDelegate", "WKNavigation", "WKWebViewConfiguration", "WKPreferences", "block2", "objc2-app-kit"] }
 block2 = "0.6"
 
+
+[target.'cfg(target_os = "linux")'.dependencies]
+gtk = "0.18"
+webkit2gtk = "2.0"
+
+[target.'cfg(target_os = "windows")'.dependencies]
+webview2-com = "0.39"
+windows = { version = "0.62", features = [
+  "Win32_Foundation",
+  "Win32_System_Com",
+  "Win32_System_Memory",
+  "Win32_System_Ole",
+  "Win32_System_SystemServices",
+  "Win32_UI_Shell",
+  "Win32_UI_WindowsAndMessaging",
+] }
+windows-core = "0.62"
 
 # Read the optimization guideline for more details: https://tauri.app/concept/size/#cargo-configuration
 [profile.release]

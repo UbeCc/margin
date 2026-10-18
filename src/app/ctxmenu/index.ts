@@ -13,18 +13,21 @@ import { confirmDialog } from '../ui/modal';
 import { closeContextMenu, showContextMenu } from '../ui/contextmenu';
 import { localImages } from '../upload';
 import { basename } from '../util/path';
-import { buildItems, type CtxActions, type TableAction } from './items';
+import { buildItems, type CtxActions, type ImageCtxOps, type TableAction } from './items';
+import { saveMathAs } from './mathimg';
 import { contextTarget, type CtxTarget } from './targets';
 import { copySvgAsPng, svgSource } from './svg';
 
 export interface CtxHost {
   editor(): EditorHandle;
   platform: Platform;
-  run(id: CommandId): Promise<boolean> | boolean;
+  run(id: CommandId): unknown;
   openLink(href: string): void;
   baseDir(): string | null;
+  notify(m: string, k: 'info' | 'error' | 'success'): void;
   uploadImage?(src: string): void;
-  notify(msg: string, kind?: 'info' | 'success' | 'error'): void;
+  imageOps?(t: CtxTarget): ImageCtxOps | null;
+  saveVideoAs?(src: string): void;
 }
 
 const TABLE_BUTTONS: Record<TableAction, string> = {
@@ -36,6 +39,8 @@ const TABLE_BUTTONS: Record<TableAction, string> = {
   deleteCol: '.mb-col-del',
   deleteTable: '.mb-table-del',
 };
+
+
 
 type CaretDoc = Document & {
   caretRangeFromPoint?(x: number, y: number): Range | null;
@@ -274,6 +279,7 @@ export class EditorContextMenu {
     }
   }
 
+
   private tableAction(a: TableAction): void {
     const block = this.target?.block;
     if (!block) return;
@@ -285,6 +291,7 @@ export class EditorContextMenu {
   private actions(t: CtxTarget): CtxActions {
     const p = this.host.platform;
     const svg = () => t.block?.querySelector('svg') ?? null;
+    const ops = this.host.imageOps?.(t) ?? null;
     return {
       run: (id) => void this.host.run(id),
       exec: (cmd) => this.exec(cmd),
@@ -303,7 +310,18 @@ export class EditorContextMenu {
           }
         : undefined,
       uploadImage: this.host.uploadImage,
-      deleteImage: (withFile) => void this.deleteImage(withFile),
+      deleteImage: (withFile) => (ops ? ops.remove(withFile) : void this.deleteImage(withFile)),
+      copyImageTo: (_src, move) => ops?.copyTo(move),
+      imageTarget: () => ops?.target() ?? null,
+      zoomChoices: () => ops?.zoom() ?? null,
+      syntaxState: () => ops?.syntax() ?? null,
+      saveImageAs: ops ? () => ops.saveAs() : undefined,
+      saveMathAs: () => {
+        const el = t.block?.querySelector('.katex') ?? t.math?.querySelector('.katex');
+        if (!el) return this.host.notify('The math has not been rendered yet.', 'info');
+        void saveMathAs(p, el).catch((e) => this.host.notify(`Could not save the math: ${String(e)}`, 'error'));
+      },
+      saveVideoAs: this.host.saveVideoAs,
       tableAction: (a) => this.tableAction(a),
       editBlock: () => {
         const pv = t.block?.querySelector('.mb-preview');

@@ -2,22 +2,22 @@
  "generated_from": {
   "spec": "typora-re/parity-spec.md",
   "prose": "typora-re/sections/*.md",
-  "margin_head": "4b27764af8b90c7f642aa9cf7fe567ab681da021"
+  "margin_head": "818d86f5fa2442c7b62f68213935f55cb576ae16"
  },
  "summary": {
-  "head": "4b27764af8b90c7f642aa9cf7fe567ab681da021",
-  "artifact_sha256": "c3025c7acba4b0c08fdc461fc3f17cc210f18ccb1711d44ab0b2b73d54e0b36f",
+  "head": "818d86f5fa2442c7b62f68213935f55cb576ae16",
+  "artifact_sha256": "fb83700547ba5f2583b7f6f98f85e499a292c1bc3245e785707796aec06280af",
   "inventory": {
    "total": 172,
-   "owned": 145,
-   "partial": 10,
-   "missing": 9,
+   "owned": 149,
+   "partial": 8,
+   "missing": 7,
    "oos": 8,
-   "verified_by_test": 132
+   "verified_by_test": 136
   },
   "ledger": {
-   "ledger_id": "rol_b53a85d8633d2df3539b45ed910480e1fc50b8309193c619dda80e2753bdff0a",
-   "closure_digest": "d7770d97eefb9a99fb74de35e0a5a68d9f5dd6aad84d6bebb25071e1f933df8c",
+   "ledger_id": "rol_d96a5c7b5813ba68e8532bf8e9ffa716ae1776a65969518fc9b075cf9abcab06",
+   "closure_digest": "eb52c32289f5a028f2a25897bbf5964dddda1476960bec9b169eedc7240bed8c",
    "status": "unknown",
    "summary": {
     "total": 177,
@@ -27,7 +27,7 @@
     "by_status": [
      {
       "key": "unowned",
-      "count": 9
+      "count": 7
      },
      {
       "key": "characterized",
@@ -35,7 +35,7 @@
      },
      {
       "key": "implemented",
-      "count": 155
+      "count": 157
      },
      {
       "key": "verified",
@@ -119,18 +119,18 @@
      }
     ]
    },
-   "evidence_id": "ev_b6ecd56c03038cf8d8d3b8e6d2b6fdd96616cfe3596cb0f0dd9f665775dfe458"
+   "evidence_id": "ev_a6cb971f91b60cc999392c2573886f0ce3b731bbf2bab7f8d95f5cac218fa16f"
   },
   "coverage": {
    "status": "unknown",
    "reason_counts": {
-    "owner-missing": 9,
+    "owner-missing": 7,
     "package-proof-missing": 1,
-    "verifier-missing": 25,
-    "verifier-unknown": 7
+    "verifier-missing": 23,
+    "verifier-unknown": 5
    },
    "claims_total": 164,
-   "claims_qualified_by_controlled_replay": 132,
+   "claims_qualified_by_controlled_replay": 136,
    "evidence_ids_cited": 176
   },
   "verifier_runs": {
@@ -172,7 +172,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "About Margin",
-    "sha256": "b0a00b03abc7a1074bb13ffcccc2e58a3a42414b5d31ccc755ee2e09f2ed49a5"
+    "sha256": "7376ac008fdd86d2246a3bc4fd1213168ff7020c2dd28ea1723f4d84ee7d4975"
    },
    "verifier": null,
    "spec": {
@@ -206,7 +206,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'preferences'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -244,7 +244,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "PredefinedMenuItem::hide_others",
-    "sha256": "b0a00b03abc7a1074bb13ffcccc2e58a3a42414b5d31ccc755ee2e09f2ed49a5"
+    "sha256": "7376ac008fdd86d2246a3bc4fd1213168ff7020c2dd28ea1723f4d84ee7d4975"
    },
    "verifier": null,
    "spec": {
@@ -282,7 +282,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'new'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -323,7 +323,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "private async newWindow(",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
    },
    "verifier": {
     "file": "tests/e2e/parity-files.spec.ts",
@@ -409,7 +409,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'open'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -456,7 +456,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'openFolder'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -503,7 +503,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "quickOpen(): void",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
    },
    "verifier": {
     "file": "tests/e2e/app-navigation.spec.ts",
@@ -635,7 +635,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'save'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -683,7 +683,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'saveAs'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -760,7 +760,7 @@
    "owner": {
     "path": "src/app/fileops.ts",
     "anchor": "duplicate(): boolean",
-    "sha256": "09ed3276ba2197951a6a2e6c5263e233b4399a08fe9f740cc00a002ef9a179a7"
+    "sha256": "cfecc87b8d1533a1884763b1cebd2370a30ddedf2a31ca490583ea1cbe5af06d"
    },
    "verifier": {
     "file": "tests/e2e/parity-files.spec.ts",
@@ -798,7 +798,7 @@
    "owner": {
     "path": "src/app/fileops.ts",
     "anchor": "async moveTo()",
-    "sha256": "09ed3276ba2197951a6a2e6c5263e233b4399a08fe9f740cc00a002ef9a179a7"
+    "sha256": "cfecc87b8d1533a1884763b1cebd2370a30ddedf2a31ca490583ea1cbe5af06d"
    },
    "verifier": {
     "file": "tests/e2e/parity-files.spec.ts",
@@ -930,7 +930,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'toggleLineEnding'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
    },
    "verifier": {
     "file": "src/app/__tests__/document.test.ts",
@@ -968,7 +968,7 @@
    "owner": {
     "path": "src/app/fileops.ts",
     "anchor": "async properties()",
-    "sha256": "09ed3276ba2197951a6a2e6c5263e233b4399a08fe9f740cc00a002ef9a179a7"
+    "sha256": "cfecc87b8d1533a1884763b1cebd2370a30ddedf2a31ca490583ea1cbe5af06d"
    },
    "verifier": {
     "file": "tests/e2e/parity-files.spec.ts",
@@ -1007,7 +1007,7 @@
    "owner": {
     "path": "src/app/fileops.ts",
     "anchor": "async copyPath()",
-    "sha256": "09ed3276ba2197951a6a2e6c5263e233b4399a08fe9f740cc00a002ef9a179a7"
+    "sha256": "cfecc87b8d1533a1884763b1cebd2370a30ddedf2a31ca490583ea1cbe5af06d"
    },
    "verifier": {
     "file": "tests/e2e/parity-files.spec.ts",
@@ -1090,7 +1090,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'print'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
    },
    "verifier": null,
    "spec": {
@@ -1126,7 +1126,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'close'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -1220,7 +1220,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'undo'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
    },
    "verifier": {
     "file": "tests/e2e/core-cases.ts",
@@ -1265,7 +1265,7 @@
    "owner": {
     "path": "src/editor/core/clipboard.ts",
     "anchor": "export function onPaste",
-    "sha256": "3823a29547fe150ca5e59ad76cd7a258a436003c9732ae0080ce308aaa391c63"
+    "sha256": "6f0e36cd40886984240bbad52eb1540fde1df3d042d0a48752ddac75c2b8e11c"
    },
    "verifier": {
     "file": "tests/e2e/core-cases.ts",
@@ -1437,7 +1437,7 @@
    "owner": {
     "path": "src/editor/core/copy-as.ts",
     "anchor": "export function copyAs",
-    "sha256": "6ff9a5571006fdb7564ae9250deccc7c23274660b9d7c3ca94fbdab85a847f7f"
+    "sha256": "131ef65b851e5714171944ca7443fd06cb8fe87cbf9f5f9131ca203c5fb8edfc"
    },
    "verifier": {
     "file": "tests/e2e/parity-clipboard.spec.ts",
@@ -1468,7 +1468,7 @@
      "clipboard-contextmenu §9"
     ]
    },
-   "note": null,
+   "note": "source mode: every variant copies the selected source text (#116); WKWebView execCommand refusal falls back to clipboard_write_payload",
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -1489,7 +1489,7 @@
    "owner": {
     "path": "src/editor/core/copy-as.ts",
     "anchor": "export function pastePlain",
-    "sha256": "6ff9a5571006fdb7564ae9250deccc7c23274660b9d7c3ca94fbdab85a847f7f"
+    "sha256": "131ef65b851e5714171944ca7443fd06cb8fe87cbf9f5f9131ca203c5fb8edfc"
    },
    "verifier": {
     "file": "tests/e2e/parity-clipboard.spec.ts",
@@ -1508,7 +1508,7 @@
      "clipboard-contextmenu §5.3"
     ]
    },
-   "note": null,
+   "note": "source mode: the system plain paste — native read + replaceSelection (#116)",
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -1648,7 +1648,7 @@
    "owner": {
     "path": "src/app/prefs/editor-md.ts",
     "anchor": "'Check spelling while typing'",
-    "sha256": "2e877e36cec6c8be43664de7d7d9a05819c88796937c9bb7467fa170ed9d3be3"
+    "sha256": "445b62b0b84a160df125c6dca25903e022e86a989e0dae56613cd33a4bb6e021"
    },
    "verifier": null,
    "spec": {
@@ -2135,7 +2135,7 @@
    "owner": {
     "path": "src/editor/core/input.ts",
     "anchor": "Tab",
-    "sha256": "f3a29f4ad35dc57d4e42e5e174a50cb7cd52f0733aae32c49f05e7caa10776a9"
+    "sha256": "8fc840381159e18db075ff2ff1538a1f35ce3613e699fb663b47d88ff4d76152"
    },
    "verifier": {
     "file": "tests/e2e/core-qa.spec.ts",
@@ -2712,7 +2712,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'toggleSource'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
    },
    "verifier": {
     "file": "tests/e2e/core-cases.ts",
@@ -2758,7 +2758,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'toggleFocus'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
    },
    "verifier": {
     "file": "tests/e2e/app-navigation.spec.ts",
@@ -2802,7 +2802,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'toggleSidebar'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
    },
    "verifier": {
     "file": "tests/e2e/app-navigation.spec.ts",
@@ -2904,7 +2904,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'zoomIn'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
    },
    "verifier": null,
    "spec": {
@@ -2943,7 +2943,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "PredefinedMenuItem::fullscreen",
-    "sha256": "b0a00b03abc7a1074bb13ffcccc2e58a3a42414b5d31ccc755ee2e09f2ed49a5"
+    "sha256": "7376ac008fdd86d2246a3bc4fd1213168ff7020c2dd28ea1723f4d84ee7d4975"
    },
    "verifier": null,
    "spec": {
@@ -3061,7 +3061,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "THEMES_SUBMENU_ID",
-    "sha256": "b0a00b03abc7a1074bb13ffcccc2e58a3a42414b5d31ccc755ee2e09f2ed49a5"
+    "sha256": "7376ac008fdd86d2246a3bc4fd1213168ff7020c2dd28ea1723f4d84ee7d4975"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -3103,7 +3103,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'openThemesFolder'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
    },
    "verifier": null,
    "spec": {
@@ -3163,7 +3163,7 @@
    "owner": {
     "path": "src-tauri/src/commands.rs",
     "anchor": "set_theme_menu",
-    "sha256": "142e87c9cb8c10d7ac460a6298ca1500dcc1291adb568939dc7c8ba110e05a83"
+    "sha256": "3d242e50b622d22e1ef55a6a066314c70ede19a5b86c62a3caf4d10df0f6979a"
    },
    "verifier": null,
    "spec": {
@@ -3195,7 +3195,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "PredefinedMenuItem::minimize",
-    "sha256": "b0a00b03abc7a1074bb13ffcccc2e58a3a42414b5d31ccc755ee2e09f2ed49a5"
+    "sha256": "7376ac008fdd86d2246a3bc4fd1213168ff7020c2dd28ea1723f4d84ee7d4975"
    },
    "verifier": null,
    "spec": {
@@ -3229,7 +3229,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "ID_HELP_MARKDOWN",
-    "sha256": "b0a00b03abc7a1074bb13ffcccc2e58a3a42414b5d31ccc755ee2e09f2ed49a5"
+    "sha256": "7376ac008fdd86d2246a3bc4fd1213168ff7020c2dd28ea1723f4d84ee7d4975"
    },
    "verifier": null,
    "spec": {
@@ -3299,7 +3299,7 @@
    "owner": {
     "path": "src/app/ctxmenu/targets.ts",
     "anchor": "export function contextTarget",
-    "sha256": "e632198a8d292e6829c061e1953b863ad0338f61097b7439b13b56718358fa2f"
+    "sha256": "43daadbadb25c0206fe4887ce668f1fd4d153eabf43e73d25f61bb3da46c00e4"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -3340,7 +3340,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "label: 'Copy / Paste As…'",
-    "sha256": "21e23f483375a18c28ebc1332acb98a5d337e46aca76f9b47fba558159f9066b"
+    "sha256": "48873bdc7750656dddabfd7c4f2ab18a8ecd7d26470e0c9b404b6797d03afea3"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -3382,7 +3382,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "label: 'Copy Link Address'",
-    "sha256": "21e23f483375a18c28ebc1332acb98a5d337e46aca76f9b47fba558159f9066b"
+    "sha256": "48873bdc7750656dddabfd7c4f2ab18a8ecd7d26470e0c9b404b6797d03afea3"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -3425,7 +3425,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "block('para:insertBefore', 'Insert Paragraph Before')",
-    "sha256": "21e23f483375a18c28ebc1332acb98a5d337e46aca76f9b47fba558159f9066b"
+    "sha256": "48873bdc7750656dddabfd7c4f2ab18a8ecd7d26470e0c9b404b6797d03afea3"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -3466,14 +3466,14 @@
   {
    "obligation_id": "typora.ctx.emoji",
    "id": "ctx.emoji",
-   "title": "Emoji/inline-math context entries (copy emoji, copy inline math)",
-   "status": "partial",
-   "priority": "P2",
+   "title": "Emoji/inline-math context entries (copy emoji, copy inline math, copy as image)",
+   "status": "owned",
+   "priority": null,
    "epic": "ctx",
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "function copyMath",
-    "sha256": "21e23f483375a18c28ebc1332acb98a5d337e46aca76f9b47fba558159f9066b"
+    "sha256": "48873bdc7750656dddabfd7c4f2ab18a8ecd7d26470e0c9b404b6797d03afea3"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -3485,7 +3485,8 @@
      "Copy '%@'",
      "Copy Math",
      "Copy as Tex",
-     "Copy as MathML"
+     "Copy as MathML",
+     "Copy as Image"
     ],
     "panel": [],
     "bridge": [],
@@ -3494,26 +3495,34 @@
      "fe-contextmenus-tools §1.2"
     ]
    },
-   "note": "inline math Copy Math ▸ Tex/MathML; Margin renders no :emoji: shortcodes, inline Copy as Image disabled",
+   "note": ":smile: renders (EMOJI map); inline Copy as Image rasterizes the KaTeX node to PNG (mathimg.ts)",
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-case",
-    "missing-verifier",
     "static-only",
-    "weak-original-case-authority"
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.ctx.media",
    "id": "ctx.media",
-   "title": "Media context entries: play / pause / download video",
-   "status": "missing",
-   "priority": "P2",
+   "title": "Video context entries: Save Video As… after the system items",
+   "status": "owned",
+   "priority": null,
    "epic": "ctx",
-   "owner": null,
-   "verifier": null,
+   "owner": {
+    "path": "src/app/ctxmenu/targets.ts",
+    "anchor": "closest?.('video')",
+    "sha256": "43daadbadb25c0206fe4887ce668f1fd4d153eabf43e73d25f61bb3da46c00e4"
+   },
+   "verifier": {
+    "file": "src/app/__tests__/ctxmenu.test.ts",
+    "test": "video and emoji targets",
+    "kind": "unit"
+   },
    "spec": {
     "menu": [
      "Play",
@@ -3526,17 +3535,20 @@
      "Download failed"
     ],
     "bridge": [],
-    "prose": []
+    "prose": [
+     "fe-contextmenus-tools §1.2"
+    ]
    },
-   "note": null,
+   "note": "§1.2 video menu = system items | Save Video As…; no Play/Pause context items in Typora (spec A labels accounted, not shown); download-progress strings not reproduced",
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.tools.table.rows-cols",
@@ -3757,7 +3769,7 @@
    "owner": {
     "path": "src/editor/blocks/code-fence.ts",
     "anchor": "mount",
-    "sha256": "59a9db0d8f274377f298b12f027295724ab2a84b6d4efe3c904be13a92b1e068"
+    "sha256": "2bd09e96a5472bfed97874a1357dfc53f690a98a1e474f68693137705c717514"
    },
    "verifier": {
     "file": "tests/e2e/blocks-widgets.spec.ts",
@@ -3799,7 +3811,7 @@
    "owner": {
     "path": "src/editor/blocks/code-fence.ts",
     "anchor": "command(op: string)",
-    "sha256": "59a9db0d8f274377f298b12f027295724ab2a84b6d4efe3c904be13a92b1e068"
+    "sha256": "2bd09e96a5472bfed97874a1357dfc53f690a98a1e474f68693137705c717514"
    },
    "verifier": {
     "file": "tests/e2e/parity-tools.spec.ts",
@@ -3841,7 +3853,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "'Delete Code Block'",
-    "sha256": "21e23f483375a18c28ebc1332acb98a5d337e46aca76f9b47fba558159f9066b"
+    "sha256": "48873bdc7750656dddabfd7c4f2ab18a8ecd7d26470e0c9b404b6797d03afea3"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -3881,7 +3893,7 @@
    "owner": {
     "path": "src/editor/blocks/code-fence.ts",
     "anchor": "private applyCodePrefs",
-    "sha256": "59a9db0d8f274377f298b12f027295724ab2a84b6d4efe3c904be13a92b1e068"
+    "sha256": "2bd09e96a5472bfed97874a1357dfc53f690a98a1e474f68693137705c717514"
    },
    "verifier": {
     "file": "tests/e2e/parity-prefs.spec.ts",
@@ -3960,7 +3972,7 @@
    "owner": {
     "path": "src/editor/core/block-tools.ts",
     "anchor": "export function mathTool",
-    "sha256": "e4498e4b1e1f99625958afae0ab9242d5ae63db81d8a04f0baa5c585dd278ac5"
+    "sha256": "14e422071fe136d1335821de15819726e1b0c8c21e9a8825f3188a8dd2e60b06"
    },
    "verifier": {
     "file": "tests/e2e/parity-tools.spec.ts",
@@ -4005,7 +4017,7 @@
    "owner": {
     "path": "src/editor/core/block-tools.ts",
     "anchor": "export function refreshMath",
-    "sha256": "e4498e4b1e1f99625958afae0ab9242d5ae63db81d8a04f0baa5c585dd278ac5"
+    "sha256": "14e422071fe136d1335821de15819726e1b0c8c21e9a8825f3188a8dd2e60b06"
    },
    "verifier": {
     "file": "tests/e2e/parity-tools.spec.ts",
@@ -4433,13 +4445,13 @@
    "priority": null,
    "epic": "images",
    "owner": {
-    "path": "src/app/images/context-menu.ts",
+    "path": "src/app/ctxmenu/items.ts",
     "anchor": "Open Image Location",
-    "sha256": "db4fd257906a86e44b32d7ba6b924aec525cf05edf456806f6396b97a30b9487"
+    "sha256": "48873bdc7750656dddabfd7c4f2ab18a8ecd7d26470e0c9b404b6797d03afea3"
    },
    "verifier": {
     "file": "tests/e2e/parity-images.spec.ts",
-    "test": "images.reveal-open: Image context: Open Image Location / Open in Browser / Copy Image Content",
+    "test": "images.reveal-open: Image context: Open Image Location… / Open in Browser… / Copy Image Content",
     "kind": "e2e"
    },
    "spec": {
@@ -4480,7 +4492,7 @@
    },
    "verifier": {
     "file": "tests/e2e/parity-images.spec.ts",
-    "test": "images.zoom: Image zoom (Zoom Image to N%) and switch Markdown/HTML image syntax",
+    "test": "images.zoom: Image zoom (direct entry + presets) and switch Markdown/HTML image syntax",
     "kind": "e2e"
    },
    "spec": {
@@ -4557,7 +4569,7 @@
    "owner": {
     "path": "src-tauri/src/upload.rs",
     "anchor": "pub fn test_upload(",
-    "sha256": "255901199d65b0b34a15ad5989e3a71f48200350e152971cd0efceafef68010a"
+    "sha256": "67b5a1f26ab513b81f6c61f5c6ff880ddab5fe32aaf9a1ba8b4a26b438dcc4ec"
    },
    "verifier": {
     "file": "tests/e2e/parity-images.spec.ts",
@@ -4663,7 +4675,7 @@
    "owner": {
     "path": "src/app/settings.ts",
     "anchor": "DEFAULT_SETTINGS",
-    "sha256": "e05834acf99a8b4a1dc53a3e4d9f59618f5adbd22ab5699845a70e8857cb11b2"
+    "sha256": "bed37e20cc32353ebf6e66d045e11e398f335f698fcbfe397a29b6f27bbc61fd"
    },
    "verifier": {
     "file": "src/app/__tests__/settings.test.ts",
@@ -4756,7 +4768,7 @@
    "owner": {
     "path": "src/app/settings.ts",
     "anchor": "export function launchPlan",
-    "sha256": "e05834acf99a8b4a1dc53a3e4d9f59618f5adbd22ab5699845a70e8857cb11b2"
+    "sha256": "bed37e20cc32353ebf6e66d045e11e398f335f698fcbfe397a29b6f27bbc61fd"
    },
    "verifier": {
     "file": "tests/e2e/parity-prefs.spec.ts",
@@ -4968,7 +4980,7 @@
    "owner": {
     "path": "src/app/settings.ts",
     "anchor": "textColumnWidth",
-    "sha256": "e05834acf99a8b4a1dc53a3e4d9f59618f5adbd22ab5699845a70e8857cb11b2"
+    "sha256": "bed37e20cc32353ebf6e66d045e11e398f335f698fcbfe397a29b6f27bbc61fd"
    },
    "verifier": {
     "file": "tests/e2e/parity-prefs.spec.ts",
@@ -5017,7 +5029,7 @@
    "owner": {
     "path": "src/editor/core/input.ts",
     "anchor": "const autoPair",
-    "sha256": "f3a29f4ad35dc57d4e42e5e174a50cb7cd52f0733aae32c49f05e7caa10776a9"
+    "sha256": "8fc840381159e18db075ff2ff1538a1f35ce3613e699fb663b47d88ff4d76152"
    },
    "verifier": {
     "file": "tests/e2e/parity-prefs.spec.ts",
@@ -5062,7 +5074,7 @@
    "owner": {
     "path": "src/app/commands.ts",
     "anchor": "export function setCustomKeys",
-    "sha256": "80b437d431a9357eb46f16b2e648db754682cf0555d4d2743cceaf9bce84a727"
+    "sha256": "3cfb43c6293c77b9ead2485e7a977bdf572c8b8bdfdde6721462f2519eaff75a"
    },
    "verifier": {
     "file": "tests/e2e/parity-prefs.spec.ts",
@@ -5099,7 +5111,7 @@
    "owner": {
     "path": "src/app/settings.ts",
     "anchor": "export function newFileEol",
-    "sha256": "e05834acf99a8b4a1dc53a3e4d9f59618f5adbd22ab5699845a70e8857cb11b2"
+    "sha256": "bed37e20cc32353ebf6e66d045e11e398f335f698fcbfe397a29b6f27bbc61fd"
    },
    "verifier": {
     "file": "tests/e2e/parity-prefs.spec.ts",
@@ -5142,7 +5154,7 @@
    "owner": {
     "path": "src/app/settings.ts",
     "anchor": "DEFAULT_SETTINGS",
-    "sha256": "e05834acf99a8b4a1dc53a3e4d9f59618f5adbd22ab5699845a70e8857cb11b2"
+    "sha256": "bed37e20cc32353ebf6e66d045e11e398f335f698fcbfe397a29b6f27bbc61fd"
    },
    "verifier": null,
    "spec": {
@@ -5174,9 +5186,9 @@
    "priority": null,
    "epic": null,
    "owner": {
-    "path": "src/app/sidebar/filetree.ts",
-    "anchor": "'New File…'",
-    "sha256": "90dcfd7b4785d50da3d5c72435990ca145be3222595506a50bf3c82e34f18777"
+    "path": "src/app/sidebar/file-menus.ts",
+    "anchor": "'New File'",
+    "sha256": "26a7868eabb32c605807bf3fdb1bd80afc019a431e5cb98cff803330844018c7"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -5237,7 +5249,7 @@
    "owner": {
     "path": "src/app/sidebar/filelist.ts",
     "anchor": "export class FileList",
-    "sha256": "204066d3194206c15e87bee2855599e11ad7233a97433ae70f6013591e54a701"
+    "sha256": "b6ec0cd10639105d1c0b6c0fe7cb7f0157f919fe2ad189379b54f77cc8282b9a"
    },
    "verifier": {
     "file": "tests/e2e/parity-sidebar.spec.ts",
@@ -5284,7 +5296,7 @@
    "owner": {
     "path": "src/app/sidebar/search.ts",
     "anchor": "export class SidebarSearch",
-    "sha256": "594a9a3173c0a84cbab2f671125bdeccc6aeb8210d2ca9a3acbaa17e025d3bad"
+    "sha256": "e091a9314c15299005e7de1f020207982a5c3007366e3bc14cff23a3219324d6"
    },
    "verifier": {
     "file": "tests/e2e/parity-sidebar.spec.ts",
@@ -5373,7 +5385,7 @@
    "owner": {
     "path": "src/app/sidebar/outline.ts",
     "anchor": "activeId",
-    "sha256": "bb2d978c384f9d6c972ae7c457bfe374531b71a4e034d62ccbfecc889b24bd8c"
+    "sha256": "4dabf1735538cbf64e6de86fbe6b52acadc9d5edfa1b4d6d81ddff63017e6949"
    },
    "verifier": {
     "file": "tests/e2e/app-navigation.spec.ts",
@@ -5404,18 +5416,18 @@
   {
    "obligation_id": "typora.sidebar.outline-collapse",
    "id": "sidebar.outline-collapse",
-   "title": "Outline: collapsible/flat outline, expand/collapse all, filter, unpin",
+   "title": "Outline: collapsible/flat outline, expand/collapse all, filter, pin/unpin (drop-down outline)",
    "status": "owned",
    "priority": null,
    "epic": "sidebar",
    "owner": {
     "path": "src/app/sidebar/outline.ts",
     "anchor": "export function filterHeadings",
-    "sha256": "bb2d978c384f9d6c972ae7c457bfe374531b71a4e034d62ccbfecc889b24bd8c"
+    "sha256": "4dabf1735538cbf64e6de86fbe6b52acadc9d5edfa1b4d6d81ddff63017e6949"
    },
    "verifier": {
     "file": "tests/e2e/parity-sidebar.spec.ts",
-    "test": "sidebar.outline-collapse: Outline: collapsible/flat outline",
+    "test": "sidebar.outline-collapse: Outline: collapsible/flat outline, expand/collapse all, filter, unpin",
     "kind": "e2e"
    },
    "spec": {
@@ -5432,10 +5444,11 @@
     ],
     "bridge": [],
     "prose": [
-     "fe-contextmenus-tools §2"
+     "fe-contextmenus-tools §2",
+     "fe-sidebar-statusbar-find §10"
     ]
    },
-   "note": "pin/unpin (outline drop-down) not implemented",
+   "note": "#131: unpin hides the sidebar for a floating drop-down outline (Escape/outside click closes, View ▸ Outline reopens); pin restores the sidebar Outline tab",
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -5456,7 +5469,7 @@
    "owner": {
     "path": "src/app/sidebar/drag.ts",
     "anchor": "export function dropMarkdown",
-    "sha256": "ed280d2af33458d82b7ed63fc8d05652c87901c59c788c230447ae8525f0a958"
+    "sha256": "fa335e1534f6c86b587adc05084b97dcc83674acbd966bae80fa6a9a2547bd88"
    },
    "verifier": {
     "file": "tests/e2e/parity-sidebar.spec.ts",
@@ -5471,7 +5484,7 @@
     ],
     "prose": []
    },
-   "note": "#23",
+   "note": "#23; #131: drag-move asks 'Are you sure you want to move %@?' (suppressible) and offers Undo Move / Undo Rename %@",
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -5492,7 +5505,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "private createExports(",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -5986,7 +5999,7 @@
    "owner": {
     "path": "src/editor/core/parser/options.ts",
     "anchor": "PARSER_KEYS",
-    "sha256": "12e486c14eda14f7825f74dd6eda8f7d94f94fbe0d394ee9921363dca917b56c"
+    "sha256": "8c2f093b63d6492555e9637b6d858d4cdf3f979aa65846523b9e7053b2a8a3a9"
    },
    "verifier": {
     "file": "tests/e2e/parity-syntax.spec.ts",
@@ -6029,7 +6042,7 @@
    "owner": {
     "path": "src/editor/core/parser/starts.ts",
     "anchor": "outside Strict Mode",
-    "sha256": "cd4f5c9fb8ea02ba52abf6176492de1031afba432c531317ce8a693bb9c6841a"
+    "sha256": "9b50a5bcdd527cc2928b132d6b3353bf316343a496b6e21360c536b170d00434"
    },
    "verifier": {
     "file": "tests/e2e/parity-syntax.spec.ts",
@@ -6264,7 +6277,7 @@
    "owner": {
     "path": "src/editor/core/input.ts",
     "anchor": "beforeinput",
-    "sha256": "f3a29f4ad35dc57d4e42e5e174a50cb7cd52f0733aae32c49f05e7caa10776a9"
+    "sha256": "8fc840381159e18db075ff2ff1538a1f35ce3613e699fb663b47d88ff4d76152"
    },
    "verifier": {
     "file": "tests/e2e/core-qa.spec.ts",
@@ -6300,7 +6313,7 @@
    "owner": {
     "path": "src/editor/core/input.ts",
     "anchor": "compositionend",
-    "sha256": "f3a29f4ad35dc57d4e42e5e174a50cb7cd52f0733aae32c49f05e7caa10776a9"
+    "sha256": "8fc840381159e18db075ff2ff1538a1f35ce3613e699fb663b47d88ff4d76152"
    },
    "verifier": {
     "file": "tests/e2e/core-cases.ts",
@@ -6481,7 +6494,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "private degradeLarge(",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
    },
    "verifier": {
     "file": "tests/e2e/parity-files.spec.ts",
@@ -6630,7 +6643,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "setDocumentEdited",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
    },
    "verifier": null,
    "spec": {
@@ -6662,7 +6675,7 @@
    "owner": {
     "path": "src-tauri/src/lib.rs",
     "anchor": "on_second_instance",
-    "sha256": "40e3fe0359c164f0b637c4f8ba65055c397b75689b805cce025127371b7a2071"
+    "sha256": "03250da8052456a774a498ace7a3f6910350ec9558bad8875663f6195f660bd0"
    },
    "verifier": {
     "file": "tests/e2e/parity-files.spec.ts",
@@ -6713,7 +6726,7 @@
      "files-windows-settings §2.1"
     ]
    },
-   "note": "#23; macOS native paths via src-tauri/src/drop_macos.rs; Linux/Windows drops not intercepted yet",
+   "note": "#23 #129; native paths on all platforms (src-tauri/src/drop_macos.rs, drop_linux.rs, drop_windows.rs); source mode inserts at the drop point (source-mode.ts insertAt)",
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6770,11 +6783,19 @@
    "obligation_id": "typora.beh.files.quicklook",
    "id": "beh.files.quicklook",
    "title": "Quick Look / preview of a file from the sidebar",
-   "status": "missing",
-   "priority": "P2",
+   "status": "owned",
+   "priority": null,
    "epic": "sidebar",
-   "owner": null,
-   "verifier": null,
+   "owner": {
+    "path": "src-tauri/src/quicklook_macos.rs",
+    "anchor": "pub fn quick_look_file",
+    "sha256": "e3ef7db4f3a734b6fde7d7516475b83c0dd6ebbb69d802a4d302d820aac94307"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-sidebar-r3.spec.ts",
+    "test": "sidebar.quicklook: Quick Look in tree/list menus and Space on a focused row",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [],
     "panel": [
@@ -6784,17 +6805,20 @@
     "bridge": [
      "window.previewFile"
     ],
-    "prose": []
+    "prose": [
+     "files-windows-settings §7"
+    ]
    },
-   "note": null,
+   "note": "#131: shared QLPreviewPanel via main-thread bridge; Space on a focused row, tree + Articles menus",
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.beh.files.asset-scope",
@@ -6806,7 +6830,7 @@
    "owner": {
     "path": "src-tauri/src/commands.rs",
     "anchor": "allow_asset_dir",
-    "sha256": "142e87c9cb8c10d7ac460a6298ca1500dcc1291adb568939dc7c8ba110e05a83"
+    "sha256": "3d242e50b622d22e1ef55a6a066314c70ede19a5b86c62a3caf4d10df0f6979a"
    },
    "verifier": null,
    "spec": {
@@ -6840,7 +6864,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "applyAppearance",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "5a54c2fdcea3ae6be3dc9c56c728a4e22cc8eab9072170e08cbfeb0ce6361b26"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -6907,14 +6931,14 @@
   {
    "obligation_id": "typora.beh.clip.rich-copy",
    "id": "beh.clip.rich-copy",
-   "title": "Rich copy writes plain + HTML + RTF + private format",
+   "title": "Rich copy writes plain + HTML + RTF + RTFD + WebArchive (doc URL base) + private format",
    "status": "owned",
    "priority": null,
    "epic": "clipboard",
    "owner": {
     "path": "src/editor/core/clipboard.ts",
     "anchor": "export function onCopy",
-    "sha256": "3823a29547fe150ca5e59ad76cd7a258a436003c9732ae0080ce308aaa391c63"
+    "sha256": "6f0e36cd40886984240bbad52eb1540fde1df3d042d0a48752ddac75c2b8e11c"
    },
    "verifier": {
     "file": "tests/e2e/parity-clipboard.spec.ts",
@@ -6931,7 +6955,7 @@
      "clipboard-contextmenu §9"
     ]
    },
-   "note": "RTF on macOS via clipboard_write_rich (#79); RTFD / webarchive flavours not written",
+   "note": "postCopy order (webarchive → RTFD → RTF) via clipboard_write_rich with the document file URL as base, untitled.md default (#79 #115); no-WebKit fallback writes every flavour itself",
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6946,13 +6970,13 @@
    "obligation_id": "typora.beh.clip.rtf-paste",
    "id": "beh.clip.rtf-paste",
    "title": "Paste RTF/RTFD from rich apps (attachments materialized)",
-   "status": "partial",
-   "priority": "P2",
+   "status": "owned",
+   "priority": null,
    "epic": "clipboard",
    "owner": {
     "path": "src-tauri/src/clipboard_read.rs",
     "anchor": "pub fn rtf_to_html",
-    "sha256": "88d1e56a773345d9d4e88d43d7f07fe82508514e030e8ba8a25cde698bbe74cf"
+    "sha256": "8efaf3b232f64b0f6b3c8edfdd962dbba7239e726b17e3a21ddeaa1296e2bbec"
    },
    "verifier": {
     "file": "tests/e2e/parity-clipboard.spec.ts",
@@ -6968,16 +6992,16 @@
      "clipboard-contextmenu §9"
     ]
    },
-   "note": "RTF/RTFD text+formatting converted natively (NSAttributedString, macOS); RTFD image attachments not materialized",
+   "note": "RTF/RTFD text+formatting converted natively (NSAttributedString, macOS); RTFD image attachments materialized as data: URIs and stored through the image rule (#114)",
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-case",
-    "missing-verifier",
     "static-only",
-    "weak-original-case-authority"
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.oos.license",
@@ -7153,7 +7177,7 @@
    "owner": {
     "path": "src/app/ui/modal.ts",
     "anchor": "export function",
-    "sha256": "529c19cd6027e4066cea0f8084ca0989b652ba36b67cff5c1ac7295b5923f116"
+    "sha256": "e1960f107055c2c86fb7a7dc105b469de5e264a2db295803b327da8b1a8c68b7"
    },
    "verifier": null,
    "spec": {

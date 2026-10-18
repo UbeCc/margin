@@ -13,6 +13,8 @@ export interface PlatformExtras {
   createDir?(path: string): Promise<void>;
   /** Reveal in Finder / Explorer. */
   revealInFolder?(path: string): Promise<void>;
+  /** Quick Look a file from the sidebar (`window.previewFile`, #131). */
+  quickLook?(path: string): Promise<void>;
   /** Open another app window (#94): empty, or showing `path`. */
   openWindow?(opts?: { path?: string }): Promise<void>;
   /** Raw file bytes, for decoding with a chosen / detected encoding (#94). */

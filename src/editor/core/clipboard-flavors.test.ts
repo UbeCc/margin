@@ -2,7 +2,8 @@
 import { describe, it, expect } from 'vitest';
 import { MARGIN_MIME, buildCopyFlavors, embeddedMarkdown, pickPasteMarkdown, writeFlavors } from './clipboard-flavors';
 import { htmlToMarkdown } from './paste';
-import { expandToBlockStart } from './clipboard';
+import { expandToBlockStart, extractDataImages, storeDataImages } from './clipboard';
+import type { EditorCore } from './editor';
 import { Doc } from './model';
 
 const getter = (d: Record<string, string>) => (t: string) => d[t] ?? '';
@@ -96,5 +97,27 @@ describe('copy range widening (expandToBlockStart)', () => {
     expect(at('# Title\n', 'Tit', 'Tit')).toBe('Tit');
     expect(at('- one\n- two\n', 'one', 'one')).toBe('one');
     expect(at('para one\n\nx\n', 'one', 'x')).toBe('one\n\nx');
+  });
+});
+
+describe('RTFD data: images on paste (#114)', () => {
+  const PNG = 'iVBORw0KGgo='; // truncated bytes are fine: the helper never decodes for the fallback
+  it('extractDataImages tokenizes imgs and keeps non-data imgs', () => {
+    const r = extractDataImages(`<p>pic <img alt="shot.png" src="data:image/png;base64,${PNG}"> and <img src="https://x/y.png"></p>`);
+    expect(r.imgs).toEqual([{ alt: 'shot.png', mime: 'image/png', b64: PNG }]);
+    expect(r.html).toContain('\u20630\u2063');
+    expect(r.html).toContain('https://x/y.png');
+  });
+  it('storeDataImages routes through the image rule and splices back into converted markdown', async () => {
+    const r = extractDataImages(`<p>before <img alt="shot.png" src="data:image/png;base64,${PNG}"> after</p>`);
+    const ed = { settings: { storeImage: async (i: { mime: string; name: string }) => `![kept](img/${i.name})` } } as unknown as EditorCore;
+    const md = htmlToMarkdown(r.html);
+    const snips = await storeDataImages(ed, r.imgs);
+    const out = md.replace(/\u2063(\d+)\u2063/g, (_, i) => snips[+i] ?? '');
+    expect(out).toBe('before ![kept](img/shot.png) after');
+  });
+  it('without the image rule the data: URI stays inline', async () => {
+    const snips = await storeDataImages({ settings: {} } as unknown as EditorCore, [{ alt: 'a', mime: 'image/png', b64: PNG }]);
+    expect(snips[0]).toBe(`![a](data:image/png;base64,${PNG})`);
   });
 });

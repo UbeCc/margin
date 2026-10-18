@@ -14,6 +14,11 @@ describe('upload settings', () => {
     expect(uploadConfig(uploadSettingsOf({ uploader: 'command', uploadCommand: ' picgo upload ', uploadTimeout: 5 }))).toEqual({ kind: 'command', command: 'picgo upload', timeoutSecs: 5 });
     expect(uploadConfig(uploadSettingsOf({ uploader: 'picgo', picgoPort: 1234 }))).toEqual({ kind: 'picgo', port: 1234, timeoutSecs: 20 });
   });
+  it('Typora presets (#137): PicGo.app goes through the app flow, uPic/Picsee are fixed argv', () => {
+    expect(uploadConfig(uploadSettingsOf({ uploader: 'picgo-app', picgoPort: 36678, uploadTimeout: 7 }))).toEqual({ kind: 'picgo-app', port: 36678, timeoutSecs: 7 });
+    expect(uploadConfig(uploadSettingsOf({ uploader: 'upic', uploadTimeout: 9 }))).toEqual({ kind: 'command', command: '/Applications/uPic.app/Contents/MacOS/uPic -o url -u', timeoutSecs: 9 });
+    expect(uploadConfig(uploadSettingsOf({ uploader: 'picsee' }))).toEqual({ kind: 'command', command: '/Applications/Picsee.app/Contents/MacOS/Picsee -u', timeoutSecs: 20 });
+  });
 });
 
 describe('findImageRefs', () => {

@@ -65,6 +65,10 @@ export interface MarginSettings extends AppSettings {
   fileSearchUseRegexp: boolean;
   /** Outline: "Collapsible Outline" vs "Flat Outline". */
   outlineCollapsible: boolean;
+  /** Outline pinned in the sidebar (true) vs floating drop-down (#131). */
+  outlinePinned: boolean;
+  /** Ask "Are you sure you want to move %@" before sidebar drag-moves (suppressible). */
+  confirmSidebarMove: boolean;
   /** Auto-save delay in ms after the last edit. */
   autoSaveDelay: number;
   restoreLastFolder: boolean;
@@ -87,8 +91,6 @@ export interface MarginSettings extends AppSettings {
   language: string;
   /** Files › Default Line Ending for new files. */
   defaultLineEnding: 'auto' | 'lf' | 'crlf';
-  /** Remap Unicode punctuation on parse (#102; persisted, see PR notes). */
-  remapPunctuation: boolean;
   /** Appearance › Window Style (desktop, applied after restart). */
   windowStyle: 'seamless' | 'unibody' | 'native';
   /** Appearance › Text Column Width in px; 0 = theme default. */
@@ -168,6 +170,8 @@ export const DEFAULT_SETTINGS: Readonly<MarginSettings> = Object.freeze({
   fileSearchWholeWord: false,
   fileSearchUseRegexp: false,
   outlineCollapsible: false,
+  outlinePinned: true,
+  confirmSidebarMove: true,
   restoreLastFolder: false,
   export: DEFAULT_EXPORT,
   pandocPath: '',
@@ -178,7 +182,6 @@ export const DEFAULT_SETTINGS: Readonly<MarginSettings> = Object.freeze({
   quitOnLastWindowClose: false,
   language: 'auto',
   defaultLineEnding: 'auto',
-  remapPunctuation: false,
   windowStyle: 'seamless',
   textColumnWidth: 0,
   showOutlineByDefault: false,
@@ -241,6 +244,15 @@ export function migrateSettings(input: unknown): MarginSettings {
   // v2 "restoreLastFolder" boolean → onLaunch (#100).
   if (raw.onLaunch === undefined && raw.restoreLastFolder === true) raw.onLaunch = 'restoreFolders';
   const onLaunch = (ON_LAUNCH as unknown[]).includes(raw.onLaunch) ? (raw.onLaunch as OnLaunch) : d.onLaunch;
+
+  // #133: `remapPunctuation` used to live at the top level; fold it into `markdown`
+  // (an explicit value in the markdown block wins).
+  if (typeof raw.remapPunctuation === 'boolean') {
+    const mdRaw = isObj(raw.markdown) ? raw.markdown : {};
+    if (mdRaw.remapPunctuation === undefined) mdRaw.remapPunctuation = raw.remapPunctuation;
+    raw.markdown = mdRaw;
+    delete raw.remapPunctuation;
+  }
   const scheme = raw.colorScheme;
   const tab = raw.sidebarTab;
   return {
@@ -291,6 +303,8 @@ export function migrateSettings(input: unknown): MarginSettings {
     fileSearchWholeWord: bool(raw.fileSearchWholeWord, d.fileSearchWholeWord),
     fileSearchUseRegexp: bool(raw.fileSearchUseRegexp, d.fileSearchUseRegexp),
     outlineCollapsible: bool(raw.outlineCollapsible, d.outlineCollapsible),
+    outlinePinned: bool(raw.outlinePinned, d.outlinePinned),
+    confirmSidebarMove: bool(raw.confirmSidebarMove, d.confirmSidebarMove),
     restoreLastFolder: onLaunch === 'restoreAll' || onLaunch === 'restoreFolders',
     export: migrateExportSettings(raw.export),
     pandocPath: typeof raw.pandocPath === 'string' ? raw.pandocPath.trim() : '',
@@ -301,7 +315,6 @@ export function migrateSettings(input: unknown): MarginSettings {
     quitOnLastWindowClose: bool(raw.quitOnLastWindowClose, d.quitOnLastWindowClose),
     language: str(raw.language, d.language),
     defaultLineEnding: oneOf(raw.defaultLineEnding, ['auto', 'lf', 'crlf'] as const, d.defaultLineEnding),
-    remapPunctuation: bool(raw.remapPunctuation, d.remapPunctuation),
     windowStyle: oneOf(raw.windowStyle, ['seamless', 'unibody', 'native'] as const, d.windowStyle),
     textColumnWidth: columnWidth(raw.textColumnWidth),
     showOutlineByDefault: bool(raw.showOutlineByDefault, d.showOutlineByDefault),
@@ -356,12 +369,13 @@ export function migrateMarkdown(v: unknown, d: Readonly<MarkdownOptions> = TYPOR
   const ci = Number(raw.codeIndentSize);
   out.codeIndentSize = ci === 0 || ci === 2 || ci === 3 || ci === 4 ? ci : d.codeIndentSize;
   out.mathNumbering = oneOf(raw.mathNumbering, ['all', 'ams', 'none'] as const, d.mathNumbering);
+  // Typora stores 'svg' / 'latex' (key `mathFormatOnCopy`); a legacy 1 value meant rendered SVG.
+  out.mathCopyFormat = oneOf(raw.mathCopyFormat, ['svg', 'latex'] as const, raw.mathFormatOnCopy === 'latex' ? 'latex' : d.mathCopyFormat);
+  out.smartPunctuation = oneOf(raw.smartPunctuation, ['input', 'rendering'] as const, d.smartPunctuation);
+  out.headingStyle = oneOf(raw.headingStyle, ['atx', 'atxSuffix', 'setext', 'setextVar'] as const, d.headingStyle);
+  const indent = Number(raw.indentSize);
+  out.indentSize = ([-1, 0, 2, 3, 4, 5] as const).includes(indent as never) ? (indent as MarkdownOptions['indentSize']) : d.indentSize;
   return out;
-}
-
-/** Move `item` to the front of a recent list (dedup, capped). */
-export function pushRecent(list: readonly string[], item: string, max = MAX_RECENT): string[] {
-  return [item, ...list.filter((x) => x !== item)].slice(0, max);
 }
 
 /** Preset image rules shown in Preferences. */
@@ -385,6 +399,12 @@ export function imageRulePresetId(rule: ImageRule): string {
 function clampFontSize(v: number): number {
   return Math.min(24, Math.max(9, Math.round(v)));
 }
+
+/** Move `item` to the front of a recent list (dedup, capped). */
+export function pushRecent(list: readonly string[], item: string, max = MAX_RECENT): string[] {
+  return [item, ...list.filter((x) => x !== item)].slice(0, max);
+}
+
 /** Files › Default Line Ending: "Auto ( Recommended )" follows the OS (#100). */
 export function newFileEol(pref: MarginSettings['defaultLineEnding'], windows = /Win/i.test(navigator.platform || '')): '\n' | '\r\n' {
   return pref === 'crlf' || (pref === 'auto' && windows) ? '\r\n' : '\n';

@@ -17,6 +17,7 @@ export function fakeEditor(md: string): EditorHandle & { calls: EditorCommand[] 
       text = next;
       return true;
     },
+    focus(): void {},
   };
   return ed as unknown as EditorHandle & { calls: EditorCommand[] };
 }
