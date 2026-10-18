@@ -3,11 +3,11 @@ import { indentCols, consumeCols } from './lines';
 import { syntaxOptions, remapOn } from './options';
 
 /** ATX heading level; outside Strict Mode `#Heading` (no space) also counts (#102).
- *  #133 remap: full-width `＃` counts like `#`. */
-const ATX_STRICT = [/^ {0,3}(#{1,6})(?:[ \t]|$)/, /^ {0,3}([#＃]{1,6})(?:[ \t]|$)/];
-const ATX_LOOSE = [/^ {0,3}(#{1,6})(?:[ \t]|$|(?=[^#\s]))/, /^ {0,3}([#＃]{1,6})(?:[ \t]|$|(?=[^#\s＃]))/];
+ * Full-width `＃` is inert: Typora's heading regexes are ASCII `#` only (typora-re#12). */
+const ATX_STRICT = /^ {0,3}(#{1,6})(?:[ \t]|$)/;
+const ATX_LOOSE = /^ {0,3}(#{1,6})(?:[ \t]|$|(?=[^#\s]))/;
 export function atxLevel(s: string): number {
-  const m = (syntaxOptions.strict ? ATX_STRICT : ATX_LOOSE)[remapOn() ? 1 : 0].exec(s);
+  const m = (syntaxOptions.strict ? ATX_STRICT : ATX_LOOSE).exec(s);
   return m ? m[1].length : 0;
 }
 
@@ -43,18 +43,31 @@ export function isMathClose(s: string): boolean {
   return s.trimEnd().endsWith('$$');
 }
 
-/** Thematic break; #133 remap: en/em dashes (`–—`) count like `---`. */
+/** Thematic break; #133 remap (typora-re#12): dash-family mixed runs join the ASCII
+ * forms — dash-first, spaceless, per Typora's `V=/^(-{3}|–[-–—]+|—[-–—]*)$/`
+ * (`—` alone is a break; `–` needs one more dash char; pure ASCII keeps the usual runs). */
 const THEMATIC = [
   /^ {0,3}(?:(?:\*[ \t]*){3,}|(?:-[ \t]*){3,}|(?:_[ \t]*){3,})$/,
-  /^ {0,3}(?:(?:\*[ \t]*){3,}|(?:[-–—][ \t]*){3,}|(?:_[ \t]*){3,})$/,
+  /^ {0,3}(?:(?:\*[ \t]*){3,}|(?:-[ \t]*){3,}|(?:_[ \t]*){3,}|–[-–—]+|—[-–—]*)$/,
 ];
 export function isThematic(s: string): boolean {
   return THEMATIC[remapOn() ? 1 : 0].test(s);
 }
 
+/** #133 remap: `–`→`--`, `—`→`---` (Typora string-replaces a line then compares to `---`). */
+export const remapDashes = (s: string): string => s.replace(/–/g, '--').replace(/—/g, '---');
+
+/** Front-matter / `---`-line check: ASCII `---`, or — with remap — the dash-family
+ * string-replaced equality (`---`, `—`, `–-`, `-–`; typora-re#12). */
+export function isDashFence(s: string): boolean {
+  const t = s.replace(/[ \t]+$/, '');
+  return remapOn() ? remapDashes(t) === '---' : t === '---';
+}
+
 export function setextLevel(s: string): number {
-  const m = /^ {0,3}(=+|-+)[ \t]*$/.exec(s);
-  return m ? (m[1][0] === '=' ? 1 : 2) : 0;
+  if (/^ {0,3}=+[ \t]*$/.test(s)) return 1;
+  if (remapOn() ? /^ {0,3}(?:-+|—[-–—]*|–[-–—]+)[ \t]*$/.test(s) : /^ {0,3}-+[ \t]*$/.test(s)) return 2;
+  return 0;
 }
 
 const BLOCK_TAGS =
@@ -112,26 +125,25 @@ export interface ListStart {
   /** chars consumed (marker + spacing + optional task box). */
   consumed: number;
   ordered: boolean;
+  /** ordered: `.` or `)`; unordered: the marker char. */
   delim: string;
   start: number;
   markerText: string;
   width: number;
   task: null | string;
-  /** Nothing after the marker. */
   empty: boolean;
 }
 
 export function listStart(s: string, col0 = 0): ListStart | null {
-  // #133 remap: full-width markers (－＋＊), full-width digits with ASCII/full-width
-  // delimiters, and CJK task boxes 【x】/【 】 — the original characters stay in the source.
+  // #133 remap (typora-re#12): list markers and digits stay ASCII-only (full-width
+  // `－＋＊`/`１`/`．` are inert — no block-start regex contains them); only the task
+  // brackets widen to `[\[【](x|X)[\]】]` (so mixed `【x]`/`[x】` too). The separator
+  // class (space/tab/NBSP) is unchanged by remap; source chars are never rewritten.
   const remap = remapOn();
-  const m = (remap
-    ? /^( {0,3})([-+*－＋＊]|\d{1,9}[.)．）]|[０-９]{1,9}[.)．）])(?=[ \t]|$)/
-    : /^( {0,3})([-+*]|\d{1,9}[.)])(?=[ \t]|$)/
-  ).exec(s);
+  const m = /^( {0,3})([-+*]|\d{1,9}[.)])(?=[ \t]|$)/.exec(s);
   if (!m) return null;
   if (isThematic(s)) return null;
-  const ordered = /[\d０-９]/.test(m[2][0]);
+  const ordered = /^\d/.test(m[2][0]);
   const after = s.slice(m[0].length);
   const empty = /^[ \t]*$/.test(after);
   const base = indentCols(s, col0) + m[2].length;
@@ -150,18 +162,16 @@ export function listStart(s: string, col0 = 0): ListStart | null {
   const markerText = s.slice(0, consumed);
   let task: null | string = null;
   const rest = s.slice(consumed);
-  const t = remap
-    ? /^(?:\[([ xX])\]|【([ xX])】)(?:[ \t]|$)/.exec(rest)
-    : /^\[([ xX])\](?:[ \t]|$)/.exec(rest);
+  const t = (remap ? /^[\[【]([ xX])[\]】](?:[ \t]|$)/ : /^\[([ xX])\](?:[ \t]|$)/).exec(rest);
   if (t && !empty) {
-    task = t[1] ?? t[2];
+    task = t[1];
     consumed += t[0].length;
   }
   return {
     consumed,
     ordered,
     delim: ordered ? m[2].slice(-1) : m[2],
-    start: ordered ? parseInt(m[2].normalize('NFKC'), 10) : 1,
+    start: ordered ? parseInt(m[2], 10) : 1,
     markerText,
     width: base + spaceCols,
     task,

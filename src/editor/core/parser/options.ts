@@ -32,8 +32,12 @@ export const PARSER_KEYS: ReadonlySet<keyof MarkdownOptions> = new Set<keyof Mar
 ]);
 
 /**
- * Remap Unicode Punctuation on Parse (#133, fe-preferences §10): on when the box
- * is checked, or forced by smart quotes/dashes in Convert-on-Input mode.
+ * Remap Unicode Punctuation on Parse (#133, fe-preferences §7.3/§10): on when the
+ * box is checked, or forced while smart quotes/dashes convert on input (the input
+ * pipeline stores curly punctuation the parser must still recognise).
+ * Scope (typora-re#12): blockquote `>〉》`, task brackets `[\[【](x|X)[\]】]`,
+ * dash family (front-matter/`---`-line equality + dash-first mixed runs) —
+ * full-width digits/dot/minus/＊/＃ are inert.
  */
 export function remapOn(): boolean {
   const o = syntaxOptions;

@@ -156,15 +156,19 @@ test('syntax.save-normalize: On save: insert final newline, remap Unicode punctu
   await p.locator('[data-pref="markdown.remapPunctuation"]').check();
   await close(page);
   await expect.poll(() => page.evaluate(() => (window.__margin as unknown as { settings: { markdown: { remapPunctuation: boolean } } }).settings.markdown.remapPunctuation)).toBe(true);
-  // remap ON drives the parser (#133): 〉 opens a blockquote, 【x】 is a task checkbox,
-  // full-width ＃ is a heading — and the source is never rewritten (lossless).
+  // remap ON drives the parser (#133 per typora-re#12): 〉 opens a blockquote, 【x】 is
+  // a task checkbox, `—` closes front matter like `---` — and the source is never
+  // rewritten (lossless). Full-width ＃/digits are inert (paragraphs, not structures).
   await setDoc(page, '〉quote text\n');
   await expect(ed(page).locator('.md-block.md-in-quote')).toHaveCount(1);
   await setDoc(page, '- 【x】 done\n');
   await expect(ed(page).locator('input.md-task-box')).toBeChecked();
-  await setDoc(page, '＃ Title\n');
-  await expect(ed(page).locator('.md-block.md-heading.md-h1')).toHaveCount(1);
-  expect(await editorValue(page)).toBe('＃ Title\n');
+  await setDoc(page, '—\ntitle: x\n—\n');
+  await expect(ed(page).locator('.md-block[data-type=front_matter]')).toHaveCount(1);
+  await setDoc(page, '＃ Title\n１． first\n');
+  await expect(ed(page).locator('.md-block.md-heading')).toHaveCount(0);
+  await expect(ed(page).locator('.md-block.md-in-list')).toHaveCount(0);
+  expect(await editorValue(page)).toBe('＃ Title\n１． first\n');
   // forced dependency (fe-preferences §7.3): Convert on Input (default) + Smart Quotes
   // → the remap box is checked and disabled even with the stored value off
   const p2 = await md(page);

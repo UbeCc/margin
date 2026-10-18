@@ -4434,12 +4434,11 @@
    "residual_unknown_ids": [],
    "unavailable_authority": [],
    "required_next_evidence": [
-    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules.",
-    "Implement: Insert Final New Line On Save is per document (follows the opened file; palette command); Remap Unicode Punctuation persisted only, parser remap pending (gap issue)"
+    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules."
    ],
    "disposition": "active",
    "review_evidence_ids": [
-    "ev_1c92d513ea60222776d3e090b1adfd71ac7a2d2369cc16083e4e49094c1c84b2"
+    "ev_3ba5f1d95e8d020f5a7ba173411715f0c222b871384cea454ce7d1788477336d"
    ]
   },
   {
@@ -10650,7 +10649,7 @@
     "owner": {
      "module_path": "src/editor/core/parser/options.ts",
      "symbol": "PARSER_KEYS",
-     "owner_sha256": "8c2f093b63d6492555e9637b6d858d4cdf3f979aa65846523b9e7053b2a8a3a9"
+     "owner_sha256": "b662b6343e3792c72bc94e0f6819fb113cb5007a7700af6e4502b2cd3c582f8a"
     },
     "parser_type": null,
     "original_cases": [
@@ -10691,7 +10690,7 @@
     "owner": {
      "module_path": "src/editor/core/parser/starts.ts",
      "symbol": "outside Strict Mode",
-     "owner_sha256": "adc265d0dd3c4a8da9e5563c0906f8c22a1f2dd9e94046c0cc516de7adccf81f"
+     "owner_sha256": "2e291e95c2f23b68a079890dcd41e51f706d83a7b3ac41fac30c63152870b259"
     },
     "parser_type": null,
     "original_cases": [
@@ -10771,27 +10770,50 @@
    {
     "obligation_id": "typora.syntax.save-normalize",
     "owner": {
-     "module_path": "src/app/document.ts",
-     "symbol": "Insert Final New Line On Save",
-     "owner_sha256": "8bcb316b4b34e7821352e34015cd90b267a3feb446bb2c2e8872ee3c63d14648"
+     "module_path": "src/editor/core/parser/starts.ts",
+     "symbol": "export const remapDashes",
+     "owner_sha256": "2e291e95c2f23b68a079890dcd41e51f706d83a7b3ac41fac30c63152870b259"
     },
     "parser_type": null,
     "original_cases": [
      {
       "kind": "positive",
-      "evidence_id": "ev_1c92d513ea60222776d3e090b1adfd71ac7a2d2369cc16083e4e49094c1c84b2",
-      "location": "typora-re/parity-spec.md"
+      "evidence_id": "ev_3ba5f1d95e8d020f5a7ba173411715f0c222b871384cea454ce7d1788477336d",
+      "location": "fe-preferences §10"
      }
     ],
-    "fixtures": [],
-    "verifier": null
+    "fixtures": [
+     {
+      "fixture_id": "syntax.save-normalize.positive",
+      "case_kind": "positive",
+      "authority": "renderer",
+      "evidence_ids": [
+       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+      ]
+     }
+    ],
+    "verifier": {
+     "verifier_id": "margin.playwright.syntax.save-normalize",
+     "claim_id": "claim.syntax.save-normalize",
+     "command": "npx playwright test tests/e2e/parity-syntax.spec.ts -g \"syntax.save-normalize: On save: insert final newline, remap Unicode punctuation on parse\"",
+     "authority": "renderer",
+     "status": "pass",
+     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "enumerated_obligation_ids": [
+      "typora.syntax.save-normalize"
+     ],
+     "nondeterminism": {
+      "mode": "total-order",
+      "specification": "Single deterministic suite run; pass = suite exited 0 with the named test not skipped."
+     }
+    }
    },
    {
     "obligation_id": "typora.syntax.toc",
     "owner": {
      "module_path": "src/editor/core/parser/starts.ts",
      "symbol": "isToc",
-     "owner_sha256": "adc265d0dd3c4a8da9e5563c0906f8c22a1f2dd9e94046c0cc516de7adccf81f"
+     "owner_sha256": "2e291e95c2f23b68a079890dcd41e51f706d83a7b3ac41fac30c63152870b259"
     },
     "parser_type": null,
     "original_cases": [

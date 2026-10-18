@@ -9,14 +9,14 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 | | surfaces |
 |---|---|
 | total | 173 |
-| owned (implemented) | 161 (with a named passing test: 148) |
-| partial | 4 |
+| owned (implemented) | 162 (with a named passing test: 149) |
+| partial | 3 |
 | missing | 0 |
 | out of scope | 8 |
 
-REA ledger `rol_d90bac8fd979387db4eacdb89824cb101dfe0a322637ea618d18de61a9d09edb` (closure `15d401e22c3a2856…`): status **unknown**; implemented 165, out-of-scope 8, unknown 5.
+REA ledger `rol_b3bdbe0556251c73dd5ebd00b04fcdd3b329411d8e70d3d9669fe934b6387589` (closure `9578f16632db20f9…`): status **unknown**; implemented 165, out-of-scope 8, unknown 5.
 
-REA coverage boundary `margin.typora-parity`: status **unknown**; 148/165 claims qualified by controlled-replay verifier Evidence. Reasons: package-proof-missing 1, verifier-missing 13, verifier-unknown 4.
+REA coverage boundary `margin.typora-parity`: status **unknown**; 149/165 claims qualified by controlled-replay verifier Evidence. Reasons: package-proof-missing 1, verifier-missing 13, verifier-unknown 3.
 
 Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): build exit 0, cargo-test exit 0, independence exit 0, playwright exit 0, vitest exit 0. See `rea/summary.json`.
 
@@ -41,7 +41,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `images` Image pipeline: insert-local, copy/move/upload, zoom, syntax switch, image root path | P1 | 0 |
 | `prefs` Preferences completeness (General, Editor, Image, Markdown, Export, Appearance panes) | P1 | 1 |
 | `sidebar` Sidebar & outline: list view, file search, sort, collapsible outline, filter | P1 | 0 |
-| `syntax` Markdown syntax options & whitespace/line-break settings | P2 | 1 |
+| `syntax` Markdown syntax options & whitespace/line-break settings | P2 | 0 |
 | `chrome` Window chrome & writing aids: status bar, always-on-top, spelling, substitutions, speech, emoji | P2 | 0 |
 
 ## Application menu
@@ -285,7 +285,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `syntax.extensions` | Syntax support toggles: highlight, sub/sup, inline math, emoji shortcodes — Typora fresh-install defaults (inline math/sub/sup/highlight off, emoji on); pre-#102 installs keep Margin rendering. Deliberate fix: Superscript is independent of Subscript (Typora ties its visibility to the subscript box) | owned |  | `src/editor/core/parser/options.ts` `PARSER_KEYS` | `tests/e2e/parity-syntax.spec.ts` › syntax.extensions: Syntax support toggles: highlight, sub/sup, inline math, emoji shortcodes | 8 |
 | `syntax.strict` | Strict Mode (closer to GFM) and list/quote style preferences — non-strict: `#Heading` without space; list markers for menu-created lists | owned |  | `src/editor/core/parser/starts.ts` `outside Strict Mode` | `tests/e2e/parity-syntax.spec.ts` › syntax.strict: Strict Mode (closer to GFM) and list/quote style preferences | 6 |
 | `syntax.whitespace` | Whitespace & line breaks: preserve single line break, visible <br/>, first-line indent, \\ line break — preserve/ignore single line break, Visible <br/> (default on), first-line indent; Apply Line Break at \\ is the Math option (display math). Deliberate fix: one source of truth for the Preserve check state | owned |  | `src/editor/core/editor.ts` `md-ignore-linebreak` | `tests/e2e/parity-syntax.spec.ts` › syntax.whitespace: Whitespace & line breaks: preserve single line break | 9 |
-| `syntax.save-normalize` | On save: insert final newline, remap Unicode punctuation on parse — Insert Final New Line On Save is per document (follows the opened file; palette command); Remap Unicode Punctuation persisted only, parser remap pending (gap issue) | **partial** | P2 | `src/app/document.ts` `Insert Final New Line On Save` | `tests/e2e/parity-syntax.spec.ts` › syntax.save-normalize: On save: insert final newline, remap Unicode punctuation on parse | 2 |
+| `syntax.save-normalize` | On save: insert final newline, remap Unicode punctuation on parse — Insert Final New Line On Save is per document (follows the opened file; palette command); remap scope per typora-re#12: blockquote >〉》 (no space after marker), task brackets [\[【](x\|X)[\]】], dash family (–→-- / —→--- fence equality + dash-first mixed runs V); full-width digits/dot/minus/＊/＃ inert; effective when the box is on or forced by Convert-on-Input smart quotes/dashes; lossless both states | owned |  | `src/editor/core/parser/starts.ts` `export const remapDashes` | `tests/e2e/parity-syntax.spec.ts` › syntax.save-normalize: On save: insert final newline, remap Unicode punctuation on parse | 2 |
 | `syntax.toc` | TOC writings: [toc], 【toc】, {:toc}, [[_TOC_]] all parse to the TOC widget — #151: exactly four writings (block-start keys D/B/L/I/W); case-insensitive [toc]; $$toc$$ is a math block, not a TOC | owned |  | `src/editor/core/parser/starts.ts` `isToc` | `tests/e2e/parity-syntax.spec.ts` › syntax.toc: toc writings [toc] 【toc】 {:toc} [[_TOC_]] all render the TOC widget (#151) | 0 |
 
 ## Behaviors — editor core

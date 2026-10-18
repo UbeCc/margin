@@ -2,22 +2,22 @@
  "generated_from": {
   "spec": "typora-re/parity-spec.md",
   "prose": "typora-re/sections/*.md",
-  "margin_head": "e2015b1bd685484d704588517e3a27ea99e3635a"
+  "margin_head": "311f963f6fdb17141d4aa2d534657ce8cec97179"
  },
  "summary": {
-  "head": "e2015b1bd685484d704588517e3a27ea99e3635a",
-  "artifact_sha256": "a8818df6ac7d968d669d275a99c2d2e8653fa388a8b4e20f9da559553e79bdbb",
+  "head": "311f963f6fdb17141d4aa2d534657ce8cec97179",
+  "artifact_sha256": "93250a69298105ea68fab2997944704227a2587a9e36c14db2cfa248a3b58f25",
   "inventory": {
    "total": 173,
-   "owned": 161,
-   "partial": 4,
+   "owned": 162,
+   "partial": 3,
    "missing": 0,
    "oos": 8,
-   "verified_by_test": 148
+   "verified_by_test": 149
   },
   "ledger": {
-   "ledger_id": "rol_d90bac8fd979387db4eacdb89824cb101dfe0a322637ea618d18de61a9d09edb",
-   "closure_digest": "15d401e22c3a285675ba1cbd298998eb4297c63cb67bbc3f66c67a86961e249f",
+   "ledger_id": "rol_b3bdbe0556251c73dd5ebd00b04fcdd3b329411d8e70d3d9669fe934b6387589",
+   "closure_digest": "9578f16632db20f9f33758c22208161b877cdf380aa3bff9837bdd5f0c6c5919",
    "status": "unknown",
    "summary": {
     "total": 178,
@@ -119,17 +119,17 @@
      }
     ]
    },
-   "evidence_id": "ev_61e612c9df83ac3104580821ba4763eafb648e4040378f8905adfe6758e2cb53"
+   "evidence_id": "ev_54cdcd1faa6b18cbd34175e8e3044dc53052ee2ea37a8dc1da134d584dd51ef3"
   },
   "coverage": {
    "status": "unknown",
    "reason_counts": {
     "package-proof-missing": 1,
     "verifier-missing": 13,
-    "verifier-unknown": 4
+    "verifier-unknown": 3
    },
    "claims_total": 165,
-   "claims_qualified_by_controlled_replay": 148,
+   "claims_qualified_by_controlled_replay": 149,
    "evidence_ids_cited": 177
   },
   "verifier_runs": {
@@ -6075,7 +6075,7 @@
    "owner": {
     "path": "src/editor/core/parser/options.ts",
     "anchor": "PARSER_KEYS",
-    "sha256": "8c2f093b63d6492555e9637b6d858d4cdf3f979aa65846523b9e7053b2a8a3a9"
+    "sha256": "b662b6343e3792c72bc94e0f6819fb113cb5007a7700af6e4502b2cd3c582f8a"
    },
    "verifier": {
     "file": "tests/e2e/parity-syntax.spec.ts",
@@ -6118,7 +6118,7 @@
    "owner": {
     "path": "src/editor/core/parser/starts.ts",
     "anchor": "outside Strict Mode",
-    "sha256": "adc265d0dd3c4a8da9e5563c0906f8c22a1f2dd9e94046c0cc516de7adccf81f"
+    "sha256": "2e291e95c2f23b68a079890dcd41e51f706d83a7b3ac41fac30c63152870b259"
    },
    "verifier": {
     "file": "tests/e2e/parity-syntax.spec.ts",
@@ -6198,13 +6198,13 @@
    "obligation_id": "typora.syntax.save-normalize",
    "id": "syntax.save-normalize",
    "title": "On save: insert final newline, remap Unicode punctuation on parse",
-   "status": "partial",
-   "priority": "P2",
+   "status": "owned",
+   "priority": null,
    "epic": "syntax",
    "owner": {
-    "path": "src/app/document.ts",
-    "anchor": "Insert Final New Line On Save",
-    "sha256": "8bcb316b4b34e7821352e34015cd90b267a3feb446bb2c2e8872ee3c63d14648"
+    "path": "src/editor/core/parser/starts.ts",
+    "anchor": "export const remapDashes",
+    "sha256": "2e291e95c2f23b68a079890dcd41e51f706d83a7b3ac41fac30c63152870b259"
    },
    "verifier": {
     "file": "tests/e2e/parity-syntax.spec.ts",
@@ -6218,18 +6218,20 @@
     ],
     "panel": [],
     "bridge": [],
-    "prose": []
+    "prose": [
+     "fe-preferences §10"
+    ]
    },
-   "note": "Insert Final New Line On Save is per document (follows the opened file; palette command); Remap Unicode Punctuation persisted only, parser remap pending (gap issue)",
+   "note": "Insert Final New Line On Save is per document (follows the opened file; palette command); remap scope per typora-re#12: blockquote >〉》 (no space after marker), task brackets [\\[【](x|X)[\\]】], dash family (–→-- / —→--- fence equality + dash-first mixed runs V); full-width digits/dot/minus/＊/＃ inert; effective when the box is on or forced by Convert-on-Input smart quotes/dashes; lossless both states",
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-case",
-    "missing-verifier",
     "static-only",
-    "weak-original-case-authority"
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.syntax.toc",
@@ -6241,7 +6243,7 @@
    "owner": {
     "path": "src/editor/core/parser/starts.ts",
     "anchor": "isToc",
-    "sha256": "adc265d0dd3c4a8da9e5563c0906f8c22a1f2dd9e94046c0cc516de7adccf81f"
+    "sha256": "2e291e95c2f23b68a079890dcd41e51f706d83a7b3ac41fac30c63152870b259"
    },
    "verifier": {
     "file": "tests/e2e/parity-syntax.spec.ts",
