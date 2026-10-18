@@ -553,6 +553,10 @@ export class App {
     if (id.startsWith('heading:')) return ed.exec({ kind: 'heading', level: Number(id.slice(8)) as 0 });
     if (id.startsWith('mark:')) return ed.exec({ kind: 'mark', mark: id.slice(5) as 'strong' });
     if (id.startsWith('block:')) return ed.exec({ kind: 'block', block: id.slice(6) as 'quote' });
+    if (id.startsWith('task:')) return ed.exec({ kind: 'task', op: id.slice(5) as 'toggle' });
+    if (id === 'para:headingUp' || id === 'para:headingDown') return ed.exec({ kind: 'headingLevel', delta: id === 'para:headingUp' ? 1 : -1 });
+    if (id === 'para:insertBefore' || id === 'para:insertAfter') return ed.exec({ kind: 'insertParagraph', where: id === 'para:insertBefore' ? 'before' : 'after' });
+    if (id === 'clearFormat') return ed.exec({ kind: 'clearFormat' });
     if (id.startsWith('copyAs:')) return ed.exec({ kind: 'copyAs', format: id.slice(7) as 'markdown' });
     if (id.startsWith('select:')) return ed.exec({ kind: 'select', scope: id.slice(7) as 'word' });
     if (id.startsWith('delete:')) return ed.exec({ kind: 'delete', scope: id.slice(7) as 'word' });
@@ -785,7 +789,11 @@ export class App {
       pick: (it) => {
         if (it.id.startsWith('recent:')) void this.doc.open(it.id.slice(7));
         else if (it.id.startsWith('folder:')) void this.openFolder(it.id.slice(7));
-        else if (isCommandId(it.id)) void this.run(it.id);
+        else if (isCommandId(it.id)) {
+          // the palette took the DOM selection: put the editor's caret/selection back first
+          if (commandSpec(it.id)?.scope === 'editor') this.editor.focus();
+          void this.run(it.id);
+        }
       },
     });
   }

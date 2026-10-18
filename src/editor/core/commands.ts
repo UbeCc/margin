@@ -6,6 +6,7 @@ import * as E from './edit';
 import { splitBlockMeta } from './render-inline';
 import { find, replace } from './find';
 import { insertMarkdown } from './clipboard';
+import { nextHeadingLevel, insertParagraph, taskStatus, clearFormat, insertFootnote } from './para-cmds';
 import { selectScope, deleteScope, jumpTo } from './scopes';
 import { copyAs, pastePlain } from './copy-as';
 
@@ -35,6 +36,11 @@ const MARKS: Record<string, [string, string]> = {
   code: ['`', '`'],
   strike: ['~~', '~~'],
   highlight: ['==', '=='],
+  underline: ['<u>', '</u>'],
+  sub: ['<sub>', '</sub>'],
+  sup: ['<sup>', '</sup>'],
+  math: ['$', '$'],
+  comment: ['<!-- ', ' -->'],
 };
 
 function curLeaf(ed: EditorCore): number {
@@ -137,7 +143,7 @@ function containerBlock(ed: EditorCore, kind: 'quote' | 'ul' | 'ol' | 'task'): b
 }
 
 /** Insert a block after the current leaf (or into it when it is an empty paragraph). */
-function insertBlock(ed: EditorCore, md: string, focusWidget: boolean): boolean {
+function insertBlock(ed: EditorCore, md: string, focusWidget: boolean, caretOff?: number): boolean {
   const doc = ed.doc;
   const i = curLeaf(ed);
   const EOL = doc.eol;
@@ -163,7 +169,7 @@ function insertBlock(ed: EditorCore, md: string, focusWidget: boolean): boolean 
     const j = doc.locate(at).i;
     const nl = doc.leaves[j];
     if (focusWidget && nl && !E.isTextLeaf(nl)) return { widget: nl.id, at: 'start' as const };
-    if (nl && E.isTextLeaf(nl) && nl.type !== 'hr') return { pos: doc.docPos(j, leafContent(nl).length) };
+    if (nl && E.isTextLeaf(nl) && nl.type !== 'hr') return { pos: doc.docPos(j, caretOff ?? leafContent(nl).length) };
     return E.ensureParagraphAfter(doc, j);
   });
   ed.hist.break();
@@ -174,8 +180,18 @@ export function execCommand(ed: EditorCore, cmd: EditorCommand): boolean {
   switch (cmd.kind) {
     case 'heading':
       return heading(ed, cmd.level);
+    case 'headingLevel': {
+      const lv = nextHeadingLevel(ed, cmd.delta);
+      return lv !== null && heading(ed, lv);
+    }
     case 'mark':
       return mark(ed, cmd.mark);
+    case 'insertParagraph':
+      return insertParagraph(ed, cmd.where);
+    case 'task':
+      return taskStatus(ed, cmd.op);
+    case 'clearFormat':
+      return clearFormat(ed);
     case 'block':
       switch (cmd.block) {
         case 'quote':
@@ -193,6 +209,12 @@ export function execCommand(ed: EditorCore, cmd: EditorCommand): boolean {
           return insertBlock(ed, '---', false);
         case 'toc':
           return insertBlock(ed, '[toc]', false);
+        case 'html':
+          return insertBlock(ed, '<div>\n</div>', true);
+        case 'linkRef':
+          return insertBlock(ed, '[]: ', false, 1);
+        case 'footnote':
+          return insertFootnote(ed);
         case 'front_matter': {
           const f = ed.doc.leaves[0];
           if (f?.type === 'front_matter') {

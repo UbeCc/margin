@@ -4,7 +4,7 @@
  * nodes, everything else `text`.
  */
 
-export type WrapTag = 'em' | 'strong' | 'del' | 'mark' | 'code' | 'link' | 'fnref';
+export type WrapTag = 'em' | 'strong' | 'del' | 'mark' | 'code' | 'link' | 'fnref' | 'u' | 'sub' | 'sup';
 
 export type INode =
   | { k: 'text'; v: string }
@@ -110,6 +110,18 @@ function parseDest(s: string, i: number): { end: number; href: string; title?: s
   return { end: j + 1, href: href.replace(/\\([!-/:-@[-`{-~])/g, '$1'), title };
 }
 
+/** [start, end) of the `</tag>` closing the `<tag>` opened before `from` (same-tag nesting counted), or null. */
+function matchTag(s: string, from: number, tag: string): [number, number] | null {
+  const re = new RegExp(`<(/?)${tag}>`, 'gi');
+  re.lastIndex = from;
+  let depth = 1;
+  for (let m = re.exec(s); m; m = re.exec(s)) {
+    depth += m[1] ? -1 : 1;
+    if (!depth) return [m.index, m.index + m[0].length];
+  }
+  return null;
+}
+
 export function parseInline(s: string, refs: RefMap = new Map()): INode[] {
   const items: Item[] = [];
   let buf = '';
@@ -146,6 +158,14 @@ export function parseInline(s: string, refs: RefMap = new Map()): INode[] {
         continue;
       }
     } else if (c === '<') {
+      // paired formatting tags written by Format › Underline / Superscript / Subscript
+      const ft = /^<(u|sub|sup)>/i.exec(rest);
+      const fe = ft ? matchTag(s, i + ft[0].length, ft[1]) : null;
+      if (ft && fe) {
+        put({ k: 'wrap', tag: ft[1].toLowerCase() as WrapTag, ch: [meta(ft[0]), ...parseInline(s.slice(i + ft[0].length, fe[0]), refs), meta(s.slice(fe[0], fe[1]))] });
+        i = fe[1];
+        continue;
+      }
       const a = /^<([A-Za-z][A-Za-z0-9+.-]{1,31}:[^\s<>]*|[\w.!#$%&'*+/=?^`{|}~-]+@[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9-]+)*)>/.exec(rest);
       if (a) {
         const href = a[1].includes(':') ? a[1] : 'mailto:' + a[1];

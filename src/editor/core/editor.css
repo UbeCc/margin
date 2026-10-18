@@ -53,6 +53,11 @@
 .md-editor .md-link.md-expand { text-decoration: none; }
 .md-editor .md-html { color: var(--margin-muted, #8a8f98); font-family: var(--margin-mono, monospace); font-size: 0.9em; }
 .md-editor .md-fnref { vertical-align: super; font-size: 0.8em; }
+.md-editor .md-u { text-decoration: underline; }
+.md-editor .md-sub { vertical-align: sub; font-size: 0.8em; }
+.md-editor .md-sup { vertical-align: super; font-size: 0.8em; }
+.md-editor .md-comment { font-style: italic; opacity: 0.75; }
+.md-editor .md-fnref.md-fn-missing { color: var(--margin-danger, #d33); }
 .md-editor .md-entity.md-expand > .md-entity-char { display: none; }
 
 /* images: rendered image when idle, source (and image) when the caret is inside */
