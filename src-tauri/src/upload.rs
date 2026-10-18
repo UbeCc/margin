@@ -17,6 +17,18 @@ use std::sync::mpsc;
 use std::time::{Duration, Instant};
 
 pub const DEFAULT_PICGO_PORT: u16 = 36677;
+
+/// Bumped by `cancel_upload`; a running command compares it with its start value.
+static CANCEL_GEN: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+
+fn cancel_gen() -> u64 {
+    CANCEL_GEN.load(std::sync::atomic::Ordering::SeqCst)
+}
+
+/// Abort every upload command that is running now (it is killed).
+pub fn cancel_all() {
+    CANCEL_GEN.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+}
 pub const DEFAULT_PER_IMAGE_SECS: u64 = 30;
 pub const MAX_TIMEOUT_SECS: u64 = 300;
 const OUTPUT_LIMIT: usize = 4 << 20;
@@ -109,6 +121,31 @@ pub fn split_command(s: &str) -> Result<Vec<String>, String> {
     Ok(out)
 }
 
+/// One output line as an uploaded-image URL (Typora's rules): `http(s)://`, `ftp://`
+/// or `file:/` lines, or a bare `host.tld/path` (which gets `http://` prepended).
+pub fn url_of_line(line: &str) -> Option<String> {
+    let l = line.trim();
+    if l.is_empty() || l.chars().any(char::is_whitespace) {
+        return None;
+    }
+    let lower = l.to_ascii_lowercase();
+    for scheme in ["https://", "http://", "ftp://"] {
+        if lower.starts_with(scheme) && l.len() > scheme.len() + 1 {
+            return Some(l.to_string());
+        }
+    }
+    if lower.starts_with("file:/") && l.len() > "file:/".len() {
+        return Some(l.to_string());
+    }
+    // host.tld/… : at least one dot in the host, then a path
+    let (host, rest) = l.split_once('/')?;
+    let labels: Vec<&str> = host.split('.').collect();
+    let ok = labels.len() >= 2
+        && labels.iter().all(|x| !x.is_empty() && x.chars().all(|c| c.is_ascii_alphanumeric() || c == '-' || c == ':'))
+        && labels.last().is_some_and(|tld| tld.split(':').next().is_some_and(|t| t.len() >= 2 && t.chars().all(|c| c.is_ascii_alphabetic())));
+    (ok && !rest.is_empty()).then(|| format!("http://{l}"))
+}
+
 fn is_url(line: &str) -> bool {
     let l = line.trim();
     (l.starts_with("https://") || l.starts_with("http://"))
@@ -116,25 +153,34 @@ fn is_url(line: &str) -> bool {
         && !l.chars().any(char::is_whitespace)
 }
 
-/// URLs from the tail of an uploader's output: scanning backwards (ignoring blank
-/// lines) collects the contiguous run of `http(s)://` lines. Exactly one URL per
-/// image is required; when the run is longer, the last `n` are used.
-pub fn extract_urls(stdout: &str, n: usize) -> Result<Vec<String>, String> {
+/// All URLs at the tail of an uploader's output: scanning backwards (ignoring blank
+/// lines) collects the contiguous run of URL lines and stops at the first other line.
+pub fn tail_urls(stdout: &str) -> Vec<String> {
     let mut found: Vec<String> = Vec::new();
     for line in stdout.lines().rev() {
         if line.trim().is_empty() {
             continue;
         }
-        if !is_url(line) {
-            break;
+        match url_of_line(line) {
+            Some(u) => found.push(u),
+            None => break,
         }
-        found.push(line.trim().to_string());
     }
     found.reverse();
-    if found.len() < n {
-        return Err(format!("uploader returned {} URL(s) for {} image(s)", found.len(), n));
+    found
+}
+
+/// URLs for `n` uploaded images (Typora): one image takes the last URL; a batch needs
+/// exactly one URL per image.
+pub fn extract_urls(stdout: &str, n: usize) -> Result<Vec<String>, String> {
+    let mut found = tail_urls(stdout);
+    if n == 1 && !found.is_empty() {
+        return Ok(found.split_off(found.len() - 1));
     }
-    Ok(found.split_off(found.len() - n))
+    if found.len() != n || n == 0 {
+        return Err(format!("Failed to fetch uploaded image from command output: {} URL(s) for {} image(s)", found.len(), n));
+    }
+    Ok(found)
 }
 
 /// Every path must be an absolute path to an existing regular file.
@@ -186,9 +232,19 @@ fn spawn_retrying(cmd: &mut Command) -> std::io::Result<std::process::Child> {
     }
 }
 
-/// Run `argv + paths` directly (no shell) and return one URL per path.
-pub fn run_command(argv: &[String], paths: &[String], timeout: Duration) -> Result<Vec<String>, String> {
+/// Raw outcome of one uploader run.
+pub struct RawRun {
+    /// None: timed out or cancelled (the child was killed).
+    pub status: Option<std::process::ExitStatus>,
+    pub cancelled: bool,
+    pub stdout: String,
+    pub stderr: String,
+}
+
+/// Run `argv + paths` directly (no shell), with a deadline and cancellation.
+pub fn run_raw(argv: &[String], paths: &[String], timeout: Duration) -> Result<RawRun, String> {
     let (prog, args) = argv.split_first().ok_or("upload command is empty")?;
+    let start_gen = cancel_gen();
     let mut cmd = Command::new(prog);
     cmd.args(args).args(paths).stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::piped());
     #[cfg(target_os = "macos")]
@@ -201,10 +257,12 @@ pub fn run_command(argv: &[String], paths: &[String], timeout: Duration) -> Resu
     let out_rx = spawn_reader(child.stdout.take().expect("piped stdout"));
     let err_rx = spawn_reader(child.stderr.take().expect("piped stderr"));
     let deadline = Instant::now() + timeout;
+    let mut cancelled = false;
     let status = loop {
         match child.try_wait().map_err(|e| e.to_string())? {
             Some(st) => break Some(st),
-            None if Instant::now() >= deadline => {
+            None if Instant::now() >= deadline || cancel_gen() != start_gen => {
+                cancelled = cancel_gen() != start_gen;
                 let _ = child.kill();
                 let _ = child.wait();
                 break None;
@@ -216,17 +274,28 @@ pub fn run_command(argv: &[String], paths: &[String], timeout: Duration) -> Resu
     let grace = Duration::from_millis(if status.is_some() { 2000 } else { 300 });
     let stdout = String::from_utf8_lossy(&out_rx.recv_timeout(grace).unwrap_or_default()).into_owned();
     let stderr = String::from_utf8_lossy(&err_rx.recv_timeout(grace).unwrap_or_default()).into_owned();
-    let Some(status) = status else {
-        return Err(format!("uploader timed out after {}s and was stopped", timeout.as_secs()));
+    Ok(RawRun { status, cancelled, stdout, stderr })
+}
+
+/// Interpret a raw run: success needs exit status 0 and one URL per image.
+pub fn urls_of_run(r: &RawRun, n: usize, timeout: Duration) -> Result<Vec<String>, String> {
+    let Some(status) = r.status else {
+        return Err(if r.cancelled { "upload cancelled".into() } else { format!("uploader timed out after {}s and was stopped", timeout.as_secs()) });
     };
     if !status.success() {
-        let detail = tail(if stderr.trim().is_empty() { &stdout } else { &stderr }, 5);
+        let detail = tail(if r.stderr.trim().is_empty() { &r.stdout } else { &r.stderr }, 5);
         return Err(format!("uploader failed ({status}): {detail}"));
     }
-    extract_urls(&stdout, paths.len()).map_err(|e| {
-        let detail = tail(&stdout, 5);
+    extract_urls(&r.stdout, n).map_err(|e| {
+        let detail = tail(&r.stdout, 5);
         if detail.is_empty() { e } else { format!("{e}; output:\n{detail}") }
     })
+}
+
+/// Run `argv + paths` directly (no shell) and return one URL per path.
+pub fn run_command(argv: &[String], paths: &[String], timeout: Duration) -> Result<Vec<String>, String> {
+    let r = run_raw(argv, paths, timeout)?;
+    urls_of_run(&r, paths.len(), timeout)
 }
 
 /// POST `{"list": paths}` to PicGo's built-in server on 127.0.0.1 and return its URLs.
@@ -346,6 +415,94 @@ pub fn upload(paths: &[String], config: &UploadConfig) -> Result<Vec<String>, St
 #[tauri::command]
 pub async fn upload_images(paths: Vec<String>, config: UploadConfig) -> Result<Vec<String>, String> {
     tauri::async_runtime::spawn_blocking(move || upload(&paths, &config)).await.map_err(|e| e.to_string())?
+}
+
+/// Abort running uploads (the UI's Cancel on an in-flight upload).
+#[tauri::command]
+pub fn cancel_upload() {
+    cancel_all();
+}
+
+/// Result of Preferences › Images › Test Uploader.
+#[derive(Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TestReport {
+    pub ok: bool,
+    /// What ran, for display: argv shell-quoted (it is *not* run through a shell).
+    pub command: String,
+    pub stdout: String,
+    pub stderr: String,
+    pub urls: Vec<String>,
+    pub message: String,
+}
+
+/// Display form of argv (single-quoted where needed).
+pub fn display_argv(argv: &[String]) -> String {
+    argv.iter()
+        .map(|a| {
+            if !a.is_empty() && a.chars().all(|c| c.is_ascii_alphanumeric() || "-_./:=@%+,".contains(c)) {
+                a.clone()
+            } else {
+                format!("'{}'", a.replace('\'', "'\\''"))
+            }
+        })
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
+const SAMPLE_A: &[u8] = include_bytes!("../icons/32x32.png");
+const SAMPLE_B: &[u8] = include_bytes!("../icons/128x128.png");
+
+fn sample_images() -> Result<(tempfile::TempDir, Vec<String>), String> {
+    let dir = tempfile::Builder::new().prefix("margin-uploader-test").tempdir().map_err(|e| e.to_string())?;
+    let mut out = Vec::new();
+    for (name, bytes) in [("margin-test-1.png", SAMPLE_A), ("margin-test-2.png", SAMPLE_B)] {
+        let p = dir.path().join(name);
+        std::fs::write(&p, bytes).map_err(|e| e.to_string())?;
+        out.push(p.to_string_lossy().into_owned());
+    }
+    Ok((dir, out))
+}
+
+/// Upload two bundled sample images; passes only with exactly 2 URLs (Typora's rule).
+pub fn test_upload(config: &UploadConfig, paths: &[String]) -> TestReport {
+    let fail = |command: String, stdout: String, stderr: String, message: String| TestReport { ok: false, command, stdout, stderr, urls: vec![], message };
+    match config {
+        UploadConfig::Command { command, timeout_secs } => {
+            let argv = match split_command(command) {
+                Ok(a) if !a.is_empty() => a,
+                Ok(_) => return fail(String::new(), String::new(), String::new(), "no upload command configured".into()),
+                Err(e) => return fail(command.clone(), String::new(), String::new(), e),
+            };
+            let shown = display_argv(&[argv.clone(), paths.to_vec()].concat());
+            let timeout = batch_timeout(*timeout_secs, paths.len());
+            match run_raw(&argv, paths, timeout) {
+                Err(e) => fail(shown, String::new(), String::new(), e),
+                Ok(r) => match urls_of_run(&r, paths.len(), timeout) {
+                    Ok(urls) => TestReport { ok: true, command: shown, stdout: r.stdout, stderr: r.stderr, urls, message: "Successfully get uploaded image url.".into() },
+                    Err(e) => TestReport { urls: tail_urls(&r.stdout), ..fail(shown, r.stdout, r.stderr, e) },
+                },
+            }
+        }
+        UploadConfig::Picgo { port, timeout_secs } => {
+            let port = port.unwrap_or(DEFAULT_PICGO_PORT);
+            let shown = format!("POST http://127.0.0.1:{port}/upload");
+            match picgo_upload(port, paths, batch_timeout(*timeout_secs, paths.len())) {
+                Ok(urls) => TestReport { ok: true, command: shown, stdout: urls.join("\n"), stderr: String::new(), urls, message: "Successfully get uploaded image url.".into() },
+                Err(e) => fail(shown, String::new(), String::new(), e),
+            }
+        }
+    }
+}
+
+#[tauri::command]
+pub async fn test_uploader(config: UploadConfig) -> Result<TestReport, String> {
+    tauri::async_runtime::spawn_blocking(move || {
+        let (_dir, paths) = sample_images()?;
+        Ok(test_upload(&config, &paths))
+    })
+    .await
+    .map_err(|e| e.to_string())?
 }
 
 #[cfg(test)]

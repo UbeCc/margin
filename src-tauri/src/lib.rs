@@ -7,6 +7,7 @@ mod commands;
 mod fsops;
 #[cfg(unix)]
 mod fsops_unix;
+mod image_tools;
 mod images;
 mod menu;
 mod pandoc;
@@ -296,6 +297,11 @@ pub fn run() {
             commands::create_dir,
             commands::reveal_path,
             upload::upload_images,
+            upload::test_uploader,
+            upload::cancel_upload,
+            image_tools::copy_image,
+            image_tools::image_scale,
+            image_tools::open_images_dialog,
             clipboard_macos::clipboard_write_rich,
             clipboard_read::clipboard_read,
         ])
