@@ -197,6 +197,8 @@ export class App {
         baseDir: () => this.doc.dir,
         uploadImage: (src) => void this.uploader.uploadSrcs([src]),
         imageOps: (t) => (t.img ? this.images.ctxOps(t.img) : null),
+        imageUploadFirst: () => this.images.uploadLeads(),
+        menuChecks: (id) => this.ctxCheck(id),
         saveVideoAs: (src) => void saveMediaAs({ platform: this.platform, notify: (m, k) => void toast(m, { kind: k }) }, null, src, 'Video'),
         notify: (m, k) => void toast(m, { kind: k }),
       },
@@ -616,6 +618,28 @@ export class App {
     const enable = extras(this.platform).setMenuEnabled;
     void enable?.call(this.platform, 'subst:remap', !remapForced).catch(() => {});
     for (const [id, on] of checks) void set.call(this.platform, id, on).catch(() => {});
+  }
+
+  /** Check-mark state for the in-app context menu's WebKit-native submenus
+  * (Spelling and Grammar ▸ / Substitutions ▸) — same sources as syncMenuChecks. */
+  private ctxCheck(id: CommandId): boolean | undefined {
+    const s = this.settings;
+    switch (id) {
+      case 'spell:toggle':
+        return s.spellcheck;
+      case 'spell:grammar':
+        return s.spellGrammar;
+      case 'spell:autocorrect':
+        return s.spellAutocorrect;
+      case 'subst:quotes':
+        return s.markdown.smartQuote;
+      case 'subst:dashes':
+        return s.markdown.smartDash;
+      case 'subst:textReplacement':
+        return s.smartTextReplacement;
+      default:
+        return undefined;
+    }
   }
 
   private showSidebarTab(id: 'files' | 'outline'): void {

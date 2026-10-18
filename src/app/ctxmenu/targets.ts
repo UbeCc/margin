@@ -83,6 +83,7 @@ export function contextTarget(
   root: HTMLElement | null,
   sourceHost: HTMLElement | null = null,
   point?: { x: number; y: number },
+  opts: { uploadFirst?: boolean } = {},
 ): CtxTarget {
   const none: CtxTarget = { kind: 'none', keys: [], block: null, blockType: null };
   if (!(target instanceof Element)) return none;
@@ -127,9 +128,21 @@ export function contextTarget(
       src,
       local,
       loaded,
+      // §1.2: [Upload Image] leads the menu when the target storage is "upload" (#154);
+      // otherwise it sits after the copy/move group.
       keys: [
+        ...(loaded && opts.uploadFirst ? ['uploadImg'] : []),
         local ? (loaded ? 'revealImgInFinder' : '') : /^https?:/i.test(src) ? 'revealImgInBrowser' : '',
-        ...(loaded ? ['copyImgToDir', 'copyImgToSelect', ...(local ? ['moveImgToDir', 'moveImgToSelect'] : []), 'uploadImg', '|', 'copyImg'] : []),
+        ...(loaded
+          ? [
+              'copyImgToDir',
+              'copyImgToSelect',
+              ...(local ? ['moveImgToDir', 'moveImgToSelect'] : []),
+              ...(opts.uploadFirst ? [] : ['uploadImg']),
+              '|',
+              'copyImg',
+            ]
+          : []),
         'zoomImg',
         'imgSyntax',
         local ? 'deleteImgFile' : 'deleteImg',

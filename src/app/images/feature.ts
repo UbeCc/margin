@@ -39,7 +39,9 @@ export class ImageFeature {
   readonly tools: ImageTools;
   private rootDir: string | null = null;
   private rootKey = '';
-
+  /** #155: cached device-pixels-per-point per absolute path (Typora's `images.getScale`). */
+  private scales = new Map<string, number>();
+  private scalePending = new Set<string>();
   constructor(private host: ImageFeatureHost) {
     const ed = (): EditorHandle => host.editor();
     this.tools = new ImageTools({
@@ -117,21 +119,54 @@ export class ImageFeature {
    */
   attach(page: HTMLElement): () => void {
     // Right-clicks are owned by the editor context menu; this hook only marks
-    // failed-load images so they keep a clickable placeholder box (any tab host).
+    // failed-load images so they keep a clickable placeholder box (any tab host),
+    // and prefetches the pixel ratio of loaded local images (#155).
     const mark = () =>
-      page.querySelectorAll<HTMLImageElement>('.md-image img.md-img').forEach((img) => {
+      page.querySelectorAll<HTMLImageElement>('.md-image img.md-img, .mb-html-block img').forEach((img) => {
         const m = () => img.classList.toggle('md-img-loaded', img.complete && img.naturalWidth > 0);
         if (!img.dataset.loadHook) {
           img.dataset.loadHook = '1';
-          img.addEventListener('load', m);
+          img.addEventListener('load', () => (m(), this.prefetchScale(img)));
           img.addEventListener('error', m);
         }
         m();
+        this.prefetchScale(img);
       });
     mark();
     const mo = new MutationObserver(mark);
     mo.observe(page, { subtree: true, childList: true });
     return () => mo.disconnect();
+  }
+
+  /**
+   * #155 (images.md §4.6): fetch the image's pixel ratio asynchronously so the
+   * synchronous menu build can offer "Zoom Image to <100/ratio>%" (Retina
+   * screenshots etc.). Cached per absolute path; fires once per element.
+   */
+  private prefetchScale(img: HTMLImageElement): void {
+    if (img.dataset.scaleProbe || !(img.complete && img.naturalWidth > 0)) return;
+    const root = this.host.editorRoot();
+    if (!root.contains(img)) return;
+    img.dataset.scaleProbe = '1';
+    const fetch = this.host.platform.imageScale;
+    if (!fetch) return;
+    const ref = refForImage(img, root, this.host.editor().getMarkdown(), (s) => this.host.resolveAsset(s));
+    const abs = ref ? this.tools.absOf(ref.src) : null;
+    if (abs) void this.fetchScale(abs);
+  }
+
+  private async fetchScale(abs: string): Promise<void> {
+    const fetch = this.host.platform.imageScale;
+    if (!fetch || this.scales.has(abs) || this.scalePending.has(abs)) return;
+    this.scalePending.add(abs);
+    try {
+      const r = await fetch.call(this.host.platform, abs);
+      if (Number.isFinite(r) && r > 0) this.scales.set(abs, r);
+    } catch {
+      /* unreadable → no ratio entry */
+    } finally {
+      this.scalePending.delete(abs);
+    }
   }
 
   /** Editor-context-menu ops for one right-clicked image (#141): builds on the same tools as the image menu. */
@@ -152,11 +187,20 @@ export class ImageFeature {
         const local = !!abs && !REMOTE_RE.test(ref.src) && !isUrlLike(ref.src);
         return { label: dir, canMove: local, run: (move) => void t.copyOne(ref, dir, move) };
       },
-      zoom: () => ({
-        zoomNow,
-        presets: ZOOM_CTX_PRESETS,
-        set: (v) => void t.zoom(ref, v),
-      }),
+      zoom: () => {
+        const abs = t.absOf(ref.src);
+        if (abs) void this.fetchScale(abs); // warm the cache for the next open
+        const ratio = abs ? this.scales.get(abs) : undefined;
+        // §1.3: direct "Zoom Image to N%" — the explicit style zoom, else 100/ratio
+        // when the image carries a device-pixel-ratio hint ≠ 1.
+        const hint = ratio !== undefined && ratio !== 1 ? `${Math.round(100 / ratio)}%` : null;
+        return {
+          zoomNow,
+          direct: zoomNow ?? hint,
+          presets: ZOOM_CTX_PRESETS,
+          set: (v) => void t.zoom(ref, v),
+        };
+      },
       syntax: () => {
         const html = parseImage(ref.raw)?.html === true;
         return { isHtml: html, switchTo: (to) => void t.switchSyntax(ref, to) };
@@ -164,6 +208,11 @@ export class ImageFeature {
       saveAs: () => void saveMediaAs({ platform: this.host.platform, notify: (m, k) => this.host.notify(m, k) }, t.absOf(ref.src), ref.src, 'Image'),
       remove: (withFile) => void (withFile ? t.deleteImageFile(ref) : t.deleteImage(ref)),
     };
+  }
+
+  /** #154: the storage target is an uploader → "Upload Image" leads the image context menu. */
+  uploadLeads(): boolean {
+    return this.tools.isUploadTarget();
   }
 
   /** The image at the caret (expanded inline image or the selected / focused rendered image). */

@@ -19,6 +19,7 @@ const acts = (): CtxActions => ({
   writeText: vi.fn(),
   openLink: vi.fn(),
   openExternal: vi.fn(),
+  lookup: vi.fn(),
   deleteImage: vi.fn(),
   tableAction: vi.fn(),
   editBlock: vi.fn(),
@@ -82,6 +83,11 @@ describe('context menu targets (Typora key lists)', () => {
     expect(contextTarget(root.querySelector('#web img'), root).keys).toEqual(['revealImgInBrowser', 'zoomImg', 'imgSyntax', 'deleteImg', '|', 'normal']);
     expect(contextTarget(document.getElementById('field'), root).keys).toEqual(['input']);
     expect(contextTarget(document.body, root).kind).toBe('none');
+    // #154: upload storage → Upload Image leads the list (not duplicated in the group)
+    expect(contextTarget(root.querySelector('img'), root, null, undefined, { uploadFirst: true }).keys).toEqual([
+      'uploadImg', 'revealImgInFinder', 'copyImgToDir', 'copyImgToSelect', 'moveImgToDir', 'moveImgToSelect', '|', 'copyImg',
+      'zoomImg', 'imgSyntax', 'deleteImgFile', '|', 'normal', '|', 'download-image',
+    ]);
   });
 
   it('source mode is a plain text field menu', () => {
@@ -104,14 +110,46 @@ describe('context menu items', () => {
   it('text menu: Cut / Copy / Paste / Copy / Paste As, Search with Google on a selection', () => {
     const root = doc('<p data-bid="a" data-type="paragraph">hello</p>');
     const t = contextTarget(root.querySelector('p'), root);
-    expect(labels(buildItems(t, { selection: '' }, acts()))).toEqual(['Cut', 'Copy', 'Paste', 'Copy / Paste As…']);
+    expect(labels(buildItems(t, { selection: '' }, acts()))).toEqual([
+      'Cut', 'Copy', 'Paste', 'Copy / Paste As…', '|', 'Spelling and Grammar', 'Substitutions', 'Speech',
+    ]);
     const a = acts();
     const items = buildItems(t, { selection: 'hello' }, a);
-    expect(labels(items)).toEqual(['Cut', 'Copy', 'Paste', 'Copy / Paste As…', '|', 'Search with Google']);
-    (items[items.length - 1] as { run(): void }).run();
+    expect(labels(items)).toEqual([
+      'Look Up “hello”', '|', 'Cut', 'Copy', 'Paste', 'Copy / Paste As…', '|', 'Search with Google',
+      'Spelling and Grammar', 'Substitutions', 'Speech',
+    ]);
+    (items.find((i) => !('separator' in i) && !('submenu' in i) && i.label === 'Look Up “hello”') as { run(): void }).run();
+    expect(a.lookup).toHaveBeenCalledWith('hello');
+    (items.find((i) => !('separator' in i) && !('submenu' in i) && i.label === 'Search with Google') as { run(): void }).run();
     expect(a.openExternal).toHaveBeenCalledWith('https://www.google.com/search?q=hello');
-    const sub = items.find((i) => 'submenu' in i) as { submenu: MenuItem[] };
+    const sub = items.find((i) => 'submenu' in i && i.label === 'Copy / Paste As…') as { submenu: MenuItem[] };
     expect(labels(sub.submenu)).toEqual(['Copy as Markdown', 'Copy as HTML Code', 'Copy without Theme Styling', '|', 'Paste as Plain Text']);
+  });
+
+  it('text menu: Spelling and Grammar ▸ / Substitutions ▸ with check state, Speech ▸', () => {
+    const root = doc('<p data-bid="a" data-type="paragraph">hi</p>');
+    const t = contextTarget(root.querySelector('p'), root);
+    const a = acts();
+    a.checks = (id) => (id === 'spell:toggle' || id === 'subst:quotes' ? true : false);
+    const items = buildItems(t, { selection: '' }, a);
+    const spelling = items.find((i) => 'submenu' in i && i.label === 'Spelling and Grammar') as { submenu: MenuItem[] };
+    expect(labels(spelling.submenu)).toEqual([
+      'Show Spelling and Grammar', 'Check Document Now', 'Check Spelling While Typing',
+      'Check Grammar With Spelling', 'Correct Spelling Automatically',
+    ]);
+    expect((spelling.submenu[2] as { checked?: boolean }).checked).toBe(true);
+    spelling.submenu[1] && (spelling.submenu[1] as { run(): void }).run();
+    expect(a.run).toHaveBeenCalledWith('spell:now');
+    const subst = items.find((i) => 'submenu' in i && i.label === 'Substitutions') as { submenu: MenuItem[] };
+    expect(labels(subst.submenu)).toEqual(['Smart Quotes', 'Smart Dashes', 'Text Replacement', '|', 'More Options…']);
+    expect((subst.submenu[0] as { checked?: boolean }).checked).toBe(true);
+    (subst.submenu[0] as { run(): void }).run();
+    expect(a.run).toHaveBeenCalledWith('subst:quotes');
+    const speech = items.find((i) => 'submenu' in i && i.label === 'Speech') as { submenu: MenuItem[] };
+    expect(labels(speech.submenu)).toEqual(['Start Speaking', 'Stop Speaking']);
+    (speech.submenu[0] as { run(): void }).run();
+    expect(a.run).toHaveBeenCalledWith('speech:start');
   });
 
   it('link menu puts Copy Link Address next to Copy', () => {
@@ -138,7 +176,8 @@ describe('context menu items', () => {
   it('input menu has only Cut / Copy / Paste', () => {
     doc('');
     const t = contextTarget(document.getElementById('field'), document.querySelector('.md-editor'));
-    expect(labels(buildItems(t, { selection: 'x' }, acts()))).toEqual(['Cut', 'Copy', 'Paste']);
+    // §6.3: the field menu keeps Speech alongside Cut/Copy/Paste.
+    expect(labels(buildItems(t, { selection: 'x' }, acts()))).toEqual(['Cut', 'Copy', 'Paste', '|', 'Speech']);
   });
 
   it('video and emoji targets: Save Video As… after system items; Copy <char> for :emoji:', () => {
@@ -149,7 +188,7 @@ describe('context menu items', () => {
     const a = acts();
     a.saveVideoAs = vi.fn();
     const v = buildItems(contextTarget(root.querySelector('video'), root), { selection: '' }, a);
-    expect(labels(v)).toEqual(['Cut', 'Copy', 'Paste', 'Copy / Paste As…', '|', 'Save Video As…']);
+    expect(labels(v)).toEqual(['Cut', 'Copy', 'Paste', 'Copy / Paste As…', '|', 'Spelling and Grammar', 'Substitutions', 'Speech', '|', 'Save Video As…']);
     (v[v.length - 1] as { run(): void }).run();
     expect(a.saveVideoAs).toHaveBeenCalledWith('assets/v.mp4');
     const e = buildItems(contextTarget(root.querySelector('.md-entity-char'), root), { selection: '' }, a);
@@ -169,9 +208,11 @@ describe('context menu items', () => {
     a.uploadImage = vi.fn();
     a.copyImageTo = vi.fn();
     a.imageTarget = () => ({ label: './assets', canMove: true, run: vi.fn() });
-    a.zoomChoices = () => ({ zoomNow: '50%', presets: ['25%', '33%', '50%', '67%', '100%', '150%', '200%'], set: vi.fn() });
     a.syntaxState = () => ({ isHtml: false, switchTo: vi.fn() });
     a.saveImageAs = vi.fn();
+    const set = vi.fn();
+    // #155: explicit style zoom wins the direct entry
+    a.zoomChoices = () => ({ zoomNow: '50%', direct: '50%', presets: ['25%', '33%', '50%', '67%', '100%', '150%', '200%'], set });
     const items = buildItems(contextTarget(img, root), { selection: '' }, a);
     expect(labels(items)).toEqual([
       'Open Image Location…', 'Copy to ./assets', 'Copy Image to…', 'Move to ./assets', 'Rename or Move Image to…', 'Upload Image',
@@ -185,6 +226,18 @@ describe('context menu items', () => {
     expect((syn.submenu[0] as { checked?: boolean }).checked).toBe(true);
     (items[items.length - 1] as { run(): void }).run();
     expect(a.saveImageAs).toHaveBeenCalledWith('assets/a.png');
+    // #155: no style zoom → the 100/pixel-ratio entry leads (Retina screenshot)
+    a.zoomChoices = () => ({ zoomNow: null, direct: '50%', presets: ['25%', '33%', '50%', '67%', '100%', '150%', '200%'], set });
+    const retina = buildItems(contextTarget(img, root), { selection: '' }, a);
+    const entry = retina.find((i) => 'label' in i && i.label.startsWith('Zoom Image to')) as { label: string; run(): void };
+    expect(entry.label).toBe('Zoom Image to 50%');
+    entry.run();
+    expect(set).toHaveBeenCalledWith('50%');
+    // ratio 1 / unknown → no direct entry (only the preset submenu)
+    a.zoomChoices = () => ({ zoomNow: null, direct: null, presets: ['25%'], set });
+    const plain = labels(buildItems(contextTarget(img, root), { selection: '' }, a));
+    expect(plain).toContain('Zoom Image');
+    expect(plain.some((l) => l.startsWith('Zoom Image to'))).toBe(false);
   });
 });
 

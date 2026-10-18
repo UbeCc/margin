@@ -228,6 +228,20 @@ test('images.reveal-open: Image context: Open Image Location… / Open in Browse
   await expect(ctxItem(page, 'Open Image Location…')).toHaveCount(0);
   await ctxItem(page, /^Open Image in Browser…$/).click();
   expect(await page.evaluate(() => (window as unknown as Win).__calls)).toEqual(['https://x.example/w.png']);
+
+  // #154: storage target = uploader → Upload Image leads (and is not duplicated);
+  // the copy-to-folder quick item disappears (§1.3: target "upload" ≠ copy folder)
+  await settings(page, { imageUploadOnInsert: true });
+  await expect
+    .poll(() => page.locator('.md-editor .md-image img.md-img').evaluateAll((els) => els.every((e) => (e as HTMLImageElement).complete)))
+    .toBe(true);
+  await rightClickImage(page, 0);
+  const labelsUp = page.locator('.context-menu:not(.context-submenu) > .context-item .context-label');
+  await expect(labelsUp).toHaveText([
+    'Upload Image', 'Open Image Location…', 'Copy Image to…', 'Rename or Move Image to…',
+    'Zoom Image', 'Switch Image Syntax', 'Delete Image File',
+    'Cut', 'Copy', 'Copy Image Content', 'Paste', 'Copy / Paste As…', 'Save Image As…',
+  ]);
 });
 
 test('images.zoom: Image zoom (direct entry + presets) and switch Markdown/HTML image syntax', async ({ page }) => {
@@ -251,7 +265,29 @@ test('images.zoom: Image zoom (direct entry + presets) and switch Markdown/HTML 
   await page.locator('.context-item[data-key=imgSyntax]').hover();
   await page.locator(".context-item[data-key='imgSyntax:html']").click();
   await expect.poll(() => editorValue(page)).toBe('<img src="/pics/shot.png" alt="s" />\n');
+
+  // #155: device-pixel-ratio 2 (PNG pHYs 144 dpi, Typora's images.getScale) →
+  // "Zoom Image to 50%" with no explicit style zoom; ratio 1 shows no direct entry.
+  await page.evaluate(() => {
+    const w = window as unknown as Win;
+    w.__MARGIN_WEB__.imageScales.set('/pics/retina.png', 2);
+    w.__MARGIN_WEB__.imageScales.set('/pics/plain.png', 1);
+  });
+  await putPng(page, '/pics/retina.png');
+  await putPng(page, '/pics/plain.png');
+  await setDoc(page, '![r](/pics/retina.png)\n\n![p](/pics/plain.png)\n');
+  // the ratio is prefetched async at render; the (synchronous) menu needs it cached
+  await expect
+    .poll(() => page.locator('.md-image img[data-scale-probe]').count())
+    .toBe(2);
+  await rightClickImage(page, 0);
+  await ctxItem(page, 'Zoom Image to 50%').click();
+  await expect.poll(() => editorValue(page)).toBe('<img src="/pics/retina.png" alt="r" style="zoom:50%;" />\n\n![p](/pics/plain.png)\n');
+  await rightClickImage(page, 1);
+  await expect(page.locator('.context-item[data-key=zoomImg]')).toBeVisible();
+  await expect(page.locator('.context-item', { hasText: 'Zoom Image to' })).toHaveCount(0);
 });
+
 
 test('images.upload: Image upload: custom command (argv) / PicGo; upload one / all local images; test uploader', async ({ page }) => {
   await page.evaluate(() => {
