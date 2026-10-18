@@ -63,7 +63,7 @@ function copyPasteAs(a: CtxActions, hasSel: boolean): MenuItem {
   });
   return {
     id: 'moreCopyPaste',
-    label: 'Copy / Paste As',
+    label: 'Copy / Paste As…',
     submenu: [
       c('copyAs:markdown', 'Copy as Markdown'),
       c('copyAs:html', 'Copy as HTML Code'),
@@ -78,17 +78,16 @@ function copyPasteAs(a: CtxActions, hasSel: boolean): MenuItem {
 function editItems(t: CtxTarget, s: CtxState, a: CtxActions): MenuItem[] {
   const hasSel = s.selection.length > 0;
   const out: MenuItem[] = [];
-  const q = s.selection.trim();
-  if (q && t.kind !== 'input') {
-    out.push({ id: 'searchGoogle', label: 'Search with Google', run: () => a.openExternal('https://www.google.com/search?q=' + encodeURIComponent(q)) }, sep);
-  }
   out.push({ id: 'cut', label: 'Cut', hint: formatShortcut('Mod+X'), disabled: !hasSel, run: () => a.cut() });
   out.push({ id: 'copy', label: 'Copy', hint: formatShortcut('Mod+C'), disabled: !hasSel, run: () => a.copy() });
-  if (t.kind === 'image')
+  if (t.kind === 'image' && t.loaded !== false)
     out.push({ id: 'copyImg', label: 'Copy Image Content', run: () => (a.restore(), a.run('copyAs:image')) });
   if (t.kind === 'link' && t.href !== undefined) out.push({ id: 'copyLink', label: 'Copy Link Address', run: () => a.writeText(t.href!) });
   out.push({ id: 'paste', label: 'Paste', hint: formatShortcut('Mod+V'), run: () => a.paste() });
   if (t.kind !== 'input') out.push(copyPasteAs(a, hasSel));
+  // remaining system items (WebKit's "Search with Google" for a text selection)
+  const q = s.selection.trim();
+  if (q && t.kind !== 'input') out.push(sep, { id: 'searchGoogle', label: 'Search with Google', run: () => a.openExternal('https://www.google.com/search?q=' + encodeURIComponent(q)) });
   return out;
 }
 
@@ -174,15 +173,15 @@ export function itemForKey(key: string, t: CtxTarget, s: CtxState, a: CtxActions
     case 'deleteFences':
       return block('delete:block', 'Delete Code Block');
     case 'revealImgInFinder':
-      return { id: key, label: 'Open Image Location', disabled: !a.revealImage, run: () => a.revealImage?.(src) };
+      return a.revealImage ? { id: key, label: 'Open Image Location…', run: () => a.revealImage!(src) } : null;
     case 'revealImgInBrowser':
-      return { id: key, label: 'Open Image in Browser', run: () => a.openExternal(src) };
+      return { id: key, label: 'Open Image in Browser…', run: () => a.openExternal(src) };
     case 'copyImgToSelect':
-      return { id: key, label: 'Copy Image to…', disabled: !a.copyImageTo, run: () => a.copyImageTo?.(src, false) };
+      return a.copyImageTo ? { id: key, label: 'Copy Image to…', run: () => a.copyImageTo!(src, false) } : null;
     case 'moveImgToSelect':
-      return { id: key, label: 'Move Image to…', disabled: !a.copyImageTo, run: () => a.copyImageTo?.(src, true) };
+      return a.copyImageTo ? { id: key, label: 'Rename or Move Image to…', run: () => a.copyImageTo!(src, true) } : null;
     case 'uploadImg':
-      return { id: key, label: 'Upload Image', disabled: !a.uploadImage || !t.local, run: () => a.uploadImage?.(src) };
+      return a.uploadImage ? { id: key, label: 'Upload Image', run: () => a.uploadImage!(src) } : null;
     case 'zoomImg':
     case 'imgSyntax':
       return null; // image zoom / syntax switch: image pipeline (#99)

@@ -44,7 +44,7 @@ describe('context menu targets (Typora key lists)', () => {
     expect(link.kind).toBe('link');
     expect(link.href).toBe('https://x.io');
     expect(link.keys).toEqual(['openLink', 'copyLink', '|', 'normal']);
-    expect(contextTarget(root.querySelector('.md-math .md-src'), root).keys).toEqual(['normal', '|', 'copyMathInline']);
+    expect(contextTarget(root.querySelector('.md-math .md-src'), root).keys).toEqual(['copyMathInline', '|', 'normal']);
   });
 
   it('widget blocks get their Typora groups', () => {
@@ -67,7 +67,9 @@ describe('context menu targets (Typora key lists)', () => {
       '<p data-bid="p" data-type="paragraph"><span class="md-wrap md-image"><span class="md-src">![a](assets/a.png)</span><img class="md-img" src="blob:x"></span>' +
         '<span class="md-wrap md-image" id="web"><span class="md-src">![b](https://h/b.png)</span><img class="md-img"></span></p>',
     );
+    for (const img of root.querySelectorAll('img')) Object.defineProperties(img, { naturalWidth: { value: 10, configurable: true }, complete: { value: true } });
     const local = contextTarget(root.querySelector('img'), root);
+    expect(local.keys).toEqual(['revealImgInFinder', 'copyImgToSelect', 'moveImgToSelect', 'uploadImg', 'copyImg', 'zoomImg', 'imgSyntax', 'deleteImgFile', '|', 'normal', '|', 'download-image']);
     expect(local.kind).toBe('image');
     expect(local.src).toBe('assets/a.png');
     expect(local.keys[0]).toBe('revealImgInFinder');
@@ -75,6 +77,9 @@ describe('context menu targets (Typora key lists)', () => {
     const web = contextTarget(root.querySelector('#web img'), root);
     expect(web.keys[0]).toBe('revealImgInBrowser');
     expect(web.keys).toContain('deleteImg');
+    expect(web.keys).not.toContain('moveImgToSelect');
+    Object.defineProperty(web.img!, 'naturalWidth', { value: 0 });
+    expect(contextTarget(root.querySelector('#web img'), root).keys).toEqual(['revealImgInBrowser', 'zoomImg', 'imgSyntax', 'deleteImg', '|', 'normal']);
     expect(contextTarget(document.getElementById('field'), root).keys).toEqual(['input']);
     expect(contextTarget(document.body, root).kind).toBe('none');
   });
@@ -99,11 +104,11 @@ describe('context menu items', () => {
   it('text menu: Cut / Copy / Paste / Copy / Paste As, Search with Google on a selection', () => {
     const root = doc('<p data-bid="a" data-type="paragraph">hello</p>');
     const t = contextTarget(root.querySelector('p'), root);
-    expect(labels(buildItems(t, { selection: '' }, acts()))).toEqual(['Cut', 'Copy', 'Paste', 'Copy / Paste As']);
+    expect(labels(buildItems(t, { selection: '' }, acts()))).toEqual(['Cut', 'Copy', 'Paste', 'Copy / Paste As…']);
     const a = acts();
     const items = buildItems(t, { selection: 'hello' }, a);
-    expect(labels(items)).toEqual(['Search with Google', '|', 'Cut', 'Copy', 'Paste', 'Copy / Paste As']);
-    (items[0] as { run(): void }).run();
+    expect(labels(items)).toEqual(['Cut', 'Copy', 'Paste', 'Copy / Paste As…', '|', 'Search with Google']);
+    (items[items.length - 1] as { run(): void }).run();
     expect(a.openExternal).toHaveBeenCalledWith('https://www.google.com/search?q=hello');
     const sub = items.find((i) => 'submenu' in i) as { submenu: MenuItem[] };
     expect(labels(sub.submenu)).toEqual(['Copy as Markdown', 'Copy as HTML Code', 'Copy without Theme Styling', '|', 'Paste as Plain Text']);
@@ -113,7 +118,7 @@ describe('context menu items', () => {
     const root = doc('<p data-bid="a" data-type="paragraph"><span class="md-wrap md-link" data-href="u">l</span></p>');
     const a = acts();
     const items = buildItems(contextTarget(root.querySelector('.md-link'), root), { selection: '' }, a);
-    expect(labels(items)).toEqual(['Open Link', '|', 'Cut', 'Copy', 'Copy Link Address', 'Paste', 'Copy / Paste As']);
+    expect(labels(items)).toEqual(['Open Link', '|', 'Cut', 'Copy', 'Copy Link Address', 'Paste', 'Copy / Paste As…']);
     (items[0] as { run(): void }).run();
     expect(a.openLink).toHaveBeenCalledWith('u');
   });
@@ -122,8 +127,8 @@ describe('context menu items', () => {
     const root = doc('<div data-bid="c" data-type="code_fence"><i></i></div>');
     const a = acts();
     const items = tidy(buildItems(contextTarget(root.querySelector('i'), root), { selection: '' }, a));
-    expect(labels(items)).toEqual(['Cut', 'Copy', 'Paste', 'Copy / Paste As', '|', 'Code Tools', '|', 'Insert Paragraph Before', 'Insert Paragraph After', 'Delete Code Block']);
-    (items.at(-1) as { run(): void }).run();
+    expect(labels(items)).toEqual(['Cut', 'Copy', 'Paste', 'Copy / Paste As…', '|', 'Code Tools', '|', 'Insert Paragraph Before', 'Insert Paragraph After', 'Delete Code Block']);
+    (items[items.length - 1] as { run(): void }).run();
     expect(a.run).toHaveBeenCalledWith('delete:block');
     const tools = items.find((i) => 'submenu' in i && i.label === 'Code Tools') as { submenu: { label: string; run(): void }[] };
     tools.submenu[0].run();

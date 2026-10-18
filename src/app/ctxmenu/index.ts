@@ -54,6 +54,33 @@ function rangeAtPoint(x: number, y: number): Range | null {
   return d.caretRangeFromPoint?.(x, y) ?? null;
 }
 
+/** Put `text` on the clipboard from a user gesture (copy event first, async API as fallback). */
+async function writeText(text: string): Promise<boolean> {
+  let done = false;
+  const h = (e: ClipboardEvent) => {
+    if (!e.clipboardData) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    e.clipboardData.setData('text/plain', text);
+    done = true;
+  };
+  document.addEventListener('copy', h, { capture: true });
+  try {
+    document.execCommand('copy');
+  } catch {
+    /* refused */
+  } finally {
+    document.removeEventListener('copy', h, { capture: true });
+  }
+  if (done) return true;
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 const isField = (el: Element | null): el is HTMLInputElement | HTMLTextAreaElement =>
   el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement;
 
@@ -61,14 +88,29 @@ export class EditorContextMenu {
   private range: Range | null = null;
   private focusEl: HTMLElement | null = null;
   private target: CtxTarget | null = null;
+  private pressed: Range | null = null;
 
   constructor(private host: CtxHost, private editorHost: HTMLElement) {}
 
   /** Listen for right-clicks on the document. Returns a detach function. */
   attach(): () => void {
     const on = (e: MouseEvent) => this.onContextMenu(e);
+    // Remember the selection before a right-button press can collapse it (the
+    // core / engine may move the caret on mousedown), and keep the press from
+    // moving it at all inside the document: placeSelection() decides instead.
+    const down = (e: MouseEvent) => {
+      if (e.button !== 2) return;
+      const sel = getSelection();
+      this.pressed = sel && sel.rangeCount ? sel.getRangeAt(0).cloneRange() : null;
+      const root = this.root();
+      if (root?.contains(e.target as Node) && !this.host.editor().isSourceMode()) e.preventDefault();
+    };
+    document.addEventListener('mousedown', down, true);
     document.addEventListener('contextmenu', on);
-    return () => document.removeEventListener('contextmenu', on);
+    return () => {
+      document.removeEventListener('mousedown', down, true);
+      document.removeEventListener('contextmenu', on);
+    };
   }
 
   private root(): HTMLElement | null {
@@ -98,7 +140,14 @@ export class EditorContextMenu {
   /** Move the selection onto the clicked object unless the click is inside the current selection. */
   private placeSelection(t: CtxTarget, e: MouseEvent): void {
     const sel = getSelection();
-    const cur = sel && sel.rangeCount ? sel.getRangeAt(0) : null;
+    let cur = sel && sel.rangeCount ? sel.getRangeAt(0) : null;
+    const pre = this.pressed;
+    this.pressed = null;
+    if (sel && pre && !pre.collapsed && (!cur || cur.collapsed)) {
+      sel.removeAllRanges();
+      sel.addRange(pre);
+      cur = pre;
+    }
     const inside = (n: Node | null) => !!(n && cur && !cur.collapsed && cur.intersectsNode(n));
     let r: Range | null = null;
     const wrap = t.imageWrap ?? t.math;
@@ -109,7 +158,8 @@ export class EditorContextMenu {
       r.setEndAfter(wrap);
     } else if (t.kind === 'text' || t.kind === 'link') {
       const hit = rangeAtPoint(e.clientX, e.clientY);
-      if (cur && !cur.collapsed && hit && cur.isPointInRange(hit.startContainer, hit.startOffset)) return;
+      const inRects = (rg: Range) => [...rg.getClientRects()].some((b) => e.clientX >= b.left - 1 && e.clientX <= b.right + 1 && e.clientY >= b.top - 1 && e.clientY <= b.bottom + 1);
+      if (cur && !cur.collapsed && ((hit && cur.isPointInRange(hit.startContainer, hit.startOffset)) || inRects(cur))) return;
       r = hit;
     } else if (t.block) {
       if (cur && t.block.contains(cur.startContainer)) return;
@@ -230,7 +280,7 @@ export class EditorContextMenu {
       cut: () => (this.restore(), document.execCommand('cut')),
       copy: () => (this.restore(), document.execCommand('copy')),
       paste: () => void this.paste(),
-      writeText: (text) => void navigator.clipboard?.writeText(text).catch(() => this.host.notify('Could not write to the clipboard.', 'error')),
+      writeText: (text) => void writeText(text).then((ok) => ok || this.host.notify('Could not write to the clipboard.', 'error')),
       openLink: (href) => this.host.openLink(href),
       openExternal: (url) => void p.openExternal(url),
       revealImage: extras(p).revealInFolder

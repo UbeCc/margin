@@ -35,6 +35,8 @@ export interface CtxTarget {
   src?: string;
   /** Image is a local file (not http(s) / data:). */
   local?: boolean;
+  /** Image loaded (error images keep only reveal / zoom / syntax / delete). */
+  loaded?: boolean;
   /** Inline math wrap. */
   math?: HTMLElement;
   /** Table cell under the pointer (row / column), when inside a table widget. */
@@ -103,6 +105,7 @@ export function contextTarget(target: EventTarget | null, root: HTMLElement | nu
   const imageWrap = img?.closest<HTMLElement>('.md-image') ?? undefined;
   if (img && imageWrap) {
     const src = imageMarkdownSrc(imageWrap.querySelector('.md-src')?.textContent ?? '') ?? img.getAttribute('src') ?? '';
+    const loaded = img.complete && img.naturalWidth > 0;
     const local = !/^([a-z][\w+.-]*:|\/\/)/i.test(src) || /^file:/i.test(src);
     return {
       ...base,
@@ -111,19 +114,17 @@ export function contextTarget(target: EventTarget | null, root: HTMLElement | nu
       imageWrap,
       src,
       local,
+      loaded,
       keys: [
-        local ? 'revealImgInFinder' : 'revealImgInBrowser',
-        'copyImgToSelect',
-        'moveImgToSelect',
-        'uploadImg',
-        'copyImg',
+        local ? (loaded ? 'revealImgInFinder' : '') : /^https?:/i.test(src) ? 'revealImgInBrowser' : '',
+        ...(loaded ? ['copyImgToSelect', ...(local ? ['moveImgToSelect'] : []), 'uploadImg', 'copyImg'] : []),
         'zoomImg',
         'imgSyntax',
         local ? 'deleteImgFile' : 'deleteImg',
         '|',
         'normal',
-        'download-image',
-      ],
+        ...(loaded ? ['|', 'download-image'] : []),
+      ].filter(Boolean),
     };
   }
 
@@ -131,7 +132,7 @@ export function contextTarget(target: EventTarget | null, root: HTMLElement | nu
   if (link && link.dataset.href !== undefined) return { ...base, kind: 'link', href: link.dataset.href, keys: ['openLink', 'copyLink', '|', 'normal'] };
 
   const math = target.closest<HTMLElement>('.md-math');
-  if (math) return { ...base, kind: 'mathInline', math, keys: ['normal', '|', 'copyMathInline'] };
+  if (math) return { ...base, kind: 'mathInline', math, keys: ['copyMathInline', '|', 'normal'] };
 
   return base;
 }
