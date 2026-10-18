@@ -9,14 +9,14 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 | | surfaces |
 |---|---|
 | total | 171 |
-| owned (implemented) | 82 (with a named passing test: 69) |
-| partial | 20 |
-| missing | 61 |
+| owned (implemented) | 86 (with a named passing test: 73) |
+| partial | 21 |
+| missing | 56 |
 | out of scope | 8 |
 
-REA ledger `rol_fe89516b35388868f919ee54f7f71e883a6cfbd1b4db2d1a650f71b935f88403` (closure `aa012a43129121c1…`): status **unknown**; unowned 61, implemented 102, out-of-scope 8, unknown 5.
+REA ledger `rol_d83cfacc91a6cb86df8683ed6bf1838127ce33978f71b2cea050761606b34682` (closure `a5e569ee53735569…`): status **unknown**; unowned 56, implemented 107, out-of-scope 8, unknown 5.
 
-REA coverage boundary `margin.typora-parity`: status **unknown**; 69/163 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 61, package-proof-missing 1, verifier-missing 85, verifier-unknown 9.
+REA coverage boundary `margin.typora-parity`: status **unknown**; 73/163 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 56, package-proof-missing 1, verifier-missing 80, verifier-unknown 10.
 
 Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): build exit 0, cargo-test exit 101, independence exit 0, playwright exit 0, vitest exit 0. See `rea/summary.json`.
 
@@ -36,7 +36,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `files` File lifecycle: tabs/windows, recent, duplicate/move/rename, encoding, versions, recovery | P0 | 16 |
 | `export` Export, import & print: image/Pandoc/custom formats, export settings, export-with-previous | P0 | 9 |
 | `clipboard` Clipboard & selection: copy-as / paste-as, selection & delete scopes, jump-to | P0 | 2 |
-| `ctx` Editor & sidebar context menus (text, link, table, image, code, math, diagram, outline, files) | P1 | 7 |
+| `ctx` Editor & sidebar context menus (text, link, table, image, code, math, diagram, outline, files) | P1 | 3 |
 | `tools` Table, code-fence and math tools | P1 | 9 |
 | `images` Image pipeline: insert-local, copy/move/upload, zoom, syntax switch, image root path | P1 | 10 |
 | `prefs` Preferences completeness (General, Editor, Image, Markdown, Export, Appearance panes) | P1 | 8 |
@@ -176,11 +176,11 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
-| `ctx.framework` | Context-menu framework: target-aware item lists for the editor — only the sidebar has a context menu (src/app/ui/contextmenu.ts) | **missing** | P1 | — | none | 1 |
-| `ctx.text` | Text context menu: cut/copy/paste, copy-as, insert, format, paragraph submenus, search with… | **missing** | P1 | — | none | 4 |
-| `ctx.link` | Link context menu: Open Link / Copy Link Address / Hyperlink Actions | **missing** | P1 | — | none | 4 |
-| `ctx.block-generic` | Block context menu: Insert Paragraph Before/After, Delete (atomic blocks) | **missing** | P1 | — | none | 1 |
-| `ctx.emoji` | Emoji/inline-math context entries (copy emoji, copy inline math) | **missing** | P2 | — | none | 0 |
+| `ctx.framework` | Context-menu framework: target-aware item lists for the editor — in-app menu (no native NSMenu merge): key lists per target, actions bound to the right-clicked element | owned |  | `src/app/ctxmenu/targets.ts` `export function contextTarget` | `tests/e2e/parity-ctx.spec.ts` › ctx.framework: | 1 |
+| `ctx.text` | Text context menu: cut/copy/paste, copy-as, insert, format, paragraph submenus, search with… — Cut/Copy/Paste + Copy / Paste As… + Search with Google; WebKit spelling suggestions, Look Up, Speech, Substitutions are not reproduced by the in-app menu | **partial** | P1 | `src/app/ctxmenu/items.ts` `label: 'Copy / Paste As…'` | `tests/e2e/parity-ctx.spec.ts` › ctx.text: | 4 |
+| `ctx.link` | Link context menu: Open Link / Copy Link Address / Hyperlink Actions | owned |  | `src/app/ctxmenu/items.ts` `label: 'Copy Link Address'` | `tests/e2e/parity-ctx.spec.ts` › ctx.link: | 4 |
+| `ctx.block-generic` | Block context menu: Insert Paragraph Before/After, Delete (atomic blocks) — table/HTML/math/diagram/code/atomic lists; Save Math/Image As… not yet (gap) | owned |  | `src/app/ctxmenu/items.ts` `block('para:insertBefore', 'Insert Paragraph Before')` | `tests/e2e/parity-ctx.spec.ts` › ctx.block-generic: | 9 |
+| `ctx.emoji` | Emoji/inline-math context entries (copy emoji, copy inline math) — inline math Copy Math ▸ Tex/MathML; Margin renders no :emoji: shortcodes, inline Copy as Image disabled | **partial** | P2 | `src/app/ctxmenu/items.ts` `function copyMath` | `tests/e2e/parity-ctx.spec.ts` › ctx.emoji: | 4 |
 | `ctx.media` | Media context entries: play / pause / download video | **missing** | P2 | — | none | 6 |
 
 ## Table tools
@@ -199,7 +199,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 |---|---|---|---|---|---|---|
 | `tools.code.language` | Code fence language box + syntax highlight + copy button | owned |  | `src/editor/blocks/code-fence.ts` `mount` | `tests/e2e/blocks-widgets.spec.ts` › language box edits info string, copy button works | 4 |
 | `tools.code.indent-prettify` | Code tools: Auto Indent Selected/Whole Code, Prettify Source Code | **missing** | P2 | — | none | 4 |
-| `tools.code.delete` | Code tools: Delete Code Block — backspace in empty fence only | **partial** | P2 | `src/editor/blocks/code-fence.ts` `onRemove` | `tests/e2e/blocks-widgets.spec.ts` › arrow keys exit at edges; backspace in empty removes | 1 |
+| `tools.code.delete` | Code tools: Delete Code Block — deliberate fix: Typora requests "delete-fences" but its native table is keyed "deleteFences", so the item never shows on macOS; Margin shows it | owned |  | `src/app/ctxmenu/items.ts` `'Delete Code Block'` | `tests/e2e/parity-ctx.spec.ts` › tools.code.delete: | 3 |
 | `tools.code.line-numbers` | Code fences: line numbers, line wrap, indent size | **missing** | P1 | — | none | 8 |
 
 ## Math tools
