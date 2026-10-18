@@ -519,6 +519,10 @@ button { cursor: default; }
 .context-item.danger:not(:hover):not(:focus) { color: #c9302c; }
 .context-hint { opacity: 0.6; padding-left: 20px; }
 .context-sep { height: 1px; margin: 4px 6px; background: var(--margin-border); }
+.context-item { gap: 4px; align-items: baseline; }
+.context-check { width: 12px; flex: none; }
+.context-label { flex: 1; white-space: nowrap; }
+.context-item[aria-expanded='true'] { background: var(--margin-hover, rgba(127, 127, 127, 0.15)); }
 
 /* ---------------------------------------------------------------- toasts */
 

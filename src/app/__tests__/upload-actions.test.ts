@@ -40,7 +40,7 @@ describe('ImageUploader', () => {
   it('uploads a single image via PicGo config', async () => {
     const t = setup({ settings: { uploader: 'picgo', picgoPort: 4000 }, upload: async () => ['https://p/1'] });
     expect((await t.uploader.uploadSrcs(['assets/a.png'])).ok).toBe(true);
-    expect(t.uploadImages).toHaveBeenCalledWith(['/docs/assets/a.png'], { kind: 'picgo', port: 4000, timeoutSecs: 30 });
+    expect(t.uploadImages).toHaveBeenCalledWith(['/docs/assets/a.png'], { kind: 'picgo', port: 4000, timeoutSecs: 20 });
     expect(t.editor.getMarkdown()).toContain('![one](https://p/1)');
     expect(t.editor.getMarkdown()).toContain('<b c.png>');
   });
@@ -96,27 +96,6 @@ describe('editor context menu', () => {
   it('finds the markdown src of a rendered image', () => {
     expect(imageSrcAt(renderedImage('![a](assets/a.png "t")'))).toBe('assets/a.png');
     expect(imageSrcAt(document.body)).toBeNull();
-  });
-
-  it('"Upload Image" uploads that image', async () => {
-    const t = setup({ upload: async () => ['https://cdn/a'] });
-    const img = renderedImage('![one](assets/a.png)');
-    t.uploader.attachContextMenu(document.body);
-    img.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: 5, clientY: 5 }));
-    const items = [...document.querySelectorAll<HTMLButtonElement>('.context-item')];
-    expect(items.map((b) => b.textContent)).toEqual(expect.arrayContaining([expect.stringContaining('Upload Image'), expect.stringContaining('Upload All Local Images')]));
-    items.find((b) => b.textContent?.includes('Upload Image'))!.click();
-    await vi.waitFor(() => expect(t.editor.getMarkdown()).toContain('![one](https://cdn/a)'));
-    expect(t.uploadImages).toHaveBeenCalledWith(['/docs/assets/a.png'], expect.anything());
-  });
-
-  it('remote images get a disabled "Upload Image" item', () => {
-    const t = setup({ upload: async () => [] });
-    const img = renderedImage('![web](https://x/y.png)');
-    t.uploader.attachContextMenu(document.body);
-    img.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true }));
-    const item = [...document.querySelectorAll<HTMLButtonElement>('.context-item')].find((b) => b.textContent?.includes('Upload Image'))!;
-    expect(item.disabled).toBe(true);
   });
 });
 

@@ -112,7 +112,7 @@ describe('WebPlatform storeImage', () => {
     const p = fresh();
     const doc = `${WEB_ROOT}/My Doc.md`;
     const src = await p.storeImage(doc, { kind: 'relative', dir: './${filename}.assets' }, { bytes: png, mime: 'image/png' });
-    expect(src).toMatch(/^My%20Doc\.assets\/image-\d{8}-\d{6}-[a-z0-9]{3}\.png$/);
+    expect(src).toMatch(/^My%20Doc\.assets\/image-\d{17}(?:-\d+)?\.png$/);
     const abs = `${WEB_ROOT}/${decodeURI(src)}`;
     expect(p.assetUrl(abs)).toMatch(/^data:image\/png;base64,/);
     expect(p.assetUrl(`${WEB_ROOT}/${src}`)).toMatch(/^data:image\/png/); // encoded form works too
