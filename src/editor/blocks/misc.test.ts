@@ -103,3 +103,21 @@ describe('inline markdown entities', () => {
     expect(renderInlineMarkdown('&notanentity')).toBe('&amp;notanentity');
   });
 });
+
+describe('math preferences (#102)', () => {
+  it('autoNumbered follows all / ams / none and respects \\tag', async () => {
+    const { autoNumbered } = await import('./math');
+    expect(autoNumbered('a=b', 'all')).toBe(true);
+    expect(autoNumbered('a=b', 'ams')).toBe(false);
+    expect(autoNumbered('\\begin{equation}a\\end{equation}', 'ams')).toBe(true);
+    expect(autoNumbered('\\begin{equation*}a\\end{equation*}', 'ams')).toBe(false);
+    expect(autoNumbered('a \\tag{1}', 'all')).toBe(false);
+    expect(autoNumbered('a=b', 'none')).toBe(false);
+  });
+  it('withoutLineBreaks drops top-level \\\\ and \\newline only', async () => {
+    const { withoutLineBreaks } = await import('./math');
+    expect(withoutLineBreaks('a \\\\ b \\newline c')).toBe('a   b   c');
+    expect(withoutLineBreaks('\\begin{aligned}a\\\\b\\end{aligned}')).toBe('\\begin{aligned}a\\\\b\\end{aligned}');
+    expect(withoutLineBreaks('\\newlinex')).toBe('\\newlinex');
+  });
+});

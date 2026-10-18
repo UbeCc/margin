@@ -104,7 +104,10 @@ function mark(ed: EditorCore, m: string): boolean {
 /** Toggle quote / list on the text leaves of the selection. */
 function containerBlock(ed: EditorCore, kind: 'quote' | 'ul' | 'ol' | 'task'): boolean {
   const { from, to } = ed.sel();
-  if (!ed.doc.leaves.length) return insertBlock(ed, kind === 'quote' ? '> ' : kind === 'ul' ? '- ' : kind === 'ol' ? '1. ' : '- [ ] ', false);
+  // #102: list markers created from the menu follow Preferences › Markdown (existing lists are untouched).
+  const { ulStyle: ul, olStyle } = ed.md();
+  const ol = '.';
+  if (!ed.doc.leaves.length) return insertBlock(ed, kind === 'quote' ? '> ' : kind === 'ul' ? `${ul} ` : kind === 'ol' ? `1${ol} ` : `${ul} [ ] `, false);
   const i0 = ed.doc.locate(from).i;
   const i1 = ed.doc.locate(to).i;
   const first = ed.doc.leaves[i0];
@@ -127,7 +130,7 @@ function containerBlock(ed: EditorCore, kind: 'quote' | 'ul' | 'ol' | 'task'): b
         continue;
       }
       const n = i - i0 + 1;
-      const mk = kind === 'quote' ? '> ' : kind === 'ul' ? '- ' : kind === 'ol' ? `${n}. ` : '- [ ] ';
+      const mk = kind === 'quote' ? '> ' : kind === 'ul' ? `${ul} ` : kind === 'ol' ? `${olStyle === 'ones' ? 1 : n}${ol} ` : `${ul} [ ] `;
       const cont = kind === 'quote' ? '> ' : ' '.repeat(kind === 'task' ? 2 : mk.length);
       const s = ed.doc.start(i);
       const lines = l.lines.map((ln, k) => ({ ...ln, prefix: ln.prefix + (k === 0 ? mk : k < l.n ? cont : '') }));
@@ -311,6 +314,12 @@ export function execCommand(ed: EditorCore, cmd: EditorCommand): boolean {
       return pastePlain(ed);
     case 'insertMarkdownAt':
       return insertAtPoint(ed, cmd.markdown, cmd.x, cmd.y);
+    case 'replaceRange': {
+      const n = ed.doc.text().length;
+      if (!(cmd.from >= 0 && cmd.from <= cmd.to && cmd.to <= n)) return false;
+      ed.replaceRange(cmd.from, cmd.to, cmd.text, null);
+      return true;
+    }
     case 'copyBlock':
       return copyBlock(ed, cmd.part);
     case 'insertTable':

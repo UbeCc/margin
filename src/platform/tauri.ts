@@ -148,6 +148,27 @@ export class TauriPlatform implements Platform {
     return call('pandoc_detect', { pandocPath });
   }
 
+  // ---- optional image tools (PlatformExtras, #99 / #92)
+  copyImage(src: string, dir: string, opts?: { name?: string; move?: boolean }): Promise<string> {
+    return call('copy_image', { src, dir, name: opts?.name ?? null, mv: !!opts?.move });
+  }
+
+  imageScale(path: string): Promise<number> {
+    return call('image_scale', { path });
+  }
+
+  openImagesDialog(): Promise<string[]> {
+    return call('open_images_dialog', {});
+  }
+
+  testUploader(config: UploadConfig): Promise<{ ok: boolean; command: string; stdout: string; stderr: string; urls: string[]; message: string }> {
+    return call('test_uploader', { config });
+  }
+
+  cancelUpload(): Promise<void> {
+    return call('cancel_upload', {});
+  }
+
   /**
    * After the first save of a document: copy images that were stored while it was
    * unsaved (`<app data>/images`, absolute srcs) under `rule`. Returns

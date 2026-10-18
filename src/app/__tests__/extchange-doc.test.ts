@@ -97,7 +97,7 @@ describe('external change prompt (#82)', () => {
     expect(shown.length).toBe(n);
 
     await doc.save();
-    expect(await platform.readTextFile('/n/a.md')).toBe('# A\nmine');
+    expect(await platform.readTextFile('/n/a.md')).toBe('# A\nmine\n');
     await wait();
     expect(shown.length).toBe(n); // own write ignored
   });
@@ -189,6 +189,6 @@ describe('external change prompt (#82)', () => {
     last()!.keepMine();
     editor.type('?');
     await wait(100);
-    expect(await platform.readTextFile('/n/a.md')).toBe('# A\nmine!?');
+    expect(await platform.readTextFile('/n/a.md')).toBe('# A\nmine!?\n');
   });
 });

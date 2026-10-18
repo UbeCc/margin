@@ -52,7 +52,8 @@ export async function handleFileDrop(d: FileDropDeps, drop: FileDrop): Promise<v
     else if (!overEditor) ignored++;
     else if (isImagePath(p)) {
       const src = await d.storeImage({ path: p, name: basename(p) });
-      if (src) parts.push(`![${label(stripExt(basename(p)))}](${linkDest(src)})`);
+      // storeImage returns a src, or (#99) a complete snippet (`![alt](src)` / `<img …>`) to insert verbatim.
+      if (src) parts.push(/^(?:!\[|<img\b)/i.test(src.trim()) ? src.trim() : `![${label(stripExt(basename(p)))}](${linkDest(src)})`);
     } else {
       const dir = d.docDir();
       parts.push(`[${label(basename(p))}](${linkDest(dir ? relativeFrom(dir, p) : p)})`);

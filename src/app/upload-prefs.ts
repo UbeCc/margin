@@ -1,17 +1,28 @@
 import { h } from './util/dom';
-import { uploadSettingsOf, type UploadSettings } from './upload';
+import type { UploadConfig } from '../contracts';
+import type { UploaderTestReport } from './platform-extras';
+import { uploadConfig, uploadSettingsOf, type UploadSettings } from './upload';
 
 /**
  * Preferences › Images › "Image uploader" block (#80). `set` receives the shell
  * keys `uploader`, `uploadCommand`, `picgoPort`, `uploadTimeout`.
  */
-export function uploadPrefsSection(current: object, set: (patch: Partial<UploadSettings>) => void): HTMLElement {
+export function uploadPrefsSection(
+  current: object,
+  set: (patch: Partial<UploadSettings>) => void,
+  testUploader?: (config: UploadConfig) => Promise<UploaderTestReport>,
+): HTMLElement {
   const s = uploadSettingsOf(current);
+  let live: UploadSettings = { ...s };
+  const put = (patch: Partial<UploadSettings>): void => {
+    live = { ...live, ...patch };
+    set(patch);
+  };
   const kind = h(
     'select.select',
     { 'data-pref': 'uploader' },
     h('option', { value: 'none', text: 'None' }),
-    h('option', { value: 'command', text: 'Custom command' }),
+    h('option', { value: 'command', text: 'Custom Command' }),
     h('option', { value: 'picgo', text: 'PicGo (local server)' }),
   ) as HTMLSelectElement;
   kind.value = s.uploader;
@@ -32,22 +43,53 @@ export function uploadPrefsSection(current: object, set: (patch: Partial<UploadS
   const portRow = row('PicGo server port', port, 'Contacted on 127.0.0.1 only.');
   const timeoutRow = row('Timeout per image (s)', timeout);
 
+  // #92: Test Uploader — uploads two bundled sample images, shows argv / output / URLs.
+  const report = h('pre.pref-upload-report', { 'data-pref': 'uploadReport', hidden: true });
+  const testBtn = h('button.btn.btn-small', {
+    type: 'button',
+    text: 'Test Uploader',
+    'data-pref': 'testUploader',
+    onclick: async () => {
+      report.hidden = false;
+      const config = uploadConfig(live);
+      if (typeof config === 'string') return void (report.textContent = `Validation Failed\n${config}`);
+      if (!testUploader) return void (report.textContent = 'Validation Failed\nImage upload is only available in the desktop app.');
+      report.textContent = 'Validating Image Uploader\nRunning… Waiting for results.';
+      testBtn.disabled = true;
+      try {
+        const r = await testUploader(config);
+        const lines = [r.ok ? 'Validation Succeed' : 'Validation Failed', r.message, '', 'Testing image uploading using command:', r.command];
+        if (r.urls.length) lines.push('', ...r.urls);
+        if (r.stdout.trim()) lines.push('', 'stdout:', r.stdout.trimEnd());
+        if (r.stderr.trim()) lines.push('', 'stderr:', r.stderr.trimEnd());
+        report.textContent = lines.join('\n');
+        report.dataset.ok = String(r.ok);
+      } catch (e) {
+        report.textContent = `Validation Failed\n${e instanceof Error ? e.message : String(e)}`;
+        report.dataset.ok = 'false';
+      } finally {
+        testBtn.disabled = kind.value === 'none';
+      }
+    },
+  }) as HTMLButtonElement;
+
   const sync = (): void => {
     commandRow.hidden = kind.value !== 'command';
     portRow.hidden = kind.value !== 'picgo';
     timeoutRow.hidden = kind.value === 'none';
+    testBtn.disabled = kind.value === 'none';
   };
   sync();
 
   kind.addEventListener('change', () => {
     sync();
-    set({ uploader: kind.value as UploadSettings['uploader'] });
+    put({ uploader: kind.value as UploadSettings['uploader'] });
   });
-  command.addEventListener('change', () => set({ uploadCommand: command.value }));
+  command.addEventListener('change', () => put({ uploadCommand: command.value }));
   const intField = (el: HTMLInputElement, key: 'picgoPort' | 'uploadTimeout', min: number, max: number): void => {
     el.addEventListener('change', () => {
       const v = Number(el.value);
-      if (Number.isInteger(v) && v >= min && v <= max) set({ [key]: v } as Partial<UploadSettings>);
+      if (Number.isInteger(v) && v >= min && v <= max) put({ [key]: v } as Partial<UploadSettings>);
     });
   };
   intField(port, 'picgoPort', 1, 65535);
@@ -61,6 +103,8 @@ export function uploadPrefsSection(current: object, set: (patch: Partial<UploadS
     commandRow,
     portRow,
     timeoutRow,
-    h('p.pref-note', { text: 'The uploader must print one http(s) URL per image as the last lines of its output. Use Upload Image from an image’s context menu, or Upload All Local Images from the command palette.' }),
+    h('div.pref-row', null, testBtn),
+    report,
+    h('p.pref-note', { text: 'The uploader must print one URL per image (http(s), ftp, file, or host.tld/path) as the last lines of its output. Test Uploader uploads two sample images and expects exactly two URLs. Use Upload Image from an image’s context menu, or Upload All Local Images from the command palette.' }),
   );
 }

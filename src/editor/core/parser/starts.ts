@@ -1,8 +1,10 @@
 /** Block-start recognisers (operate on the line rest after container prefixes). */
 import { indentCols, consumeCols } from './lines';
+import { syntaxOptions } from './options';
 
+/** ATX heading level; outside Strict Mode `#Heading` (no space) also counts (#102). */
 export function atxLevel(s: string): number {
-  const m = /^ {0,3}(#{1,6})(?:[ \t]|$)/.exec(s);
+  const m = (syntaxOptions.strict ? /^ {0,3}(#{1,6})(?:[ \t]|$)/ : /^ {0,3}(#{1,6})(?:[ \t]|$|(?=[^#\s]))/).exec(s);
   return m ? m[1].length : 0;
 }
 

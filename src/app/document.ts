@@ -81,6 +81,8 @@ export interface DocumentHost {
   autoSave(): { enabled: boolean; delay: number };
   /** Called before setMarkdown so the editor can know the new base dir. */
   willLoad(path: string | null): void;
+  /** Line ending for text without any line break (new files, #100). */
+  defaultEol?(): Eol;
   onState(state: DocState): void;
   onOpened(path: string): void;
   /** The file to open does not exist: offer to create it (#94). true = create. */
@@ -123,6 +125,8 @@ export class DocumentController {
     private host: DocumentHost,
     opts: { externalDebounceMs?: number } = {},
   ) {
+    // A fresh untitled document (e.g. a new tab) starts with the Default Line Ending (#100).
+    this.eol = this.savedEol = host.defaultEol?.() ?? '\n';
     host.editor.onChange(() => this.onEditorChange());
     this.fsDebounce = debounce(() => void this.reconcile(), opts.externalDebounceMs ?? 60);
   }
@@ -222,7 +226,10 @@ export class DocumentController {
   private load(path: string | null, text: string): void {
     this.loading = true;
     try {
-      this.eol = detectEol(text);
+      // Text without any line break (new / one-line file) uses the "Default Line Ending" preference.
+      this.eol = /\n/.test(text) ? detectEol(text) : (this.host.defaultEol?.() ?? detectEol(text));
+      // Edit › Line Endings › Insert Final New Line On Save is per document: on when the file ended with one.
+      this.finalNewline = /\n$/.test(text);
       const md = normalizeEol(text);
       this.host.willLoad(path);
       this.host.willLoadText?.(path, md);
@@ -412,7 +419,8 @@ export class DocumentController {
 
   private async writeTo(path: string, quiet: boolean): Promise<boolean> {
     const md = this.host.editor.getMarkdown();
-    const raw = applyEol(md, this.eol);
+    // "Insert Final New Line On Save" (#102): written to disk only; the document text is unchanged.
+    const raw = applyEol(this.finalNewline && md && !md.endsWith('\n') ? md + '\n' : md, this.eol);
     // Remember what we write *before* the watcher can echo it back.
     const prevHash = this.diskHash;
     if (path === this.path) this.diskHash = hashText(raw);
@@ -483,6 +491,15 @@ export class DocumentController {
     this.recomputeDirty.cancel();
     this.dirty = this.isModified();
     void this.host.platform.setDocumentEdited(this.dirty);
+    this.emit();
+  }
+
+  /** Per-document "Insert Final New Line On Save" flag (typora-re fe-preferences §10). */
+  finalNewline = false;
+
+  setFinalNewline(on: boolean): void {
+    if (on === this.finalNewline) return;
+    this.finalNewline = on;
     this.emit();
   }
 

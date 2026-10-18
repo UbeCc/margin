@@ -154,7 +154,10 @@ test.describe('parity: context menus (#97)', () => {
   });
 
   test('ctx.emoji: Emoji/inline-math context entries (copy emoji, copy inline math)', async ({ page }) => {
-    await load(page, 'Area $a^2+b^2$ here\n');
+    await boot(page);
+    // inline math is off on a fresh install (Typora default, #102) — switch it on first
+    await page.evaluate(() => { const a = window.__margin! as unknown as { settings: { markdown: object }; updateSettings(p: object): void }; a.updateSettings({ markdown: { ...a.settings.markdown, inlineMath: true } }); });
+    await page.evaluate((m) => window.__margin!.editor.setMarkdown(m), 'Area $a^2+b^2$ here\n');
     await page.locator('.md-editor .md-math .md-math-render').click({ button: 'right', force: true });
     expect(await labels(page)).toEqual(['Copy Math', 'Cut', 'Copy', 'Paste', 'Copy / Paste As…']);
     await item(page, 'Copy Math').hover();
