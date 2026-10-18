@@ -61,6 +61,7 @@ pub fn start_drag<R: Runtime>(win: &WebviewWindow<R>, paths: &[String]) -> bool 
     }
     let paths = paths.to_vec();
     let dispatched = win.with_webview(move |pw| {
+        PATHS.with(|p| *p.borrow_mut() = paths.clone());
         let webview = pw.inner();
         let event = gtk::current_event().filter(|e| {
             matches!(e.event_type(), gdk::EventType::ButtonPress | gdk::EventType::DoubleButtonPress | gdk::EventType::MotionNotify)
@@ -72,8 +73,8 @@ pub fn start_drag<R: Runtime>(win: &WebviewWindow<R>, paths: &[String]) -> bool 
                 if paths.is_empty() {
                     return;
                 }
-                let name = data.target().name().map(|n| n.to_string());
-                if name.as_deref() == Some(PRIVATE_TARGET) {
+                let name = data.target().name();
+                if name.as_str() == PRIVATE_TARGET {
                     data.set_text(&paths[0]);
                 } else {
                     let uris = file_uris(&paths);

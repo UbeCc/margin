@@ -12,7 +12,7 @@
 //! bookmarks and PDF metadata (the JS fallback for those is unaffected; see
 //! the parity ledger). Paper size and margins are applied natively.
 
-use gtk::prelude::*;
+use webkit2gtk::prelude::*;
 use std::path::Path;
 use std::sync::mpsc;
 use std::time::{Duration, Instant};
@@ -68,7 +68,7 @@ pub fn file_url(p: &Path) -> String {
 fn page_setup(paper: Option<&crate::export_cmds::Paper>) -> gtk::PageSetup {
     let setup = gtk::PageSetup::new();
     let (w, h) = paper.map(|p| (p.width, p.height)).unwrap_or((595.0, 842.0));
-    let size = gtk::PaperSize::custom("margin-export", "Margin export", w, h, gtk::Unit::Points);
+    let size = gtk::PaperSize::new_custom("margin-export", "Margin export", w, h, gtk::Unit::Points);
     setup.set_paper_size(&size);
     let m = paper.map(|p| p.margins.clone()).unwrap_or_default();
     setup.set_top_margin(m.top, gtk::Unit::Points);

@@ -46,18 +46,18 @@ pub fn path_from_uri(uri: &str) -> Option<String> {
 }
 
 fn uri_list_target(ctx: &gdk::DragContext) -> Option<gdk::Atom> {
-    ctx.list_targets().into_iter().find(|t| t.name().as_deref() == Some(URI_LIST))
+    ctx.list_targets().into_iter().find(|t| t.name().as_str() == URI_LIST)
 }
 
 /// A drag is "external" when its source window is not one of ours. In-page
-/// HTML5 drags are sourced from the webview's own GDK window; `None` (unknown,
-/// e.g. some Wayland sessions) counts as external, like a browser drop.
+/// HTML5 drags (and our own `start_drag_linux` sessions) are sourced from the
+/// webview's own GDK window or its toplevel.
 fn is_external(ctx: &gdk::DragContext, webview: &webkit2gtk::WebView) -> bool {
-    let Some(source) = ctx.source_window() else { return true };
-    if webview.window().is_some_and(|w| w == &source) {
+    let source = ctx.source_window();
+    if webview.window().as_ref() == Some(&source) {
         return false;
     }
-    !webview.toplevel().window().is_some_and(|w| w == &source)
+    !webview.toplevel().is_some_and(|t| t.window().as_ref() == Some(&source))
 }
 
 /// Route external file drags on `window`'s webview to `margin://file-drop`.
@@ -93,7 +93,7 @@ pub fn install<R: Runtime>(app: &AppHandle<R>, window: &WebviewWindow<R>) {
                 Some(target) => {
                     st.fetching.set(true);
                     st.at.set((x as f64, y as f64));
-                    gtk::drag_get_data(w, ctx, &target, time);
+                    w.drag_get_data(ctx, &target, time);
                     true
                 }
                 None => false,
