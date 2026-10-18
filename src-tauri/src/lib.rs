@@ -2,6 +2,7 @@
 //! menus, file-open events, close-request veto and window chrome.
 
 mod clipboard_macos;
+mod clipboard_read;
 mod commands;
 mod fsops;
 #[cfg(unix)]
@@ -296,6 +297,7 @@ pub fn run() {
             commands::reveal_path,
             upload::upload_images,
             clipboard_macos::clipboard_write_rich,
+            clipboard_read::clipboard_read,
         ])
         .setup(|app| {
             let handle = app.handle().clone();

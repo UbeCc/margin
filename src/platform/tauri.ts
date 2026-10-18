@@ -1,6 +1,6 @@
 import { convertFileSrc, invoke } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
-import type { AppSettings, DirEntry, FsEvent, ImageRule, MenuAction, Platform, RichClipboardData, UploadConfig } from '../contracts';
+import type { AppSettings, DirEntry, FsEvent, ImageRule, MenuAction, Platform, RichClipboardData, ClipboardSnapshot, UploadConfig } from '../contracts';
 import { builtinThemes, normalizeSettings, printHtmlInIframe } from './common';
 
 /** Event names emitted by `src-tauri/src/lib.rs`. */
@@ -210,6 +210,13 @@ export class TauriPlatform implements Platform {
   /** #79: RTF onto the macOS pasteboard (no-op returning false on other OSes). */
   writeClipboardRich(data: RichClipboardData): Promise<boolean> {
     return call<boolean>('clipboard_write_rich', { data });
+  }
+
+  /** #96: general pasteboard plain/HTML (+ HTML from RTF); empty off macOS. */
+  async readClipboard(): Promise<ClipboardSnapshot | null> {
+    const r = await call<{ plain: string | null; html: string | null; rtf_html: string | null }>('clipboard_read');
+    if (!r.plain && !r.html && !r.rtf_html) return null;
+    return { plain: r.plain, html: r.html, rtfHtml: r.rtf_html };
   }
 
   openExternal(url: string): Promise<void> {

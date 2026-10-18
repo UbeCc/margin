@@ -5,8 +5,9 @@ import { isTextLeaf } from './edit';
 import { docHTML } from './html';
 import { splitBlockMeta } from './render-inline';
 import { htmlToMarkdown } from './paste';
-import { buildCopyFlavors, pickPasteMarkdown, writeFlavors, type CopyFlavors } from './clipboard-flavors';
+import { MARGIN_MIME, buildCopyFlavors, pickPasteMarkdown, writeFlavors, type CopyFlavors } from './clipboard-flavors';
 import { htmlToRtf } from './clipboard-rtf';
+import { plainFromClipboard } from './copy-as';
 
 export { MARGIN_HTML_ATTR, MARGIN_MIME } from './clipboard-flavors';
 
@@ -157,14 +158,41 @@ export function insertMarkdown(ed: EditorCore, md: string, range = ed.sel()): vo
   ed.hist.break();
 }
 
-export function onPaste(ed: EditorCore, e: ClipboardEvent): void {
+export function onPaste(ed: EditorCore, e: ClipboardEvent, plain = false): void {
   const dt = e.clipboardData;
   if (!dt) return;
   e.preventDefault();
   const range = ed.sel();
+  if (plain) {
+    // Paste as Plain Text (#96): no images, formatting reduced to text
+    const t = plainFromClipboard((x) => dt.getData(x)).replace(/\r\n?/g, ed.doc.eol);
+    if (t) insertMarkdown(ed, t, range);
+    return;
+  }
   const files = Array.from(dt.files ?? []).filter((f) => f.type.startsWith('image/'));
   if (files.length) {
     void storeFiles(ed, files).then((imgs) => imgs.length && insertMarkdown(ed, imgs.join(' '), range));
+    return;
+  }
+  // RTF-only clipboards (TextEdit, Pages, Word): the engine exposes no HTML; ask the native side to convert (#96)
+  const types = Array.from(dt.types ?? []);
+  if (ed.settings.readClipboard && !types.includes('text/html') && !types.includes(MARGIN_MIME)) {
+    const plain = dt.getData('text/plain');
+    void ed.settings
+      .readClipboard()
+      .catch(() => null)
+      .then((s) => {
+        let out = plain;
+        if (s?.rtfHtml && !s.html) {
+          try {
+            out = htmlToMarkdown(s.rtfHtml) || plain;
+          } catch {
+            out = plain;
+          }
+        }
+        out = out.replace(/\r\n?/g, ed.doc.eol);
+        if (out) insertMarkdown(ed, out, range);
+      });
     return;
   }
   let { md } = pickPasteMarkdown((t) => dt.getData(t), htmlToMarkdown);

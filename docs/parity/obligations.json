@@ -2,22 +2,22 @@
  "generated_from": {
   "spec": "typora-re/parity-spec.md",
   "prose": "typora-re/sections/*.md",
-  "margin_head": "c86a3648e480b7028a52d6bf945a00bea1c424ad"
+  "margin_head": "295b41fe471ab33a118373918e00a95ece89f7f8"
  },
  "summary": {
-  "head": "c86a3648e480b7028a52d6bf945a00bea1c424ad",
-  "artifact_sha256": "7586778f0e7298e4fb1ef5f2795d0eef0512ef57622abaa10585a3221549b4b5",
+  "head": "295b41fe471ab33a118373918e00a95ece89f7f8",
+  "artifact_sha256": "abb02fa403a6f4d88a6e8f6935c1d12901260ab1a64b00ac1731fd23686d9d4c",
   "inventory": {
    "total": 171,
-   "owned": 76,
+   "owned": 82,
    "partial": 20,
-   "missing": 67,
+   "missing": 61,
    "oos": 8,
-   "verified_by_test": 63
+   "verified_by_test": 69
   },
   "ledger": {
-   "ledger_id": "rol_86bb7cb54671f1e3cfd1837584592d209e758c4b8a59218e2aab4eea5b2a3659",
-   "closure_digest": "ff2645d71581a751969899f102185f1b59f3ef5d8c52161e5e058cf736bbef92",
+   "ledger_id": "rol_fe89516b35388868f919ee54f7f71e883a6cfbd1b4db2d1a650f71b935f88403",
+   "closure_digest": "aa012a43129121c13690ab482fb92ba24df8400ec59b46c6509b1a26e80bbf29",
    "status": "unknown",
    "summary": {
     "total": 176,
@@ -27,7 +27,7 @@
     "by_status": [
      {
       "key": "unowned",
-      "count": 67
+      "count": 61
      },
      {
       "key": "characterized",
@@ -35,7 +35,7 @@
      },
      {
       "key": "implemented",
-      "count": 96
+      "count": 102
      },
      {
       "key": "verified",
@@ -119,18 +119,18 @@
      }
     ]
    },
-   "evidence_id": "ev_cbff1055134e554f6f8dae70e38d1940e8151f175579eade5acc6f159238cc7b"
+   "evidence_id": "ev_908bc9c015f44d5e3ec0ab44de4a919c24ad3c602b9ec38eb64fbc949226e78c"
   },
   "coverage": {
    "status": "unknown",
    "reason_counts": {
-    "owner-missing": 67,
+    "owner-missing": 61,
     "package-proof-missing": 1,
-    "verifier-missing": 91,
+    "verifier-missing": 85,
     "verifier-unknown": 9
    },
    "claims_total": 163,
-   "claims_qualified_by_controlled_replay": 63,
+   "claims_qualified_by_controlled_replay": 69,
    "evidence_ids_cited": 175
   },
   "verifier_runs": {
@@ -172,7 +172,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "About Margin",
-    "sha256": "ecd950a3a5803059c4cedf85bfa26757c84b84207f057faf452b633872906bbf"
+    "sha256": "ccd7b0c7de21aa97c1bbfa43967f48b693ba3e2445446ea8d311f1a9bfd9081d"
    },
    "verifier": null,
    "spec": {
@@ -206,7 +206,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'preferences'",
-    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
+    "sha256": "5afad2637e9d4c91e7d506809eb6e20c7d45464496cea8eaa6e178407405344d"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -244,7 +244,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "PredefinedMenuItem::hide_others",
-    "sha256": "ecd950a3a5803059c4cedf85bfa26757c84b84207f057faf452b633872906bbf"
+    "sha256": "ccd7b0c7de21aa97c1bbfa43967f48b693ba3e2445446ea8d311f1a9bfd9081d"
    },
    "verifier": null,
    "spec": {
@@ -282,7 +282,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'new'",
-    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
+    "sha256": "5afad2637e9d4c91e7d506809eb6e20c7d45464496cea8eaa6e178407405344d"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -391,7 +391,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'open'",
-    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
+    "sha256": "5afad2637e9d4c91e7d506809eb6e20c7d45464496cea8eaa6e178407405344d"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -438,7 +438,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'openFolder'",
-    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
+    "sha256": "5afad2637e9d4c91e7d506809eb6e20c7d45464496cea8eaa6e178407405344d"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -485,7 +485,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "quickOpen(): void",
-    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
+    "sha256": "5afad2637e9d4c91e7d506809eb6e20c7d45464496cea8eaa6e178407405344d"
    },
    "verifier": {
     "file": "tests/e2e/app-navigation.spec.ts",
@@ -606,7 +606,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'save'",
-    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
+    "sha256": "5afad2637e9d4c91e7d506809eb6e20c7d45464496cea8eaa6e178407405344d"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -654,7 +654,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'saveAs'",
-    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
+    "sha256": "5afad2637e9d4c91e7d506809eb6e20c7d45464496cea8eaa6e178407405344d"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -804,7 +804,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'reloadFromDisk'",
-    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
+    "sha256": "5afad2637e9d4c91e7d506809eb6e20c7d45464496cea8eaa6e178407405344d"
    },
    "verifier": null,
    "spec": {
@@ -870,7 +870,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'toggleLineEnding'",
-    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
+    "sha256": "5afad2637e9d4c91e7d506809eb6e20c7d45464496cea8eaa6e178407405344d"
    },
    "verifier": {
     "file": "src/app/__tests__/document.test.ts",
@@ -1008,7 +1008,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'print'",
-    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
+    "sha256": "5afad2637e9d4c91e7d506809eb6e20c7d45464496cea8eaa6e178407405344d"
    },
    "verifier": null,
    "spec": {
@@ -1044,7 +1044,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'close'",
-    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
+    "sha256": "5afad2637e9d4c91e7d506809eb6e20c7d45464496cea8eaa6e178407405344d"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -1138,7 +1138,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'undo'",
-    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
+    "sha256": "5afad2637e9d4c91e7d506809eb6e20c7d45464496cea8eaa6e178407405344d"
    },
    "verifier": {
     "file": "tests/e2e/core-cases.ts",
@@ -1183,7 +1183,7 @@
    "owner": {
     "path": "src/editor/core/clipboard.ts",
     "anchor": "export function onPaste",
-    "sha256": "65b3db5f93909732c2b36fd57c5d700ce46710e32f5a8bf2318da893a105213e"
+    "sha256": "fac7f784323bc11a52655ae051ce09f57a1667735ffc9dd27a07be34fffbd864"
    },
    "verifier": {
     "file": "tests/e2e/core-cases.ts",
@@ -1228,7 +1228,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "case 'selectAll'",
-    "sha256": "9f48c57f6b20db96d997d06c25f2824c2898335e6fd4774b10a794df30062f20"
+    "sha256": "314f28395969534314fd269af6e9e97773a61c5aa0f3f0c4b9f251ba82fdac10"
    },
    "verifier": {
     "file": "tests/e2e/blocks-core.spec.ts",
@@ -1265,7 +1265,7 @@
    "owner": {
     "path": "src/app/findbar.ts",
     "anchor": "caseSensitive",
-    "sha256": "54d79dcdc1a566f1e511c082614748282d18f8263370eca6b18b6341b0924bff"
+    "sha256": "46493f9739a703f4aef1b1ef0c7ba418351b0c51ebfaacdd2d6a81bae017125b"
    },
    "verifier": {
     "file": "tests/e2e/app-navigation.spec.ts",
@@ -1310,11 +1310,19 @@
    "obligation_id": "typora.menu.edit.find-options",
    "id": "menu.edit.find-options",
    "title": "Find options: whole word and regular expression",
-   "status": "missing",
+   "status": "partial",
    "priority": "P1",
    "epic": "clipboard",
-   "owner": null,
-   "verifier": null,
+   "owner": {
+    "path": "src/editor/core/query.ts",
+    "anchor": "export function compileQuery",
+    "sha256": "8d4d9fe46f582d1249982941aded25c198eeb5825a86e9d9822155b630d35265"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-clipboard.spec.ts",
+    "test": "menu.edit.find-options: Find options: whole word and regular expression",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [],
     "panel": [
@@ -1325,13 +1333,14 @@
     "bridge": [],
     "prose": []
    },
-   "note": "only Match Case exists",
+   "note": "Match Case / Whole Word / Regular Expression ($1 replacement) done; no In Selection",
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
    ],
    "coverage_claim_qualified": false
   },
@@ -1339,11 +1348,19 @@
    "obligation_id": "typora.menu.edit.copy-as",
    "id": "menu.edit.copy-as",
    "title": "Edit › Copy as Markdown / HTML Code / Plain Text / without Theme Styling / to MS Word",
-   "status": "missing",
-   "priority": "P0",
+   "status": "owned",
+   "priority": null,
    "epic": "clipboard",
-   "owner": null,
-   "verifier": null,
+   "owner": {
+    "path": "src/editor/core/copy-as.ts",
+    "anchor": "export function copyAs",
+    "sha256": "6ff9a5571006fdb7564ae9250deccc7c23274660b9d7c3ca94fbdab85a847f7f"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-clipboard.spec.ts",
+    "test": "menu.edit.copy-as: Edit › Copy as Markdown / HTML Code / Plain Text / without Theme Styling / to MS Word",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [
      "Copy / Paste As",
@@ -1370,23 +1387,32 @@
    },
    "note": null,
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.menu.edit.paste-plain",
    "id": "menu.edit.paste-plain",
    "title": "Edit › Paste as Plain Text",
-   "status": "missing",
-   "priority": "P0",
+   "status": "owned",
+   "priority": null,
    "epic": "clipboard",
-   "owner": null,
-   "verifier": null,
+   "owner": {
+    "path": "src/editor/core/copy-as.ts",
+    "anchor": "export function pastePlain",
+    "sha256": "6ff9a5571006fdb7564ae9250deccc7c23274660b9d7c3ca94fbdab85a847f7f"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-clipboard.spec.ts",
+    "test": "menu.edit.paste-plain: Edit › Paste as Plain Text",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [
      "Paste as Plain Text"
@@ -1401,23 +1427,32 @@
    },
    "note": null,
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.menu.edit.select-scopes",
    "id": "menu.edit.select-scopes",
    "title": "Edit › Selection: Select Word / Line-Sentence / Paragraph-Block / Styled Scope",
-   "status": "missing",
-   "priority": "P0",
+   "status": "owned",
+   "priority": null,
    "epic": "clipboard",
-   "owner": null,
-   "verifier": null,
+   "owner": {
+    "path": "src/editor/core/scopes.ts",
+    "anchor": "export function selectScope",
+    "sha256": "286e214ea35f0b36d39deb847841b2ca44d459ea1115119d140e4eb143c4fa40"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-clipboard.spec.ts",
+    "test": "menu.edit.select-scopes: Edit › Selection",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [
      "Selection",
@@ -1432,23 +1467,32 @@
    },
    "note": null,
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.menu.edit.delete-scopes",
    "id": "menu.edit.delete-scopes",
    "title": "Edit › Delete Word / Line-Sentence / Paragraph-Block / Styled Scope / Range",
-   "status": "missing",
-   "priority": "P0",
+   "status": "owned",
+   "priority": null,
    "epic": "clipboard",
-   "owner": null,
-   "verifier": null,
+   "owner": {
+    "path": "src/editor/core/scopes.ts",
+    "anchor": "export function deleteScope",
+    "sha256": "286e214ea35f0b36d39deb847841b2ca44d459ea1115119d140e4eb143c4fa40"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-clipboard.spec.ts",
+    "test": "menu.edit.delete-scopes: Edit › Delete Word",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [
      "Delete Word",
@@ -1463,29 +1507,30 @@
    },
    "note": null,
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.menu.edit.jump",
    "id": "menu.edit.jump",
    "title": "Edit › Jump To: Top / Bottom / Selection",
-   "status": "partial",
-   "priority": "P1",
+   "status": "owned",
+   "priority": null,
    "epic": "clipboard",
    "owner": {
-    "path": "src/editor/core/input.ts",
-    "anchor": "ArrowUp",
-    "sha256": "a0ad23dd52647fefd20625d4308b54564ca0b96a696456cf7e2b27a271985d57"
+    "path": "src/editor/core/scopes.ts",
+    "anchor": "export function jumpTo",
+    "sha256": "286e214ea35f0b36d39deb847841b2ca44d459ea1115119d140e4eb143c4fa40"
    },
    "verifier": {
-    "file": "tests/e2e/core-nav-keys.spec.ts",
-    "test": "doc start lands after the heading marker",
+    "file": "tests/e2e/parity-clipboard.spec.ts",
+    "test": "menu.edit.jump: Edit › Jump To: Top / Bottom / Selection",
     "kind": "e2e"
    },
    "spec": {
@@ -1499,16 +1544,16 @@
     "bridge": [],
     "prose": []
    },
-   "note": "Cmd+↑/↓ work; no menu items, no Jump to Selection",
+   "note": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-case",
-    "missing-verifier",
     "static-only",
-    "weak-original-case-authority"
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.menu.edit.spelling",
@@ -1675,7 +1720,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "case 'heading'",
-    "sha256": "9f48c57f6b20db96d997d06c25f2824c2898335e6fd4774b10a794df30062f20"
+    "sha256": "314f28395969534314fd269af6e9e97773a61c5aa0f3f0c4b9f251ba82fdac10"
    },
    "verifier": {
     "file": "tests/e2e/app-navigation.spec.ts",
@@ -1719,7 +1764,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "case 'headingLevel'",
-    "sha256": "9f48c57f6b20db96d997d06c25f2824c2898335e6fd4774b10a794df30062f20"
+    "sha256": "314f28395969534314fd269af6e9e97773a61c5aa0f3f0c4b9f251ba82fdac10"
    },
    "verifier": {
     "file": "tests/e2e/parity-core-cmds.spec.ts",
@@ -1756,7 +1801,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "case 'table'",
-    "sha256": "9f48c57f6b20db96d997d06c25f2824c2898335e6fd4774b10a794df30062f20"
+    "sha256": "314f28395969534314fd269af6e9e97773a61c5aa0f3f0c4b9f251ba82fdac10"
    },
    "verifier": {
     "file": "tests/e2e/core-cases.ts",
@@ -1802,7 +1847,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "case 'math'",
-    "sha256": "9f48c57f6b20db96d997d06c25f2824c2898335e6fd4774b10a794df30062f20"
+    "sha256": "314f28395969534314fd269af6e9e97773a61c5aa0f3f0c4b9f251ba82fdac10"
    },
    "verifier": {
     "file": "tests/e2e/blocks-widgets.spec.ts",
@@ -1844,7 +1889,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "case 'code'",
-    "sha256": "9f48c57f6b20db96d997d06c25f2824c2898335e6fd4774b10a794df30062f20"
+    "sha256": "314f28395969534314fd269af6e9e97773a61c5aa0f3f0c4b9f251ba82fdac10"
    },
    "verifier": {
     "file": "tests/e2e/core-cases.ts",
@@ -1887,7 +1932,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "case 'html'",
-    "sha256": "9f48c57f6b20db96d997d06c25f2824c2898335e6fd4774b10a794df30062f20"
+    "sha256": "314f28395969534314fd269af6e9e97773a61c5aa0f3f0c4b9f251ba82fdac10"
    },
    "verifier": {
     "file": "tests/e2e/parity-core-cmds.spec.ts",
@@ -1925,7 +1970,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "case 'quote'",
-    "sha256": "9f48c57f6b20db96d997d06c25f2824c2898335e6fd4774b10a794df30062f20"
+    "sha256": "314f28395969534314fd269af6e9e97773a61c5aa0f3f0c4b9f251ba82fdac10"
    },
    "verifier": {
     "file": "tests/e2e/core-qa.spec.ts",
@@ -2007,7 +2052,7 @@
    "owner": {
     "path": "src/editor/core/input.ts",
     "anchor": "Tab",
-    "sha256": "a0ad23dd52647fefd20625d4308b54564ca0b96a696456cf7e2b27a271985d57"
+    "sha256": "293e588ca7d10d2a7fd984b6221bc75cf96ab2f2cd05d2d71c9677b6ecce0a84"
    },
    "verifier": {
     "file": "tests/e2e/core-qa.spec.ts",
@@ -2087,7 +2132,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "case 'linkRef'",
-    "sha256": "9f48c57f6b20db96d997d06c25f2824c2898335e6fd4774b10a794df30062f20"
+    "sha256": "314f28395969534314fd269af6e9e97773a61c5aa0f3f0c4b9f251ba82fdac10"
    },
    "verifier": {
     "file": "tests/e2e/parity-core-cmds.spec.ts",
@@ -2164,7 +2209,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "case 'hr'",
-    "sha256": "9f48c57f6b20db96d997d06c25f2824c2898335e6fd4774b10a794df30062f20"
+    "sha256": "314f28395969534314fd269af6e9e97773a61c5aa0f3f0c4b9f251ba82fdac10"
    },
    "verifier": {
     "file": "tests/e2e/core-cases.ts",
@@ -2200,7 +2245,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "case 'toc'",
-    "sha256": "9f48c57f6b20db96d997d06c25f2824c2898335e6fd4774b10a794df30062f20"
+    "sha256": "314f28395969534314fd269af6e9e97773a61c5aa0f3f0c4b9f251ba82fdac10"
    },
    "verifier": {
     "file": "tests/e2e/blocks-widgets.spec.ts",
@@ -2240,7 +2285,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "case 'front_matter'",
-    "sha256": "9f48c57f6b20db96d997d06c25f2824c2898335e6fd4774b10a794df30062f20"
+    "sha256": "314f28395969534314fd269af6e9e97773a61c5aa0f3f0c4b9f251ba82fdac10"
    },
    "verifier": {
     "file": "tests/e2e/parity-core-cmds.spec.ts",
@@ -2276,7 +2321,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "case 'mark'",
-    "sha256": "9f48c57f6b20db96d997d06c25f2824c2898335e6fd4774b10a794df30062f20"
+    "sha256": "314f28395969534314fd269af6e9e97773a61c5aa0f3f0c4b9f251ba82fdac10"
    },
    "verifier": {
     "file": "tests/e2e/app-navigation.spec.ts",
@@ -2322,7 +2367,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "underline: ['<u>', '</u>']",
-    "sha256": "9f48c57f6b20db96d997d06c25f2824c2898335e6fd4774b10a794df30062f20"
+    "sha256": "314f28395969534314fd269af6e9e97773a61c5aa0f3f0c4b9f251ba82fdac10"
    },
    "verifier": {
     "file": "tests/e2e/parity-core-cmds.spec.ts",
@@ -2358,7 +2403,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "math: ['$', '$']",
-    "sha256": "9f48c57f6b20db96d997d06c25f2824c2898335e6fd4774b10a794df30062f20"
+    "sha256": "314f28395969534314fd269af6e9e97773a61c5aa0f3f0c4b9f251ba82fdac10"
    },
    "verifier": {
     "file": "tests/e2e/parity-core-cmds.spec.ts",
@@ -2394,7 +2439,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "sub: ['<sub>', '</sub>']",
-    "sha256": "9f48c57f6b20db96d997d06c25f2824c2898335e6fd4774b10a794df30062f20"
+    "sha256": "314f28395969534314fd269af6e9e97773a61c5aa0f3f0c4b9f251ba82fdac10"
    },
    "verifier": {
     "file": "tests/e2e/parity-core-cmds.spec.ts",
@@ -2431,7 +2476,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "comment: ['<!-- ', ' -->']",
-    "sha256": "9f48c57f6b20db96d997d06c25f2824c2898335e6fd4774b10a794df30062f20"
+    "sha256": "314f28395969534314fd269af6e9e97773a61c5aa0f3f0c4b9f251ba82fdac10"
    },
    "verifier": {
     "file": "tests/e2e/parity-core-cmds.spec.ts",
@@ -2467,7 +2512,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "case 'mark'",
-    "sha256": "9f48c57f6b20db96d997d06c25f2824c2898335e6fd4774b10a794df30062f20"
+    "sha256": "314f28395969534314fd269af6e9e97773a61c5aa0f3f0c4b9f251ba82fdac10"
    },
    "verifier": {
     "file": "tests/e2e/core-cases.ts",
@@ -2539,7 +2584,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "case 'insertImage'",
-    "sha256": "9f48c57f6b20db96d997d06c25f2824c2898335e6fd4774b10a794df30062f20"
+    "sha256": "314f28395969534314fd269af6e9e97773a61c5aa0f3f0c4b9f251ba82fdac10"
    },
    "verifier": null,
    "spec": {
@@ -2580,7 +2625,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'toggleSource'",
-    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
+    "sha256": "5afad2637e9d4c91e7d506809eb6e20c7d45464496cea8eaa6e178407405344d"
    },
    "verifier": {
     "file": "tests/e2e/core-cases.ts",
@@ -2626,7 +2671,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'toggleFocus'",
-    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
+    "sha256": "5afad2637e9d4c91e7d506809eb6e20c7d45464496cea8eaa6e178407405344d"
    },
    "verifier": {
     "file": "tests/e2e/app-navigation.spec.ts",
@@ -2670,7 +2715,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'toggleSidebar'",
-    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
+    "sha256": "5afad2637e9d4c91e7d506809eb6e20c7d45464496cea8eaa6e178407405344d"
    },
    "verifier": {
     "file": "tests/e2e/app-navigation.spec.ts",
@@ -2772,7 +2817,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'zoomIn'",
-    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
+    "sha256": "5afad2637e9d4c91e7d506809eb6e20c7d45464496cea8eaa6e178407405344d"
    },
    "verifier": null,
    "spec": {
@@ -2811,7 +2856,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "PredefinedMenuItem::fullscreen",
-    "sha256": "ecd950a3a5803059c4cedf85bfa26757c84b84207f057faf452b633872906bbf"
+    "sha256": "ccd7b0c7de21aa97c1bbfa43967f48b693ba3e2445446ea8d311f1a9bfd9081d"
    },
    "verifier": null,
    "spec": {
@@ -2929,7 +2974,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "THEMES_SUBMENU_ID",
-    "sha256": "ecd950a3a5803059c4cedf85bfa26757c84b84207f057faf452b633872906bbf"
+    "sha256": "ccd7b0c7de21aa97c1bbfa43967f48b693ba3e2445446ea8d311f1a9bfd9081d"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -2971,7 +3016,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'openThemesFolder'",
-    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
+    "sha256": "5afad2637e9d4c91e7d506809eb6e20c7d45464496cea8eaa6e178407405344d"
    },
    "verifier": null,
    "spec": {
@@ -3063,7 +3108,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "PredefinedMenuItem::minimize",
-    "sha256": "ecd950a3a5803059c4cedf85bfa26757c84b84207f057faf452b633872906bbf"
+    "sha256": "ccd7b0c7de21aa97c1bbfa43967f48b693ba3e2445446ea8d311f1a9bfd9081d"
    },
    "verifier": null,
    "spec": {
@@ -3097,7 +3142,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "ID_HELP_MARKDOWN",
-    "sha256": "ecd950a3a5803059c4cedf85bfa26757c84b84207f057faf452b633872906bbf"
+    "sha256": "ccd7b0c7de21aa97c1bbfa43967f48b693ba3e2445446ea8d311f1a9bfd9081d"
    },
    "verifier": null,
    "spec": {
@@ -3875,7 +3920,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "private async storeImage(",
-    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
+    "sha256": "5afad2637e9d4c91e7d506809eb6e20c7d45464496cea8eaa6e178407405344d"
    },
    "verifier": {
     "file": "src/platform/web.test.ts",
@@ -5045,7 +5090,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "private async export(",
-    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
+    "sha256": "5afad2637e9d4c91e7d506809eb6e20c7d45464496cea8eaa6e178407405344d"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -5709,7 +5754,7 @@
    "owner": {
     "path": "src/editor/core/input.ts",
     "anchor": "beforeinput",
-    "sha256": "a0ad23dd52647fefd20625d4308b54564ca0b96a696456cf7e2b27a271985d57"
+    "sha256": "293e588ca7d10d2a7fd984b6221bc75cf96ab2f2cd05d2d71c9677b6ecce0a84"
    },
    "verifier": {
     "file": "tests/e2e/core-qa.spec.ts",
@@ -5745,7 +5790,7 @@
    "owner": {
     "path": "src/editor/core/input.ts",
     "anchor": "compositionend",
-    "sha256": "a0ad23dd52647fefd20625d4308b54564ca0b96a696456cf7e2b27a271985d57"
+    "sha256": "293e588ca7d10d2a7fd984b6221bc75cf96ab2f2cd05d2d71c9677b6ecce0a84"
    },
    "verifier": {
     "file": "tests/e2e/core-cases.ts",
@@ -5854,7 +5899,7 @@
    "owner": {
     "path": "src/editor/core/find.ts",
     "anchor": "export function",
-    "sha256": "af012085c36cc333d7ccaa6a01a450bb1542ecaf35cc3d818c960efd0bf05bff"
+    "sha256": "d49a015926c2c79a012dda74d089ad868ed526f5d89dbff064df9e75dcb283a9"
    },
    "verifier": {
     "file": "tests/e2e/core-widget-find.spec.ts",
@@ -6057,7 +6102,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "setDocumentEdited",
-    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
+    "sha256": "5afad2637e9d4c91e7d506809eb6e20c7d45464496cea8eaa6e178407405344d"
    },
    "verifier": null,
    "spec": {
@@ -6089,7 +6134,7 @@
    "owner": {
     "path": "src-tauri/src/lib.rs",
     "anchor": "on_second_instance",
-    "sha256": "1d4abc67157d4a81271686617bf57eed558ee731afee52177b87563787bfcec1"
+    "sha256": "5a6217a262aa913b4ae39673666bf390ffb83819b89721adb20f91fbed857b96"
    },
    "verifier": null,
    "spec": {
@@ -6218,7 +6263,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "applyAppearance",
-    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
+    "sha256": "5afad2637e9d4c91e7d506809eb6e20c7d45464496cea8eaa6e178407405344d"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -6286,17 +6331,17 @@
    "obligation_id": "typora.beh.clip.rich-copy",
    "id": "beh.clip.rich-copy",
    "title": "Rich copy writes plain + HTML + RTF + private format",
-   "status": "partial",
-   "priority": "P0",
+   "status": "owned",
+   "priority": null,
    "epic": "clipboard",
    "owner": {
     "path": "src/editor/core/clipboard.ts",
-    "anchor": "MARGIN_HTML_ATTR",
-    "sha256": "65b3db5f93909732c2b36fd57c5d700ce46710e32f5a8bf2318da893a105213e"
+    "anchor": "export function onCopy",
+    "sha256": "fac7f784323bc11a52655ae051ce09f57a1667735ffc9dd27a07be34fffbd864"
    },
    "verifier": {
-    "file": "tests/e2e/core-cases.ts",
-    "test": "paste HTML becomes markdown; copy gives markdown",
+    "file": "tests/e2e/parity-clipboard.spec.ts",
+    "test": "beh.clip.rich-copy: Rich copy writes plain + HTML + RTF + private format",
     "kind": "e2e"
    },
    "spec": {
@@ -6309,26 +6354,34 @@
      "clipboard-contextmenu §9"
     ]
    },
-   "note": "#79: no RTF/RTFD flavors",
+   "note": "RTF on macOS via clipboard_write_rich (#79); RTFD / webarchive flavours not written",
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-case",
-    "missing-verifier",
     "static-only",
-    "weak-original-case-authority"
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.beh.clip.rtf-paste",
    "id": "beh.clip.rtf-paste",
    "title": "Paste RTF/RTFD from rich apps (attachments materialized)",
-   "status": "missing",
+   "status": "partial",
    "priority": "P2",
    "epic": "clipboard",
-   "owner": null,
-   "verifier": null,
+   "owner": {
+    "path": "src-tauri/src/clipboard_read.rs",
+    "anchor": "pub fn rtf_to_html",
+    "sha256": "88d1e56a773345d9d4e88d43d7f07fe82508514e030e8ba8a25cde698bbe74cf"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-clipboard.spec.ts",
+    "test": "beh.clip.rtf-paste: Paste RTF/RTFD from rich apps",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [],
     "panel": [],
@@ -6338,13 +6391,14 @@
      "clipboard-contextmenu §9"
     ]
    },
-   "note": null,
+   "note": "RTF/RTFD text+formatting converted natively (NSAttributedString, macOS); RTFD image attachments not materialized",
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
    ],
    "coverage_claim_qualified": false
   },

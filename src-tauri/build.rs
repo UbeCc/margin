@@ -38,6 +38,7 @@ const COMMANDS: &[&str] = &[
     "pandoc_detect",
     "pandoc_export",
     "clipboard_write_rich",
+    "clipboard_read",
 ];
 
 fn main() {
