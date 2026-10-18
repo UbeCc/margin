@@ -138,9 +138,9 @@ pub fn run(bin: &Path, args: &[String], input: Option<String>, cwd: Option<&Path
     if let Some(d) = cwd {
         cmd.current_dir(d);
     }
-    // ETXTBSY (26): the binary was just written and another thread's fork still holds
-    // a write fd until its exec (a classic Linux race, e.g. parallel tests or a
-    // package manager updating pandoc). It clears within milliseconds: retry briefly.
+    // ETXTBSY: a just-written executable can still have a writable fd open in a child
+    // that another thread forked but hasn't exec'd yet (fd inherited until CLOEXEC fires).
+    // It clears within milliseconds, so retry briefly instead of failing the export.
     let mut spawned = cmd.spawn();
     for _ in 0..20 {
         match &spawned {
