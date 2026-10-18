@@ -1,4 +1,4 @@
-import type { AppSettings, ImageRule } from '../contracts';
+import { DEFAULT_MARKDOWN_OPTIONS, type AppSettings, type ImageRule, type MarkdownOptions } from '../contracts';
 import { DEFAULT_SORT, isSortOrder, type SortOrder } from './sidebar/sort';
 import { DEFAULT_EXPORT, migrateExportSettings, type ExportSettings } from './export-settings';
 
@@ -41,9 +41,53 @@ export interface MarginSettings extends AppSettings {
   export: ExportSettings;
   /** Pandoc binary (or its folder) for docx/latex/epub export; '' = auto-detect (#81). */
   pandocPath: string;
+  // ---- #100 Preferences completeness
+  /** General › On Launch. */
+  onLaunch: OnLaunch;
+  /** Folder opened on launch when `onLaunch === 'customFolder'`. */
+  defaultFolder: string;
+  /** Quit the app when the last window closes (desktop; applied after restart). */
+  quitOnLastWindowClose: boolean;
+  /** UI language ('auto' = based on current OS). Only English strings ship today. */
+  language: string;
+  /** Files › Default Line Ending for new files. */
+  defaultLineEnding: 'auto' | 'lf' | 'crlf';
+  /** Remap Unicode punctuation on parse (#102; persisted, see PR notes). */
+  remapPunctuation: boolean;
+  /** Appearance › Window Style (desktop, applied after restart). */
+  windowStyle: 'seamless' | 'unibody' | 'native';
+  /** Appearance › Text Column Width in px; 0 = theme default. */
+  textColumnWidth: number;
+  showOutlineByDefault: boolean;
+  collapsibleOutline: boolean;
+  /** Advanced › custom shortcut keys: command id → accelerator (e.g. "Mod+Shift+K"). */
+  keyBinding: Record<string, string>;
+  /** Markdown / Editor options forwarded to the editing core (#102). */
+  markdown: MarkdownOptions;
 }
 
-export const SETTINGS_VERSION = 2;
+export type OnLaunch = 'newFile' | 'restoreAll' | 'restoreFolders' | 'customFolder';
+export const ON_LAUNCH: readonly OnLaunch[] = ['restoreAll', 'restoreFolders', 'newFile', 'customFolder'];
+
+export const SETTINGS_VERSION = 3;
+
+/**
+ * Typora's fresh-install Markdown / Editor defaults (typora-re fe-preferences §2, §5, §7):
+ * inline math / sub / sup / highlight off, strict mode on, display-source-on-focus off,
+ * no automatic equation numbering. Emoji shortcodes are always on in Typora.
+ * Installs that predate #102 keep `DEFAULT_MARKDOWN_OPTIONS` (what Margin rendered before).
+ */
+export const TYPORA_MARKDOWN_DEFAULTS: Readonly<MarkdownOptions> = Object.freeze({
+  ...DEFAULT_MARKDOWN_OPTIONS,
+  highlight: false,
+  inlineMath: false,
+  subscript: false,
+  superscript: false,
+  emoji: true,
+  strict: true,
+  expandSimpleBlock: false,
+  mathNumbering: 'none',
+});
 
 export const DEFAULT_SETTINGS: Readonly<MarginSettings> = Object.freeze({
   settingsVersion: SETTINGS_VERSION,
@@ -74,9 +118,21 @@ export const DEFAULT_SETTINGS: Readonly<MarginSettings> = Object.freeze({
   fileSearchWholeWord: false,
   fileSearchUseRegexp: false,
   outlineCollapsible: false,
-  restoreLastFolder: true,
+  restoreLastFolder: false,
   export: DEFAULT_EXPORT,
   pandocPath: '',
+  onLaunch: 'newFile',
+  defaultFolder: '',
+  quitOnLastWindowClose: false,
+  language: 'auto',
+  defaultLineEnding: 'auto',
+  remapPunctuation: false,
+  windowStyle: 'seamless',
+  textColumnWidth: 0,
+  showOutlineByDefault: false,
+  collapsibleOutline: false,
+  keyBinding: {},
+  markdown: { ...TYPORA_MARKDOWN_DEFAULTS },
 });
 
 export const MAX_RECENT = 15;
@@ -130,6 +186,9 @@ export function migrateSettings(input: unknown): MarginSettings {
   if (raw.autoSave === undefined && raw.autosave !== undefined) raw.autoSave = raw.autosave;
   if (raw.imageRule === undefined && raw.imageFolder !== undefined) raw.imageRule = raw.imageFolder;
 
+  // v2 "restoreLastFolder" boolean → onLaunch (#100).
+  if (raw.onLaunch === undefined && raw.restoreLastFolder === true) raw.onLaunch = 'restoreFolders';
+  const onLaunch = (ON_LAUNCH as unknown[]).includes(raw.onLaunch) ? (raw.onLaunch as OnLaunch) : d.onLaunch;
   const scheme = raw.colorScheme;
   const tab = raw.sidebarTab;
   return {
@@ -162,10 +221,70 @@ export function migrateSettings(input: unknown): MarginSettings {
     fileSearchWholeWord: bool(raw.fileSearchWholeWord, d.fileSearchWholeWord),
     fileSearchUseRegexp: bool(raw.fileSearchUseRegexp, d.fileSearchUseRegexp),
     outlineCollapsible: bool(raw.outlineCollapsible, d.outlineCollapsible),
-    restoreLastFolder: bool(raw.restoreLastFolder, d.restoreLastFolder),
+    restoreLastFolder: onLaunch === 'restoreAll' || onLaunch === 'restoreFolders',
     export: migrateExportSettings(raw.export),
     pandocPath: typeof raw.pandocPath === 'string' ? raw.pandocPath.trim() : '',
+    onLaunch,
+    defaultFolder: typeof raw.defaultFolder === 'string' ? raw.defaultFolder.trim() : '',
+    quitOnLastWindowClose: bool(raw.quitOnLastWindowClose, d.quitOnLastWindowClose),
+    language: str(raw.language, d.language),
+    defaultLineEnding: oneOf(raw.defaultLineEnding, ['auto', 'lf', 'crlf'] as const, d.defaultLineEnding),
+    remapPunctuation: bool(raw.remapPunctuation, d.remapPunctuation),
+    windowStyle: oneOf(raw.windowStyle, ['seamless', 'unibody', 'native'] as const, d.windowStyle),
+    textColumnWidth: columnWidth(raw.textColumnWidth),
+    showOutlineByDefault: bool(raw.showOutlineByDefault, d.showOutlineByDefault),
+    collapsibleOutline: bool(raw.collapsibleOutline, d.collapsibleOutline),
+    keyBinding: keyBinding(raw.keyBinding),
+    // An existing (pre-#102) install has a settingsVersion but no markdown block: keep its rendering.
+    markdown: migrateMarkdown(raw.markdown, raw.markdown === undefined && typeof input === 'object' && input !== null && 'settingsVersion' in input ? DEFAULT_MARKDOWN_OPTIONS : TYPORA_MARKDOWN_DEFAULTS),
   };
+}
+
+/**
+ * General › On Launch (#100): what to open at startup. Restored / custom targets win;
+ * `opts` (the web demo folder and file) is the fallback when nothing is restored.
+ */
+export function launchPlan(
+  s: Pick<MarginSettings, 'onLaunch' | 'defaultFolder' | 'lastFolder' | 'recentFiles'>,
+  opts: { initialFolder?: string | null; initialFile?: string | null } = {},
+): { folder: string | null; file: string | null } {
+  const pref =
+    s.onLaunch === 'customFolder' ? s.defaultFolder || null : s.onLaunch === 'restoreAll' || s.onLaunch === 'restoreFolders' ? s.lastFolder : null;
+  const lastFile = s.onLaunch === 'restoreAll' ? (s.recentFiles[0] ?? null) : null;
+  return { folder: pref || opts.initialFolder || null, file: lastFile ?? opts.initialFile ?? null };
+}
+
+/** 0 (theme default) or 400–3000 px. */
+function columnWidth(v: unknown): number {
+  const n = Math.round(num(v, 0, 0, 3000));
+  return n < 400 ? 0 : n;
+}
+
+function oneOf<T extends string>(v: unknown, opts: readonly T[], d: T): T {
+  return (opts as readonly unknown[]).includes(v) ? (v as T) : d;
+}
+
+function keyBinding(v: unknown): Record<string, string> {
+  if (!isObj(v)) return {};
+  const out: Record<string, string> = {};
+  for (const [k, x] of Object.entries(v)) if (typeof x === 'string' && k) out[k] = x.trim();
+  return out;
+}
+
+/** Validate the nested Markdown options; unknown / malformed fields fall back to defaults. */
+export function migrateMarkdown(v: unknown, d: Readonly<MarkdownOptions> = TYPORA_MARKDOWN_DEFAULTS): MarkdownOptions {
+  const raw: Raw = isObj(v) ? v : {};
+  const out = { ...d } as MarkdownOptions;
+  for (const k of Object.keys(d) as (keyof MarkdownOptions)[]) {
+    const dv = d[k];
+    if (typeof dv === 'boolean') (out as unknown as Raw)[k] = bool(raw[k], dv);
+  }
+  out.ulStyle = oneOf(raw.ulStyle, ['-', '*', '+'] as const, d.ulStyle);
+  out.olStyle = oneOf(raw.olStyle, ['increment', 'ones'] as const, d.olStyle);
+  const ci = Number(raw.codeIndentSize);
+  out.codeIndentSize = ci === 0 || ci === 2 || ci === 3 || ci === 4 ? ci : d.codeIndentSize;
+  out.mathNumbering = oneOf(raw.mathNumbering, ['all', 'ams', 'none'] as const, d.mathNumbering);
+  return out;
 }
 
 /** Move `item` to the front of a recent list (dedup, capped). */
@@ -187,4 +306,9 @@ export function imageRulePresetId(rule: ImageRule): string {
   if (rule.dir === './${filename}.assets') return 'filename';
   if (rule.dir === './assets') return 'assets';
   return 'custom';
+}
+
+/** Files › Default Line Ending: "Auto ( Recommended )" follows the OS (#100). */
+export function newFileEol(pref: MarginSettings['defaultLineEnding'], windows = /Win/i.test(navigator.platform || '')): '\n' | '\r\n' {
+  return pref === 'crlf' || (pref === 'auto' && windows) ? '\r\n' : '\n';
 }

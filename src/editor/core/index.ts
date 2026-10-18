@@ -14,6 +14,7 @@ import { docHTML } from './html';
 import { countStats, plainText } from './query';
 import { registry, type SourceModeLike } from './registry';
 import { isTextLeaf } from './edit';
+import { setSyntaxOptions } from './parser/options';
 
 export { registerWidget, registerInlineMath, registerSourceMode, registerFenceRouter } from './registry';
 export type { FenceRouter, SourceModeFactoryLike, SourceModeLike } from './registry';
@@ -56,6 +57,7 @@ const offsetOfLine = (text: string, line: number) => {
 };
 
 export function createEditor(host: HTMLElement, settings: EditorSettings): EditorHandle {
+  setSyntaxOptions(settings.markdown);
   const ed = new EditorCore(host, { ...settings });
   const detach = attachInput(ed);
   let source: { inst: SourceModeLike; el: HTMLElement } | null = null;
@@ -208,11 +210,20 @@ export function createEditor(host: HTMLElement, settings: EditorSettings): Edito
     isSourceMode: () => !!source,
     updateSettings(patch) {
       const assets = 'resolveAsset' in patch || 'baseDir' in patch;
+      if (patch.markdown) patch = { ...patch, markdown: { ...ed.settings.markdown, ...patch.markdown } };
+      // #102: parser-relevant syntax options re-parse the (unchanged) source and re-render everything.
+      const reparse = setSyntaxOptions(patch.markdown);
       Object.assign(ed.settings, patch);
       ed.applyModes();
       ed.view.updateSettings(ed.settings);
       source?.inst.updateSettings?.(ed.settings);
-      if (assets) ed.view.sync(true);
+      if (reparse && !source) {
+        const focused = ed.root.contains(document.activeElement);
+        const sel = ed.readSel() ?? ed.lastSel;
+        ed.doc.reparse(ed.doc.text());
+        ed.view.sync(true);
+        if (sel && focused) ed.setSel(sel, false);
+      } else if (assets) ed.view.sync(true);
     },
     renderHTML() {
       if (source) {

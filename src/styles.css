@@ -228,7 +228,7 @@ button { cursor: default; }
 .editor-scroll { flex: 1; overflow: auto; scroll-behavior: auto; scrollbar-gutter: stable; }
 .editor-page { min-height: 100%; padding: 32px 56px 0; }
 .editor-host {
-  max-width: var(--margin-doc-width);
+  max-width: var(--margin-column-width, var(--margin-doc-width));
   margin: 0 auto;
   padding-bottom: 40vh;
   min-height: 100%;
@@ -437,6 +437,12 @@ button { cursor: default; }
 .pref-block { padding: 12px 0; }
 .pref-actions { padding-top: 14px; display: flex; gap: 8px; }
 .pref-note { font-size: 11.5px; color: var(--margin-fg-muted); line-height: 1.5; }
+.pref-panel { max-height: min(70vh, 640px); overflow-y: auto; }
+.pref-group { display: flex; flex-direction: column; padding-top: 6px; }
+.pref-group-title { margin: 14px 0 2px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--margin-fg-muted); }
+.pref-group .radio-group { padding: 6px 0; }
+.pref-actions { flex-wrap: wrap; }
+.pref-label { max-width: 360px; }
 .pref-subhead { margin: 18px 0 2px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--margin-fg-muted); }
 .pref-subhead:first-child { margin-top: 0; }
 .pref-section[data-section='export'] .text-input { width: 240px; }

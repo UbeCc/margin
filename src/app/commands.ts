@@ -11,6 +11,7 @@ export type AppCommand =
   | 'reloadFromDisk'
   | 'openThemesFolder'
   | 'toggleLineEnding'
+  | 'toggleFinalNewline'
   | 'uploadAllImages';
 
 export type CommandId = MenuAction | AppCommand;
@@ -174,6 +175,7 @@ export const COMMANDS: CommandSpec[] = [
   { id: 'clearRecent', label: 'Clear Recent Files', category: 'File' },
   { id: 'zoomReset', label: 'Actual Size', category: 'View', keys: ['Mod+Shift+0'] },
   { id: 'toggleLineEnding', label: 'Toggle Line Endings (LF / CRLF)', category: 'View' },
+  { id: 'toggleFinalNewline', label: 'Insert Final New Line On Save', category: 'Edit' },
   { id: 'openThemesFolder', label: 'Open Themes Folder', category: 'Theme' },
   { id: 'uploadAllImages', label: 'Upload All Local Images', category: 'Format' },
   // #99 Format › Image (per-image entries act on the image at the caret)
@@ -226,8 +228,32 @@ const PARSED: { spec: CommandSpec; keys: ParsedShortcut[] }[] = COMMANDS.filter(
   keys: spec.keys!.map(parseShortcut),
 }));
 
+let CUSTOM: { spec: CommandSpec; keys: ParsedShortcut[] }[] = [];
+
+/**
+ * Preferences › Custom Shortcut Keys (#100): `{ "<command id or label>": "Mod+Shift+K" }`
+ * (several keys separated by ","). Custom keys win over built-in ones; an empty string
+ * leaves the default. Returns the entries that could not be resolved.
+ */
+export function setCustomKeys(map: Record<string, string>): string[] {
+  const bad: string[] = [];
+  CUSTOM = [];
+  for (const [name, accel] of Object.entries(map)) {
+    if (!accel.trim()) continue;
+    const spec = BY_ID.get(name as CommandId) ?? COMMANDS.find((c) => c.label.toLowerCase() === name.trim().toLowerCase());
+    const keys = accel.split(',').map((k) => k.trim()).filter(Boolean);
+    if (!spec || !keys.length) {
+      bad.push(name);
+      continue;
+    }
+    CUSTOM.push({ spec, keys: keys.map(parseShortcut) });
+  }
+  return bad;
+}
+
 /** Find the command bound to a key event, if any. */
 export function commandForKey(e: KeyLike, mac = isMac): CommandSpec | null {
+  for (const { spec, keys } of CUSTOM) if (keys.some((k) => matchShortcut(e, k, mac))) return { ...spec, passthrough: false };
   for (const { spec, keys } of PARSED) if (keys.some((k) => matchShortcut(e, k, mac))) return spec;
   return null;
 }

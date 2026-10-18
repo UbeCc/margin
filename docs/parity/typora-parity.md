@@ -9,14 +9,14 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 | | surfaces |
 |---|---|
 | total | 171 |
-| owned (implemented) | 118 (with a named passing test: 105) |
-| partial | 15 |
-| missing | 30 |
+| owned (implemented) | 128 (with a named passing test: 115) |
+| partial | 16 |
+| missing | 19 |
 | out of scope | 8 |
 
-REA ledger `rol_f8c19f596e09d559b8a8281bb1374b2d95699b235b3f9a99774a8e51e0eb286f` (closure `8c24acfa956b80a6…`): status **unknown**; unowned 30, implemented 133, out-of-scope 8, unknown 5.
+REA ledger `rol_8f4cbfeee84d4e4c8bc503dc91f7287999ba168333d633016883bda33f48db28` (closure `12cb70f5ef638b1a…`): status **unknown**; unowned 19, implemented 144, out-of-scope 8, unknown 5.
 
-REA coverage boundary `margin.typora-parity`: status **unknown**; 105/163 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 30, package-proof-missing 1, verifier-missing 51, verifier-unknown 7.
+REA coverage boundary `margin.typora-parity`: status **unknown**; 115/163 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 19, package-proof-missing 1, verifier-missing 38, verifier-unknown 10.
 
 Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): build exit 0, cargo-test exit 101, independence exit 0, playwright exit 0, vitest exit 0. See `rea/summary.json`.
 
@@ -39,9 +39,9 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `ctx` Editor & sidebar context menus (text, link, table, image, code, math, diagram, outline, files) | P1 | 3 |
 | `tools` Table, code-fence and math tools | P1 | 1 |
 | `images` Image pipeline: insert-local, copy/move/upload, zoom, syntax switch, image root path | P1 | 0 |
-| `prefs` Preferences completeness (General, Editor, Image, Markdown, Export, Appearance panes) | P1 | 8 |
+| `prefs` Preferences completeness (General, Editor, Image, Markdown, Export, Appearance panes) | P1 | 2 |
 | `sidebar` Sidebar & outline: list view, file search, sort, collapsible outline, filter | P1 | 1 |
-| `syntax` Markdown syntax options & whitespace/line-break settings | P2 | 5 |
+| `syntax` Markdown syntax options & whitespace/line-break settings | P2 | 1 |
 | `chrome` Window chrome & writing aids: status bar, always-on-top, spelling, substitutions, speech, emoji | P2 | 9 |
 
 ## Application menu
@@ -93,7 +93,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `menu.edit.select-scopes` | Edit › Selection: Select Word / Line-Sentence / Paragraph-Block / Styled Scope | owned |  | `src/editor/core/scopes.ts` `export function selectScope` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.select-scopes: Edit › Selection | 5 |
 | `menu.edit.delete-scopes` | Edit › Delete Word / Line-Sentence / Paragraph-Block / Styled Scope / Range | owned |  | `src/editor/core/scopes.ts` `export function deleteScope` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.delete-scopes: Edit › Delete Word | 5 |
 | `menu.edit.jump` | Edit › Jump To: Top / Bottom / Selection | owned |  | `src/editor/core/scopes.ts` `export function jumpTo` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.jump: Edit › Jump To: Top / Bottom / Selection | 4 |
-| `menu.edit.spelling` | Edit › Spelling: check while typing, check now, learn/unlearn, grammar, autocorrect — only the WebView spellcheck toggle | **partial** | P2 | `src/app/preferences.ts` `'Check spelling while typing'` | none | 22 |
+| `menu.edit.spelling` | Edit › Spelling: check while typing, check now, learn/unlearn, grammar, autocorrect — only the WebView spellcheck toggle | **partial** | P2 | `src/app/prefs/editor-md.ts` `'Check spelling while typing'` | none | 22 |
 | `menu.edit.substitutions` | Edit › Substitutions: smart quotes/dashes/punctuation, text replacement | **missing** | P2 | — | none | 8 |
 | `menu.edit.speech` | Edit › Speech: Start / Stop Speaking | **missing** | P2 | — | none | 3 |
 | `menu.edit.emoji` | Edit › Emoji and Symbols (system picker) and :emoji: autocomplete | **missing** | P2 | — | none | 6 |
@@ -200,7 +200,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `tools.code.language` | Code fence language box + syntax highlight + copy button | owned |  | `src/editor/blocks/code-fence.ts` `mount` | `tests/e2e/blocks-widgets.spec.ts` › language box edits info string, copy button works | 4 |
 | `tools.code.indent-prettify` | Code tools: Auto Indent Selected/Whole Code, Prettify Source Code — Paragraph › Code Tools (Copy Code Content / Auto Indent); Prettify Source Code is the Table op; Shift+Tab pref not wired | owned |  | `src/editor/blocks/code-fence.ts` `command(op: string)` | `tests/e2e/parity-tools.spec.ts` › tools.code.indent-prettify: | 4 |
 | `tools.code.delete` | Code tools: Delete Code Block — deliberate fix: Typora requests "delete-fences" but its native table is keyed "deleteFences", so the item never shows on macOS; Margin shows it | owned |  | `src/app/ctxmenu/items.ts` `'Delete Code Block'` | `tests/e2e/parity-ctx.spec.ts` › tools.code.delete: | 3 |
-| `tools.code.line-numbers` | Code fences: line numbers, line wrap, indent size | **missing** | P1 | — | none | 8 |
+| `tools.code.line-numbers` | Code fences: line numbers, line wrap, indent size | owned |  | `src/editor/blocks/code-fence.ts` `private applyCodePrefs` | `tests/e2e/parity-prefs.spec.ts` › tools.code.line-numbers: Code fences: line numbers, line wrap, indent size | 8 |
 
 ## Math tools
 
@@ -209,7 +209,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `tools.math.render` | Math blocks/inline: KaTeX render, errors, \tag/\eqref | owned |  | `src/editor/blocks/math.ts` `createMathBlockWidget` | `tests/e2e/blocks-core.spec.ts` › follows the referenced | 0 |
 | `tools.math.copy` | Math tools: Copy Math / Copy as TeX / Copy as MathML / Delete Math — copy: block + inline; Delete Math: blocks only (typora-re#4); Copy as Image and Use LaTeX Source / Use Rendered SVG → #127 | owned |  | `src/editor/core/block-tools.ts` `export function mathTool` | `tests/e2e/parity-tools.spec.ts` › tools.math.copy: | 7 |
 | `tools.math.refresh` | Math tools: Refresh All Math Expressions | owned |  | `src/editor/core/block-tools.ts` `export function refreshMath` | `tests/e2e/parity-tools.spec.ts` › tools.math.refresh: | 1 |
-| `tools.math.numbering` | Math numbering options (auto-number, AMS rules, physics package) | **missing** | P2 | — | none | 6 |
+| `tools.math.numbering` | Math numbering options (auto-number, AMS rules, physics package) — none (default) / AMS / all; physics = KaTeX macro subset; Apply Line Break at \\ and \newline | owned |  | `src/editor/blocks/math.ts` `export function autoNumbered` | `tests/e2e/parity-syntax.spec.ts` › tools.math.numbering: Math numbering options (auto-number, AMS rules, physics package) | 6 |
 
 ## Diagrams
 
@@ -239,16 +239,16 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
 | `pref.storage` | Settings storage: defaults, validation, migration, unknown keys kept | owned |  | `src/app/settings.ts` `DEFAULT_SETTINGS` | `src/app/__tests__/settings.test.ts` › keeps unknown keys for forward compatibility | 5 |
-| `pref.advanced` | Advanced settings: open/reset config file, reset dialog warnings — #63 corrupt settings handling | **missing** | P2 | — | none | 14 |
-| `pref.general.launch` | General: On Launch (restore files/folders, open new file, default folder) — only "Reopen last folder" | **partial** | P1 | `src/app/preferences.ts` `'restoreLastFolder'` | none | 8 |
+| `pref.advanced` | Advanced settings: open/reset config file, reset dialog warnings — advanced settings JSON editor + reset (Typora: Windows/Linux only); Reset All Dialog Warnings | owned |  | `src/app/prefs/general.ts` `Reset All Dialog Warnings` | `tests/e2e/parity-prefs.spec.ts` › pref.advanced: Advanced settings: open/reset config file, reset dialog warnings | 14 |
+| `pref.general.launch` | General: On Launch (restore files/folders, open new file, default folder) — quit-on-last-window persisted only (desktop native, applied after restart) | owned |  | `src/app/settings.ts` `export function launchPlan` | `tests/e2e/parity-prefs.spec.ts` › pref.general.launch: General: On Launch | 8 |
 | `pref.general.save` | General: Auto Save, save-on-switch, recover unsaved drafts — auto-save exists; draft recovery missing | **partial** | P0 | `src/app/document.ts` `autoSave` | `src/app/__tests__/document.test.ts` › auto-saves after the delay when enabled | 9 |
-| `pref.general.language` | General: UI language | **missing** | P2 | — | none | 1 |
+| `pref.general.language` | General: UI language — only English strings ship | owned |  | `src/app/prefs/general.ts` `System Language` | `tests/e2e/parity-prefs.spec.ts` › pref.general.language: General: UI language | 1 |
 | `pref.appearance.theme` | Appearance: theme, separate dark theme, follow system | owned |  | `src/app/preferences.ts` `'darkTheme'` | `tests/e2e/app-themes.spec.ts` › preferences: Theme lists light themes, Dark theme lists dark ones | 10 |
 | `pref.appearance.font` | Appearance: font size, custom CSS | owned |  | `src/app/preferences.ts` `'Font size'` | `tests/e2e/app-themes.spec.ts` › command palette theme entry and custom CSS | 3 |
-| `pref.appearance.window` | Appearance: window style (seamless/unibody/native), text column width, outline panel | **missing** | P2 | — | none | 13 |
-| `pref.editor.general` | Editor: auto pair brackets/markdown, display source on focus, heading style, indent | **missing** | P1 | — | none | 10 |
-| `pref.editor.shortcuts` | Custom shortcut keys | **missing** | P2 | — | none | 2 |
-| `pref.files.defaults` | Files: default line ending, default folder, file extensions — LF/CRLF per file only | **partial** | P1 | `src/app/preferences.ts` `'autoSave'` | none | 8 |
+| `pref.appearance.window` | Appearance: window style (seamless/unibody/native), text column width, outline panel — text column width + outline-by-default (Margin extras) live, collapsible outline persisted; window style persisted only | **partial** | P2 | `src/app/settings.ts` `textColumnWidth` | `tests/e2e/parity-prefs.spec.ts` › pref.appearance.window: Appearance: window style (seamless/unibody/native), text column width, outline panel | 13 |
+| `pref.editor.general` | Editor: auto pair brackets/markdown, display source on focus, heading style, indent — auto pair (markdown pairing depends on bracket pairing) + display source on focus; Indent Size on Save / Pretty indentation and Heading Style pending (gap issue) | **partial** | P1 | `src/editor/core/input.ts` `const autoPair` | `tests/e2e/parity-prefs.spec.ts` › pref.editor.general: Editor: auto pair brackets/markdown, display source on focus, heading style, indent | 10 |
+| `pref.editor.shortcuts` | Custom shortcut keys — in-app JSON key map for the JS keymap (Typora macOS opens a help page); native menu accelerators unchanged | owned |  | `src/app/commands.ts` `export function setCustomKeys` | `tests/e2e/parity-prefs.spec.ts` › pref.editor.shortcuts: Custom shortcut keys | 2 |
+| `pref.files.defaults` | Files: default line ending, default folder, file extensions — line ending for new files; default folder via On Launch | owned |  | `src/app/settings.ts` `export function newFileEol` | `tests/e2e/parity-prefs.spec.ts` › pref.files.defaults: Files: default line ending | 8 |
 | `pref.privacy` | Privacy/security toggles (no telemetry; local-only network) — Margin sends no telemetry by construction | owned |  | `src/app/settings.ts` `DEFAULT_SETTINGS` | none | 1 |
 
 ## Sidebar & outline
@@ -282,10 +282,10 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
-| `syntax.extensions` | Syntax support toggles: highlight, sub/sup, inline math, emoji shortcodes — highlight/inline math always on; sub/sup/emoji not parsed | **missing** | P2 | — | none | 8 |
-| `syntax.strict` | Strict Mode (closer to GFM) and list/quote style preferences | **missing** | P2 | — | none | 6 |
-| `syntax.whitespace` | Whitespace & line breaks: preserve single line break, visible <br/>, first-line indent, \\ line break | **missing** | P2 | — | none | 9 |
-| `syntax.save-normalize` | On save: insert final newline, remap Unicode punctuation on parse | **missing** | P2 | — | none | 2 |
+| `syntax.extensions` | Syntax support toggles: highlight, sub/sup, inline math, emoji shortcodes — Typora fresh-install defaults (inline math/sub/sup/highlight off, emoji on); pre-#102 installs keep Margin rendering. Deliberate fix: Superscript is independent of Subscript (Typora ties its visibility to the subscript box) | owned |  | `src/editor/core/parser/options.ts` `PARSER_KEYS` | `tests/e2e/parity-syntax.spec.ts` › syntax.extensions: Syntax support toggles: highlight, sub/sup, inline math, emoji shortcodes | 8 |
+| `syntax.strict` | Strict Mode (closer to GFM) and list/quote style preferences — non-strict: `#Heading` without space; list markers for menu-created lists | owned |  | `src/editor/core/parser/starts.ts` `outside Strict Mode` | `tests/e2e/parity-syntax.spec.ts` › syntax.strict: Strict Mode (closer to GFM) and list/quote style preferences | 6 |
+| `syntax.whitespace` | Whitespace & line breaks: preserve single line break, visible <br/>, first-line indent, \\ line break — preserve/ignore single line break, Visible <br/> (default on), first-line indent; Apply Line Break at \\ is the Math option (display math). Deliberate fix: one source of truth for the Preserve check state | owned |  | `src/editor/core/editor.ts` `md-ignore-linebreak` | `tests/e2e/parity-syntax.spec.ts` › syntax.whitespace: Whitespace & line breaks: preserve single line break | 9 |
+| `syntax.save-normalize` | On save: insert final newline, remap Unicode punctuation on parse — Insert Final New Line On Save is per document (follows the opened file; palette command); Remap Unicode Punctuation persisted only, parser remap pending (gap issue) | **partial** | P2 | `src/app/document.ts` `Insert Final New Line On Save` | `tests/e2e/parity-syntax.spec.ts` › syntax.save-normalize: On save: insert final newline, remap Unicode punctuation on parse | 2 |
 
 ## Behaviors — editor core
 

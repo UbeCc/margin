@@ -77,6 +77,8 @@ export interface DocumentHost {
   autoSave(): { enabled: boolean; delay: number };
   /** Called before setMarkdown so the editor can know the new base dir. */
   willLoad(path: string | null): void;
+  /** Line ending for text without any line break (new files, #100). */
+  defaultEol?(): Eol;
   onState(state: DocState): void;
   onOpened(path: string): void;
   /** Folder to suggest in Save As for untitled documents. */
@@ -182,7 +184,10 @@ export class DocumentController {
   private load(path: string | null, text: string): void {
     this.loading = true;
     try {
-      this.eol = detectEol(text);
+      // Text without any line break (new / one-line file) uses the "Default Line Ending" preference.
+      this.eol = /\n/.test(text) ? detectEol(text) : (this.host.defaultEol?.() ?? detectEol(text));
+      // Edit › Line Endings › Insert Final New Line On Save is per document: on when the file ended with one.
+      this.finalNewline = /\n$/.test(text);
       const md = normalizeEol(text);
       this.host.willLoad(path);
       this.path = path;
@@ -319,7 +324,8 @@ export class DocumentController {
 
   private async writeTo(path: string, quiet: boolean): Promise<boolean> {
     const md = this.host.editor.getMarkdown();
-    const raw = applyEol(md, this.eol);
+    // "Insert Final New Line On Save" (#102): written to disk only; the document text is unchanged.
+    const raw = applyEol(this.finalNewline && md && !md.endsWith('\n') ? md + '\n' : md, this.eol);
     // Remember what we write *before* the watcher can echo it back.
     const prevHash = this.diskHash;
     if (path === this.path) this.diskHash = hashText(raw);
@@ -361,6 +367,15 @@ export class DocumentController {
     } catch (e) {
       this.host.notify(`Couldn't reload: ${errMsg(e)}`, 'error');
     }
+  }
+
+  /** Per-document "Insert Final New Line On Save" flag (typora-re fe-preferences §10). */
+  finalNewline = false;
+
+  setFinalNewline(on: boolean): void {
+    if (on === this.finalNewline) return;
+    this.finalNewline = on;
+    this.emit();
   }
 
   setEol(eol: Eol): void {

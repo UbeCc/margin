@@ -310,6 +310,8 @@
 .mb-source .cm-panels { background: var(--margin-bg, #fff); color: inherit; border-color: var(--margin-border, rgba(127,127,127,.25)); font-family: var(--margin-font, sans-serif); }
 .mb-source .cm-activeLine { background: color-mix(in srgb, var(--margin-accent, #4a7cf7) 5%, transparent); }
 
+/* Preferences › Code Fences › Auto wrap long lines (#100) */
+.mb-wrap .mb-code-static { white-space: pre-wrap; word-break: break-word; }
 /* #98 Resize Table popover (Width x Height) */
 .mb-grid-wrap { position: relative; display: inline-flex; }
 .mb-grid-pop {
