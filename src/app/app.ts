@@ -7,7 +7,7 @@ import { buildExportHtml, documentTitle, loadKatexCss, needsKatex } from './expo
 import { FindBar } from './findbar';
 import { extras } from './platform-extras';
 import { openPreferences } from './preferences';
-import { DEFAULT_SETTINGS, migrateSettings, pushRecent, type MarginSettings } from './settings';
+import { DEFAULT_SETTINGS, launchPlan, newFileEol, migrateSettings, pushRecent, type MarginSettings } from './settings';
 import { FileTree } from './sidebar/filetree';
 import { OutlineView } from './sidebar/outline';
 import { StatusBar } from './statusbar';
@@ -143,13 +143,8 @@ export class App {
     window.addEventListener('blur', () => void this.doc.flushAutoSave());
 
     // Initial content — General › On Launch (#100)
-    const s0 = this.settings;
-    const launchFolder =
-      s0.onLaunch === 'customFolder' ? s0.defaultFolder || null : s0.onLaunch === 'restoreAll' || s0.onLaunch === 'restoreFolders' ? s0.lastFolder : null;
-    const folder = opts.initialFolder || launchFolder || null;
+    const { folder, file } = launchPlan(this.settings, opts);
     if (folder) await this.openFolder(folder, { quiet: true });
-    const lastFile = !opts.initialFile && s0.onLaunch === 'restoreAll' ? s0.recentFiles[0] : undefined;
-    const file = opts.initialFile ?? lastFile;
     if (file && (await this.platform.stat(file))) await this.doc.open(file);
     else this.onDocState(this.doc.state());
     this.refreshOutline();
@@ -876,7 +871,3 @@ export class App {
   }
 }
 
-/** Files › Default Line Ending: "Auto ( Recommended )" follows the OS (#100). */
-export function newFileEol(pref: MarginSettings['defaultLineEnding'], windows = /Win/i.test(navigator.platform || '')): '\n' | '\r\n' {
-  return pref === 'crlf' || (pref === 'auto' && windows) ? '\r\n' : '\n';
-}

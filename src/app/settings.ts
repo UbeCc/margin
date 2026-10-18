@@ -185,6 +185,20 @@ export function migrateSettings(input: unknown): MarginSettings {
   };
 }
 
+/**
+ * General › On Launch (#100): what to open at startup. Restored / custom targets win;
+ * `opts` (the web demo folder and file) is the fallback when nothing is restored.
+ */
+export function launchPlan(
+  s: Pick<MarginSettings, 'onLaunch' | 'defaultFolder' | 'lastFolder' | 'recentFiles'>,
+  opts: { initialFolder?: string | null; initialFile?: string | null } = {},
+): { folder: string | null; file: string | null } {
+  const pref =
+    s.onLaunch === 'customFolder' ? s.defaultFolder || null : s.onLaunch === 'restoreAll' || s.onLaunch === 'restoreFolders' ? s.lastFolder : null;
+  const lastFile = s.onLaunch === 'restoreAll' ? (s.recentFiles[0] ?? null) : null;
+  return { folder: pref || opts.initialFolder || null, file: lastFile ?? opts.initialFile ?? null };
+}
+
 /** 0 (theme default) or 400–3000 px. */
 function columnWidth(v: unknown): number {
   const n = Math.round(num(v, 0, 0, 3000));
@@ -238,4 +252,9 @@ export function imageRulePresetId(rule: ImageRule): string {
   if (rule.dir === './${filename}.assets') return 'filename';
   if (rule.dir === './assets') return 'assets';
   return 'custom';
+}
+
+/** Files › Default Line Ending: "Auto ( Recommended )" follows the OS (#100). */
+export function newFileEol(pref: MarginSettings['defaultLineEnding'], windows = /Win/i.test(navigator.platform || '')): '\n' | '\r\n' {
+  return pref === 'crlf' || (pref === 'auto' && windows) ? '\r\n' : '\n';
 }
