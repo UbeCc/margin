@@ -234,3 +234,148 @@ test('export.image: Export › Image (PNG/JPEG of the whole document)', async ({
   await expect(page.locator('.toast').last()).toContainText('too large');
   expect(await exportCount(page)).toBe(before);
 });
+
+type Stubbed = { pandocExport?: unknown; pandocImport?: unknown; runExportCommand?: unknown; __calls?: unknown[] };
+
+test('export.pandoc: Export via Pandoc: docx/odt/rtf/epub/latex/mediawiki/rst/textile/opml', async ({ page }) => {
+  await boot(page);
+  // Web build: no Pandoc backend → clear error before any save panel.
+  await run(page, 'exportOdt');
+  await expect(page.locator('.toast[data-kind=error]').last()).toContainText('needs Pandoc');
+  await page.evaluate(() => {
+    const w = window.__MARGIN_WEB__! as unknown as Stubbed;
+    w.__calls = [];
+    w.pandocExport = async (md: string, out: string, o: { format: string }) => {
+      w.__calls!.push({ out, format: o.format, md: md.slice(0, 20) });
+      await window.__MARGIN_WEB__!.writeTextFile(out, 'converted');
+      return '';
+    };
+  });
+  const cases: [string, string, string][] = [
+    ['exportDocx', 'docx', 'docx'], ['exportOdt', 'odt', 'odt'], ['exportRtf', 'rtf', 'rtf'], ['exportEpub', 'epub', 'epub'], ['exportLatex', 'latex', 'tex'],
+    ['exportMediawiki', 'mediawiki', 'wiki'], ['exportRst', 'rst', 'rst'], ['exportTextile', 'textile', 'textile'], ['exportOpml', 'opml', 'opml'],
+  ];
+  for (const [action, , ext] of cases) {
+    await queueDialog(page, `${ROOT}/Out/Welcome.${ext}`);
+    expect(await run(page, action)).toBe(true);
+  }
+  const calls = await page.evaluate(() => (window.__MARGIN_WEB__! as unknown as Stubbed).__calls as { out: string; format: string; md: string }[]);
+  expect(calls.map((c) => c.format)).toEqual(cases.map((c) => c[1]));
+  expect(calls.map((c) => c.out)).toEqual(cases.map((c) => `${ROOT}/Out/Welcome.${c[2]}`));
+  expect(calls[0].md).toContain('# Welcome to Margin');
+  // Pandoc exports join "Export and Overwrite with Previous" (confirmed, same path, no panel).
+  void run(page, 'exportOverwrite');
+  await page.locator('.export-overwrite button[data-id=overwrite]').click();
+  await expect.poll(async () => (await page.evaluate(() => ((window.__MARGIN_WEB__! as unknown as Stubbed).__calls as unknown[]).length))).toBe(cases.length + 1);
+  const last = await page.evaluate(() => ((window.__MARGIN_WEB__! as unknown as Stubbed).__calls as { out: string; format: string }[]).at(-1)!);
+  expect(last).toMatchObject({ out: `${ROOT}/Out/Welcome.opml`, format: 'opml' });
+});
+
+test('export.custom: Custom export commands and "run command after export"', async ({ page }) => {
+  await boot(page);
+  await run(page, 'exportCustom');
+  await expect(page.locator('.toast').last()).toContainText('No custom export commands');
+  await run(page, 'exportSettings');
+  const pane = page.locator('.pref-section[data-section=export]');
+  await pane.locator('select[data-custom=template]').selectOption({ label: 'Markdown copy' });
+  await expect(pane.locator('.custom-export')).toHaveCount(1);
+  await pane.locator('button[data-custom=add]').click();
+  await expect(pane.locator('.custom-export')).toHaveCount(2);
+  const second = pane.locator('.custom-export').nth(1);
+  await second.locator('input[data-custom=name]').fill('Shout');
+  await second.locator('input[data-custom=name]').dispatchEvent('change');
+  await second.locator('input[data-custom=command]').fill('tr a-z A-Z');
+  await second.locator('input[data-custom=command]').dispatchEvent('change');
+  await second.locator('input[data-custom=saveDialog]').uncheck();
+  // Delete asks first.
+  await second.locator('button[data-custom=delete]').click();
+  await page.locator('.dialog-card button[data-id=cancel]').click();
+  await expect(pane.locator('.custom-export')).toHaveCount(2);
+  await pane.locator('input[data-export="general.runAfterExport"]').fill('echo done ${outputPath}');
+  await pane.locator('input[data-export="general.runAfterExport"]').blur();
+  await expect.poll(() => page.evaluate(() => window.__margin!.settings.export.general.runAfterExport)).toBe('echo done ${outputPath}');
+  const custom = await page.evaluate(() => window.__margin!.settings.export.custom);
+  expect(custom.map((c) => [c.name, c.command, c.saveDialog])).toEqual([['Markdown copy', 'tee ${outputPath}', true], ['Shout', 'tr a-z A-Z', false]]);
+  await page.keyboard.press('Escape');
+
+  // Web build without a command runner: refused with a clear message.
+  await page.evaluate((id) => window.__margin!.exports.export(`custom:${id}`), custom[0].id);
+  await expect(page.locator('.toast[data-kind=error]').last()).toContainText('desktop app');
+
+  await page.evaluate(() => {
+    const w = window.__MARGIN_WEB__! as unknown as Stubbed;
+    w.__calls = [];
+    w.runExportCommand = async (command: string, vars: Record<string, string>, stdin: string | null, cwd: string | null) => {
+      w.__calls!.push({ command, outputPath: vars.outputPath, title: vars.title, stdin: stdin?.slice(0, 20) ?? null, cwd });
+      return { stdout: '', stderr: '' };
+    };
+  });
+  // Custom export via the palette picker: save panel → ${outputPath}; Markdown on stdin.
+  await queueDialog(page, `${ROOT}/Out/copy`);
+  void run(page, 'exportCustom');
+  await page.locator('.palette-input').fill('markdown copy');
+  await page.keyboard.press('Enter');
+  await expect.poll(() => page.evaluate(() => ((window.__MARGIN_WEB__! as unknown as Stubbed).__calls as unknown[]).length)).toBe(2);
+  const calls = await page.evaluate(() => (window.__MARGIN_WEB__! as unknown as Stubbed).__calls as { command: string; outputPath: string; stdin: string | null; cwd: string; title: string }[]);
+  expect(calls[0]).toMatchObject({ command: 'tee ${outputPath}', outputPath: `${ROOT}/Out/copy.md`, stdin: '# Welcome to Margin\n', cwd: ROOT, title: 'Welcome to Margin' });
+  // …followed by the run-after-export command with the same variables.
+  expect(calls[1]).toMatchObject({ command: 'echo done ${outputPath}', outputPath: `${ROOT}/Out/copy.md`, stdin: null });
+  // No-save-panel export: outputPath is empty.
+  await page.evaluate((id) => window.__margin!.exports.export(`custom:${id}`), custom[1].id);
+  await expect.poll(() => page.evaluate(() => ((window.__MARGIN_WEB__! as unknown as Stubbed).__calls as unknown[]).length)).toBe(4);
+  const c3 = await page.evaluate(() => ((window.__MARGIN_WEB__! as unknown as Stubbed).__calls as { command: string; outputPath: string }[])[2]);
+  expect(c3).toMatchObject({ command: 'tr a-z A-Z', outputPath: '' });
+  // A failing command surfaces its error.
+  await page.evaluate(() => {
+    (window.__MARGIN_WEB__! as unknown as Stubbed).runExportCommand = async () => {
+      throw new Error('Command failed (exit status: 2):\nboom');
+    };
+  });
+  await queueDialog(page, `${ROOT}/Out/copy2.md`);
+  expect(await page.evaluate((id) => window.__margin!.exports.export(`custom:${id}`), custom[0].id)).toBe(false);
+  await expect(page.locator('.toast[data-kind=error]').last()).toContainText('boom');
+});
+
+test('export.import: File › Import (docx/html/… via Pandoc)', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(async (root) => {
+    await window.__MARGIN_WEB__!.writeTextFile(`${root}/In/page.html`, '<html><body><h1>Imported Title</h1><p>Some <strong>bold</strong> and <a href="https://example.com">a link</a>.</p><ul><li>one</li><li>two</li></ul></body></html>');
+    await window.__MARGIN_WEB__!.writeTextFile(`${root}/In/report.docx`, 'binary');
+  }, ROOT);
+  // HTML imports without Pandoc via the built-in converter, as a new unsaved document.
+  await queueDialog(page, `${ROOT}/In/page.html`);
+  expect(await run(page, 'import')).toBe(true);
+  await expect(page.locator('.toast').last()).toContainText('Imported page.html');
+  const md = await page.evaluate(() => window.__margin!.editor.getMarkdown());
+  expect(md).toContain('# Imported Title');
+  expect(md).toContain('**bold**');
+  expect(md).toContain('[a link](https://example.com)');
+  expect(md).toMatch(/[-*] one/);
+  const state = await page.evaluate(() => ({ path: window.__margin!.doc.path, dirty: window.__margin!.doc.dirty }));
+  expect(state).toEqual({ path: null, dirty: true });
+  // docx needs Pandoc: clear failure with a way to configure it; nothing replaced.
+  await page.evaluate(() => {
+    const d = window.__margin!.doc as unknown as { confirmLeave: () => Promise<boolean> };
+    d.confirmLeave = async () => true;
+  });
+  await queueDialog(page, `${ROOT}/In/report.docx`);
+  expect(await run(page, 'import')).toBe(false);
+  const err = page.locator('.toast[data-kind=error]').last();
+  await expect(err).toContainText('Pandoc is needed');
+  await expect(err).toContainText('Set Pandoc Path');
+  expect(await page.evaluate(() => window.__margin!.editor.getMarkdown())).toContain('# Imported Title');
+  await expect(page.locator('.toast[data-kind=info]', { hasText: 'Importing' })).toHaveCount(0);
+  // With a Pandoc backend, its Markdown is used.
+  await page.evaluate(() => {
+    (window.__MARGIN_WEB__! as unknown as Stubbed).pandocImport = async (p: string) => `# From Pandoc\n\nconverted ${p.split('/').pop()}\n`;
+  });
+  await queueDialog(page, `${ROOT}/In/report.docx`);
+  expect(await run(page, 'import')).toBe(true);
+  expect(await page.evaluate(() => window.__margin!.editor.getMarkdown())).toBe('# From Pandoc\n\nconverted report.docx\n');
+  // Unsupported type / cancelled panel.
+  await queueDialog(page, `${ROOT}/notes.txt`);
+  expect(await run(page, 'import')).toBe(false);
+  await expect(page.locator('.toast[data-kind=error]').last()).toContainText('not a supported import format');
+  await queueDialog(page, null);
+  expect(await run(page, 'import')).toBe(false);
+});

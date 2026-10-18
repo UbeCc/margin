@@ -439,6 +439,9 @@ button { cursor: default; }
 .pref-section[data-section='export'] .text-input { width: 240px; }
 .pref-section[data-section='export'] .css-input { width: 240px; }
 .page-custom { margin-left: 6px; }
+.custom-export { display: flex; flex-direction: column; gap: 6px; padding: 10px 0; border-bottom: 1px solid color-mix(in srgb, var(--margin-border) 60%, transparent); }
+.custom-export .text-input[data-custom='command'] { width: 100%; box-sizing: border-box; font-family: var(--margin-mono, ui-monospace, monospace); font-size: 12px; }
+.custom-export .text-input[data-custom='extension'] { width: 64px; }
 .page-custom .number { width: 64px; }
 .page-size { margin-left: 8px; }
 .dialog-check { display: flex; align-items: center; gap: 8px; margin: -6px 0 16px; font-size: 13px; color: var(--margin-fg-muted); }

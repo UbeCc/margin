@@ -3,7 +3,8 @@
  * plus per-format options (PDF, HTML, HTML without styles, Image).
  */
 import { themeLabel } from '../themes';
-import { migrateExportSettings, type ExportSettings } from './export-settings';
+import { CUSTOM_EXPORT_TEMPLATES, migrateExportSettings, type CustomExport, type ExportSettings } from './export-settings';
+import { confirmDialog } from './ui/modal';
 import { pageSetupFields } from './export-ui';
 import { h, debounce } from './util/dom';
 
@@ -88,6 +89,7 @@ export function exportPrefsSection(host: ExportPrefsHost): HTMLElement {
     row('After Export', sel('general', 'afterExport', [['none', 'Do nothing'], ['open', 'Open exported file'], ['reveal', 'Reveal in folder']])),
     row('Allow YAML front matter to override export settings', check('general', 'allowYamlOverrides'), 'title, author, subject, keywords, header, footer'),
     row('Do not warn before “Export and Overwrite with Previous”', check('general', 'noOverwriteWarning')),
+    row('Run command after export', text('general', 'runAfterExport', 'open -R ${outputPath}'), 'Executable and arguments; no shell. ${outputPath} ${outputFolder} ${currentPath} …'),
     heading('PDF'),
     pageSetupFields(host.get().pdf.page, (page) => patch('pdf', 'page', page)),
     row('Theme', sel('pdf', 'theme', themes)),
@@ -109,5 +111,71 @@ export function exportPrefsSection(host: ExportPrefsHost): HTMLElement {
     row('Image Width', num('image', 'width', 200, 4000, 'px')),
     row('Font Size', num('image', 'fontSize', 8, 48, 'px')),
     row('Theme', sel('image', 'theme', themes)),
+    heading('Custom Export Commands'),
+    customExportsEditor(host),
+  );
+}
+
+/** Add / edit / delete custom export commands (File › Export › Custom…). */
+function customExportsEditor(host: ExportPrefsHost): HTMLElement {
+  const list = h('div.custom-exports');
+  const save = (next: CustomExport[]): void => {
+    host.set(migrateExportSettings({ ...host.get(), custom: next }));
+    render();
+  };
+  const update = (id: string, patch: Partial<CustomExport>): void => {
+    host.set(migrateExportSettings({ ...host.get(), custom: host.get().custom.map((c) => (c.id === id ? { ...c, ...patch } : c)) }));
+  };
+  const add = (tpl: Omit<CustomExport, 'id'>): void => save([...host.get().custom, { ...tpl, id: `c${Date.now().toString(36)}` }]);
+  const render = (): void => {
+    list.replaceChildren(
+      ...host.get().custom.map((c) => {
+        const field = (key: 'name' | 'command' | 'extension', ph: string): HTMLInputElement => {
+          const el = h('input.text-input', { type: 'text', spellcheck: 'false', placeholder: ph, value: c[key], 'data-custom': key });
+          el.addEventListener('change', () => update(c.id, { [key]: el.value } as Partial<CustomExport>));
+          return el;
+        };
+        const input = h('select.select', { 'data-custom': 'input' }, h('option', { value: 'markdown', text: 'Markdown on stdin' }), h('option', { value: 'html', text: 'HTML on stdin' }));
+        input.value = c.input;
+        input.addEventListener('change', () => update(c.id, { input: input.value as CustomExport['input'] }));
+        const dlg = h('input', { type: 'checkbox', 'data-custom': 'saveDialog' });
+        dlg.checked = c.saveDialog;
+        dlg.addEventListener('change', () => update(c.id, { saveDialog: dlg.checked }));
+        const del = h('button.btn.btn-small.btn-danger', {
+          type: 'button',
+          text: 'Delete',
+          'data-custom': 'delete',
+          onclick: async () => {
+            if (await confirmDialog('Delete this export option?', c.name, 'Delete', true)) save(host.get().custom.filter((x) => x.id !== c.id));
+          },
+        });
+        return h(
+          'div.custom-export',
+          { 'data-id': c.id },
+          h('div.inline', null, field('name', 'Name'), field('extension', 'ext'), del),
+          field('command', 'Executable and arguments, e.g. pandoc -o ${outputPath}'),
+          h('div.inline', null, input, h('label.inline', null, dlg, h('span', { text: 'Ask for output file' }))),
+        );
+      }),
+    );
+  };
+  const tpl = h('select.select', { 'data-custom': 'template' }, h('option', { value: '', text: 'Add From a Template…' }), ...CUSTOM_EXPORT_TEMPLATES.map((t, i) => h('option', { value: String(i), text: t.name })));
+  tpl.addEventListener('change', () => {
+    const t = CUSTOM_EXPORT_TEMPLATES[Number(tpl.value)];
+    tpl.value = '';
+    if (t) add(t);
+  });
+  render();
+  return h(
+    'div.pref-block',
+    null,
+    list,
+    h(
+      'div.pref-actions',
+      null,
+      h('button.btn', { type: 'button', text: 'Add', 'data-custom': 'add', onclick: () => add({ name: 'New export', command: '', extension: 'txt', input: 'markdown', saveDialog: true }) }),
+      tpl,
+    ),
+    h('p.pref-note', { text: 'Commands run without a shell: the line is split into arguments first, then ${outputPath}, ${outputFolder}, ${currentPath}, ${currentFolder}, ${title}, ${today}… are filled into each argument.' }),
   );
 }

@@ -29,6 +29,8 @@ const FILE: &[Item] = &[
     ("save", "Save", Some("CmdOrCtrl+S")),
     ("saveAs", "Save As…", Some("CmdOrCtrl+Shift+S")),
     ("reloadFromDisk", "Revert to Saved", None),
+    ("-", "", None),
+    ("import", "Import…", None),
 ];
 const EXPORT: &[Item] = &[
     ("exportHtml", "HTML…", None),
@@ -36,11 +38,18 @@ const EXPORT: &[Item] = &[
     ("exportDocx", "Word (.docx)…", None),
     ("exportLatex", "LaTeX…", None),
     ("exportEpub", "EPUB…", None),
+    ("exportOdt", "OpenOffice…", None),
+    ("exportRtf", "RTF…", None),
+    ("exportMediawiki", "MediaWiki…", None),
+    ("exportRst", "reStructuredText…", None),
+    ("exportTextile", "Textile…", None),
+    ("exportOpml", "OPML…", None),
 ];
 /// Export submenu, after the format items (#95).
 const EXPORT_MORE: &[Item] = &[
     ("exportHtmlPlain", "HTML (without Styles)…", None),
     ("exportImage", "Image…", None),
+    ("exportCustom", "Custom…", None),
     ("-", "", None),
     ("exportPrevious", "Export with Previous", None),
     ("exportOverwrite", "Export and Overwrite with Previous", None),
@@ -297,7 +306,8 @@ mod tests {
                 "showFiles", "revealActiveFile", "reloadFromDisk", "toggleLineEnding", "exportHtmlPlain", "exportImage",
                 "exportPrevious", "exportOverwrite", "exportSettings", "pageSetup",
                 "exportDocx", "exportLatex",
-                "exportEpub",
+                "exportEpub", "exportOdt", "exportRtf", "exportMediawiki", "exportRst", "exportTextile", "exportOpml",
+                "exportCustom", "import",
             ]
             .contains(&a)
                 || a.starts_with("heading:")

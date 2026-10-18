@@ -10,7 +10,8 @@ Owner: **app**. Vanilla-DOM shell around `EditorHandle` + `Platform` (see `src/c
 | `wiring.ts` | **the only integration point**: `getPlatform()`, lazy `installBlocks`, editor core (stub until #1) |
 | `dev-stubs.ts` | `<textarea>` EditorHandle used until the core lands (or with `?stub=editor`) |
 | `app.ts` | `App`: layout, settings, command dispatcher (`run(id)`), palettes, export, image/link wiring |
-| `export-actions.ts`, `export-settings.ts`, `export-image.ts`, `export-ui.ts`, `preferences-export.ts` | Export pipeline, export settings + YAML overrides, image rasterizer, Page Setup / overwrite dialogs, Preferences › Export (#95) |
+| `export-actions.ts`, `export-settings.ts`, `export-image.ts`, `export-ui.ts`, `preferences-export.ts` | Export pipeline (incl. Pandoc + custom command kinds, run-after-export), export settings + YAML overrides, image rasterizer, Page Setup / overwrite dialogs, Preferences › Export (#95) |
+| `import.ts` | File › Import: Pandoc (`pandocImport`) or the core HTML → Markdown converter for HTML; opens an untitled doc (#95) |
 | `document.ts` | `DocumentController`: open / save / save as / close, auto-save, dirty tracking, EOL (LF/CRLF) preservation, external-change handling |
 | `commands.ts` | command table (labels, categories, shortcuts, scope) for keys, menus and the command palette |
 | `settings.ts` | `MarginSettings` (= `AppSettings` + shell prefs), `migrateSettings()` |

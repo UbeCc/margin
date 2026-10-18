@@ -1,17 +1,17 @@
 {
- "head": "d5cf09ef21f2b410afc38b8bfdb915c46544195d",
- "artifact_sha256": "40b951e7eb0047d13da15fcf99bab9f96ceb6aea0a0481c58f1dd48f967e8b09",
+ "head": "6022182e87f987d46e3fa220ff622e401804068b",
+ "artifact_sha256": "2592c9b1da92aea6d97e9e92066259fb626369c4a15ccebc13e04b2d6cab6f5b",
  "inventory": {
   "total": 171,
-  "owned": 70,
+  "owned": 73,
   "partial": 25,
-  "missing": 68,
+  "missing": 65,
   "oos": 8,
-  "verified_by_test": 57
+  "verified_by_test": 60
  },
  "ledger": {
-  "ledger_id": "rol_c6515a3838dd0aa0d955574d00b1e9790193389124d86a55d8566d281aab5894",
-  "closure_digest": "917f355101dfe286da4579ee9ad7065754946dd70ca70191bb2be62ddf46b7dc",
+  "ledger_id": "rol_1414c577fec3e72ef773a6956fd0613a769d4ee598c3f351588540e9ce101722",
+  "closure_digest": "66d96f1a7dc931831c6e6003c1e26b66b2dc37c3502d94fce020e10978f0ded1",
   "status": "unknown",
   "summary": {
    "total": 176,
@@ -21,7 +21,7 @@
    "by_status": [
     {
      "key": "unowned",
-     "count": 68
+     "count": 65
     },
     {
      "key": "characterized",
@@ -29,7 +29,7 @@
     },
     {
      "key": "implemented",
-     "count": 95
+     "count": 98
     },
     {
      "key": "verified",
@@ -113,18 +113,18 @@
     }
    ]
   },
-  "evidence_id": "ev_d26f451a7123c322ad23ffd2457d86efa041ac3c24c0ec2a62f4aa08cf13addd"
+  "evidence_id": "ev_0367afab394eb2bd2c93c6d915495992d05262860f965a8bca58ad3a58b65d46"
  },
  "coverage": {
   "status": "unknown",
   "reason_counts": {
-   "owner-missing": 68,
+   "owner-missing": 65,
    "package-proof-missing": 1,
-   "verifier-missing": 93,
+   "verifier-missing": 90,
    "verifier-unknown": 13
   },
   "claims_total": 163,
-  "claims_qualified_by_controlled_replay": 57,
+  "claims_qualified_by_controlled_replay": 60,
   "evidence_ids_cited": 175
  },
  "verifier_runs": {

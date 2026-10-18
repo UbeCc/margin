@@ -7,6 +7,7 @@ import { documentTitle, loadKatexCss, needsKatex } from './export';
 import { ExportController, registerPandocExporters } from './export-actions';
 import { pageCss } from './export-settings';
 import { confirmOverwriteDialog, openPageSetup } from './export-ui';
+import { runImport, type ImportHost } from './import';
 import { FindBar } from './findbar';
 import { extras } from './platform-extras';
 import { openPreferences } from './preferences';
@@ -598,7 +599,18 @@ export class App {
       case 'exportDocx':
       case 'exportLatex':
       case 'exportEpub':
+      case 'exportOdt':
+      case 'exportRtf':
+      case 'exportMediawiki':
+      case 'exportRst':
+      case 'exportTextile':
+      case 'exportOpml':
         return this.exportPandoc(PANDOC_ACTIONS[id]);
+      case 'exportCustom':
+        this.customExportPalette();
+        return true;
+      case 'import':
+        return runImport(this.importHost());
       case 'print':
         this.applyPrintPageCss();
         await this.platform.print();
@@ -678,7 +690,7 @@ export class App {
     return false;
   }
 
-  private preferences(section?: 'export'): void {
+  private preferences(section?: 'export' | 'files'): void {
     openPreferences({
       settings: () => this.settings,
       update: (p) => this.updateSettings(p),
@@ -769,6 +781,9 @@ export class App {
       const active = this.themes.current === n;
       items.push({ id: `theme:${n}`, text: `Theme: ${themeLabel(n)}`, label: `Theme: ${themeLabel(n)}`, detail: active ? 'current' : '' });
     }
+    for (const c of this.settings.export.custom) {
+      items.push({ id: `custom:${c.id}`, text: `File: Export as ${c.name}`, label: `File: Export as ${c.name}`, detail: 'custom export' });
+    }
     for (const p of this.settings.recentFiles) {
       items.push({ id: `recent:${p}`, text: `Open Recent: ${basename(p)}`, label: `Open Recent: ${basename(p)}`, detail: displayPath(dirname(p)) });
     }
@@ -788,7 +803,8 @@ export class App {
           kind: 'command',
         })),
       pick: (it) => {
-        if (it.id.startsWith('recent:')) void this.doc.open(it.id.slice(7));
+        if (it.id.startsWith('custom:')) void this.exports.export(it.id);
+        else if (it.id.startsWith('recent:')) void this.doc.open(it.id.slice(7));
         else if (it.id.startsWith('folder:')) void this.openFolder(it.id.slice(7));
         else if (isCommandId(it.id)) void this.run(it.id);
       },
@@ -796,6 +812,35 @@ export class App {
   }
 
   // ======================================================== export
+
+  /** File › Export › Custom…: pick one of the user's export commands. */
+  private customExportPalette(): void {
+    const list = this.settings.export.custom;
+    if (!list.length) {
+      toast('No custom export commands yet — add one in Export Settings.', { kind: 'info', action: { label: 'Export Settings', run: () => this.preferences('export') } });
+      return;
+    }
+    if (isPaletteOpen()) closePalette();
+    openPalette({
+      className: 'command-palette',
+      placeholder: 'Export with…',
+      provide: (q) =>
+        fuzzyFilter(q, list, (c) => c.name, 50).map(({ item, match }) => ({ id: `custom:${item.id}`, label: item.name, labelHits: match.indices, detail: item.command, kind: 'command' })),
+      pick: (it) => void this.exports.export(it.id),
+    });
+  }
+
+  private importHost(): ImportHost {
+    return {
+      platform: this.platform,
+      pandocPath: () => this.settings.pandocPath,
+      openAsNew: (md) => this.doc.newDocument(md),
+      progress: (m) => toast(m, { kind: 'info', timeout: 0 }),
+      notify: (m, kind, action) => void toast(m, { kind, action }),
+      htmlToMarkdown: async (html) => (await import('../editor/core/paste')).htmlToMarkdown(html),
+      openPandocSettings: () => this.preferences('files'),
+    };
+  }
 
   private createExports(): ExportController {
     const c = new ExportController({
