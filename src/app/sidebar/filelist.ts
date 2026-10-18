@@ -2,7 +2,7 @@ import type { DirEntry, Platform } from '../../contracts';
 import { h, clearChildren } from '../util/dom';
 import { basename, dirname, extname, relative, stripExt } from '../util/path';
 import { showContextMenu } from '../ui/contextmenu';
-import { extras } from '../platform-extras';
+import { fileMenu, type SideFileOps } from './file-menus';
 import { compareBy, DEFAULT_SORT, type SortOrder } from './sort';
 import { collectDocs, dateLabel, LIST_LIMIT, summarize } from './walk';
 import { makeDraggable } from './drag';
@@ -10,6 +10,10 @@ import { makeDraggable } from './drag';
 export interface FileListHost {
   platform: Platform;
   openFile(path: string): void;
+  /** Shared sidebar ops (the tree implements them); absent = item disabled. */
+  ops(): SideFileOps;
+  /** The sidebar view currently shown (check mark on the view items). */
+  view(): 'tree' | 'list' | 'search';
 }
 
 /**
@@ -136,13 +140,7 @@ export class FileList {
     });
     row.addEventListener('contextmenu', (e) => {
       e.preventDefault();
-      const p = extras(this.host.platform);
-      showContextMenu(e.clientX, e.clientY, [
-        { label: 'Open', run: () => this.host.openFile(d.path) },
-        { separator: true },
-        { label: 'Copy Path', run: () => void navigator.clipboard?.writeText(d.path) },
-        { label: 'Reveal in Finder', run: () => void p.revealInFolder?.(d.path), disabled: !p.revealInFolder },
-      ]);
+      showContextMenu(e.clientX, e.clientY, fileMenu({ ops: this.host.ops(), entry: d, view: 'list', active: this.host.view() === 'list' ? 'list' : 'tree', rootDir: this.root ?? '' }));
     });
     this.rows.set(d.path, row);
     return row;

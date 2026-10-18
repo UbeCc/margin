@@ -26,11 +26,12 @@ export class FilesPanel {
   private reloadListSoon = debounce(() => void this.reloadList(), 200);
 
   constructor(private host: FilesPanelHost) {
-    this.tree = new FileTree({ ...host, extraActions: () => this.actions(), refreshMode: () => this.refreshMode() });
-    this.list = new FileList({ platform: host.platform, openFile: (p) => host.openFile(p) });
+    this.tree = new FileTree({ ...host, extraActions: () => this.actions(), refreshMode: () => this.refreshMode(), openSidebarSearch: () => void this.openSearch(), setSidebarView: (m) => void this.setMode(m) });
+    this.list = new FileList({ platform: host.platform, openFile: (p) => host.openFile(p), ops: () => this.tree.ops(), view: () => this.mode });
     this.search = new SidebarSearch({
       platform: host.platform,
       openAt: (p, q, o, n) => host.openAt(p, q, o, n),
+      openInNewWindow: host.openInNewWindow ? (p) => void host.openInNewWindow!(p) : undefined,
       options: () => {
         const s = host.settings();
         return { caseSensitive: s.fileSearchCaseSensitive, wholeWord: s.fileSearchWholeWord, regex: s.fileSearchUseRegexp };
@@ -133,7 +134,7 @@ export class FilesPanel {
     const cur = list ? s.listSort : s.sidebarSort;
     const grouped = list ? s.listGroupByFolder : s.sidebarGroupByFolder;
     const items: MenuItem[] = SORT_OPTIONS.map((o) => ({ label: o.label, checked: o.id === cur, run: () => this.setSort(o.id) }));
-    items.push({ separator: true }, { label: 'Group By Folder', checked: grouped, run: () => this.setGrouped(!grouped) });
+    items.push({ separator: true }, { label: 'Group By Folder', checked: grouped, run: () => this.setGrouped(!grouped) }, { label: 'Refresh', run: () => (this.mode === 'tree' ? void this.tree.refreshAll() : this.refreshMode()) });
     showContextMenu(x, y, items);
   }
 

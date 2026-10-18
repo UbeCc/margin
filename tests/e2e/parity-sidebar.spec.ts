@@ -17,7 +17,7 @@ test('sidebar.sort: File tree sorting (name/natural/created/modified, asc/desc)'
   await page.evaluate((root) => window.__MARGIN_WEB__!.writeTextFile(`${root}/notes.txt`, 'newer'), ROOT);
   await expect(fileRows(page)).toHaveText(['notes.txt', 'Welcome.md']); // natural, ascending (default)
   await (await headerButton(page, 'Sort')).click();
-  await expect(page.locator('.context-menu [role=menuitemcheckbox]')).toHaveCount(9); // 8 orders + Group By Folder
+  await expect(page.locator('.context-menu [role=menuitemcheckbox]')).toHaveCount(9); // 8 orders + Group By Folder (Refresh is a plain item)
   await expect(menuItem(page, 'Sort Naturally (Ascending)')).toHaveAttribute('aria-checked', 'true');
   await menuItem(page, 'Sort by Name (Descending)').click();
   await expect(fileRows(page)).toHaveText(['Welcome.md', 'notes.txt']);
@@ -158,4 +158,105 @@ test('sidebar.drag: Drag files from sidebar into the editor / other apps; drop f
   // Negative: dropping a folder into itself is refused.
   await ideas.dragTo(roadmap);
   await expect(tree(page).locator(`.tree-row[data-path="${ROOT}/Ideas"]`)).toBeVisible();
+});
+
+
+const menuBox = (page: Page) => page.locator('.context-menu:not(.context-submenu)');
+const ctxItem = (page: Page, label: string) => page.locator('.context-menu .context-item', { hasText: new RegExp(`^.?${label.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}`) }).first();
+async function menuLabels(page: Page): Promise<string[]> {
+  await expect(menuBox(page)).toBeVisible();
+  const parts: string[] = [];
+  for (const el of await menuBox(page).locator(':scope > *').all()) {
+    parts.push((await el.getAttribute('class')) === 'context-sep' ? '|' : ((await el.locator('.context-label').textContent()) ?? ''));
+  }
+  return parts;
+}
+
+test('ctx-files: sidebar context menus in Typora order (#142)', async ({ page }) => {
+  const welcome = tree(page).locator(`[data-path="${ROOT}/Welcome.md"]`);
+  const fileTail = ['|', 'Get Info…', 'Delete…', '|', 'Copy File Path', 'Reveal in Finder'];
+  // Tree file: Open, Open in New Window | New File, New Folder | Search | Articles, File Tree | Duplicate, Rename… | tail
+  await welcome.click({ button: 'right' });
+  expect(await menuLabels(page)).toEqual([
+    'Open', 'Open in New Window', '|', 'New File', 'New Folder', '|', 'Search', '|',
+    'Articles (List View)', 'File Tree (Tree View)', '|', 'Duplicate', 'Rename…', ...fileTail,
+  ]);
+  await expect(ctxItem(page, 'File Tree (Tree View)')).toHaveAttribute('aria-checked', 'true');
+  await ctxItem(page, 'Search').click();
+  await expect(tree(page)).toHaveAttribute('data-mode', 'search');
+  await page.locator('.sidebar-search-input').press('Escape'); // empty query leaves search
+  await expect(tree(page)).toHaveAttribute('data-mode', 'tree');
+
+  // Duplicate makes "Welcome (copy).md"; rename records an undoable op.
+  await welcome.click({ button: 'right' });
+  await ctxItem(page, 'Duplicate').click();
+  await expect(tree(page).locator(`[data-path="${ROOT}/Welcome (copy).md"]`)).toBeVisible();
+  await welcome.click({ button: 'right' });
+  await ctxItem(page, 'Rename…').click();
+  await page.locator('.dialog .text-input').fill('Hola.md');
+  await page.keyboard.press('Enter');
+  const hola = tree(page).locator(`[data-path="${ROOT}/Hola.md"]`);
+  await expect(hola).toBeVisible();
+  await hola.click({ button: 'right' });
+  expect(await menuLabels(page)).toEqual([
+    'Open', 'Open in New Window', 'Undo Rename Welcome.md', '|', 'New File', 'New Folder', '|', 'Search', '|',
+    'Articles (List View)', 'File Tree (Tree View)', '|', 'Duplicate', 'Rename…', ...fileTail,
+  ]);
+  await ctxItem(page, 'Undo Rename Welcome.md').click();
+  await expect(welcome).toBeVisible();
+
+  // Get Info… opens a small sheet about the file.
+  await welcome.click({ button: 'right' });
+  await ctxItem(page, 'Get Info…').click();
+  await expect(page.locator('.info-dialog')).toContainText(/Welcome\.md[\s\S]*Where[\s\S]*Size[\s\S]*Modified/);
+  await page.locator('.info-dialog [data-id=ok]').click();
+  await expect(page.locator('.info-dialog')).toHaveCount(0);
+
+  // Tree folder: no Open / Duplicate.
+  await tree(page).locator(`[data-path="${ROOT}/Journal"]`).click({ button: 'right' });
+  expect(await menuLabels(page)).toEqual([
+    'Open in New Window', '|', 'New File', 'New Folder', '|', 'Search', '|',
+    'Articles (List View)', 'File Tree (Tree View)', '|', 'Rename…', ...fileTail,
+  ]);
+
+  // Articles list item: New File only, then Get Info…, Rename…, Duplicate in that order.
+  await tree(page).locator(`[data-path="${ROOT}/Journal"]`).click({ button: 'right' });
+  await ctxItem(page, 'Articles (List View)').click();
+  await expect(tree(page)).toHaveAttribute('data-mode', 'list');
+  await page.locator('.list-item', { hasText: 'Roadmap' }).click({ button: 'right' });
+  await expect(ctxItem(page, 'Articles')).toHaveAttribute('aria-checked', 'true');
+  expect(await menuLabels(page)).toEqual([
+    'Open', 'Open in New Window', '|', 'New File', '|', 'Search', '|',
+    'Articles', 'File Tree', '|', 'Get Info…', 'Rename…', 'Duplicate',
+    '|', 'Delete…', '|', 'Copy File Path', 'Reveal in Finder',
+  ]);
+
+  // Search results: row menu vs the empty panel; Expand / Collapse All.
+  await page.keyboard.press(`${MOD}+Shift+f`);
+  const input = page.locator('.sidebar-search-input');
+  await input.fill('Shipped');
+  await input.press('Enter');
+  const group = page.locator('.search-group').first();
+  await expect(group).toBeVisible();
+  await group.locator('.search-file').click({ button: 'right' });
+  expect(await menuLabels(page)).toEqual([
+    'Open', 'Open in New Window', '|', 'Copy File Path', 'Reveal in Finder', '|', 'Search', '|', 'Expand All', 'Collapse All',
+  ]);
+  await expect(ctxItem(page, 'Search')).toHaveAttribute('aria-checked', 'true');
+  await page.locator('.search-status').click({ button: 'right' });
+  expect(await menuLabels(page)).toEqual(['Search', '|', 'Expand All', 'Collapse All']);
+  await page.evaluate((root) => {
+    const lines = Array.from({ length: 8 }, (_, i) => `Ship line ${i + 1}`).join('\n');
+    window.__MARGIN_WEB__!.writeTextFile(`${root}/Journal/shiplog.md`, lines);
+  }, ROOT);
+  await input.fill('Ship line');
+  await input.press('Enter');
+  await expect(group.locator('.search-line')).toHaveCount(8);
+  await expect(group.locator('.search-line:not([hidden])')).toHaveCount(5);
+  await group.locator('.search-file').click({ button: 'right' });
+  await ctxItem(page, 'Collapse All').click();
+  await expect(group.locator('.search-line:not([hidden])')).toHaveCount(5);
+  await group.locator('.search-file').click({ button: 'right' });
+  await ctxItem(page, 'Expand All').click();
+  await expect(group.locator('.search-line:not([hidden])')).toHaveCount(8);
 });
