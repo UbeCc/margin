@@ -60,6 +60,40 @@ const EXPORT: &[Item] = &[
 ];
 const EDIT_TOP: &[Item] = &[("undo", "Undo", Some("CmdOrCtrl+Z")), ("redo", "Redo", Some("CmdOrCtrl+Shift+Z"))];
 const EDIT_FIND: &[Item] = &[("find", "Find…", Some("CmdOrCtrl+F")), ("replace", "Replace…", Some("CmdOrCtrl+Alt+F"))];
+// #96 Edit › Copy As / Paste as Plain Text / Selection / Delete / Jump To
+const EDIT_COPY_AS: &[Item] = &[
+    ("copyAs:markdown", "Copy as Markdown", Some("CmdOrCtrl+Shift+C")),
+    ("copyAs:html", "Copy as HTML Code", None),
+    ("copyAs:plain", "Copy as Plain Text", None),
+    ("copyAs:unstyled", "Copy without Theme Styling", None),
+    ("copyAs:word", "Copy to Word Processor", None),
+    ("-", "", None),
+    ("copyAs:tex", "Copy Math as TeX", None),
+    ("copyAs:mathml", "Copy Math as MathML", None),
+    ("copyAs:image", "Copy Image", None),
+];
+const EDIT_PASTE_AS: &[Item] = &[("pastePlain", "Paste as Plain Text", Some("CmdOrCtrl+Shift+V"))];
+const EDIT_SELECTION: &[Item] = &[
+    ("select:word", "Select Word", Some("CmdOrCtrl+D")),
+    ("select:line", "Select Line / Sentence", Some("CmdOrCtrl+L")),
+    ("select:block", "Select Paragraph / Block", None),
+    ("select:styled", "Select Styled Scope", Some("CmdOrCtrl+Shift+E")),
+];
+const EDIT_DELETE: &[Item] = &[
+    ("delete:word", "Delete Word", Some("CmdOrCtrl+Shift+D")),
+    ("delete:line", "Delete Line / Sentence", None),
+    ("delete:block", "Delete Paragraph / Block", None),
+    ("delete:styled", "Delete Styled Scope", None),
+    ("delete:range", "Delete Range", None),
+];
+// ⌘↑ / ⌘↓ stay editor keys (text fields keep them); only the labels are shown
+const EDIT_JUMP: &[Item] = &[
+    ("jump:top", "Jump to Top", None),
+    ("jump:bottom", "Jump to Bottom", None),
+    ("jump:selection", "Jump to Selection", Some("CmdOrCtrl+J")),
+];
+#[cfg(test)]
+const EDIT_EXTRA: &[&[Item]] = &[EDIT_COPY_AS, EDIT_PASTE_AS, EDIT_SELECTION, EDIT_DELETE, EDIT_JUMP];
 const PARAGRAPH: &[Item] = &[
     ("heading:1", "Heading 1", Some("CmdOrCtrl+1")),
     ("heading:2", "Heading 2", Some("CmdOrCtrl+2")),
@@ -135,6 +169,7 @@ const VIEW: &[Item] = &[
 pub fn all_actions() -> Vec<&'static str> {
     let mut v: Vec<&'static str> = [FILE_OPEN, FILE, EXPORT, EDIT_TOP, EDIT_FIND, PARAGRAPH, FORMAT, VIEW, WINDOW_TABS]
         .iter()
+        .chain(EDIT_EXTRA.iter())
         .flat_map(|g| g.iter().map(|i| i.0))
         .filter(|id| *id != "-")
         .collect();
@@ -237,7 +272,13 @@ pub fn build<R: Runtime>(
         .item(&PredefinedMenuItem::cut(app, None)?)
         .item(&PredefinedMenuItem::copy(app, None)?)
         .item(&PredefinedMenuItem::paste(app, None)?)
-        .item(&PredefinedMenuItem::select_all(app, None)?)
+        .item(&PredefinedMenuItem::select_all(app, None)?);
+    let edit = add_items(app, edit, EDIT_PASTE_AS)?
+        .item(&add_items(app, SubmenuBuilder::new(app, "Copy As"), EDIT_COPY_AS)?.build()?)
+        .separator()
+        .item(&add_items(app, SubmenuBuilder::new(app, "Selection"), EDIT_SELECTION)?.build()?)
+        .item(&add_items(app, SubmenuBuilder::new(app, "Delete"), EDIT_DELETE)?.build()?)
+        .item(&add_items(app, SubmenuBuilder::new(app, "Jump To"), EDIT_JUMP)?.build()?)
         .separator();
     let edit = add_items(app, edit, EDIT_FIND)?.build()?;
     menu = menu.item(&edit);
@@ -308,7 +349,7 @@ mod tests {
     #[test]
     fn accelerators_are_unique() {
         let mut seen = std::collections::HashSet::new();
-        for g in [FILE_OPEN, FILE, EXPORT, EDIT_TOP, EDIT_FIND, PARAGRAPH, FORMAT, VIEW, WINDOW_TABS] {
+        for g in [FILE_OPEN, FILE, EXPORT, EDIT_TOP, EDIT_FIND, PARAGRAPH, FORMAT, VIEW, WINDOW_TABS].iter().chain(EDIT_EXTRA.iter()) {
             for (_, _, a) in g.iter() {
                 if let Some(a) = a {
                     assert!(seen.insert(*a), "duplicate accelerator {a}");
@@ -337,7 +378,11 @@ mod tests {
                 || a.starts_with("mark:")
                 || a.starts_with("block:")
                 || a.starts_with("para:")
-                || a.starts_with("task:");
+                || a.starts_with("task:")
+                || ["pastePlain", "jump:top", "jump:bottom", "jump:selection"].contains(&a)
+                || a.starts_with("copyAs:")
+                || a.starts_with("select:")
+                || a.starts_with("delete:");
             assert!(ok, "{a} is not a MenuAction");
         }
     }

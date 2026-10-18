@@ -40,6 +40,7 @@ const COMMANDS: &[&str] = &[
     "clipboard_write_rich",
     "open_window",
     "read_file_bytes",
+    "clipboard_read",
 ];
 
 fn main() {

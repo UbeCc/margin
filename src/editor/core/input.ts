@@ -4,6 +4,7 @@
  * positions); IME composition is left to the browser and read back on
  * compositionend; structural keys go through edit.ts.
  */
+import { pastePlain } from './copy-as';
 import { EditorCore } from './editor';
 import { EMPTY_ID } from './view';
 import { leafContent } from './model';
@@ -153,6 +154,13 @@ export function attachInput(ed: EditorCore): () => void {
       e.preventDefault();
       if (e.key === 'y' || e.key === 'Y' || e.shiftKey) redo(ed);
       else undo(ed);
+      return;
+    }
+    // ⇧⌘V / Ctrl+Shift+V: Paste as Plain Text (#96). The engine's own "paste and match style"
+    // would expose only text/plain (= markdown for a Margin copy), so read every flavour ourselves.
+    if (mod && e.shiftKey && !e.altKey && e.code === 'KeyV') {
+      e.preventDefault();
+      pastePlain(ed);
       return;
     }
     if (e.key === 'Enter' && !mod && !e.altKey) {

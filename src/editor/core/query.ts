@@ -63,3 +63,51 @@ export function findIn(text: string, q: string, selFrom: number, selTo: number, 
   if (i < 0) i = h.lastIndexOf(n);
   return i;
 }
+
+/** Find options (#96): Match Case, Whole Word, Regular Expression. */
+export interface FindOptions {
+  caseSensitive?: boolean;
+  wholeWord?: boolean;
+  regex?: boolean;
+}
+
+/** Global regex for `q` under `o`, or null when `q` is empty or an invalid pattern. */
+export function compileQuery(q: string, o: FindOptions = {}): RegExp | null {
+  if (!q) return null;
+  let src = o.regex ? q : q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  if (o.wholeWord) src = `(?<![\\p{L}\\p{N}_])(?:${src})(?![\\p{L}\\p{N}_])`;
+  try {
+    return new RegExp(src, 'gu' + (o.caseSensitive ? '' : 'i') + (o.regex ? 'm' : ''));
+  } catch {
+    return null;
+  }
+}
+
+/** Every non-empty match of `re` in `text`. */
+export function allMatches(text: string, re: RegExp): { index: number; length: number; match: RegExpExecArray }[] {
+  const out: { index: number; length: number; match: RegExpExecArray }[] = [];
+  re.lastIndex = 0;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text))) {
+    if (!m[0].length) {
+      re.lastIndex++;
+      continue;
+    }
+    out.push({ index: m.index, length: m[0].length, match: m });
+  }
+  return out;
+}
+
+/** Next match relative to the selection `[selFrom, selTo]` (wraps around), or null. */
+export function findMatch(text: string, q: string, selFrom: number, selTo: number, o: FindOptions = {}, backwards = false): { index: number; length: number } | null {
+  const re = compileQuery(q, o);
+  if (!re) return null;
+  const ms = allMatches(text, re);
+  if (!ms.length) return null;
+  if (!backwards) {
+    const start = selFrom === selTo ? selFrom : selFrom + 1;
+    return ms.find((m) => m.index >= start) ?? ms[0];
+  }
+  for (let k = ms.length - 1; k >= 0; k--) if (ms[k].index < selFrom) return ms[k];
+  return ms[ms.length - 1];
+}

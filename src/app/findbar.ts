@@ -1,6 +1,6 @@
 import type { EditorCommand, EditorHandle } from '../contracts';
 import { h, icon } from './util/dom';
-import { clearMatches, currentIndex, findRanges, matchStatus, paintMatches } from './findmatches';
+import { clearMatches, currentIndex, findRanges, matchStatus, paintMatches, queryRegExp, type FindOpts } from './findmatches';
 
 /** Find / replace bar docked at the top of the editor area. */
 export class FindBar {
@@ -10,6 +10,10 @@ export class FindBar {
   private status: HTMLElement;
   private caseBtn: HTMLButtonElement;
   private caseSensitive = false;
+  private wordBtn: HTMLButtonElement;
+  private regexBtn: HTMLButtonElement;
+  private wholeWord = false;
+  private regex = false;
 
   constructor(
     private editor: () => EditorHandle,
@@ -19,6 +23,23 @@ export class FindBar {
     this.replacement = h('input.find-input', { type: 'text', placeholder: 'Replace with', 'aria-label': 'Replace with', spellcheck: 'false' });
     this.status = h('span.find-status', { 'aria-live': 'polite' });
     this.caseBtn = h('button.icon-btn.find-case', { type: 'button', title: 'Match Case', 'aria-label': 'Match Case', 'aria-pressed': 'false', onclick: () => this.toggleCase() }, icon('caseSensitive'));
+    const toggle = (label: string, cls: string, ic: Parameters<typeof icon>[0], flip: () => boolean): HTMLButtonElement => {
+      const b: HTMLButtonElement = h(`button.icon-btn.${cls}`, {
+        type: 'button',
+        title: label,
+        'aria-label': label,
+        'aria-pressed': 'false',
+        onclick: () => {
+          const on = flip();
+          b.setAttribute('aria-pressed', String(on));
+          b.classList.toggle('on', on);
+          this.refresh(null);
+        },
+      }, icon(ic));
+      return b;
+    };
+    this.wordBtn = toggle('Whole Word', 'find-word', 'wholeWord', () => (this.wholeWord = !this.wholeWord));
+    this.regexBtn = toggle('Regular Expression', 'find-regex', 'regex', () => (this.regex = !this.regex));
     const btn = (label: string, ic: Parameters<typeof icon>[0], run: () => void): HTMLButtonElement =>
       h('button.icon-btn', { type: 'button', title: label, 'aria-label': label, onclick: run }, icon(ic));
     const textBtn = (label: string, cls: string, run: () => void): HTMLButtonElement =>
@@ -32,6 +53,8 @@ export class FindBar {
         null,
         h('span.find-field', null, icon('search', 'find-icon'), this.query),
         this.caseBtn,
+        this.wordBtn,
+        this.regexBtn,
         this.status,
         btn('Previous Match (⇧↩)', 'up', () => this.find(true)),
         btn('Next Match (↩)', 'down', () => this.find(false)),
@@ -103,6 +126,10 @@ export class FindBar {
     this.refresh(null);
   }
 
+  private opts(): FindOpts {
+    return { caseSensitive: this.caseSensitive, wholeWord: this.wholeWord, regex: this.regex };
+  }
+
   private refreshTimer = 0;
   /** Live count while typing, off the keystroke path (large docs; keeps the field's undo grouping). */
   private refreshSoon(): void {
@@ -124,13 +151,17 @@ export class FindBar {
     const host = this.host();
     if (ed.isSourceMode() || !host) {
       clearMatches();
-      const hay = this.caseSensitive ? ed.getMarkdown() : ed.getMarkdown().toLowerCase();
-      const needle = this.caseSensitive ? q : q.toLowerCase();
-      const n = hay.split(needle).length - 1;
-      this.setStatus(matchStatus(n, -1));
+      const re = queryRegExp(q, this.opts());
+      const n = re ? [...ed.getMarkdown().matchAll(re)].filter((m) => m[0].length).length : 0;
+      this.setStatus(re ? matchStatus(n, -1) : 'Invalid pattern');
       return;
     }
-    const ranges = findRanges(host, q, this.caseSensitive);
+    if (!queryRegExp(q, this.opts())) {
+      clearMatches();
+      this.setStatus('Invalid pattern');
+      return;
+    }
+    const ranges = findRanges(host, q, this.opts());
     const i = currentIndex(ranges, sel);
     paintMatches(ranges, i >= 0 ? ranges[i] : null);
     this.setStatus(matchStatus(ranges.length, i));
@@ -166,7 +197,7 @@ export class FindBar {
     const q = this.query.value;
     if (!q) return false;
     const keep = this.fieldFocus();
-    const ok = this.editor().exec({ kind: 'find', query: q, caseSensitive: this.caseSensitive, backwards });
+    const ok = this.editor().exec({ kind: 'find', query: q, ...this.opts(), backwards });
     this.el.classList.toggle('no-match', !ok);
     this.afterExec(keep, ok);
     if (!ok) this.status.textContent = 'No results';
@@ -183,7 +214,7 @@ export class FindBar {
     const q = this.query.value;
     if (!q) return;
     const keep = this.fieldFocus();
-    const ok = this.editor().exec({ kind: 'replace', query: q, replacement: this.replacement.value, all, caseSensitive: this.caseSensitive } as EditorCommand);
+    const ok = this.editor().exec({ kind: 'replace', query: q, replacement: this.replacement.value, all, ...this.opts() } as EditorCommand);
     this.el.classList.toggle('no-match', !ok);
     this.afterExec(keep, ok && !all);
     if (!ok) this.status.textContent = 'No results';
