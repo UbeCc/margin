@@ -146,10 +146,10 @@ async fn run(
 /// failed repair still leaves a readable, printable PDF.
 fn repair_tounicode(out: &Path) {
     let Ok(bytes) = std::fs::read(out) else { return };
-    if let Some(fixed) = crate::pdf_tounicode::repair_radical_tounicode(&bytes) {
-        if let Err(e) = std::fs::write(out, fixed) {
-            log::warn!("ToUnicode repair could not rewrite {}: {e}", out.display());
-        }
+    if let Some(fixed) = crate::pdf_tounicode::repair_radical_tounicode(&bytes)
+        && let Err(e) = std::fs::write(out, fixed)
+    {
+        log::warn!("ToUnicode repair could not rewrite {}: {e}", out.display());
     }
 }
 
