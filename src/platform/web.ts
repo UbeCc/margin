@@ -30,6 +30,8 @@ import { matchShortcut } from './shortcuts';
 
 interface FileNode {
   kind: 'file';
+  /** Raw bytes (base64) when the file is not UTF-8 text (test hook for encodings). */
+  bytes?: string;
   /** text, or a data: URL when `binary` */
   content: string;
   binary?: boolean;
@@ -553,6 +555,43 @@ export class WebPlatform implements Platform {
     const created = this.ensureDir(p);
     this.persist();
     this.emit(created.map((c) => ({ kind: 'created', path: c })));
+  }
+
+  /** File › New Window (#94): a second browser window on the same (localStorage) disk. */
+  openedWindows: string[] = [];
+  async openWindow(opts: { path?: string } = {}): Promise<void> {
+    const q = new URLSearchParams({ window: 'new' });
+    if (opts.path) q.set('open', normalizePath(opts.path));
+    const url = `${location.pathname}?${q}`;
+    this.openedWindows.push(url);
+    this.persist();
+    window.open(url, '_blank');
+  }
+
+  /** Raw bytes (#94 Reopen with Encoding). Text nodes may carry `bytes` seeded via {@link externalWriteBytes}. */
+  async readFileBytes(path: string): Promise<Uint8Array> {
+    const n = this.nodes.get(normalizePath(path));
+    if (!n || n.kind === 'dir') throw new Error(`ENOENT: ${path}`);
+    if (n.bytes) return Uint8Array.from(atob(n.bytes), (c) => c.charCodeAt(0));
+    return new TextEncoder().encode(n.binary ? '' : n.content);
+  }
+
+  /** Test hook: put a non-UTF-8 file on disk (readTextFile decodes it lossily, like the desktop). */
+  externalWriteBytes(path: string, bytes: number[]): void {
+    const p = normalizePath(path);
+    const u8 = Uint8Array.from(bytes);
+    const created = this.putFile(p, new TextDecoder('utf-8').decode(u8), false);
+    const n = this.nodes.get(p);
+    if (n && n.kind === 'file') n.bytes = btoa(String.fromCharCode(...u8));
+    this.persist();
+    this.emit(created.length ? created.map((c) => ({ kind: 'created', path: c })) : [{ kind: 'modified', path: p }]);
+  }
+
+  /** Copy File Path: recorded for tests, and best-effort onto the real clipboard. */
+  clipboardText: string | null = null;
+  async writeClipboardText(text: string): Promise<void> {
+    this.clipboardText = text;
+    await navigator.clipboard?.writeText(text).catch(() => undefined);
   }
 
   /** No file manager in the browser: recorded for tests. */

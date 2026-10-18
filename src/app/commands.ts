@@ -46,6 +46,22 @@ export const COMMANDS: CommandSpec[] = [
   { id: 'saveAs', label: 'Save As…', category: 'File', keys: ['Mod+Shift+S'] },
   { id: 'close', label: 'Close File', category: 'File', keys: ['Mod+W'] },
   { id: 'reloadFromDisk', label: 'Reload From Disk', category: 'File' },
+  // File lifecycle (#94)
+  { id: 'newTab', label: 'New Tab', category: 'File', keys: ['Mod+T'] },
+  { id: 'newWindow', label: 'New Window', category: 'File', keys: ['Mod+Shift+N'] },
+  { id: 'nextTab', label: 'Next Tab', category: 'File', keys: ['Mod+Shift+]', 'Ctrl+Tab'] },
+  { id: 'prevTab', label: 'Previous Tab', category: 'File', keys: ['Mod+Shift+[', 'Ctrl+Shift+Tab'] },
+  { id: 'reopenClosed', label: 'Reopen Closed File', category: 'File', keys: ['Mod+Shift+T'] },
+  { id: 'saveAll', label: 'Save All', category: 'File', keys: ['Mod+Alt+S'] },
+  { id: 'duplicate', label: 'Duplicate', category: 'File' },
+  { id: 'renameFile', label: 'Rename…', category: 'File' },
+  { id: 'moveTo', label: 'Move To…', category: 'File' },
+  { id: 'revealInFinder', label: isMac ? 'Reveal in Finder' : 'Open File Location', category: 'File' },
+  { id: 'copyFilePath', label: 'Copy File Path', category: 'File' },
+  { id: 'browseVersions', label: 'Browse All Versions…', category: 'File' },
+  { id: 'reopenWithEncoding', label: 'Reopen with Encoding…', category: 'File' },
+  { id: 'properties', label: 'Properties…', category: 'File' },
+  { id: 'recoverDrafts', label: 'Recover Unsaved Drafts…', category: 'File' },
   { id: 'exportHtml', label: 'Export as HTML…', category: 'File' },
   { id: 'exportPdf', label: 'Export as PDF…', category: 'File', keys: ['Mod+Alt+E'] },
   { id: 'exportDocx', label: 'Export as Word (.docx)…', category: 'File' },
@@ -95,7 +111,7 @@ export const COMMANDS: CommandSpec[] = [
 
 /** 'Mod+Shift+S' form of a native menu accelerator (src/platform/shortcuts.ts). */
 export function nativeKey(s: Shortcut): string {
-  const key = s.code.replace(/^Key|^Digit/, '').replace('Backslash', '\\').replace('Slash', '/').replace('Equal', '=').replace('Minus', '-').replace('Comma', ',');
+  const key = s.code.replace(/^Key|^Digit/, '').replace('Backslash', '\\').replace('Slash', '/').replace('Equal', '=').replace('Minus', '-').replace('Comma', ',').replace('BracketRight', ']').replace('BracketLeft', '[');
   return [s.mod === false ? null : 'Mod', s.alt ? 'Alt' : null, s.shift ? 'Shift' : null, key].filter(Boolean).join('+');
 }
 

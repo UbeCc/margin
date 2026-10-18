@@ -13,6 +13,12 @@ export interface PlatformExtras {
   createDir?(path: string): Promise<void>;
   /** Reveal in Finder / Explorer. */
   revealInFolder?(path: string): Promise<void>;
+  /** Open another app window (#94): empty, or showing `path`. */
+  openWindow?(opts?: { path?: string }): Promise<void>;
+  /** Raw file bytes, for decoding with a chosen / detected encoding (#94). */
+  readFileBytes?(path: string): Promise<Uint8Array>;
+  /** Write text to the system clipboard (Copy File Path). */
+  writeClipboardText?(text: string): Promise<void>;
   /** Export markdown with Pandoc (#81). Resolves to pandoc's warnings ('' if none). */
   pandocExport?(markdown: string, outPath: string, opts: PandocExportOptions): Promise<string>;
   /** Locate pandoc (configured path → PATH → common dirs) and check version ≥ 2. */

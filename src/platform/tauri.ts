@@ -1,5 +1,6 @@
 import { convertFileSrc, invoke } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import type { AppSettings, DirEntry, FsEvent, ImageRule, MenuAction, Platform, RichClipboardData } from '../contracts';
 import { builtinThemes, normalizeSettings, printHtmlInIframe } from './common';
 
@@ -19,11 +20,14 @@ async function call<T>(cmd: string, args?: Record<string, unknown>): Promise<T> 
   }
 }
 
-/** `listen()` is async; the contract wants a sync unsubscribe. */
+/**
+ * `listen()` is async; the contract wants a sync unsubscribe. Scoped to this window:
+ * with several windows (#94) menu / open-files / close events go to one of them.
+ */
 function subscribe<T>(event: string, handler: (payload: T) => void): () => void {
   let unlisten: UnlistenFn | null = null;
   let cancelled = false;
-  void listen<T>(event, (e) => handler(e.payload)).then((u) => {
+  void getCurrentWebviewWindow().listen<T>(event, (e) => handler(e.payload)).then((u) => {
     if (cancelled) u();
     else unlisten = u;
   });
@@ -211,6 +215,35 @@ export class TauriPlatform implements Platform {
     return call('open_external', { url });
   }
 
+  /** File › New Window / Open in New Window (#94). */
+  openWindow(opts: { path?: string } = {}): Promise<void> {
+    return call('open_window', { path: opts.path ?? null });
+  }
+
+  /** Raw bytes for Reopen with Encoding (#94). */
+  async readFileBytes(path: string): Promise<Uint8Array> {
+    const buf = await call<ArrayBuffer | number[]>('read_file_bytes', { path });
+    return buf instanceof ArrayBuffer ? new Uint8Array(buf) : Uint8Array.from(buf);
+  }
+
+  /** Copy File Path: async clipboard API, falling back to a hidden textarea + execCommand. */
+  async writeClipboardText(text: string): Promise<void> {
+    try {
+      await navigator.clipboard.writeText(text);
+      return;
+    } catch {
+      /* not allowed without a user gesture in some webviews */
+    }
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand('copy');
+    ta.remove();
+    if (!ok) throw new Error('clipboard unavailable');
+  }
+
   setTitle(title: string): Promise<void> {
     return call('set_title', { title });
   }
@@ -225,10 +258,14 @@ export class TauriPlatform implements Platform {
 
   onOpenFiles(cb: (paths: string[]) => void): () => void {
     const off = subscribe<string[]>(EV.openFiles, cb);
+    // "Open in New Window" passes its file in the window URL (#94).
+    const own = new URLSearchParams(location.search).getAll('open');
+    if (own.length) queueMicrotask(() => cb(own));
     // Files passed before the frontend was listening (launch via Finder / CLI).
-    void call<string[]>('take_pending_open_files').then((paths) => {
-      if (paths.length) cb(paths);
-    });
+    else
+      void call<string[]>('take_pending_open_files').then((paths) => {
+        if (paths.length) cb(paths);
+      });
     return off;
   }
 

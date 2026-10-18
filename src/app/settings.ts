@@ -21,6 +21,10 @@ export interface MarginSettings extends AppSettings {
   restoreLastFolder: boolean;
   /** Pandoc binary (or its folder) for docx/latex/epub export; '' = auto-detect (#81). */
   pandocPath: string;
+  /** Save a modified file without asking when switching documents from the sidebar (#94). */
+  saveOnSwitch: boolean;
+  /** Documents larger than this (bytes) open in source mode with a warning (#94). */
+  largeFileBytes: number;
 }
 
 export const SETTINGS_VERSION = 2;
@@ -47,6 +51,8 @@ export const DEFAULT_SETTINGS: Readonly<MarginSettings> = Object.freeze({
   sidebarWidth: 260,
   restoreLastFolder: true,
   pandocPath: '',
+  saveOnSwitch: false,
+  largeFileBytes: 2_000_000,
 });
 
 export const MAX_RECENT = 15;
@@ -125,6 +131,8 @@ export function migrateSettings(input: unknown): MarginSettings {
     sidebarWidth: Math.round(num(raw.sidebarWidth, d.sidebarWidth, 180, 520)),
     restoreLastFolder: bool(raw.restoreLastFolder, d.restoreLastFolder),
     pandocPath: typeof raw.pandocPath === 'string' ? raw.pandocPath.trim() : '',
+    saveOnSwitch: bool(raw.saveOnSwitch, d.saveOnSwitch),
+    largeFileBytes: Math.round(num(raw.largeFileBytes, d.largeFileBytes, 1_000, 1_000_000_000)),
   };
 }
 
