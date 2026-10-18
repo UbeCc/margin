@@ -1,5 +1,5 @@
 {
- "evidence_id": "ev_dd6e0a252c39318745e6f51b325e72b4279d37c56f45feba86ce66230c7a2cae",
+ "evidence_id": "ev_7b98173ab80059f4532ff22019e3249023706f24d5105620ee600d70239352d6",
  "subject": null,
  "provider": {
   "id": "rea-javascript-application-workflows",
@@ -10,14 +10,14 @@
  "predicate_type": "rea.reconstruction-obligation-ledger",
  "operation": "build_reconstruction_obligation_ledger",
  "parameters": {
-  "ledger_id": "rol_b59784f01ada62ade82d561c290c941304f13b8ca8e9f364cc296ce33e6cce13",
-  "closure_digest": "019b8994fa84cde532e8bcc96b77c83619188b5c6f9ec7ef6696cf774e2fc24a"
+  "ledger_id": "rol_6026325b6947364ccb77a7b431f6a3115bf831e05a0cd6f97f64c5d3e8e8d2fe",
+  "closure_digest": "1c6e39fb7de10c332d2278f4be20e86a6f405ee4e1d3b53dd408549a2d40a1aa"
  },
  "raw_result": null,
  "normalized_result": {
   "schema": "ReconstructionObligationLedger",
-  "ledger_id": "rol_b59784f01ada62ade82d561c290c941304f13b8ca8e9f364cc296ce33e6cce13",
-  "closure_digest": "019b8994fa84cde532e8bcc96b77c83619188b5c6f9ec7ef6696cf774e2fc24a",
+  "ledger_id": "rol_6026325b6947364ccb77a7b431f6a3115bf831e05a0cd6f97f64c5d3e8e8d2fe",
+  "closure_digest": "1c6e39fb7de10c332d2278f4be20e86a6f405ee4e1d3b53dd408549a2d40a1aa",
   "status": "unknown",
   "coverage": {
    "status": "complete"
@@ -13670,7 +13670,7 @@
      "owner": {
       "module_path": "src/app/settings.ts",
       "symbol": "allowMagnification",
-      "owner_sha256": "df268296b75ba8938bdb8a2e47388e9302dcdca6b5cc38f3d20a6b818adbc3f2"
+      "owner_sha256": "be61152e04db49367e419a12e3dfe799db9d807cd18120674327e6109131b9b1"
      },
      "parser_type": null,
      "original_cases": [
@@ -14634,7 +14634,7 @@
      "owner": {
       "module_path": "src/app/preferences.ts",
       "symbol": "'Font size in px'",
-      "owner_sha256": "081ed5d26ea53bc0748ee8ab5847e945f2d6725ff3405517557651720f46ab1b"
+      "owner_sha256": "e9d591813fc6b93d4f570267f761ac477185356b3123fe60cec730db4daf29de"
      },
      "parser_type": null,
      "original_cases": [
@@ -14738,7 +14738,7 @@
      "owner": {
       "module_path": "src/app/preferences.ts",
       "symbol": "'darkTheme'",
-      "owner_sha256": "081ed5d26ea53bc0748ee8ab5847e945f2d6725ff3405517557651720f46ab1b"
+      "owner_sha256": "e9d591813fc6b93d4f570267f761ac477185356b3123fe60cec730db4daf29de"
      },
      "parser_type": null,
      "original_cases": [
@@ -14843,7 +14843,7 @@
      "owner": {
       "module_path": "src/app/settings.ts",
       "symbol": "textColumnWidth",
-      "owner_sha256": "df268296b75ba8938bdb8a2e47388e9302dcdca6b5cc38f3d20a6b818adbc3f2"
+      "owner_sha256": "be61152e04db49367e419a12e3dfe799db9d807cd18120674327e6109131b9b1"
      },
      "parser_type": null,
      "original_cases": [
@@ -15110,7 +15110,7 @@
      "owner": {
       "module_path": "src/app/settings.ts",
       "symbol": "export function newFileEol",
-      "owner_sha256": "df268296b75ba8938bdb8a2e47388e9302dcdca6b5cc38f3d20a6b818adbc3f2"
+      "owner_sha256": "be61152e04db49367e419a12e3dfe799db9d807cd18120674327e6109131b9b1"
      },
      "parser_type": null,
      "original_cases": [
@@ -15318,7 +15318,7 @@
      "owner": {
       "module_path": "src/app/settings.ts",
       "symbol": "export function launchPlan",
-      "owner_sha256": "df268296b75ba8938bdb8a2e47388e9302dcdca6b5cc38f3d20a6b818adbc3f2"
+      "owner_sha256": "be61152e04db49367e419a12e3dfe799db9d807cd18120674327e6109131b9b1"
      },
      "parser_type": null,
      "original_cases": [
@@ -15527,7 +15527,7 @@
      "owner": {
       "module_path": "src/app/settings.ts",
       "symbol": "DEFAULT_SETTINGS",
-      "owner_sha256": "df268296b75ba8938bdb8a2e47388e9302dcdca6b5cc38f3d20a6b818adbc3f2"
+      "owner_sha256": "be61152e04db49367e419a12e3dfe799db9d807cd18120674327e6109131b9b1"
      },
      "parser_type": null,
      "original_cases": [
@@ -15608,7 +15608,7 @@
      "owner": {
       "module_path": "src/app/settings.ts",
       "symbol": "DEFAULT_SETTINGS",
-      "owner_sha256": "df268296b75ba8938bdb8a2e47388e9302dcdca6b5cc38f3d20a6b818adbc3f2"
+      "owner_sha256": "be61152e04db49367e419a12e3dfe799db9d807cd18120674327e6109131b9b1"
      },
      "parser_type": null,
      "original_cases": [
