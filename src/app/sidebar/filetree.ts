@@ -96,6 +96,11 @@ export class FileTree {
   setSort(order: SortOrder): void {
     if (order === this.order) return;
     this.order = order;
+    // Date orders need fresh stat data (in-place "modified" events don't re-list).
+    if (/^(created|modified)/.test(order)) {
+      void this.refreshAll();
+      return;
+    }
     for (const node of this.dirs.values()) {
       if (!node.loaded) continue;
       node.children = sortEntries(node.children, order);
@@ -296,7 +301,7 @@ export class FileTree {
       if (ev.kind === 'renamed') {
         dirs.add(dirname(ev.from));
         dirs.add(dirname(ev.to));
-      } else if (ev.kind !== 'modified' || !this.rows.has(ev.path)) dirs.add(dirname(ev.path)); // atomic saves can surface as 'modified' of a new path
+      } else if (ev.kind !== 'modified' || !this.rows.has(ev.path) || this.order.startsWith('modified')) dirs.add(dirname(ev.path)); // atomic saves can surface as 'modified' of a new path
     }
     for (const d of dirs) void this.refreshDir(d);
   }
