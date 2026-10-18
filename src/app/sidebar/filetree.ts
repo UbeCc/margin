@@ -3,7 +3,7 @@ import { extras } from '../platform-extras';
 import { h, icon, clearChildren } from '../util/dom';
 import { basename, dirname, isInside, isMarkdownPath, isValidFileName, join, uniqueName, extname } from '../util/path';
 import { DEFAULT_SORT, sortEntries, type SortOrder } from './sort';
-import { canMoveInto, draggedPath, makeDraggable } from './drag';
+import { canMoveInto, draggedPath, endDrag, makeDraggable } from './drag';
 import { showContextMenu, type MenuItem } from '../ui/contextmenu';
 import { ask, confirmDialog, promptDialog } from '../ui/modal';
 
@@ -66,6 +66,7 @@ export class FileTree {
       const src = draggedPath(e);
       if (!src || !this.root) return;
       e.preventDefault();
+      endDrag();
       void this.move(src, this.root);
     });
     this.renderEmpty();
@@ -471,6 +472,7 @@ export class FileTree {
       if (!src) return;
       e.preventDefault();
       e.stopPropagation();
+      endDrag();
       void this.move(src, dir);
     });
   }

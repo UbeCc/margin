@@ -8,9 +8,18 @@ import { isImagePath, relativeFrom, stripExt, basename, isInside, dirname } from
  */
 export const DRAG_MIME = 'application/x-margin-path';
 
+/**
+ * Path of the sidebar row being dragged in this window. Some engines (WebKitGTK)
+ * drop custom MIME types from `dataTransfer.types`, so in-page drags are also
+ * tracked here.
+ */
+let current: string | null = null;
+
 export function makeDraggable(row: HTMLElement, path: string): void {
   row.draggable = true;
+  row.addEventListener('dragend', () => (current = null));
   row.addEventListener('dragstart', (e) => {
+    current = path;
     const dt = e.dataTransfer;
     if (!dt) return;
     dt.effectAllowed = 'copyMove';
@@ -21,9 +30,15 @@ export function makeDraggable(row: HTMLElement, path: string): void {
 }
 
 export function draggedPath(e: DragEvent): string | null {
+  if (current) return current;
   const dt = e.dataTransfer;
   if (!dt || !Array.from(dt.types).includes(DRAG_MIME)) return null;
   return dt.getData(DRAG_MIME) || ''; // '' during dragover (data is protected until drop)
+}
+
+/** The drop consumed the drag (dragend may not fire after the source row re-renders). */
+export function endDrag(): void {
+  current = null;
 }
 
 /** Percent-encode what Markdown link destinations can't hold raw (spaces, parens, <>). */

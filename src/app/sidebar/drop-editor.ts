@@ -1,5 +1,5 @@
 import type { EditorHandle } from '../../contracts';
-import { draggedPath, dropMarkdown } from './drag';
+import { draggedPath, dropMarkdown, endDrag } from './drag';
 
 export interface DropHost {
   docDir(): string | null;
@@ -42,6 +42,7 @@ export function installSidebarDrop(scroller: HTMLElement, host: DropHost): void 
       if (path === null) return;
       e.preventDefault();
       e.stopPropagation();
+      endDrag();
       if (!path) return;
       const ed = host.editor();
       const r = caretAt(e.clientX, e.clientY);
