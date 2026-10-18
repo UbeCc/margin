@@ -231,7 +231,13 @@ export function attachInput(ed: EditorCore): () => void {
       ed.change(() => E.indent(ed.doc, c.i, c.off, e.shiftKey) ?? undefined);
       return;
     }
-    if (isLineStartKey(e)) setTimeout(skipMarker, 0);
+    if (isLineStartKey(e)) {
+      // #122: apply the fix-up as soon as the browser reports the moved selection
+      // (selectionchange) instead of relying on a 0 ms timer alone — under load a
+      // following key event can be dispatched before the timer fires.
+      lineStartPending = true;
+      setTimeout(skipMarkerIfPending, 0);
+    }
     const edge = docEdgeKey(e);
     if (edge) {
       ed.hist.break();
@@ -275,7 +281,14 @@ export function attachInput(ed: EditorCore): () => void {
     return mac ? e.metaKey && e.key === 'ArrowLeft' : !e.metaKey && e.key === 'Home';
   };
 
-  /** After a native line-start move: a caret inside a heading's leading marker goes past it (#57, WebKit). */
+  /** Set on a line-start key; the fix-up runs on selectionchange or the fallback timer. */
+  let lineStartPending = false;
+  const skipMarkerIfPending = () => {
+    if (!lineStartPending) return;
+    lineStartPending = false;
+    skipMarker();
+  };
+
   const skipMarker = () => {
     const c = caretLeaf();
     if (!c) return;
@@ -372,6 +385,10 @@ export function attachInput(ed: EditorCore): () => void {
 
   const onSelChange = () => {
     if (ed.composing) return;
+    // #122: a pending line-start marker fix-up runs now — the browser has just
+    // reported the moved caret, which is earlier than the 0 ms fallback timer
+    // when the renderer is under load.
+    skipMarkerIfPending();
     const s = getSelection();
     if (!s || !s.rangeCount || !root.contains(s.focusNode)) return;
     const b = ed.view.blockOf(s.focusNode);
