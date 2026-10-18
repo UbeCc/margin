@@ -19,6 +19,12 @@ export default defineConfig({
   use: {
     baseURL: `http://localhost:${PORT}`,
     trace: 'retain-on-failure',
+    // #152: entrance animations (dialog pop, context-menu drop) are transform
+    // keyframes; under CI CPU starvation WebKit renders frames seconds apart, so a
+    // "0.18s" pop stretches past the 30s budget and Playwright's stability check
+    // never sees two identical frames. The app honors prefers-reduced-motion with
+    // a global animation kill (styles.css), so boxes are static from frame one.
+    reducedMotion: 'reduce',
   },
   projects: all.filter((p) => browsers.includes(p.name)),
   webServer: {
