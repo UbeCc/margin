@@ -1,6 +1,6 @@
 import { convertFileSrc, invoke } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
-import type { AppSettings, DirEntry, FsEvent, ImageRule, MenuAction, Platform, RichClipboardData } from '../contracts';
+import type { AppSettings, DirEntry, FsEvent, ImageRule, MenuAction, Platform, RichClipboardData, UploadConfig } from '../contracts';
 import { builtinThemes, normalizeSettings, printHtmlInIframe } from './common';
 
 /** Event names emitted by `src-tauri/src/lib.rs`. */
@@ -163,6 +163,11 @@ export class TauriPlatform implements Platform {
 
   revealInFolder(path: string): Promise<void> {
     return call('reveal_path', { path });
+  }
+
+  /** #80: custom command (argv, no shell) or PicGo on 127.0.0.1; one URL per path. */
+  uploadImages(paths: string[], config: UploadConfig): Promise<string[]> {
+    return call('upload_images', { paths, config });
   }
 
   /** Let the webview load images from one more directory (non-recursive). */
