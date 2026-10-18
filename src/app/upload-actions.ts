@@ -12,7 +12,7 @@ export interface UploadHost {
   /** Directory of the current document (null = unsaved). */
   baseDir(): string | null;
   settings(): object;
-  notify(message: string, kind: 'info' | 'error' | 'success'): void;
+  notify(message: string, kind: 'info' | 'error' | 'success', action?: { label: string; run: () => void }): void;
 }
 
 export type UploadOutcome = { ok: true; uploaded: number } | { ok: false; error: string };
@@ -82,7 +82,7 @@ export class ImageUploader {
     if (!images.length) return this.fail(emptyMessage);
     this.busy = true;
     try {
-      this.host.notify(`Uploading ${images.length} image${images.length > 1 ? 's' : ''}…`, 'info');
+      this.host.notify(`Uploading in progress… (${images.length} image${images.length > 1 ? 's' : ''})`, 'info', { label: 'Cancel', run: () => void this.cancel() });
       let urls: string[];
       try {
         urls = await upload.call(this.host.platform, images.map((i) => i.path), config);

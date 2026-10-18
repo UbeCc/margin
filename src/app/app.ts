@@ -115,7 +115,7 @@ export class App {
       editor: () => this.editor,
       baseDir: () => this.doc.dir,
       settings: () => this.settings,
-      notify: (m, k) => void toast(m, { kind: k }),
+      notify: (m, k, action) => void toast(m, { kind: k, ...(action ? { action } : {}) }),
     });
     // #99: image rules, Format › Image, image context menu, typora-root-url.
     this.images = new ImageFeature({

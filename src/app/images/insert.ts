@@ -81,7 +81,7 @@ export async function insertImage(host: InsertHost, input: ImageInput): Promise<
         return write(parked);
       }
       try {
-        host.notify('Uploading in progress…', 'info');
+        host.notify('Uploading in progress…', 'info', { label: 'Cancel', run: () => void host.platform.cancelUpload?.() });
         const [url] = await host.upload([parked]);
         return imageSnippet(url, alt, opts.imageSyntax);
       } catch (e) {
