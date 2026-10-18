@@ -191,7 +191,7 @@ export class App {
       uploader: this.uploader,
       notify: (m, k, action) => void toast(m, { kind: k, ...(action ? { action } : {}) }),
       saveAs: () => void this.doc.saveAs(),
-      openImagePreferences: () => this.preferences('images'),
+      openImagePreferences: () => this.preferences('images', '[data-pref-group="image-rules"]'),
       resolveAsset: (src) => this.resolveAsset(src),
       assetsChanged: () => this.assetsChanged(),
     });
@@ -1156,7 +1156,7 @@ export class App {
         this.updateSettings({ markdown: { ...this.settings.markdown, remapPunctuation: !this.settings.markdown.remapPunctuation } });
         return true;
       case 'subst:more':
-        this.preferences('markdown');
+        this.preferences('markdown', '[data-group="Smart Punctuation"]');
         return true;
       case 'emojiPicker': {
         // "Emoji and Symbols": the system picker on desktop; here, open the
@@ -1294,7 +1294,7 @@ export class App {
     toast(`${key === 'inlineMath' ? 'Inline Math' : 'Highlight'} syntax enabled (Preferences › Markdown › Syntax Support)`, { timeout: 3000 });
   }
 
-  private preferences(section?: Section): void {
+  private preferences(section?: Section, deepLink?: string): void {
     openPreferences({
       settings: () => this.settings,
       update: (p) => this.updateSettings(p),
@@ -1318,7 +1318,7 @@ export class App {
         const test = extras(this.platform).testUploader;
         return test ? test.call(this.platform, config) : Promise.reject(new Error('Image upload is only available in the desktop app.'));
       },
-    }, section);
+    }, section, deepLink);
   }
 
   private async openThemesFolder(): Promise<void> {

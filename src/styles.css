@@ -442,6 +442,12 @@ button { cursor: default; }
 .pref-group { display: flex; flex-direction: column; padding-top: 6px; }
 .pref-group-title { margin: 14px 0 2px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--margin-fg-muted); }
 .pref-group .radio-group { padding: 6px 0; }
+.pref-search { margin-left: auto; width: 200px; padding: 5px 10px; font-size: 12px; border: 1px solid var(--margin-border); border-radius: 6px; background: var(--margin-bg); color: var(--margin-fg); }
+.pref-group.pref-hit, [data-pref-group].pref-hit { outline: 1px solid color-mix(in srgb, var(--margin-accent, #4b9eff) 70%, transparent); outline-offset: 4px; border-radius: 4px; }
+.pref-hits { margin-left: 6px; font-size: 10px; line-height: 1; padding: 3px 6px; border-radius: 8px; background: color-mix(in srgb, var(--margin-accent, #4b9eff) 22%, transparent); color: var(--margin-fg); }
+.pref-hits:empty, .pref-hits[data-hits=''] { display: none; }
+.pref-group.pref-deeplink, [data-pref-group].pref-deeplink { animation: pref-deeplink-blink 0.9s ease-in-out 4; outline: 1px solid color-mix(in srgb, var(--margin-accent, #4b9eff) 80%, transparent); outline-offset: 4px; border-radius: 4px; }
+@keyframes pref-deeplink-blink { 50% { outline-color: transparent; } }
 .pref-actions { flex-wrap: wrap; }
 .pref-label { max-width: 360px; }
 .pref-subhead { margin: 18px 0 2px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--margin-fg-muted); }
