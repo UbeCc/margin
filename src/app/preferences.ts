@@ -53,7 +53,7 @@ export function openPreferences(host: PreferencesHost, initial: Section = 'gener
   const names = host.themeNames();
   const darkNames = names.filter((n) => host.isDarkTheme(n));
   // Font Size: "Auto ( Recommended )" / "Customized" + 9–24 px box, clamped on blur (#134).
-  const sizeBox = h('input.number', { type: 'number', min: '9', max: '24', step: '1', value: String(s.customFontSize), 'data-pref': 'customFontSize', 'aria-label': 'Font size in px' });
+  const sizeBox = h('input.number', { type: 'number', min: '9', max: '24', step: '1', value: String(s.customFontSize), 'data-pref': 'fontSize', 'aria-label': 'Font size in px' });
   const applyFontSize = (): void => {
     const v = Math.max(9, Math.min(24, Math.round(Number(sizeBox.value) || 14)));
     sizeBox.value = String(v);

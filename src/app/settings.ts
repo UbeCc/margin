@@ -249,10 +249,12 @@ export function migrateSettings(input: unknown): MarginSettings {
   }
   const scheme = raw.colorScheme;
   const tab = raw.sidebarTab;
-  // #134: a legacy single `fontSize` (10–32) migrates to Customized, clamped to Typora's 9–24.
-  const legacySize = raw.useCustomFontSize === undefined && typeof raw.fontSize === 'number' && raw.fontSize !== 16 ? clampFontSize(raw.fontSize) : d.customFontSize;
-  const customized = raw.useCustomFontSize === undefined ? legacySize !== d.customFontSize : bool(raw.useCustomFontSize, false);
-  const customSize = Math.round(num(raw.customFontSize, legacySize, 9, 24));
+  // #134: `fontSize` stays authoritative (Advanced JSON / legacy settings set it
+  // directly); Auto pins it to 16, the Customized box keeps the 9–24 clamp.
+  const explicitSize = typeof raw.fontSize === 'number' ? clampFontSize(raw.fontSize) : d.fontSize;
+  const useCustom = bool(raw.useCustomFontSize, false);
+  const customized = useCustom || explicitSize !== d.fontSize;
+  const customSize = customized ? (useCustom && typeof raw.customFontSize === 'number' ? clampFontSize(raw.customFontSize) : explicitSize) : Math.round(num(raw.customFontSize, d.customFontSize, 9, 24));
   return {
     ...raw,
     settingsVersion: SETTINGS_VERSION,
@@ -283,8 +285,7 @@ export function migrateSettings(input: unknown): MarginSettings {
     allowMagnification: bool(raw.allowMagnification, d.allowMagnification),
     useCustomFontSize: customized,
     customFontSize: customSize,
-    // #134: Auto uses the theme default (16); Customized uses the 9–24 px box.
-    fontSize: customized ? customSize : 16,
+    fontSize: customized ? customSize : d.fontSize,
     copyMarkdownByDefault: bool(raw.copyMarkdownByDefault, d.copyMarkdownByDefault),
     lineWiseCopyCut: bool(raw.lineWiseCopyCut, d.lineWiseCopyCut),
     typewriterCaret: bool(raw.typewriterCaret, d.typewriterCaret),
