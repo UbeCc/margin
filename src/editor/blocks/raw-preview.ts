@@ -236,6 +236,7 @@ class RawPreviewInstance<P extends Parsed> implements WidgetInstance {
     this.settings = settings;
     this.editor?.setShiftTabAutoIndent({ ...DEFAULT_MARKDOWN_OPTIONS, ...settings.markdown }.shiftTabAutoIndent);
     if (schemeChanged) {
+      this.applyScheme();
       this.editor?.setDark(settings.colorScheme === 'dark');
       this.renderPreview();
     }
