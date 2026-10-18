@@ -2,8 +2,11 @@ import type { ImageRule } from '../contracts';
 import { themeLabel } from '../themes';
 import { IMAGE_RULE_PRESETS, imageRulePresetId, type MarginSettings } from './settings';
 import { h, debounce } from './util/dom';
-import { openModal } from './ui/modal';
+import { confirmDialog, openModal } from './ui/modal';
 import { uploadPrefsSection } from './upload-prefs';
+import { prefKit } from './prefs/kit';
+import { generalPane } from './prefs/general';
+import { editorPane, markdownPane } from './prefs/editor-md';
 
 export interface PreferencesHost {
   settings(): MarginSettings;
@@ -16,14 +19,16 @@ export interface PreferencesHost {
   detectPandoc?(path: string): Promise<string>;
 }
 
-type Section = 'appearance' | 'editor' | 'files' | 'images';
+/** Pane order follows Typora: General, Appearance, Editor, Image, Markdown, Export (#100). */
+export type Section = 'general' | 'appearance' | 'editor' | 'images' | 'markdown' | 'export';
 
 let openHandle: { close(): void } | null = null;
 
-export function openPreferences(host: PreferencesHost, initial: Section = 'appearance'): void {
+export function openPreferences(host: PreferencesHost, initial: Section = 'general'): void {
   if (openHandle) return;
   const s = host.settings();
   const set = (patch: Partial<MarginSettings>): void => host.update(patch);
+  const kit = prefKit(() => host.settings(), set);
 
   const row = (label: string, control: HTMLElement, hint?: string): HTMLElement =>
     h('label.pref-row', null, h('span.pref-label', null, label, hint ? h('span.pref-hint', { text: hint }) : null), h('span.pref-control', null, control));
@@ -49,6 +54,19 @@ export function openPreferences(host: PreferencesHost, initial: Section = 'appea
   fontSize.addEventListener('change', () => {
     const v = Math.round(Number(fontSize.value));
     if (v >= 10 && v <= 32) set({ fontSize: v });
+  });
+  const columnWidth = h('input.number', {
+    type: 'number',
+    min: '400',
+    max: '3000',
+    step: '10',
+    placeholder: 'Default',
+    value: s.textColumnWidth ? String(s.textColumnWidth) : '',
+    'data-pref': 'textColumnWidth',
+  });
+  columnWidth.addEventListener('change', () => {
+    const v = columnWidth.value.trim() ? Math.round(Number(columnWidth.value)) : 0;
+    if (v === 0 || (v >= 400 && v <= 3000)) set({ textColumnWidth: v });
   });
   const customCss = h('textarea.css-input', { rows: '6', spellcheck: 'false', placeholder: '.margin-doc h1 { letter-spacing: 0.02em; }', 'data-pref': 'customCss' });
   customCss.value = s.customCss;
@@ -76,25 +94,26 @@ export function openPreferences(host: PreferencesHost, initial: Section = 'appea
       'Used in dark mode when the theme above is light',
     ),
     row('Font size', h('span.inline', null, fontSize, h('span.unit', { text: 'px' }))),
+    row(
+      'Window Style',
+      select('windowStyle', [['seamless', 'Seamless'], ['unibody', 'Unibody'], ['native', 'System Native']], s.windowStyle, (v) =>
+        set({ windowStyle: v as MarginSettings['windowStyle'] }),
+      ),
+      '(applied after restart; desktop only)',
+    ),
+    row('Text Column Width', h('span.inline', null, columnWidth, h('span.unit', { text: 'px' })), 'Empty = theme default'),
+    h(
+      'div.pref-group',
+      { 'data-group': 'Left Panel' },
+      h('h3.pref-group-title', { text: 'Left Panel' }),
+      toggle('showOutlineByDefault', 'Show Outline Panel by Default'),
+      toggle('collapsibleOutline', 'Collapsible Outline on Left Panel'),
+    ),
     h('div.pref-block', null, h('div.pref-label', null, 'Custom CSS', h('span.pref-hint', { text: 'Applied on top of the theme' })), customCss),
     h('div.pref-actions', null, h('button.btn', { type: 'button', text: 'Open Themes Folder', onclick: () => host.openThemesFolder() })),
   );
 
-  // ---------------------------------------------------------------- editor
-  const editor = h(
-    'section.pref-section',
-    { 'data-section': 'editor' },
-    toggle('spellcheck', 'Check spelling while typing'),
-    toggle('focusMode', 'Focus mode', 'Dim everything except the current block (F8)'),
-    toggle('typewriterMode', 'Typewriter mode', 'Keep the current line vertically centered (F9)'),
-  );
-
-  // ---------------------------------------------------------------- files
-  const delay = h('input.number', { type: 'number', min: '0.3', max: '60', step: '0.1', value: String(s.autoSaveDelay / 1000), 'data-pref': 'autoSaveDelay' });
-  delay.addEventListener('change', () => {
-    const v = Number(delay.value);
-    if (v >= 0.3 && v <= 60) set({ autoSaveDelay: Math.round(v * 1000) });
-  });
+  // ---------------------------------------------------------------- export
   const pandocPath = h('input.text-input', { type: 'text', placeholder: 'Auto-detect', value: s.pandocPath, spellcheck: 'false', 'data-pref': 'pandocPath' });
   pandocPath.addEventListener('change', () => set({ pandocPath: pandocPath.value.trim() }));
   const pandocStatus = h('span.pref-hint', { 'data-pref-status': 'pandoc' });
@@ -112,26 +131,11 @@ export function openPreferences(host: PreferencesHost, initial: Section = 'appea
         },
       })
     : null;
-  const files = h(
+  const exportPane = h(
     'section.pref-section',
-    { 'data-section': 'files' },
-    toggle('autoSave', 'Auto save', 'Save documents automatically after you stop typing'),
-    row('Auto-save delay', h('span.inline', null, delay, h('span.unit', { text: 's' }))),
-    toggle('restoreLastFolder', 'Reopen last folder on launch'),
-    row('Pandoc path', h('span.inline', null, pandocPath, pandocDetect), 'Used for Word, LaTeX and EPUB export'),
+    { 'data-section': 'export' },
+    row('Pandoc Path', h('span.inline', null, pandocPath, pandocDetect), 'Used for Word, LaTeX and EPUB export'),
     h('div.pref-block', null, pandocStatus),
-    h(
-      'div.pref-actions',
-      null,
-      h('button.btn', {
-        type: 'button',
-        text: 'Clear Recent Files',
-        onclick: (e: Event) => {
-          set({ recentFiles: [], recentFolders: [] });
-          (e.currentTarget as HTMLButtonElement).textContent = 'Cleared';
-        },
-      }),
-    ),
   );
 
   // ---------------------------------------------------------------- images
@@ -201,10 +205,12 @@ export function openPreferences(host: PreferencesHost, initial: Section = 'appea
 
   // ---------------------------------------------------------------- shell
   const sections: Record<Section, [string, HTMLElement]> = {
+    general: ['General', generalPane(kit, { pickFolder: () => host.pickFolder(), confirm: (t, m) => confirmDialog(t, m, 'Revert', true) })],
     appearance: ['Appearance', appearance],
-    editor: ['Editor', editor],
-    files: ['Files', files],
-    images: ['Images', images],
+    editor: ['Editor', editorPane(kit)],
+    images: ['Image', images],
+    markdown: ['Markdown', markdownPane(kit)],
+    export: ['Export', exportPane],
   };
   const nav = h('nav.pref-nav', { role: 'tablist' });
   const panel = h('div.pref-panel');
