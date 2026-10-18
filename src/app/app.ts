@@ -10,6 +10,7 @@ import { openPreferences } from './preferences';
 import { DEFAULT_SETTINGS, migrateSettings, pushRecent, type MarginSettings } from './settings';
 import type { FileTree } from './sidebar/filetree';
 import { FilesPanel } from './sidebar/files-panel';
+import { installSidebarDrop } from './sidebar/drop-editor';
 import { OutlineView } from './sidebar/outline';
 import { StatusBar } from './statusbar';
 import { ThemeManager } from './themes';
@@ -227,6 +228,10 @@ export class App {
         e.preventDefault();
         this.editor.focus();
       }
+    });
+    installSidebarDrop(this.scroller, {
+      docDir: () => (this.doc.path ? dirname(this.doc.path) : null),
+      editor: () => this.editor,
     });
     const main = h('main.main', null, this.findbar.el, this.extBanner.el, this.scroller);
 

@@ -5,6 +5,7 @@ import { showContextMenu } from '../ui/contextmenu';
 import { extras } from '../platform-extras';
 import { compareBy, DEFAULT_SORT, type SortOrder } from './sort';
 import { collectDocs, LIST_LIMIT, summarize } from './walk';
+import { makeDraggable } from './drag';
 
 export interface FileListHost {
   platform: Platform;
@@ -128,6 +129,7 @@ export class FileList {
       h('div.list-meta', { text: meta }),
     );
     if (d.path === this.active) row.classList.add('active');
+    makeDraggable(row, d.path);
     row.addEventListener('click', () => {
       row.focus({ preventScroll: true });
       this.host.openFile(d.path);

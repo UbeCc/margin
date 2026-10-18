@@ -118,3 +118,20 @@ test('sidebar.outline-collapse: Outline: collapsible/flat outline, expand/collap
   await expect(page.locator('.outline-toggle')).toHaveCount(0);
   await expect.poll(() => page.evaluate(() => window.__margin!.settings.outlineCollapsible)).toBe(false);
 });
+
+test('sidebar.drag: Drag files from sidebar into the editor / other apps; drop files to open', async ({ page }) => {
+  const ideas = tree(page).locator(`.tree-row[data-path="${ROOT}/Ideas"]`);
+  await ideas.click();
+  const roadmap = tree(page).locator(`.tree-row[data-path="${ROOT}/Ideas/Roadmap.md"]`);
+  await expect(roadmap).toHaveAttribute('draggable', 'true');
+  // Into the editor: a relative link at the drop point.
+  await roadmap.dragTo(page.locator('.md-editor .md-block').last());
+  await expect.poll(() => editorValue(page)).toContain('[Roadmap](Ideas/Roadmap.md)');
+  // Onto a folder: move it there (open document path follows).
+  await tree(page).locator(`.tree-row[data-path="${ROOT}/notes.txt"]`).dragTo(tree(page).locator(`.tree-row[data-path="${ROOT}/Journal"]`));
+  await expect(tree(page).locator(`.tree-row[data-path="${ROOT}/Journal/notes.txt"]`)).toBeVisible();
+  await expect(tree(page).locator(`.tree-row[data-path="${ROOT}/notes.txt"]`)).toHaveCount(0);
+  // Negative: dropping a folder into itself is refused.
+  await ideas.dragTo(roadmap);
+  await expect(tree(page).locator(`.tree-row[data-path="${ROOT}/Ideas"]`)).toBeVisible();
+});

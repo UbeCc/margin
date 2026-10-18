@@ -3,6 +3,7 @@ import { extras } from '../platform-extras';
 import { h, icon, clearChildren } from '../util/dom';
 import { basename, dirname, isInside, isMarkdownPath, isValidFileName, join, uniqueName, extname } from '../util/path';
 import { DEFAULT_SORT, sortEntries, type SortOrder } from './sort';
+import { canMoveInto, draggedPath, makeDraggable } from './drag';
 import { showContextMenu, type MenuItem } from '../ui/contextmenu';
 import { confirmDialog, promptDialog } from '../ui/modal';
 
@@ -57,6 +58,15 @@ export class FileTree {
       this.showMenu(e.clientX, e.clientY, null);
     });
     this.body.addEventListener('keydown', (e) => this.onKey(e));
+    this.body.addEventListener('dragover', (e) => {
+      if (this.root && draggedPath(e) !== null) e.preventDefault();
+    });
+    this.body.addEventListener('drop', (e) => {
+      const src = draggedPath(e);
+      if (!src || !this.root) return;
+      e.preventDefault();
+      void this.move(src, this.root);
+    });
     this.renderEmpty();
   }
 
@@ -224,6 +234,8 @@ export class FileTree {
       }
     }
     if (entry.path === this.active) row.classList.add('active');
+    makeDraggable(row, entry.path);
+    if (entry.isDir) this.dropTarget(row, entry.path);
     row.addEventListener('click', () => {
       row.focus({ preventScroll: true });
       if (entry.isDir) void this.toggle(entry.path);
@@ -359,18 +371,63 @@ export class FileTree {
     } catch (e) {
       return this.host.notify(`Couldn't rename: ${errMsg(e)}`, 'error');
     }
-    // Keep expansion state of renamed folders.
+    this.relocated(entry.path, to);
+    await this.refreshDir(dirname(entry.path));
+  }
+
+  /** Bookkeeping after `from` became `to` (keeps expansion state of moved folders). */
+  private relocated(from: string, to: string): void {
     for (const [p, node] of [...this.dirs]) {
-      if (isInside(entry.path, p)) {
+      if (isInside(from, p)) {
         this.dirs.delete(p);
-        node.path = to + p.slice(entry.path.length);
+        node.path = to + p.slice(from.length);
         this.dirs.set(node.path, node);
         node.loaded = false;
       }
     }
-    if (this.active && isInside(entry.path, this.active)) this.active = to + this.active.slice(entry.path.length);
-    this.host.onRenamed(entry.path, to);
-    await this.refreshDir(dirname(entry.path));
+    if (this.active && isInside(from, this.active)) this.active = to + this.active.slice(from.length);
+    this.host.onRenamed(from, to);
+  }
+
+  /** Move a file or folder into `destDir` (sidebar drag & drop). */
+  async move(src: string, destDir: string): Promise<boolean> {
+    const rename = extras(this.host.platform).rename;
+    if (!rename || !canMoveInto(src, destDir)) return false;
+    const to = join(destDir, basename(src));
+    if (await this.host.platform.stat(to)) {
+      this.host.notify(`“${basename(src)}” already exists in ${basename(destDir)}`, 'error');
+      return false;
+    }
+    try {
+      await rename.call(this.host.platform, src, to);
+    } catch (e) {
+      this.host.notify(`Couldn't move: ${errMsg(e)}`, 'error');
+      return false;
+    }
+    this.relocated(src, to);
+    await this.refreshDir(dirname(src));
+    await this.toggle(destDir, true);
+    await this.refreshDir(destDir);
+    return true;
+  }
+
+  private dropTarget(el: HTMLElement, dir: string): void {
+    el.addEventListener('dragover', (e) => {
+      if (draggedPath(e) === null) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+      el.classList.add('drop-target');
+    });
+    el.addEventListener('dragleave', () => el.classList.remove('drop-target'));
+    el.addEventListener('drop', (e) => {
+      el.classList.remove('drop-target');
+      const src = draggedPath(e);
+      if (!src) return;
+      e.preventDefault();
+      e.stopPropagation();
+      void this.move(src, dir);
+    });
   }
 
   async delete(entry: DirEntry): Promise<void> {
