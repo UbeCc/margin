@@ -565,6 +565,7 @@ export class App {
     closeContextMenu();
     const ed = this.editor;
     if (id.startsWith('heading:')) return ed.exec({ kind: 'heading', level: Number(id.slice(8)) as 0 });
+    if (id === 'mark:math' || id === 'mark:highlight') this.enableSyntaxFor(id === 'mark:math' ? 'inlineMath' : 'highlight');
     if (id.startsWith('mark:')) return ed.exec({ kind: 'mark', mark: id.slice(5) as 'strong' });
     if (id.startsWith('block:')) return ed.exec({ kind: 'block', block: id.slice(6) as 'quote' });
     if (id.startsWith('task:')) return ed.exec({ kind: 'task', op: id.slice(5) as 'toggle' });
@@ -693,6 +694,16 @@ export class App {
         return (await this.uploader.uploadAll()).ok;
     }
     return false;
+  }
+
+  /**
+   * Format › Inline Math / Highlight while that syntax is off (Typora's fresh-install default):
+   * turn it on so the inserted `$…$` / `==…==` renders, and say where the switch lives (#102).
+   */
+  private enableSyntaxFor(key: 'inlineMath' | 'highlight'): void {
+    if (this.settings.markdown[key]) return;
+    this.updateSettings({ markdown: { ...this.settings.markdown, [key]: true } });
+    toast(`${key === 'inlineMath' ? 'Inline Math' : 'Highlight'} syntax enabled (Preferences › Markdown › Syntax Support)`, { timeout: 3000 });
   }
 
   private preferences(): void {

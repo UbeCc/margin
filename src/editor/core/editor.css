@@ -156,4 +156,5 @@
 .md-editor .md-focus .md-html-br { font-size: 0.9em; }
 .md-editor.md-indent-first .md-paragraph > .md-content { text-indent: 2em; }
 /* Display source for simple blocks on focus: off → heading `#` stays hidden while editing */
-.md-editor.md-no-expand-simple .md-focus.md-heading > .md-content > .md-meta.md-bmeta { display: none; }
+/* (kept in layout with zero size so the caret can still sit around it while typing `# `) */
+.md-editor.md-no-expand-simple .md-focus.md-heading > .md-content > .md-meta.md-bmeta { font-size: 0; letter-spacing: 0; }
