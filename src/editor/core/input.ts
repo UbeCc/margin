@@ -9,7 +9,7 @@ import { EditorCore } from './editor';
 import { EMPTY_ID } from './view';
 import { leafContent } from './model';
 import * as E from './edit';
-import { onCopy, onPaste, onDrop } from './clipboard';
+import { onCopy, onPaste, onDrop, expandToBlockStart } from './clipboard';
 import { undo, redo } from './commands';
 import { footnoteDef, footnoteRef } from './para-cmds';
 import { parseInline, inlinePlain } from './parser/inline';
@@ -123,14 +123,21 @@ export function attachInput(ed: EditorCore): () => void {
       const r = rangeOf(e);
       if (!r) return;
       let text = e.data ?? e.dataTransfer?.getData('text/plain') ?? '';
+      let from = r.from;
       if (t.startsWith('delete')) {
         text = '';
         if (r.from === r.to) return; // nothing selected by the browser: structural cases are handled on keydown
+        // A selection made by select-all / dragging starts after a block's hidden
+        // marker (`# `, `> `); widen it to the line start like copy/cut do (#91),
+        // else Backspace leaves a lone `#` behind.
+        from = expandToBlockStart(ed.doc, r.from, r.to);
       }
+      let to = r.to;
+      if (t.startsWith('delete') && from === 0 && /^[\r\n]*$/.test(ed.doc.text().slice(to))) to = ed.doc.text().length;
       e.preventDefault();
       const key = (t.startsWith('delete') ? 'del:' : 'type:') + (caretBlock()?.id ?? '');
       if (t === 'insertText' && r.from === r.to && text.length === 1 && autoPair(r.from, text, key)) return;
-      ed.replaceRange(r.from, r.to, text, key);
+      ed.replaceRange(from, to, text, key);
       return;
     }
     if (t === 'insertFromPaste' || t === 'insertFromDrop' || t === 'insertFromComposition' || t === 'deleteCompositionText') return;
