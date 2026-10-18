@@ -9,14 +9,14 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 | | surfaces |
 |---|---|
 | total | 171 |
-| owned (implemented) | 107 (with a named passing test: 94) |
-| partial | 14 |
-| missing | 42 |
+| owned (implemented) | 119 (with a named passing test: 106) |
+| partial | 12 |
+| missing | 32 |
 | out of scope | 8 |
 
-REA ledger `rol_e08ce22515e19c7dd8fc11fa3c5678760428660dbdf84ee4985317ae20f7ebfa` (closure `0db45ac41bcba12b…`): status **unknown**; unowned 42, implemented 121, out-of-scope 8, unknown 5.
+REA ledger `rol_db4dd5bb703badd68c3fe101e0734ada9f905281fc2b52bc8d67d9559458e9bc` (closure `6a47c8270d22893d…`): status **unknown**; unowned 32, implemented 131, out-of-scope 8, unknown 5.
 
-REA coverage boundary `margin.typora-parity`: status **unknown**; 94/163 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 42, package-proof-missing 1, verifier-missing 63, verifier-unknown 6.
+REA coverage boundary `margin.typora-parity`: status **unknown**; 106/163 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 32, package-proof-missing 1, verifier-missing 52, verifier-unknown 5.
 
 Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): build exit 0, cargo-test exit 0, independence exit 0, playwright exit 0, vitest exit 0. See `rea/summary.json`.
 
@@ -36,8 +36,8 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `files` File lifecycle: tabs/windows, recent, duplicate/move/rename, encoding, versions, recovery | P0 | 0 |
 | `export` Export, import & print: image/Pandoc/custom formats, export settings, export-with-previous | P0 | 0 |
 | `clipboard` Clipboard & selection: copy-as / paste-as, selection & delete scopes, jump-to | P0 | 2 |
-| `ctx` Editor & sidebar context menus (text, link, table, image, code, math, diagram, outline, files) | P1 | 7 |
-| `tools` Table, code-fence and math tools | P1 | 9 |
+| `ctx` Editor & sidebar context menus (text, link, table, image, code, math, diagram, outline, files) | P1 | 3 |
+| `tools` Table, code-fence and math tools | P1 | 1 |
 | `images` Image pipeline: insert-local, copy/move/upload, zoom, syntax switch, image root path | P1 | 10 |
 | `prefs` Preferences completeness (General, Editor, Image, Markdown, Export, Appearance panes) | P1 | 8 |
 | `sidebar` Sidebar & outline: list view, file search, sort, collapsible outline, filter | P1 | 6 |
@@ -104,7 +104,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 |---|---|---|---|---|---|---|
 | `menu.para.headings` | Paragraph › Heading 1–6 / Paragraph | owned |  | `src/editor/core/commands.ts` `case 'heading'` | `tests/e2e/app-navigation.spec.ts` › keyboard shortcuts drive editor commands | 8 |
 | `menu.para.heading-level` | Paragraph › Increase / Decrease Heading Level | owned |  | `src/editor/core/commands.ts` `case 'headingLevel'` | `tests/e2e/parity-core-cmds.spec.ts` › menu.para.heading-level: | 2 |
-| `menu.para.table` | Paragraph › Table / Insert Table (with rows×columns dialog) — inserts a fixed 2×2 table; no size dialog | **partial** | P1 | `src/editor/core/commands.ts` `case 'table'` | `tests/e2e/core-cases.ts` › table shortcut mounts the table widget | 7 |
+| `menu.para.table` | Paragraph › Table / Insert Table (with rows×columns dialog) — 3 columns × 4 rows incl. header, remembers the last size, 1–40 cols / 1–99 rows (typora-re#4); inserts after the caret block instead of splitting the paragraph; no Touch Bar | owned |  | `src/app/ui/table-dialog.ts` `export function insertTableDialog` | `tests/e2e/parity-tools.spec.ts` › menu.para.table: | 7 |
 | `menu.para.math-block` | Paragraph › Math Block | owned |  | `src/editor/core/commands.ts` `case 'math'` | `tests/e2e/blocks-widgets.spec.ts` › renders KaTeX, edits source, shows errors | 4 |
 | `menu.para.code-fence` | Paragraph › Code Fences (with language box) | owned |  | `src/editor/core/commands.ts` `case 'code'` | `tests/e2e/core-cases.ts` › ``` + Enter mounts a code widget | 4 |
 | `menu.para.html-block` | Paragraph › HTML Block (insert) | owned |  | `src/editor/core/commands.ts` `case 'html'` | `tests/e2e/parity-core-cmds.spec.ts` › menu.para.html-block: | 1 |
@@ -176,21 +176,21 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
-| `ctx.framework` | Context-menu framework: target-aware item lists for the editor — only the sidebar has a context menu (src/app/ui/contextmenu.ts) | **missing** | P1 | — | none | 1 |
-| `ctx.text` | Text context menu: cut/copy/paste, copy-as, insert, format, paragraph submenus, search with… | **missing** | P1 | — | none | 4 |
-| `ctx.link` | Link context menu: Open Link / Copy Link Address / Hyperlink Actions | **missing** | P1 | — | none | 4 |
-| `ctx.block-generic` | Block context menu: Insert Paragraph Before/After, Delete (atomic blocks) | **missing** | P1 | — | none | 1 |
-| `ctx.emoji` | Emoji/inline-math context entries (copy emoji, copy inline math) | **missing** | P2 | — | none | 0 |
+| `ctx.framework` | Context-menu framework: target-aware item lists for the editor — in-app menu (no native NSMenu merge): key lists per target, actions bound to the right-clicked element | owned |  | `src/app/ctxmenu/targets.ts` `export function contextTarget` | `tests/e2e/parity-ctx.spec.ts` › ctx.framework: | 1 |
+| `ctx.text` | Text context menu: cut/copy/paste, copy-as, insert, format, paragraph submenus, search with… — Cut/Copy/Paste + Copy / Paste As… + Search with Google; WebKit spelling suggestions, Look Up, Speech, Substitutions are not reproduced by the in-app menu | **partial** | P1 | `src/app/ctxmenu/items.ts` `label: 'Copy / Paste As…'` | `tests/e2e/parity-ctx.spec.ts` › ctx.text: | 4 |
+| `ctx.link` | Link context menu: Open Link / Copy Link Address / Hyperlink Actions | owned |  | `src/app/ctxmenu/items.ts` `label: 'Copy Link Address'` | `tests/e2e/parity-ctx.spec.ts` › ctx.link: | 4 |
+| `ctx.block-generic` | Block context menu: Insert Paragraph Before/After, Delete (atomic blocks) — table/HTML/math/diagram/code/atomic lists; Save Math/Image As… not yet (gap) | owned |  | `src/app/ctxmenu/items.ts` `block('para:insertBefore', 'Insert Paragraph Before')` | `tests/e2e/parity-ctx.spec.ts` › ctx.block-generic: | 9 |
+| `ctx.emoji` | Emoji/inline-math context entries (copy emoji, copy inline math) — inline math Copy Math ▸ Tex/MathML; Margin renders no :emoji: shortcodes, inline Copy as Image disabled | **partial** | P2 | `src/app/ctxmenu/items.ts` `function copyMath` | `tests/e2e/parity-ctx.spec.ts` › ctx.emoji: | 4 |
 | `ctx.media` | Media context entries: play / pause / download video | **missing** | P2 | — | none | 6 |
 
 ## Table tools
 
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
-| `tools.table.rows-cols` | Table: add row above/below, column before/after, delete row/column — toolbar ops exist; no menu/context entries | **partial** | P1 | `src/editor/blocks/table.ts` `Table tools` | `tests/e2e/blocks-widgets.spec.ts` › Tab at last cell adds a row; Enter moves down; toolbar ops | 6 |
-| `tools.table.move` | Table: Move Row Up/Down, Move Column Left/Right | **missing** | P1 | — | none | 6 |
-| `tools.table.align-resize` | Table: column alignment and Resize Table dialog — alignment via toolbar; no resize dialog | **partial** | P1 | `src/editor/blocks/table.ts` `Table tools` | none | 6 |
-| `tools.table.copy-delete` | Table: Copy Table / Delete Table | **missing** | P1 | — | none | 3 |
+| `tools.table.rows-cols` | Table: add row above/below, column before/after, delete row/column — Paragraph › Table submenu + palette + toolbar; ⌘↩ / ⌘⇧⌫ stay cell keys | owned |  | `src/editor/blocks/table.ts` `private runOp` | `tests/e2e/parity-tools.spec.ts` › tools.table.rows-cols: | 6 |
+| `tools.table.move` | Table: Move Row Up/Down, Move Column Left/Right — header row never moves; ⌘⌥ arrows in a cell | owned |  | `src/editor/blocks/table.ts` `case 'moveRowUp'` | `tests/e2e/parity-tools.spec.ts` › tools.table.move: | 6 |
+| `tools.table.align-resize` | Table: column alignment and Resize Table dialog — Width = columns, Height = rows incl. header (typora-re#4) | owned |  | `src/editor/blocks/table.ts` `private buildResize` | `tests/e2e/parity-tools.spec.ts` › tools.table.align-resize: | 6 |
+| `tools.table.copy-delete` | Table: Copy Table / Delete Table — copy = markdown plain + bordered HTML; Prettify Source Code re-formats the table | owned |  | `src/editor/blocks/table.ts` `private copyTable` | `tests/e2e/parity-tools.spec.ts` › tools.table.copy-delete: | 3 |
 | `tools.table.cells` | Table cell editing, Tab/Enter navigation, TSV paste, IME | owned |  | `src/editor/blocks/table.ts` `Table tools` | `tests/e2e/blocks-core.spec.ts` › pasting TSV / CSV fills and grows the grid | 0 |
 
 ## Code tools
@@ -198,8 +198,8 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
 | `tools.code.language` | Code fence language box + syntax highlight + copy button | owned |  | `src/editor/blocks/code-fence.ts` `mount` | `tests/e2e/blocks-widgets.spec.ts` › language box edits info string, copy button works | 4 |
-| `tools.code.indent-prettify` | Code tools: Auto Indent Selected/Whole Code, Prettify Source Code | **missing** | P2 | — | none | 4 |
-| `tools.code.delete` | Code tools: Delete Code Block — backspace in empty fence only | **partial** | P2 | `src/editor/blocks/code-fence.ts` `onRemove` | `tests/e2e/blocks-widgets.spec.ts` › arrow keys exit at edges; backspace in empty removes | 1 |
+| `tools.code.indent-prettify` | Code tools: Auto Indent Selected/Whole Code, Prettify Source Code — Paragraph › Code Tools (Copy Code Content / Auto Indent); Prettify Source Code is the Table op; Shift+Tab pref not wired | owned |  | `src/editor/blocks/code-fence.ts` `command(op: string)` | `tests/e2e/parity-tools.spec.ts` › tools.code.indent-prettify: | 4 |
+| `tools.code.delete` | Code tools: Delete Code Block — deliberate fix: Typora requests "delete-fences" but its native table is keyed "deleteFences", so the item never shows on macOS; Margin shows it | owned |  | `src/app/ctxmenu/items.ts` `'Delete Code Block'` | `tests/e2e/parity-ctx.spec.ts` › tools.code.delete: | 3 |
 | `tools.code.line-numbers` | Code fences: line numbers, line wrap, indent size | **missing** | P1 | — | none | 8 |
 
 ## Math tools
@@ -207,8 +207,8 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
 | `tools.math.render` | Math blocks/inline: KaTeX render, errors, \tag/\eqref | owned |  | `src/editor/blocks/math.ts` `createMathBlockWidget` | `tests/e2e/blocks-core.spec.ts` › follows the referenced | 0 |
-| `tools.math.copy` | Math tools: Copy Math / Copy as TeX / Copy as MathML / Delete Math | **missing** | P1 | — | none | 7 |
-| `tools.math.refresh` | Math tools: Refresh All Math Expressions | **missing** | P2 | — | none | 1 |
+| `tools.math.copy` | Math tools: Copy Math / Copy as TeX / Copy as MathML / Delete Math — copy: block + inline; Delete Math: blocks only (typora-re#4); Copy as Image and Use LaTeX Source / Use Rendered SVG → #127 | owned |  | `src/editor/core/block-tools.ts` `export function mathTool` | `tests/e2e/parity-tools.spec.ts` › tools.math.copy: | 7 |
+| `tools.math.refresh` | Math tools: Refresh All Math Expressions | owned |  | `src/editor/core/block-tools.ts` `export function refreshMath` | `tests/e2e/parity-tools.spec.ts` › tools.math.refresh: | 1 |
 | `tools.math.numbering` | Math numbering options (auto-number, AMS rules, physics package) | **missing** | P2 | — | none | 6 |
 
 ## Diagrams
@@ -270,9 +270,9 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `export.html` | Export › HTML (theme inlined, local images relative) | owned |  | `src/app/app.ts` `private createExports(` | `tests/e2e/app-themes.spec.ts` › export HTML inlines the theme | 8 |
 | `export.html-plain` | Export › HTML (without Styles) | owned |  | `src/app/export.ts` `export function buildPlainHtml` | `tests/e2e/parity-export.spec.ts` › export.html-plain: Export › HTML (without Styles) | 1 |
 | `export.pdf` | Export › PDF — macOS native; #14 for Windows/Linux | owned |  | `src-tauri/src/pdf_macos.rs` `pub async fn export_pdf` | none | 2 |
-| `export.pdf-options` | PDF options: paper size/margins, header/footer, page breaks, bookmarks, internal links — #15 | owned |  | `src-tauri/src/pdf_post_macos.rs` `pub fn post_process` | `tests/e2e/parity-export.spec.ts` › export.pdf-options: PDF options | 14 |
+| `export.pdf-options` | PDF options: paper size/margins, header/footer, page breaks, bookmarks, internal links — #15; native-commands §4: paper Default (→ Page Setup)/A5/A4/A3/US Letter/US Legal/Tabloid/Custom, margins Default 45/36 pt or Custom, header/footer presets, Page Break Between Top Headings, Append Extra Content | owned |  | `src-tauri/src/pdf_post_macos.rs` `pub fn post_process` | `tests/e2e/parity-export.spec.ts` › export.pdf-options: PDF options | 14 |
 | `export.image` | Export › Image (PNG/JPEG of the whole document) | owned |  | `src/app/export-image.ts` `export async function rasterizeHtml` | `tests/e2e/parity-export.spec.ts` › export.image: Export › Image | 8 |
-| `export.pandoc` | Export via Pandoc: docx/odt/rtf/epub/latex/mediawiki/rst/textile/opml — #81; feed pandoc JSON/native AST from the editor model, argv only | owned |  | `src/app/export-pandoc.ts` `export async function exportWithPandoc` | `tests/e2e/parity-export.spec.ts` › export.pandoc: Export via Pandoc | 32 |
+| `export.pandoc` | Export via Pandoc: docx/odt/rtf/epub/latex/mediawiki/rst/textile/opml — #81; feed pandoc JSON/native AST from the editor model, argv only; #90 Abort button + per-format Style Reference/Template/Chapter Level/Extra Arguments (verified by export.pandoc-options e2e) | owned |  | `src/app/export-pandoc.ts` `export async function exportWithPandoc` | `tests/e2e/parity-export.spec.ts` › export.pandoc: Export via Pandoc | 32 |
 | `export.custom` | Custom export commands and "run command after export" | owned |  | `src-tauri/src/export_custom.rs` `pub fn run_command` | `tests/e2e/parity-export.spec.ts` › export.custom: Custom export commands | 18 |
 | `export.settings` | Export settings pane: per-format options, theme, default folder, after-export action, YAML overrides | owned |  | `src/app/preferences-export.ts` `export function exportPrefsSection` | `tests/e2e/parity-export.spec.ts` › export.settings: Export settings pane | 23 |
 | `export.previous` | Export with Previous / Export and Overwrite with Previous | owned |  | `src/app/export-actions.ts` `async export(kind` | `tests/e2e/parity-export.spec.ts` › export.previous: Export with Previous | 8 |
