@@ -36,6 +36,21 @@ test.describe('navigation keys (#56 #57)', () => {
     await page.getByText('Head').click();
     await page.keyboard.press('End');
     await page.keyboard.press(lineStart);
+    // #122 root cause: after a native line-start move the caret rests at model
+    // offset 3 (past the hidden "## " marker) in either of two DOM shapes —
+    // ("## ", 3) at the end of the hidden marker span or ("Head", 0) — and the
+    // marker fix-up that guarantees it is asynchronous (selectionchange + a
+    // 0 ms fallback in input.ts `skipMarker`). Poll for the settled contract
+    // instead of typing into a caret that may still be inside the marker.
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          const s = getSelection();
+          const t = s?.focusNode?.textContent;
+          return (t === '## ' && s.focusOffset === 3) || (t === 'Head' && s.focusOffset === 0);
+        }),
+      )
+      .toBe(true);
     await page.keyboard.type('Z');
     expect(await md(page)).toBe('p\n\n## ZHead\n');
   });
