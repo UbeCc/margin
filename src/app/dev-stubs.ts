@@ -180,6 +180,11 @@ export const createStubEditor: CreateEditor = (host: HTMLElement, initial: Edito
     strike: ['~~', '~~'],
     highlight: ['==', '=='],
     link: ['[', '](https://)'],
+    underline: ['<u>', '</u>'],
+    sub: ['<sub>', '</sub>'],
+    sup: ['<sup>', '</sup>'],
+    math: ['$', '$'],
+    comment: ['<!-- ', ' -->'],
   };
   const blocks: Record<string, string> = {
     quote: '> ',
@@ -194,6 +199,9 @@ export const createStubEditor: CreateEditor = (host: HTMLElement, initial: Edito
     hr: '---\n',
     toc: '[TOC]\n',
     front_matter: '---\ntitle: \n---\n',
+    html: '<div>\n</div>\n',
+    linkRef: '[]: \n',
+    footnote: '[^1]: \n',
   };
   let findFrom = -1;
 
@@ -277,6 +285,12 @@ export const createStubEditor: CreateEditor = (host: HTMLElement, initial: Edito
         }
         return exec({ kind: 'find', query: cmd.query, caseSensitive: true });
       }
+      // structural Paragraph/Format commands need the real core
+      case 'headingLevel':
+      case 'insertParagraph':
+      case 'task':
+      case 'clearFormat':
+        return false;
     }
   };
 
