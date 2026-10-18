@@ -428,6 +428,7 @@ pub fn run() {
             image_tools::open_images_dialog,
             clipboard_macos::clipboard_write_rich,
             clipboard_macos::clipboard_write_payload,
+            clipboard_macos::clipboard_write_image,
             clipboard_read::clipboard_read,
         ])
         .setup(|app| {

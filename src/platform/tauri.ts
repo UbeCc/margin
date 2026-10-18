@@ -265,6 +265,11 @@ export class TauriPlatform implements Platform {
   writeClipboardRich(data: RichClipboardData): Promise<boolean> {
     return call<boolean>('clipboard_write_rich', { data });
   }
+  /** #136: image file → system clipboard as PNG+TIFF (macOS; other OSes resolve false). */
+  writeClipboardImage(path: string): Promise<boolean> {
+    return call<boolean>('clipboard_write_image', { path });
+  }
+
 
   /** #116: overwrite the pasteboard with the given flavours (Copy as … without a copy event). */
   writeClipboardNative(data: NativeClipboardData): Promise<boolean> {

@@ -134,6 +134,23 @@ pub async fn clipboard_write_payload(data: NativeClipboardData) -> Result<bool, 
     #[cfg(not(target_os = "macos"))]
     {
         let _ = data;
+/// #136 `clipboard.writeImage`: put a local image file on the pasteboard as
+/// PNG + TIFF (Typora writes `addTypes:@[PNG,TIFF]` + `writeObjects:@[image]`).
+#[tauri::command]
+pub async fn clipboard_write_image(path: String) -> Result<bool, String> {
+    if path.is_empty() {
+        return Err("no image path".into());
+    }
+    #[cfg(target_os = "macos")]
+    {
+        tauri::async_runtime::spawn_blocking(move || mac::write_image(&path))
+            .await
+            .map_err(|e| e.to_string())
+            .and_then(|r| r)
+    }
+    #[cfg(not(target_os = "macos"))]
+    {
+        let _ = path;
         Ok(false)
     }
 }
@@ -261,7 +278,6 @@ mod mac {
             ok &= set_data(pb, "public.rtfd", &rtfd);
         }
         ok &= set_data(pb, "public.rtf", d.rtf.as_bytes());
-        ok &= set_string(pb, "net.daringfireball.markdown", &d.markdown);
         ok
     }
 
@@ -300,6 +316,22 @@ mod mac {
         let ty = NSString::from_str(ty);
         let d: Option<Retained<NSData>> = unsafe { msg_send![pb, dataForType: &*ty] };
         d.map(|d| d.to_vec())
+    }
+
+    /// NSImage from a local file → pasteboard (PNG + TIFF types, then the object).
+    pub fn write_image(path: &str) -> Result<bool, String> {
+        let pb = board().ok_or("no pasteboard")?;
+        let p = NSString::from_str(path);
+        let img: Option<Retained<AnyObject>> = unsafe { msg_send![class!(NSImage), imageWithContentsOfFile: &*p] };
+        let img = img.ok_or_else(|| format!("could not read an image from {path}"))?;
+        unsafe {
+            let _: isize = msg_send![&*pb, clearContents];
+            add_type(&pb, "public.png");
+            add_type(&pb, "public.tiff");
+            let objs: Retained<AnyObject> = msg_send![class!(NSArray), arrayWithObject: &*img];
+            let ok: Bool = msg_send![&*pb, writeObjects: &*objs];
+            Ok(ok.as_bool())
+        }
     }
 }
 

@@ -109,6 +109,21 @@ describe('preferences completeness (#100, #102)', () => {
     expect(m.strict).toBe(true);
   });
 
+  it('#127 math copy format and Shift+Tab auto-indent defaults and validation', () => {
+    const d = migrateSettings({}).markdown;
+    expect(d.mathCopyFormat).toBe('svg');
+    expect(d.shiftTabAutoIndent).toBe(false);
+    const m = migrateSettings({ markdown: { mathCopyFormat: 'latex', shiftTabAutoIndent: true } }).markdown;
+    expect(m.mathCopyFormat).toBe('latex');
+    expect(m.shiftTabAutoIndent).toBe(true);
+    const bad = migrateSettings({ markdown: { mathCopyFormat: 'png', shiftTabAutoIndent: 'yes' } }).markdown;
+    expect(bad.mathCopyFormat).toBe('svg');
+    expect(bad.shiftTabAutoIndent).toBe(false);
+    // Typora's key was `mathFormatOnCopy` ('svg'/'latex') — carried over when Margin's is unset.
+    expect(migrateSettings({ markdown: { mathFormatOnCopy: 'latex' } }).markdown.mathCopyFormat).toBe('latex');
+    expect(migrateSettings({ markdown: { mathFormatOnCopy: 'svg', mathCopyFormat: 'latex' } }).markdown.mathCopyFormat).toBe('latex');
+  });
+
   it('#133: top-level remapPunctuation migrates into markdown; new keys validate', () => {
     expect(migrateSettings({ remapPunctuation: true }).markdown.remapPunctuation).toBe(true);
     // an explicit markdown value wins over the legacy top-level key

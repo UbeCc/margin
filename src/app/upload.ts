@@ -7,9 +7,12 @@ import { isUrlLike, resolveDocPath } from './util/path';
  * command as argv (never a shell) or talks to PicGo on 127.0.0.1.
  */
 
-export type UploaderKind = 'none' | 'command' | 'picgo';
+export type UploaderKind = 'none' | 'command' | 'picgo' | 'picgo-app' | 'upic' | 'picsee';
 
-/** Shell keys stored alongside MarginSettings (unknown keys are persisted verbatim). */
+/** Typora's preset uploaders (images.md §6.1): fixed argv, run without a shell. */
+export const UPIC_PRESET = '/Applications/uPic.app/Contents/MacOS/uPic -o url -u';
+export const PICSEE_PRESET = '/Applications/Picsee.app/Contents/MacOS/Picsee -u';
+
 export interface UploadSettings {
   uploader: UploaderKind;
   /** Program and arguments, e.g. `picgo upload` or `'/Applications/uPic.app/Contents/MacOS/uPic' -o url -u`. */
@@ -40,7 +43,7 @@ export function uploadSettingsOf(s: object): UploadSettings {
   const r = s as Record<string, unknown>;
   const kind = r.uploader;
   return {
-    uploader: kind === 'command' || kind === 'picgo' ? kind : 'none',
+    uploader: kind === 'command' || kind === 'picgo' || kind === 'picgo-app' || kind === 'upic' || kind === 'picsee' ? kind : 'none',
     uploadCommand: typeof r.uploadCommand === 'string' ? r.uploadCommand : '',
     picgoPort: int(r.picgoPort, UPLOAD_DEFAULTS.picgoPort, 1, 65535),
     uploadTimeout: int(r.uploadTimeout, UPLOAD_DEFAULTS.uploadTimeout, 1, 300),
@@ -49,13 +52,17 @@ export function uploadSettingsOf(s: object): UploadSettings {
 
 /** Native config, or an error message explaining what to set up. */
 export function uploadConfig(u: UploadSettings): UploadConfig | string {
-  if (u.uploader === 'picgo') return { kind: 'picgo', port: u.picgoPort, timeoutSecs: u.uploadTimeout };
+  if (u.uploader === 'picgo' || u.uploader === 'picgo-app')
+    return { kind: u.uploader, port: u.picgoPort, timeoutSecs: u.uploadTimeout };
+  if (u.uploader === 'upic' || u.uploader === 'picsee')
+    return { kind: 'command', command: u.uploader === 'upic' ? UPIC_PRESET : PICSEE_PRESET, timeoutSecs: u.uploadTimeout };
   if (u.uploader === 'command') {
     if (!u.uploadCommand.trim()) return 'Set an upload command in Preferences › Images first.';
     return { kind: 'command', command: u.uploadCommand.trim(), timeoutSecs: u.uploadTimeout };
   }
   return 'Choose an image uploader in Preferences › Images first.';
 }
+
 
 // ---------------------------------------------------------------- markdown scanning
 

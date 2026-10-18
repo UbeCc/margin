@@ -13,6 +13,7 @@ import { ExportController, registerPandocExporters } from './export-actions';
 import { DEFAULT_PRINT_SETUP, effectivePage, pageCss, type PrintSetup } from './export-settings';
 import { confirmOverwriteDialog, openExportingSheet, openPageSetup } from './export-ui';
 import { runImport, type ImportHost } from './import';
+import { copyMathAsImage } from './math-image';
 import { FindBar } from './findbar';
 import type { FindOpts } from './findmatches';
 import { extras } from './platform-extras';
@@ -35,6 +36,7 @@ import { closeContextMenu } from './ui/contextmenu';
 import { EditorContextMenu } from './ctxmenu';
 import { ImageUploader } from './upload-actions';
 import { ImageFeature } from './images/feature';
+import { takePicture } from './images/take-picture';
 import { debounce, h } from './util/dom';
 import { fuzzyFilter, fuzzyMatch } from './util/fuzzy';
 import { formatShortcut, isMac } from './util/keymap';
@@ -169,6 +171,7 @@ export class App {
       saveAs: () => void this.doc.saveAs(),
       openImagePreferences: () => this.preferences('images'),
       resolveAsset: (src) => this.resolveAsset(src),
+      assetsChanged: () => this.assetsChanged(),
     });
     this.images.attach(this.page); // tab hosts live in the page (#94)
     this.docs.newTab();
@@ -363,11 +366,19 @@ export class App {
   private editorSettings(tab?: DocTab): EditorSettings {
     return {
       baseDir: null,
+      assetKey: this.assetKey,
       resolveAsset: (src) => this.resolveAsset(src, tab),
       storeImage: (input) => this.storeImage(input),
       openLink: (href) => void this.openLink(href),
       ...(this.platform.writeClipboardNative ? { writeClipboardNative: (d) => this.platform.writeClipboardNative!(d) } : {}),
       docUrl: fileUrl(tab?.doc?.path),
+      ...(this.platform.writeClipboardRich ? { writeClipboardRich: (d) => this.platform.writeClipboardRich!(d) } : {}),
+      // #127 Copy Math ▸ Copy as Image: rasterize KaTeX → PNG on the clipboard.
+      copyMathImage: async (tex, display) => {
+        const ok = await copyMathAsImage(tex, display);
+        if (!ok) toast('Could not copy the math image.', { timeout: 3000 });
+        return ok;
+      },
       ...(this.platform.readClipboard ? { readClipboard: () => this.platform.readClipboard!() } : {}),
       spellcheck: this.settings.spellcheck,
       focusMode: this.settings.focusMode,
@@ -680,6 +691,14 @@ export class App {
   private exportDir: string | null = null;
   /** File › Page Setup (session only, like Typora's shared print info). */
   private printSetup: PrintSetup = { ...DEFAULT_PRINT_SETUP };
+
+  /** Bumped whenever image asset resolution changes (#136: typora-root-url). */
+  private assetKey = '0';
+
+  private assetsChanged(): void {
+    this.assetKey = String(Number(this.assetKey) + 1);
+    for (const e of this.docs.editors()) e.updateSettings({ assetKey: this.assetKey });
+  }
 
   private resolveAsset(src: string, tab?: DocTab): string {
     const doc = tab?.doc ?? this.docs?.active?.doc;
@@ -1009,6 +1028,12 @@ export class App {
       case 'openThemesFolder':
         await this.openThemesFolder();
         return true;
+      case 'takePicture':
+        return takePicture({
+          editor: () => this.editor,
+          store: (input) => this.images.store(input),
+          notify: (m, k) => void toast(m, { kind: k }),
+        });
       case 'uploadAllImages':
         return (await this.uploader.uploadAll()).ok;
     }
@@ -1131,9 +1156,13 @@ export class App {
   }
 
   commandPalette(): void {
-    const items: { id: string; text: string; label: string; detail: string; hint?: string }[] = [];
+    // #127 menu enable state: Code Tools items run only inside a code fence / math / HTML block
+    // (Typora Paragraph › Code Tools, fe-contextmenus-tools §7).
+    const block = this.editor.caretBlockType();
+    const codeToolsOk = block === 'code_fence' || block === 'diagram' || block === 'math_block' || block === 'html_block';
+    const items: { id: string; text: string; label: string; detail: string; hint?: string; disabled?: boolean }[] = [];
     for (const c of COMMANDS) {
-      items.push({ id: c.id, text: `${c.category}: ${c.label}`, label: `${c.category}: ${c.label}`, detail: '', hint: c.keys?.[0] ? formatShortcut(c.keys[0]) : undefined });
+      items.push({ id: c.id, text: `${c.category}: ${c.label}`, label: `${c.category}: ${c.label}`, detail: '', hint: c.keys?.[0] ? formatShortcut(c.keys[0]) : undefined, disabled: c.id.startsWith('code:') ? !codeToolsOk : undefined });
     }
     for (const n of this.themes.names()) {
       const active = this.themes.current === n;
@@ -1159,6 +1188,7 @@ export class App {
           detail: item.detail || undefined,
           hint: item.hint,
           kind: 'command',
+          disabled: item.disabled,
         })),
       pick: (it) => {
         if (it.id.startsWith('custom:')) void this.exports.export(it.id);

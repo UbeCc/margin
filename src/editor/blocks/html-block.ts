@@ -34,6 +34,8 @@ export function createHtmlBlockWidget(): BlockWidget {
         resolveUrl: (u) => (isRelative(u) ? settings.resolveAsset(u) : u),
       });
     },
+    // #136: re-render (re-resolve <img> srcs) when the shell's asset resolution changes.
+    settingsKey: (s) => s.assetKey ?? '',
     renderHTML(p) {
       // Exported HTML is opened in browsers / printed to PDF: run it through the same
       // allowlist as the preview so scripts and event handlers never reach the file (#8).
