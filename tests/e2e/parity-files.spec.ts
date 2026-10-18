@@ -461,3 +461,15 @@ test('pref.general.launch: General: On Launch (restore files/folders, open new f
   await expect(page.locator(`.file-tree [data-path="${ROOT}/Journal/2026-10-17.md"]`)).toBeVisible();
   await expect(page.locator('.tab-bar')).toBeHidden(); // one blank document: no tab bar
 });
+
+test('sidebar Duplicate names copies "X (copy).ext", "X (copy) (copy).ext"', async ({ page }) => {
+  await page.locator(`.file-tree [data-path="${ROOT}/Ideas"]`).click();
+  for (const expected of ['Roadmap (copy).md', 'Roadmap (copy) (copy).md']) {
+    await page.locator(`.file-tree [data-path="${ROOT}/Ideas/Roadmap.md"]`).click({ button: 'right' });
+    await page.locator('.context-item', { hasText: /^Duplicate$/ }).click();
+    await expect(page.locator(`.file-tree [data-path="${ROOT}/Ideas/${expected}"]`)).toBeVisible();
+    expect(await diskFile(page, `${ROOT}/Ideas/${expected}`)).toBe(await diskFile(page, `${ROOT}/Ideas/Roadmap.md`));
+  }
+  // The open document is untouched.
+  await expect(page.locator('.title-text')).toHaveText('Welcome');
+});

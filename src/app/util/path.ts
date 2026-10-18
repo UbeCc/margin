@@ -148,6 +148,18 @@ export function uniqueName(base: string, ext: string, taken: Set<string>): strin
   return name;
 }
 
+/**
+ * Typora's sidebar Duplicate name (native-commands §2.6): `<stem> (copy).<ext>`, then
+ * `<stem> (copy) (copy).<ext>` … until free; no dot when there is no extension.
+ */
+export function copyName(name: string, taken: Set<string>): string {
+  const ext = extname(name);
+  let stem = ext ? name.slice(0, -ext.length) : name;
+  do stem += ' (copy)';
+  while (taken.has((stem + ext).toLowerCase()));
+  return stem + ext;
+}
+
 /** Natural, case-insensitive compare ("file2" < "file10"). */
 export const naturalCompare = (a: string, b: string): number =>
   a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });

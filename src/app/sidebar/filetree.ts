@@ -1,7 +1,7 @@
 import type { DirEntry, FsEvent, Platform } from '../../contracts';
 import { extras } from '../platform-extras';
 import { h, icon, clearChildren } from '../util/dom';
-import { basename, dirname, isInside, isMarkdownPath, isValidFileName, join, naturalCompare, uniqueName, extname } from '../util/path';
+import { basename, dirname, isInside, isMarkdownPath, isValidFileName, join, naturalCompare, uniqueName, extname, copyName } from '../util/path';
 import { showContextMenu, type MenuItem } from '../ui/contextmenu';
 import { confirmDialog, promptDialog } from '../ui/modal';
 
@@ -309,6 +309,20 @@ export class FileTree {
     await this.refreshDir(dir);
   }
 
+  /** Sidebar › Duplicate (Typora `library.duplicate`): a copy beside the file, never overwriting. */
+  async duplicate(entry: DirEntry): Promise<void> {
+    const dir = dirname(entry.path);
+    const path = join(dir, copyName(entry.name, await this.takenNames(dir)));
+    try {
+      if (await this.host.platform.stat(path)) throw new Error(`${basename(path)} already exists`);
+      await this.host.platform.writeTextFile(path, await this.host.platform.readTextFile(entry.path));
+    } catch (e) {
+      return this.host.notify(`Operation Failed: ${errMsg(e)}`, 'error');
+    }
+    await this.refreshDir(dir);
+    await this.reveal(path);
+  }
+
   async rename(entry: DirEntry): Promise<void> {
     const rename = extras(this.host.platform).rename;
     if (!rename) return;
@@ -372,6 +386,7 @@ export class FileTree {
       items.push(
         { separator: true },
         { label: 'Rename…', run: () => void this.rename(entry), disabled: !p.rename },
+        ...(entry.isDir || !isMarkdownPath(entry.name) ? [] : [{ label: 'Duplicate', run: () => void this.duplicate(entry) }]),
         { label: 'Move to Trash', run: () => void this.delete(entry), disabled: !p.remove, danger: true },
       );
     }
