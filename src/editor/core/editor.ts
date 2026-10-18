@@ -41,7 +41,8 @@ export class EditorCore {
     this.root = document.createElement('div');
     this.root.className = 'md-editor';
     this.root.contentEditable = 'true';
-    this.root.spellcheck = settings.spellcheck;
+    this.root.setAttribute('autocorrect', settings.autocorrect === false ? 'off' : 'on');
+    this.root.setAttribute('autocapitalize', settings.autocorrect === false ? 'off' : 'sentences');
     this.root.setAttribute('role', 'textbox');
     this.root.setAttribute('aria-multiline', 'true');
     host.append(this.root);
@@ -68,7 +69,9 @@ export class EditorCore {
   applyModes(): void {
     this.root.classList.toggle('md-focus-mode', !!this.settings.focusMode);
     this.root.classList.toggle('md-typewriter', !!this.settings.typewriterMode);
-    this.root.spellcheck = !!this.settings.spellcheck;
+    this.root.setAttribute('autocorrect', this.settings.autocorrect === false ? 'off' : 'on');
+    this.root.setAttribute('autocapitalize', this.settings.autocorrect === false ? 'off' : 'sentences');
+    this.root.classList.toggle('md-mid-caret', !!this.settings.typewriterCaret);
     this.root.dataset.scheme = this.settings.colorScheme;
     // #102 whitespace / display options are pure CSS over the unchanged source.
     const md = this.md();
@@ -176,7 +179,7 @@ export class EditorCore {
     else if (r.height) {
       const sc = scrollParent(this.root);
       const box = sc === document.scrollingElement ? { top: 0, bottom: innerHeight } : sc.getBoundingClientRect();
-      if (this.settings.typewriterMode) sc.scrollTop += r.top - (box.top + box.bottom) / 2;
+      if (this.settings.typewriterMode && this.settings.typewriterCaret !== false) sc.scrollTop += r.top - (box.top + box.bottom) / 2;
       else if (r.bottom > box.bottom) sc.scrollTop += r.bottom - box.bottom + 8;
       else if (r.top < box.top) sc.scrollTop -= box.top - r.top + 8;
     }

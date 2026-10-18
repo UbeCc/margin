@@ -201,6 +201,31 @@ export class TauriPlatform implements Platform {
     return call('open_exported_file', { path });
   }
 
+  // ---- optional window chrome & writing aids (PlatformExtras, #103)
+  setAlwaysOnTop(on: boolean): Promise<boolean> {
+    return call('set_always_on_top', { on });
+  }
+
+  setMenuChecked(id: string, checked: boolean): Promise<void> {
+    return call('set_menu_checked', { id, checked });
+  }
+
+  setMenuEnabled(id: string, enabled: boolean): Promise<void> {
+    return call('set_menu_enabled', { id, enabled });
+  }
+
+  toggleDevtools(): Promise<void> {
+    return call('toggle_devtools', {});
+  }
+
+  setMagnification(allow: boolean): Promise<void> {
+    return call('set_magnification', { allow });
+  }
+
+  showSpellingPanel(): Promise<void> {
+    return call('show_spelling_panel', {});
+  }
+
   // ---- optional file-tree operations (PlatformExtras, #21)
   rename(from: string, to: string): Promise<void> {
     return call('rename_path', { from, to });

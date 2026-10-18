@@ -458,6 +458,89 @@ pub async fn set_theme_menu<Rt: Runtime>(app: AppHandle<Rt>, names: Vec<String>,
     .map_err(err)
 }
 
+// -------------------------------------------------- window chrome & writing aids (#103)
+
+/// Native menu check-state sync (#103): tick / untick one item anywhere in the tree.
+#[tauri::command]
+pub async fn set_menu_checked<Rt: Runtime>(app: AppHandle<Rt>, id: String, checked: bool) -> R<()> {
+    let app2 = app.clone();
+    app.run_on_main_thread(move || menu::set_checked(&app2, &id, checked)).map_err(err)
+}
+
+/// Enable / disable one menu item (e.g. Remap Unicode Punctuation forced on while
+/// smart quotes / dashes convert on input, native-commands.md §5.4).
+#[tauri::command]
+pub async fn set_menu_enabled<Rt: Runtime>(app: AppHandle<Rt>, id: String, enabled: bool) -> R<()> {
+    let app2 = app.clone();
+    app.run_on_main_thread(move || menu::set_enabled(&app2, &id, enabled)).map_err(err)
+}
+
+/// View › Always on Top: floats only the current window; not persisted (§5.1).
+#[tauri::command]
+pub async fn set_always_on_top<Rt: Runtime>(window: WebviewWindow<Rt>, on: bool) -> R<bool> {
+    window.set_always_on_top(on).map_err(err)?;
+    Ok(on)
+}
+
+/// View › Toggle DevTools (debug builds, #103).
+#[tauri::command]
+pub async fn toggle_devtools<Rt: Runtime>(window: WebviewWindow<Rt>) -> R<()> {
+    #[cfg(debug_assertions)]
+    if window.is_devtools_open() {
+        window.close_devtools();
+    } else {
+        window.open_devtools();
+    }
+    #[cfg(not(debug_assertions))]
+    let _ = &window;
+    Ok(())
+}
+
+/// View › Allow Magnification: trackpad pinch zoom on every window, magnification
+/// reset (§5.5). Global switch, independent of ⇧⌘+/− page zoom.
+pub fn apply_magnification<Rt: Runtime>(app: &AppHandle<Rt>, allow: bool) -> tauri::Result<()> {
+    #[cfg(target_os = "macos")]
+    for w in app.webview_windows().into_values() {
+        let _ = w.with_webview(move |pw| unsafe {
+            let wk = &*(pw.inner() as *const objc2_web_kit::WKWebView);
+            wk.setAllowsMagnification(allow);
+            let _: () = objc2::msg_send![wk, setMagnification: 1.0f64];
+        });
+    }
+    #[cfg(not(target_os = "macos"))]
+    let _ = (app, allow);
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn set_magnification<Rt: Runtime>(app: AppHandle<Rt>, allow: bool) -> R<()> {
+    apply_magnification(&app, allow).map_err(err)
+}
+
+/// Edit › Spelling and Grammar › Show Spelling and Grammar (⌘:): the system
+/// spelling panel through the window's responder chain (§5.3).
+#[tauri::command]
+pub async fn show_spelling_panel<Rt: Runtime>(window: WebviewWindow<Rt>) -> R<()> {
+    #[cfg(target_os = "macos")]
+    {
+        use objc2::msg_send;
+        use objc2::runtime::NSObject;
+        window
+            .with_webview(|pw| unsafe {
+                let ns_window = &*(pw.ns_window() as *const objc2_app_kit::NSWindow);
+                let responder: objc2::rc::Retained<NSObject> = msg_send![ns_window, firstResponder];
+                let responds: bool = msg_send![&responder, respondsToSelector: objc2::sel!(showGuessPanel:)];
+                if responds {
+                    let _: () = msg_send![&responder, showGuessPanel: std::ptr::null::<NSObject>()];
+                }
+            })
+            .map_err(err)?;
+    }
+    #[cfg(not(target_os = "macos"))]
+    let _ = &window;
+    Ok(())
+}
+
 // ------------------------------------------------------------------ file-tree operations (#21)
 
 /// Rename / move a file or folder. Never overwrites an existing destination.

@@ -107,7 +107,6 @@ export class App {
   private refreshSelectionSoon = debounce(() => this.refreshSelectionStats(), 50);
   /** View › Always on Top: per window, never persisted (native-commands §5.1). */
   private alwaysOnTop = false;
-  private magnification = true;
   private colorScheme: 'light' | 'dark' = 'light';
 
   constructor(private wiring: Wiring, mount: HTMLElement) {
@@ -390,6 +389,10 @@ export class App {
       ...(this.platform.writeClipboardRich ? { writeClipboardRich: (d) => this.platform.writeClipboardRich!(d) } : {}),
       ...(this.platform.readClipboard ? { readClipboard: () => this.platform.readClipboard!() } : {}),
       spellcheck: this.settings.spellcheck,
+      autocorrect: this.settings.spellAutocorrect || this.settings.smartTextReplacement,
+      typewriterCaret: this.settings.typewriterCaret,
+      copyMarkdownByDefault: this.settings.copyMarkdownByDefault,
+      lineWiseCopyCut: this.settings.lineWiseCopyCut,
       focusMode: this.settings.focusMode,
       typewriterMode: this.settings.typewriterMode,
       colorScheme: this.colorScheme,

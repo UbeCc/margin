@@ -29,7 +29,26 @@ export interface MarginSettings extends AppSettings {
   wordsPerMinute: number;
   /** Edit › Substitutions, converted on input (`smartQuote` / `smartDash`). */
   smartQuotes: boolean;
-  smartDashes: boolean;
+  /** Convert timing for smart punctuation (`SmartyPantsOnRendering`; input = false). */
+  smartPunctMode: 'input' | 'render';
+  /** Substitutions › Text Replacement (system dictionary via the web view). */
+  smartTextReplacement: boolean;
+  /** Spelling and Grammar › Check Grammar With Spelling. */
+  spellGrammar: boolean;
+  /** Spelling and Grammar › Correct Spelling Automatically. */
+  spellAutocorrect: boolean;
+  /** View › Allow Magnification (Typora stores the inverse `noMagnification`). */
+  allowMagnification: boolean;
+  /** Appearance › Font Size: Auto (theme default) vs Customized (#134). */
+  useCustomFontSize: boolean;
+  /** Customized font size, 9–24 px (14 when first chosen). */
+  customFontSize: number;
+  /** Editor › Default Copy Behavior: ⌘C copies the Markdown source (`copy_markdown_by_default`). */
+  copyMarkdownByDefault: boolean;
+  /** Editor › Default Copy Behavior: copy/cut whole lines when nothing is selected (`lineWiseCopyCut`). */
+  lineWiseCopyCut: boolean;
+  /** Editor › Typewriter: always keep the caret centered (`no_mid_caret`, reversed). */
+  typewriterCaret: boolean;
   /** File tree ordering (#101; Typora `treeSortType`). */
   sidebarSort: SortOrder;
   /** Articles list ordering (Typora `listSortType`, kept separately). */
@@ -130,7 +149,16 @@ export const DEFAULT_SETTINGS: Readonly<MarginSettings> = Object.freeze({
   wordCountUnit: 'words',
   wordsPerMinute: DEFAULT_WPM,
   smartQuotes: false,
-  smartDashes: false,
+  smartPunctMode: 'input',
+  smartTextReplacement: false,
+  spellGrammar: false,
+  spellAutocorrect: false,
+  allowMagnification: true,
+  useCustomFontSize: false,
+  customFontSize: 14,
+  copyMarkdownByDefault: true,
+  lineWiseCopyCut: false,
+  typewriterCaret: true,
   sidebarSort: DEFAULT_SORT,
   listSort: DEFAULT_SORT,
   sidebarFileView: 'tree',
@@ -221,7 +249,6 @@ export function migrateSettings(input: unknown): MarginSettings {
     theme: str(raw.theme, d.theme).replace(/\.css$/i, ''),
     darkTheme: str(raw.darkTheme, d.darkTheme).replace(/\.css$/i, ''),
     colorScheme: scheme === 'light' || scheme === 'dark' || scheme === 'system' ? scheme : d.colorScheme,
-    fontSize: Math.round(num(raw.fontSize, d.fontSize, 10, 32)),
     autoSave: bool(raw.autoSave, d.autoSave),
     autoSaveDelay: num(raw.autoSaveDelay, d.autoSaveDelay, 300, 60_000),
     imageRule: migrateImageRule(raw.imageRule),
@@ -241,7 +268,20 @@ export function migrateSettings(input: unknown): MarginSettings {
     wordCountUnit: UNIT_CODES.includes(raw.wordCountUnit as CountUnit) ? (raw.wordCountUnit as CountUnit) : d.wordCountUnit,
     wordsPerMinute: Math.round(num(raw.wordsPerMinute, d.wordsPerMinute, 1, 999)),
     smartQuotes: bool(raw.smartQuotes, d.smartQuotes),
-    smartDashes: bool(raw.smartDashes, d.smartDashes),
+    smartPunctMode: raw.smartPunctMode === 'render' ? 'render' : 'input',
+    smartTextReplacement: bool(raw.smartTextReplacement, d.smartTextReplacement),
+    spellGrammar: bool(raw.spellGrammar, d.spellGrammar),
+    spellAutocorrect: bool(raw.spellAutocorrect, d.spellAutocorrect),
+    allowMagnification: bool(raw.allowMagnification, d.allowMagnification),
+    useCustomFontSize: bool(raw.useCustomFontSize, raw.useCustomFontSize === undefined && typeof raw.fontSize === 'number' && raw.fontSize !== 16 ? true : d.useCustomFontSize),
+    customFontSize: Math.round(num(raw.customFontSize, raw.useCustomFontSize === undefined && typeof raw.fontSize === 'number' && raw.fontSize !== 16 ? clampFontSize(raw.fontSize) : d.customFontSize, 9, 24)),
+    // #134: Auto uses the theme default (16); Customized uses the 9–24 px box.
+    fontSize: (raw.useCustomFontSize === undefined && typeof raw.fontSize === 'number' && raw.fontSize !== 16 ? true : bool(raw.useCustomFontSize, false))
+      ? Math.round(num(raw.customFontSize, raw.useCustomFontSize === undefined && typeof raw.fontSize === 'number' && raw.fontSize !== 16 ? clampFontSize(raw.fontSize) : d.customFontSize, 9, 24))
+      : 16,
+    copyMarkdownByDefault: bool(raw.copyMarkdownByDefault, d.copyMarkdownByDefault),
+    lineWiseCopyCut: bool(raw.lineWiseCopyCut, d.lineWiseCopyCut),
+    typewriterCaret: bool(raw.typewriterCaret, d.typewriterCaret),
     sidebarSort: isSortOrder(raw.sidebarSort) ? raw.sidebarSort : d.sidebarSort,
     sidebarFileView: raw.sidebarFileView === 'list' ? 'list' : 'tree',
     listSort: isSortOrder(raw.listSort) ? raw.listSort : d.listSort,
@@ -340,6 +380,11 @@ export function imageRulePresetId(rule: ImageRule): string {
   return 'custom';
 }
 
+
+/** Typora's Appearance › Font Size clamp: 9–24 px (#134). */
+function clampFontSize(v: number): number {
+  return Math.min(24, Math.max(9, Math.round(v)));
+}
 /** Files › Default Line Ending: "Auto ( Recommended )" follows the OS (#100). */
 export function newFileEol(pref: MarginSettings['defaultLineEnding'], windows = /Win/i.test(navigator.platform || '')): '\n' | '\r\n' {
   return pref === 'crlf' || (pref === 'auto' && windows) ? '\r\n' : '\n';
