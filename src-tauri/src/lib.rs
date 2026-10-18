@@ -1,6 +1,7 @@
 //! Margin native shell: commands backing `Platform` (src/contracts.ts), native
 //! menus, file-open events, close-request veto and window chrome.
 
+mod clipboard_macos;
 mod commands;
 mod export_cmds;
 mod fsops;
@@ -8,6 +9,7 @@ mod fsops;
 mod fsops_unix;
 mod images;
 mod menu;
+mod pandoc;
 #[cfg(target_os = "macos")]
 mod pdf_macos;
 #[cfg(target_os = "macos")]
@@ -18,6 +20,7 @@ mod remote_images;
 pub mod recent;
 mod settings;
 mod watch;
+mod upload;
 mod watch_state;
 #[cfg(test)]
 mod watch_live_tests;
@@ -279,6 +282,8 @@ pub fn run() {
             commands::save_dialog,
             commands::export_html,
             commands::export_pdf,
+            pandoc::pandoc_detect,
+            pandoc::pandoc_export,
             commands::print_window,
             commands::load_settings,
             commands::save_settings,
@@ -299,6 +304,8 @@ pub fn run() {
             commands::reveal_path,
             export_cmds::export_binary,
             export_cmds::open_exported_file,
+            upload::upload_images,
+            clipboard_macos::clipboard_write_rich,
         ])
         .setup(|app| {
             let handle = app.handle().clone();

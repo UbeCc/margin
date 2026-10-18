@@ -36,6 +36,10 @@ const COMMANDS: &[&str] = &[
     "reveal_path",
     "export_binary",
     "open_exported_file",
+    "upload_images",
+    "pandoc_detect",
+    "pandoc_export",
+    "clipboard_write_rich",
 ];
 
 fn main() {

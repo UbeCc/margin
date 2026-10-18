@@ -22,6 +22,8 @@ export interface MarginSettings extends AppSettings {
   restoreLastFolder: boolean;
   /** Export / print settings (#95). */
   export: ExportSettings;
+  /** Pandoc binary (or its folder) for docx/latex/epub export; '' = auto-detect (#81). */
+  pandocPath: string;
 }
 
 export const SETTINGS_VERSION = 2;
@@ -48,6 +50,7 @@ export const DEFAULT_SETTINGS: Readonly<MarginSettings> = Object.freeze({
   sidebarWidth: 260,
   restoreLastFolder: true,
   export: DEFAULT_EXPORT,
+  pandocPath: '',
 });
 
 export const MAX_RECENT = 15;
@@ -126,6 +129,7 @@ export function migrateSettings(input: unknown): MarginSettings {
     sidebarWidth: Math.round(num(raw.sidebarWidth, d.sidebarWidth, 180, 520)),
     restoreLastFolder: bool(raw.restoreLastFolder, d.restoreLastFolder),
     export: migrateExportSettings(raw.export),
+    pandocPath: typeof raw.pandocPath === 'string' ? raw.pandocPath.trim() : '',
   };
 }
 

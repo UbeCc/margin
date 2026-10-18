@@ -1,6 +1,6 @@
 import { convertFileSrc, invoke } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
-import type { AppSettings, DirEntry, FsEvent, ImageRule, MenuAction, PdfExportOptions, Platform } from '../contracts';
+import type { AppSettings, DirEntry, FsEvent, ImageRule, MenuAction, PdfExportOptions, Platform, RichClipboardData, UploadConfig } from '../contracts';
 import { builtinThemes, normalizeSettings, printHtmlInIframe, withPrintPageCss } from './common';
 
 /** Event names emitted by `src-tauri/src/lib.rs`. */
@@ -126,6 +126,19 @@ export class TauriPlatform implements Platform {
     }
   }
 
+  // ---- optional Pandoc export (PlatformExtras, #81)
+  pandocExport(
+    markdown: string,
+    outPath: string,
+    opts: { format: string; docDir: string | null; title: string | null; pandocPath: string | null; timeoutMs: number },
+  ): Promise<string> {
+    return call('pandoc_export', { markdown, outPath, ...opts });
+  }
+
+  pandocDetect(pandocPath: string | null): Promise<{ path: string; version: string }> {
+    return call('pandoc_detect', { pandocPath });
+  }
+
   /**
    * After the first save of a document: copy images that were stored while it was
    * unsaved (`<app data>/images`, absolute srcs) under `rule`. Returns
@@ -168,6 +181,11 @@ export class TauriPlatform implements Platform {
     return call('reveal_path', { path });
   }
 
+  /** #80: custom command (argv, no shell) or PicGo on 127.0.0.1; one URL per path. */
+  uploadImages(paths: string[], config: UploadConfig): Promise<string[]> {
+    return call('upload_images', { paths, config });
+  }
+
   /** Let the webview load images from one more directory (non-recursive). */
   allowAssetDir(path: string): Promise<void> {
     return call('allow_asset_dir', { path });
@@ -205,6 +223,11 @@ export class TauriPlatform implements Platform {
   }
 
   /** http(s)/mailto only; other schemes are refused natively. */
+  /** #79: RTF onto the macOS pasteboard (no-op returning false on other OSes). */
+  writeClipboardRich(data: RichClipboardData): Promise<boolean> {
+    return call<boolean>('clipboard_write_rich', { data });
+  }
+
   openExternal(url: string): Promise<void> {
     return call('open_external', { url });
   }

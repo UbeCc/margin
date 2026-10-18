@@ -10,7 +10,8 @@ export type AppCommand =
   | 'revealActiveFile'
   | 'reloadFromDisk'
   | 'openThemesFolder'
-  | 'toggleLineEnding';
+  | 'toggleLineEnding'
+  | 'uploadAllImages';
 
 export type CommandId = MenuAction | AppCommand;
 
@@ -54,6 +55,9 @@ export const COMMANDS: CommandSpec[] = [
   { id: 'exportOverwrite', label: 'Export and Overwrite with Previous', category: 'File' },
   { id: 'exportSettings', label: 'Export Settings…', category: 'File' },
   { id: 'pageSetup', label: 'Page Setup…', category: 'File' },
+  { id: 'exportDocx', label: 'Export as Word (.docx)…', category: 'File' },
+  { id: 'exportLatex', label: 'Export as LaTeX…', category: 'File' },
+  { id: 'exportEpub', label: 'Export as EPUB…', category: 'File' },
   { id: 'print', label: 'Print…', category: 'File', keys: ['Mod+Shift+P'] },
   { id: 'preferences', label: 'Preferences…', category: 'App', keys: ['Mod+,'] },
   { id: 'commandPalette', label: 'Command Palette…', category: 'App', keys: ['Mod+Shift+A'] },
@@ -94,6 +98,7 @@ export const COMMANDS: CommandSpec[] = [
   { id: 'zoomReset', label: 'Actual Size', category: 'View', keys: ['Mod+Shift+0'] },
   { id: 'toggleLineEnding', label: 'Toggle Line Endings (LF / CRLF)', category: 'View' },
   { id: 'openThemesFolder', label: 'Open Themes Folder', category: 'Theme' },
+  { id: 'uploadAllImages', label: 'Upload All Local Images', category: 'Format' },
 ];
 
 /** 'Mod+Shift+S' form of a native menu accelerator (src/platform/shortcuts.ts). */

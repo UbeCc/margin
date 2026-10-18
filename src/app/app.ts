@@ -1,9 +1,10 @@
+import { ExternalChangeBanner } from './ui/extchange';
 import type { EditorHandle, EditorSettings, MenuAction, Platform } from '../contracts';
 import type { Wiring } from './wiring';
 import { COMMANDS, commandForKey, commandSpec, isCommandId, type CommandId } from './commands';
 import { DocumentController, type DocState } from './document';
-import { loadKatexCss, needsKatex } from './export';
-import { ExportController } from './export-actions';
+import { documentTitle, loadKatexCss, needsKatex } from './export';
+import { ExportController, registerPandocExporters } from './export-actions';
 import { pageCss } from './export-settings';
 import { confirmOverwriteDialog, openPageSetup } from './export-ui';
 import { FindBar } from './findbar';
@@ -18,7 +19,9 @@ import { themeLabel } from '../themes';
 import { ask } from './ui/modal';
 import { closePalette, isPaletteOpen, openPalette, type PaletteItem } from './ui/palette';
 import { toast } from './ui/toast';
+import { PANDOC_ACTIONS, type PandocFormat } from './export-pandoc';
 import { closeContextMenu } from './ui/contextmenu';
+import { ImageUploader } from './upload-actions';
 import { debounce, h } from './util/dom';
 import { fuzzyFilter, fuzzyMatch } from './util/fuzzy';
 import { formatShortcut, isMac } from './util/keymap';
@@ -49,6 +52,7 @@ export class App {
   private titleEl!: HTMLElement;
   private sidebar!: HTMLElement;
   private editorHost!: HTMLElement;
+  private uploader!: ImageUploader;
   private scroller!: HTMLElement;
   private tree!: FileTree;
   private outline!: OutlineView;
@@ -57,6 +61,8 @@ export class App {
   private tabs: Record<'files' | 'outline', HTMLButtonElement> = {} as never;
 
   private unwatchFolder: (() => void) | null = null;
+  /** Non-blocking "changed on disk" prompt (#82). */
+  private extBanner = new ExternalChangeBanner();
   private lastKeyAction: { id: string; t: number } | null = null;
   private saveSettingsSoon = debounce(() => void this.persistSettings(), 400);
   private refreshOutlineSoon = debounce(() => this.refreshOutline(), 250);
@@ -95,6 +101,7 @@ export class App {
       editor: this.editor,
       askUnsaved: (name, reason) => this.askUnsaved(name, reason),
       askReloadDirty: (name) => this.askReloadDirty(name),
+      externalChange: (c) => this.extBanner.show(c),
       notify: (m, k) => void toast(m, { kind: k }),
       autoSave: () => ({ enabled: this.settings.autoSave, delay: this.settings.autoSaveDelay }),
       imageRule: () => this.settings.imageRule,
@@ -104,6 +111,15 @@ export class App {
       defaultDir: () => this.folder,
     });
     this.exports = this.createExports();
+    // #80: "Upload Image" context menu + "Upload All Local Images" command.
+    this.uploader = new ImageUploader({
+      platform: this.platform,
+      editor: () => this.editor,
+      baseDir: () => this.doc.dir,
+      settings: () => this.settings,
+      notify: (m, k) => void toast(m, { kind: k }),
+    });
+    this.uploader.attachContextMenu(this.editorHost);
     this.editor.onChange(() => {
       this.refreshFindSoon();
       this.refreshOutlineSoon();
@@ -144,6 +160,7 @@ export class App {
       resolveAsset: (src) => this.resolveAsset(src),
       storeImage: (input) => this.storeImage(input),
       openLink: (href) => void this.openLink(href),
+      ...(this.platform.writeClipboardRich ? { writeClipboardRich: (d) => this.platform.writeClipboardRich!(d) } : {}),
       spellcheck: this.settings.spellcheck,
       focusMode: this.settings.focusMode,
       typewriterMode: this.settings.typewriterMode,
@@ -206,7 +223,7 @@ export class App {
         this.editor.focus();
       }
     });
-    const main = h('main.main', null, this.findbar.el, this.scroller);
+    const main = h('main.main', null, this.findbar.el, this.extBanner.el, this.scroller);
 
     this.status = new StatusBar({
       toggleSidebar: () => void this.run('toggleSidebar'),
@@ -578,6 +595,10 @@ export class App {
         if (page) this.updateSettings({ export: { ...this.settings.export, pdf: { ...this.settings.export.pdf, page } } });
         return !!page;
       }
+      case 'exportDocx':
+      case 'exportLatex':
+      case 'exportEpub':
+        return this.exportPandoc(PANDOC_ACTIONS[id]);
       case 'print':
         this.applyPrintPageCss();
         await this.platform.print();
@@ -651,6 +672,8 @@ export class App {
       case 'openThemesFolder':
         await this.openThemesFolder();
         return true;
+      case 'uploadAllImages':
+        return (await this.uploader.uploadAll()).ok;
     }
     return false;
   }
@@ -663,6 +686,16 @@ export class App {
       isDarkTheme: (n) => this.themes.isDark(n),
       openThemesFolder: () => void this.openThemesFolder(),
       pickFolder: () => this.platform.openFileDialog({ directory: true }),
+      detectPandoc: async (path) => {
+        const detect = extras(this.platform).pandocDetect;
+        if (!detect) return 'Pandoc export is only available in the desktop app.';
+        try {
+          const r = await detect.call(this.platform, path || null);
+          return `Found pandoc ${r.version} at ${r.path}`;
+        } catch (e) {
+          return e instanceof Error ? e.message : String(e);
+        }
+      },
     }, section);
   }
 
@@ -765,7 +798,7 @@ export class App {
   // ======================================================== export
 
   private createExports(): ExportController {
-    return new ExportController({
+    const c = new ExportController({
       platform: this.platform,
       exportSettings: () => this.settings.export,
       updateExportSettings: (next) => this.updateSettings({ export: next }),
@@ -787,6 +820,12 @@ export class App {
       notify: (m, kind, action) => void toast(m, { kind, action }),
       confirmOverwrite: (p) => confirmOverwriteDialog(p),
     });
+    registerPandocExporters(c, {
+      pandocPath: () => this.settings.pandocPath,
+      title: () => documentTitle(this.editor.getMarkdown(), this.doc.path ? basename(this.doc.path) : null),
+      progress: (m) => toast(m, { kind: 'info', timeout: 0 }),
+    });
+    return c;
   }
 
   /** Page Setup applies to File › Print: keep an @page rule in the live document. */
@@ -799,6 +838,11 @@ export class App {
     }
     el.textContent = pageCss(this.settings.export.pdf.page, this.settings.export.pdf.pageBreaks);
   }
+
+  private exportPandoc(format: PandocFormat): Promise<boolean> {
+    return this.exports.export(`pandoc:${format}`);
+  }
+
 
   /** For tests / devtools. */
   get commandSpec(): typeof commandSpec {

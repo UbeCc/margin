@@ -9,6 +9,7 @@ import type { PdfExportOptions, Platform } from '../contracts';
 import { buildExportHtml, buildPlainHtml, documentTitle, exportHeadings, linkHeadingAnchors } from './export';
 import { imageFormatForPath, ImageTooLargeError, rasterizeHtml } from './export-image';
 import { expandVars, migrateExportSettings, paperSizeMm, resolveMeta, todayString, MM_TO_PT, type ExportSettings } from './export-settings';
+import { exportWithPandoc, PANDOC_FORMATS, type PandocFormat } from './export-pandoc';
 import { extras } from './platform-extras';
 import { basename, dirname, extname, join, stripExt } from './util/path';
 
@@ -268,5 +269,43 @@ export class ExportController {
     if (s.general.afterExport === 'open' && open) open();
     else if (s.general.afterExport === 'reveal' && reveal) reveal();
     this.host.notify(`Exported ${basename(target)}`, 'success', reveal ? { label: 'Show', run: reveal } : undefined);
+  }
+}
+
+/**
+ * Route the Pandoc exporters (#81) through the shared pipeline as `pandoc:<format>`
+ * kinds, so they get the default folder, Export with Previous / Overwrite and the
+ * after-export action. `exportWithPandoc` keeps its own progress/watchdog logic.
+ */
+export function registerPandocExporters(c: ExportController, opts: { pandocPath: () => string; title: () => string; progress: (m: string) => () => void }): void {
+  for (const format of Object.keys(PANDOC_FORMATS) as PandocFormat[]) {
+    const spec = PANDOC_FORMATS[format];
+    c.register(`pandoc:${format}`, (h) => ({
+      label: spec.filterName,
+      extensions: [spec.ext],
+      run: async (target) => {
+        const x = extras(h.platform);
+        let error = '';
+        const doc = h.docPath();
+        const ok = await exportWithPandoc(format, {
+          platform: {
+            saveFileDialog: async () => target,
+            pandocExport: x.pandocExport ? (md, out, o) => x.pandocExport!.call(h.platform, md, out, o) : undefined,
+          },
+          markdown: h.markdown(),
+          name: stripExt(basename(target)),
+          docDir: doc ? dirname(doc) : null,
+          fallbackDir: h.folder(),
+          title: opts.title(),
+          pandocPath: opts.pandocPath(),
+          progress: opts.progress,
+          notify: (m, kind) => {
+            if (kind === 'error') error = m;
+            else if (kind === 'warning') h.notify(m, 'warning');
+          },
+        });
+        if (!ok) throw new Error(error.replace(/^Export failed: /, '') || `${spec.label} export failed`);
+      },
+    }));
   }
 }

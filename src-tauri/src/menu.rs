@@ -30,7 +30,13 @@ const FILE: &[Item] = &[
     ("saveAs", "Save As…", Some("CmdOrCtrl+Shift+S")),
     ("reloadFromDisk", "Revert to Saved", None),
 ];
-const EXPORT: &[Item] = &[("exportHtml", "HTML…", None), ("exportPdf", "PDF…", Some("CmdOrCtrl+Alt+E"))];
+const EXPORT: &[Item] = &[
+    ("exportHtml", "HTML…", None),
+    ("exportPdf", "PDF…", Some("CmdOrCtrl+Alt+E")),
+    ("exportDocx", "Word (.docx)…", None),
+    ("exportLatex", "LaTeX…", None),
+    ("exportEpub", "EPUB…", None),
+];
 /// Export submenu, after the format items (#95).
 const EXPORT_MORE: &[Item] = &[
     ("exportHtmlPlain", "HTML (without Styles)…", None),
@@ -290,6 +296,8 @@ mod tests {
                 "quickOpen", "zoomIn", "zoomOut", "zoomReset", "preferences", "clearRecent", "commandPalette", "showOutline",
                 "showFiles", "revealActiveFile", "reloadFromDisk", "toggleLineEnding", "exportHtmlPlain", "exportImage",
                 "exportPrevious", "exportOverwrite", "exportSettings", "pageSetup",
+                "exportDocx", "exportLatex",
+                "exportEpub",
             ]
             .contains(&a)
                 || a.starts_with("heading:")
