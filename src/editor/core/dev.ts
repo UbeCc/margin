@@ -3,7 +3,7 @@
  * Used by tests/e2e/core-*.spec.ts through `window.__core`.
  * `?blocks=0` skips the real block widgets (fallback <pre> widgets).
  */
-import type { EditorHandle, EditorSettings } from '../../contracts';
+import type { EditorHandle, EditorSettings, RichClipboardData } from '../../contracts';
 import { createEditor, registerWidget, registerInlineMath, registerSourceMode, OUTLINE_EVENT } from './index';
 
 const SAMPLE = `# Margin core
@@ -45,6 +45,8 @@ declare global {
       outlineEvents: number;
       opened: string[];
       ready: boolean;
+      /** `?rich`: payloads sent to EditorSettings.writeClipboardRich (#79). */
+      rich: RichClipboardData[];
     };
   }
 }
@@ -66,11 +68,13 @@ async function main() {
     typewriterMode: false,
     colorScheme: 'light',
   };
+  const rich: RichClipboardData[] = [];
+  if (params.has('rich')) settings.writeClipboardRich = async (d) => (rich.push(d), true);
   const host = document.getElementById('host')!;
   const ed = createEditor(host, settings);
   const md = params.has('empty') ? '' : (params.get('md') ?? SAMPLE);
   ed.setMarkdown(md);
-  const state = { ed, md: () => ed.getMarkdown(), changes: 0, outlineEvents: 0, opened, ready: true };
+  const state = { ed, md: () => ed.getMarkdown(), changes: 0, outlineEvents: 0, opened, ready: true, rich };
   window.__core = state;
   ed.onChange(() => state.changes++);
   document.addEventListener(OUTLINE_EVENT, () => state.outlineEvents++);

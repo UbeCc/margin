@@ -1,3 +1,4 @@
+import { ExternalChangeBanner } from './ui/extchange';
 import type { EditorHandle, EditorSettings, MenuAction, Platform } from '../contracts';
 import type { Wiring } from './wiring';
 import { COMMANDS, commandForKey, commandSpec, isCommandId, type CommandId } from './commands';
@@ -53,6 +54,8 @@ export class App {
   private tabs: Record<'files' | 'outline', HTMLButtonElement> = {} as never;
 
   private unwatchFolder: (() => void) | null = null;
+  /** Non-blocking "changed on disk" prompt (#82). */
+  private extBanner = new ExternalChangeBanner();
   private lastKeyAction: { id: string; t: number } | null = null;
   private saveSettingsSoon = debounce(() => void this.persistSettings(), 400);
   private refreshOutlineSoon = debounce(() => this.refreshOutline(), 250);
@@ -91,6 +94,7 @@ export class App {
       editor: this.editor,
       askUnsaved: (name, reason) => this.askUnsaved(name, reason),
       askReloadDirty: (name) => this.askReloadDirty(name),
+      externalChange: (c) => this.extBanner.show(c),
       notify: (m, k) => void toast(m, { kind: k }),
       autoSave: () => ({ enabled: this.settings.autoSave, delay: this.settings.autoSaveDelay }),
       imageRule: () => this.settings.imageRule,
@@ -139,6 +143,7 @@ export class App {
       resolveAsset: (src) => this.resolveAsset(src),
       storeImage: (input) => this.storeImage(input),
       openLink: (href) => void this.openLink(href),
+      ...(this.platform.writeClipboardRich ? { writeClipboardRich: (d) => this.platform.writeClipboardRich!(d) } : {}),
       spellcheck: this.settings.spellcheck,
       focusMode: this.settings.focusMode,
       typewriterMode: this.settings.typewriterMode,
@@ -201,7 +206,7 @@ export class App {
         this.editor.focus();
       }
     });
-    const main = h('main.main', null, this.findbar.el, this.scroller);
+    const main = h('main.main', null, this.findbar.el, this.extBanner.el, this.scroller);
 
     this.status = new StatusBar({
       toggleSidebar: () => void this.run('toggleSidebar'),
