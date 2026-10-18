@@ -1,8 +1,9 @@
 import type { DirEntry, Platform } from '../../contracts';
 import { h, clearChildren } from '../util/dom';
 import { basename, dirname, extname, relative, stripExt } from '../util/path';
-import { showContextMenu, type MenuItem } from '../ui/contextmenu';
+import { showContextMenu } from '../ui/contextmenu';
 import { extras } from '../platform-extras';
+import { fileMenu, type SideFileOps } from './file-menus';
 import { compareBy, DEFAULT_SORT, type SortOrder } from './sort';
 import { collectDocs, dateLabel, LIST_LIMIT, summarize } from './walk';
 import { makeDraggable } from './drag';
@@ -10,8 +11,10 @@ import { makeDraggable } from './drag';
 export interface FileListHost {
   platform: Platform;
   openFile(path: string): void;
-  /** Items spliced before the first separator (the tree's "Undo %@", #131). */
-  leadingMenuItems?(): MenuItem[];
+  /** Shared sidebar ops (the tree implements them); absent = item disabled. */
+  ops(): SideFileOps;
+  /** The sidebar view currently shown (check mark on the view items). */
+  view(): 'tree' | 'list' | 'search';
 }
 
 /**
@@ -138,22 +141,7 @@ export class FileList {
     });
     row.addEventListener('contextmenu', (e) => {
       e.preventDefault();
-      const p = extras(this.host.platform);
-      const items: MenuItem[] = [
-        { label: 'Open', run: () => this.host.openFile(d.path) },
-        // Quick Look after Open, like the tree (#131).
-        { label: 'Quick Look', run: () => void p.quickLook?.(d.path), disabled: !p.quickLook },
-        { separator: true },
-        { label: 'Copy Path', run: () => void navigator.clipboard?.writeText(d.path) },
-        { label: 'Reveal in Finder', run: () => void p.revealInFolder?.(d.path), disabled: !p.revealInFolder },
-      ];
-      // The tree's undoable op also leads the Articles menu (fe-sidebar §6).
-      const lead = this.host.leadingMenuItems?.() ?? [];
-      if (lead.length) {
-        const i = items.findIndex((it) => 'separator' in it);
-        items.splice(i < 0 ? items.length : i, 0, ...lead);
-      }
-      showContextMenu(e.clientX, e.clientY, items);
+      showContextMenu(e.clientX, e.clientY, fileMenu({ ops: this.host.ops(), entry: d, view: 'list', active: this.host.view() === 'list' ? 'list' : 'tree', rootDir: this.root ?? '' }));
     });
     this.rows.set(d.path, row);
     return row;

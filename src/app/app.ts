@@ -1,3 +1,4 @@
+import { saveMediaAs } from './images/context-menu';
 import { ExternalChangeBanner } from './ui/extchange';
 import type { EditorHandle, EditorSettings, ImageMenuAction, MenuAction, Platform } from '../contracts';
 import type { Wiring } from './wiring';
@@ -185,6 +186,8 @@ export class App {
         openLink: (href) => void this.openLink(href),
         baseDir: () => this.doc.dir,
         uploadImage: (src) => void this.uploader.uploadSrcs([src]),
+        imageOps: (t) => (t.img ? this.images.ctxOps(t.img) : null),
+        saveVideoAs: (src) => void saveMediaAs({ platform: this.platform, notify: (m, k) => void toast(m, { kind: k }) }, null, src, 'Video'),
         notify: (m, k) => void toast(m, { kind: k }),
       },
       this.page, // active tab's editor host lives here (#94)

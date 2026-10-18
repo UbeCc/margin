@@ -13,19 +13,32 @@ import { confirmDialog } from '../ui/modal';
 import { closeContextMenu, showContextMenu } from '../ui/contextmenu';
 import { localImages } from '../upload';
 import { basename } from '../util/path';
-import { buildItems, type CtxActions } from './items';
+import { buildItems, type CtxActions, type ImageCtxOps, type TableAction } from './items';
+import { saveMathAs } from './mathimg';
 import { contextTarget, type CtxTarget } from './targets';
 import { copySvgAsPng, svgSource } from './svg';
 
 export interface CtxHost {
   editor(): EditorHandle;
   platform: Platform;
-  run(id: CommandId): Promise<boolean> | boolean;
+  run(id: CommandId): unknown;
   openLink(href: string): void;
   baseDir(): string | null;
+  notify(m: string, k: 'info' | 'error' | 'success'): void;
   uploadImage?(src: string): void;
-  notify(msg: string, kind?: 'info' | 'success' | 'error'): void;
+  imageOps?(t: CtxTarget): ImageCtxOps | null;
+  saveVideoAs?(src: string): void;
 }
+
+const TABLE_BUTTONS: Record<TableAction, string> = {
+  rowAbove: '.mb-row-above',
+  rowBelow: '.mb-row-below',
+  colBefore: '.mb-col-left',
+  colAfter: '.mb-col-right',
+  deleteRow: '.mb-row-del',
+  deleteCol: '.mb-col-del',
+  deleteTable: '.mb-table-del',
+};
 
 
 
@@ -267,9 +280,18 @@ export class EditorContextMenu {
   }
 
 
+  private tableAction(a: TableAction): void {
+    const block = this.target?.block;
+    if (!block) return;
+    const cell = this.target?.cell ?? block.querySelector<HTMLElement>('.mb-cell');
+    if (a !== 'deleteTable') cell?.focus({ preventScroll: true });
+    block.querySelector<HTMLButtonElement>(TABLE_BUTTONS[a])?.click();
+  }
+
   private actions(t: CtxTarget): CtxActions {
     const p = this.host.platform;
     const svg = () => t.block?.querySelector('svg') ?? null;
+    const ops = this.host.imageOps?.(t) ?? null;
     return {
       run: (id) => void this.host.run(id),
       exec: (cmd) => this.exec(cmd),
@@ -288,7 +310,19 @@ export class EditorContextMenu {
           }
         : undefined,
       uploadImage: this.host.uploadImage,
-      deleteImage: (withFile) => void this.deleteImage(withFile),
+      deleteImage: (withFile) => (ops ? ops.remove(withFile) : void this.deleteImage(withFile)),
+      copyImageTo: (_src, move) => ops?.copyTo(move),
+      imageTarget: () => ops?.target() ?? null,
+      zoomChoices: () => ops?.zoom() ?? null,
+      syntaxState: () => ops?.syntax() ?? null,
+      saveImageAs: ops ? () => ops.saveAs() : undefined,
+      saveMathAs: () => {
+        const el = t.block?.querySelector('.katex') ?? t.math?.querySelector('.katex');
+        if (!el) return this.host.notify('The math has not been rendered yet.', 'info');
+        void saveMathAs(p, el).catch((e) => this.host.notify(`Could not save the math: ${String(e)}`, 'error'));
+      },
+      saveVideoAs: this.host.saveVideoAs,
+      tableAction: (a) => this.tableAction(a),
       editBlock: () => {
         const pv = t.block?.querySelector('.mb-preview');
         pv?.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true, button: 0 }));

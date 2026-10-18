@@ -1,12 +1,16 @@
 import type { EditorHandle, ImageMenuAction, ImageRule } from '../../contracts';
 import type { FullPlatform } from '../platform-extras';
 import type { ImageUploader } from '../upload-actions';
-import { dirname, relative } from '../util/path';
-import { attachImageMenu, copyImageContent, refForImage } from './context-menu';
+import { dirname, isUrlLike, relative } from '../util/path';
+import type { ImageCtxOps } from '../ctxmenu/items';
+import { copyImageContent, moveImageDialog, refForImage, saveMediaAs } from './context-menu';
 import { insertImage, type ImageInput } from './insert';
-import { resolveWithRoot, rootDirOf, setFrontMatterValue } from './rules';
+import { REMOTE_RE, resolveWithRoot, rootDirOf, setFrontMatterValue } from './rules';
 import { ImageTools, type Located } from './tools';
-import { parseImage } from './syntax';
+import { parseImage, zoomOf } from './syntax';
+
+/** §1.2 context-menu zoom presets (differs from Format › Image: no 80%, grouped 25–67 | 100–200). */
+const ZOOM_CTX_PRESETS = ['25%', '33%', '50%', '67%', '100%', '150%', '200%'];
 
 type Kind = 'info' | 'warning' | 'error' | 'success';
 
@@ -107,23 +111,58 @@ export class ImageFeature {
     });
   }
 
-  attach(root: HTMLElement): () => void {
-    return attachImageMenu(
-      root,
-      this.menuHost(),
-      () => this.host.editor().getMarkdown(),
-      (src) => this.host.resolveAsset(src),
-    );
+  /**
+   * Editor right-clicks on images are handled by the editor context menu
+   * (`EditorContextMenu` + `ctxOps`); kept as a no-op detach for callers.
+   */
+  attach(page: HTMLElement): () => void {
+    // Right-clicks are owned by the editor context menu; this hook only marks
+    // failed-load images so they keep a clickable placeholder box (any tab host).
+    const mark = () =>
+      page.querySelectorAll<HTMLImageElement>('.md-image img.md-img').forEach((img) => {
+        const m = () => img.classList.toggle('md-img-loaded', img.complete && img.naturalWidth > 0);
+        if (!img.dataset.loadHook) {
+          img.dataset.loadHook = '1';
+          img.addEventListener('load', m);
+          img.addEventListener('error', m);
+        }
+        m();
+      });
+    mark();
+    const mo = new MutationObserver(mark);
+    mo.observe(page, { subtree: true, childList: true });
+    return () => mo.disconnect();
   }
 
-  private menuHost() {
+  /** Editor-context-menu ops for one right-clicked image (#141): builds on the same tools as the image menu. */
+  ctxOps(img: HTMLImageElement): ImageCtxOps | null {
+    const ref = refForImage(img, this.host.editorRoot(), this.host.editor().getMarkdown(), (s) => this.host.resolveAsset(s));
+    if (!ref) return null;
+    const t = this.tools;
+    const zoomNow = zoomOf(ref.raw);
     return {
-      tools: this.tools,
-      platform: this.host.platform,
-      upload: (src: string) => void this.host.uploader.uploadSrcs([src]),
-      uploadAll: () => void this.host.uploader.uploadAll(),
-      uploading: () => this.host.uploader.uploading,
-      notify: (m: string, k: 'info' | 'error' | 'success') => this.host.notify(m, k),
+      copyTo: (move) =>
+        void (move
+          ? moveImageDialog(this.host.platform, t, ref)
+          : this.host.platform.openFileDialog({ directory: true }).then((d) => (d ? t.copyOne(ref, d, false) : null))),
+      target: () => {
+        const dir = t.targetFolder();
+        const abs = t.absOf(ref.src);
+        if (!dir || (abs ?? '').startsWith(dir + '/')) return null;
+        const local = !!abs && !REMOTE_RE.test(ref.src) && !isUrlLike(ref.src);
+        return { label: dir, canMove: local, run: (move) => void t.copyOne(ref, dir, move) };
+      },
+      zoom: () => ({
+        zoomNow,
+        presets: ZOOM_CTX_PRESETS,
+        set: (v) => void t.zoom(ref, v),
+      }),
+      syntax: () => {
+        const html = parseImage(ref.raw)?.html === true;
+        return { isHtml: html, switchTo: (to) => void t.switchSyntax(ref, to) };
+      },
+      saveAs: () => void saveMediaAs({ platform: this.host.platform, notify: (m, k) => this.host.notify(m, k) }, t.absOf(ref.src), ref.src, 'Image'),
+      remove: (withFile) => void (withFile ? t.deleteImageFile(ref) : t.deleteImage(ref)),
     };
   }
 

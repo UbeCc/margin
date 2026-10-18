@@ -108,7 +108,7 @@ test('context menu: new file, rename (open doc follows), new folder, trash', asy
   const drafts = page.locator(`.tree-row[data-path="${ROOT}/Journal/Drafts"]`);
   await expect(drafts).toBeVisible();
   await drafts.click({ button: 'right' });
-  await page.locator('.context-item', { hasText: 'Move to Trash' }).click();
+  await page.locator('.context-item', { hasText: 'Delete…' }).click();
   await page.locator('.dialog [data-id=ok]').click();
   await expect(drafts).toHaveCount(0);
 });

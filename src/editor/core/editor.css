@@ -64,6 +64,10 @@
 .md-editor .md-image > .md-src { display: none; }
 .md-editor .md-image.md-expand > .md-src { display: inline; }
 .md-editor .md-img { max-width: 100%; vertical-align: bottom; }
+/* Not-yet-loaded and failed images keep a placeholder box (Typora shows a
+   loading/broken icon); otherwise WebKit collapses the <img> to 0×0 and an
+   unloaded remote image cannot be clicked or right-clicked at all (#141). */
+.md-editor img.md-img:not(.md-img-loaded) { min-width: 24px; min-height: 24px; box-sizing: border-box; outline: 1px solid color-mix(in srgb, currentColor 25%, transparent); }
 .md-editor .md-image.md-expand > .md-img { display: block; margin: 0.3em 0; }
 
 /* inline math: rendered when idle, source when editing */

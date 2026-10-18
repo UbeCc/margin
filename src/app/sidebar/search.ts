@@ -1,6 +1,8 @@
 import type { DirEntry, Platform } from '../../contracts';
+import { extras } from '../platform-extras';
 import { h, clearChildren, icon } from '../util/dom';
 import { basename, dirname, relative } from '../util/path';
+import { showContextMenu, tidy, type MenuItem } from '../ui/contextmenu';
 import { collectDocs } from './walk';
 import { queryRegExp } from '../findmatches';
 
@@ -16,6 +18,8 @@ export interface SearchHost {
   setOptions(o: SearchOptions): void;
   /** Open a file; with a query, select its `occurrence`-th match (0-based) and highlight all. */
   openAt(path: string, query: string | null, opts: SearchOptions, occurrence: number): void;
+  /** Context menu "Open in New Window" (#142). */
+  openInNewWindow?(path: string): void;
 }
 
 export interface LineHit {
@@ -37,7 +41,6 @@ export const SEARCH_MAX_FILES = 5000;
 export function makeMatcher(q: string, o: SearchOptions): RegExp | null {
   return queryRegExp(q, o);
 }
-
 /**
  * Line-based matches (no multi-line), at most 21 matching lines per file. Text
  * before the first match is cut to "..." + the last 20 characters.
@@ -128,6 +131,7 @@ export class SidebarSearch {
       this.status,
       this.results,
     );
+    this.el.addEventListener('contextmenu', (e) => this.onMenu(e));
   }
 
   setRoot(root: string | null): void {
@@ -210,18 +214,7 @@ export class SidebarSearch {
       return el;
     });
     const extra = hits.length - VISIBLE_LINES;
-    const more =
-      extra > 0
-        ? h('button.search-more', {
-            type: 'button',
-            text: `show ${extra} more matches`,
-            onclick: (e: Event) => {
-              lines.forEach((l) => (l.hidden = false));
-              (e.currentTarget as HTMLElement).remove();
-            },
-          })
-        : null;
-    return h('div.search-group', { 'data-path': d.path }, head, ...lines, more);
+    return h('div.search-group', { 'data-path': d.path }, head, ...lines, extra > 0 ? this.moreButton(lines, extra) : null);
   }
 
   private onKey(e: KeyboardEvent): void {
@@ -231,5 +224,50 @@ export class SidebarSearch {
     else if (e.key === 'ArrowUp') (i <= 0 ? this.input : items[i - 1]).focus();
     else return;
     e.preventDefault();
+  }
+
+  /** Result-area context menu (#142, fe-sidebar-statusbar-find §6): result rows vs the empty panel. */
+  private onMenu(e: MouseEvent): void {
+    if ((e.target as HTMLElement).closest('input, button:not(.search-file)')) return;
+    e.preventDefault();
+    const group = (e.target as HTMLElement).closest<HTMLElement>('.search-group');
+    const items: MenuItem[] = [];
+    if (group) {
+      const path = group.dataset.path ?? '';
+      const p = extras(this.host.platform);
+      items.push({ label: 'Open', run: () => this.host.openAt(path, null, this.host.options(), 0) });
+      if (this.host.openInNewWindow) items.push({ label: 'Open in New Window', run: () => this.host.openInNewWindow!(path) });
+      items.push(
+        { separator: true },
+        { label: 'Copy File Path', run: () => void navigator.clipboard?.writeText(path) },
+        { label: 'Reveal in Finder', run: () => void p.revealInFolder?.(path), disabled: !p.revealInFolder },
+      );
+    }
+    items.push({ separator: true }, { label: 'Search', checked: true, run: () => this.input.focus() }, { separator: true }, { label: 'Expand All', run: () => this.setExpanded(true) }, { label: 'Collapse All', run: () => this.setExpanded(false) });
+    showContextMenu(e.clientX, e.clientY, tidy(items));
+  }
+
+  /** Expand / collapse every result block to its full / 5-line form. */
+  private setExpanded(on: boolean): void {
+    for (const g of this.results.querySelectorAll<HTMLElement>('.search-group')) {
+      const lines = [...g.querySelectorAll<HTMLElement>('.search-line')];
+      lines.forEach((l, i) => (l.hidden = !on && i >= VISIBLE_LINES));
+      g.querySelector('.search-more')?.remove();
+      if (!on) {
+        const extra = lines.length - VISIBLE_LINES;
+        if (extra > 0) g.appendChild(this.moreButton(lines, extra));
+      }
+    }
+  }
+
+  private moreButton(lines: HTMLElement[], extra: number): HTMLElement {
+    return h('button.search-more', {
+      type: 'button',
+      text: `show ${extra} more matches`,
+      onclick: (e: Event) => {
+        lines.forEach((l) => (l.hidden = false));
+        (e.currentTarget as HTMLElement).remove();
+      },
+    });
   }
 }

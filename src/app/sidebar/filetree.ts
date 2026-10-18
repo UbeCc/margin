@@ -1,4 +1,5 @@
 import type { DirEntry, FsEvent, Platform } from '../../contracts';
+import { duplicateFile, fileMenu, showInfo, type SideFileOps } from './file-menus';
 import { extras } from '../platform-extras';
 import { h, icon, clearChildren } from '../util/dom';
 import { basename, dirname, isInside, isMarkdownPath, isValidFileName, join, uniqueName, extname } from '../util/path';
@@ -24,6 +25,10 @@ export interface FileTreeHost {
   extraActions?(): (HTMLElement | null)[];
   /** Refresh button outside tree mode (list / search). */
   refreshMode?(): void;
+  /** Open the sidebar folder search (context menu "Search"). */
+  openSidebarSearch?(): void;
+  /** Switch tree / Articles view (context menu view items). */
+  setSidebarView?(mode: 'tree' | 'list'): void;
   /** True while the sidebar drag-move confirmation is enabled (#131). */
   moveConfirm?(): boolean;
   /** User ticked "Do not ask again" on the move confirmation (#131). */
@@ -55,7 +60,8 @@ export class FileTree {
   private active: string | null = null;
   private order: SortOrder = DEFAULT_SORT;
   mode: FilesMode = 'tree';
-  private undoOp: { label: string; undo: () => Promise<void> } | null = null;
+  /** The undoable sidebar file op ("Undo Rename %@" / "Undo Move %@"), one step. */
+  private lastOp: { dir: string; label: string; undo(): Promise<void> } | null = null;
   private groupFolders = true;
 
   constructor(private host: FileTreeHost) {
@@ -400,7 +406,8 @@ export class FileTree {
     const from = to;
     const back = entry.path;
     const label = `Rename ${name}`;
-    this.undoOp = {
+    this.lastOp = {
+      dir: dirname(back),
       label,
       undo: async () => {
         if (await this.host.platform.stat(back)) return; // don't clobber a recreated original
@@ -479,7 +486,8 @@ export class FileTree {
     const from = to;
     const back = src;
     const label = `Move ${keptName ?? basename(src)}`;
-    this.undoOp = {
+    this.lastOp = {
+      dir: destDir,
       label,
       undo: async () => {
         let dest = back;
@@ -565,55 +573,41 @@ export class FileTree {
   }
 
   private showMenu(x: number, y: number, entry: DirEntry | null): void {
-    const p = extras(this.host.platform);
-    const dir = entry ? (entry.isDir ? entry.path : dirname(entry.path)) : this.root!;
-    const items: MenuItem[] = [];
-    if (entry && !entry.isDir) {
-      items.push({ label: 'Open', run: () => this.activate(entry) });
-      const md = isMarkdownPath(entry.name);
-      if (md && this.host.openInNewTab) items.push({ label: 'Open in New Tab', run: () => this.host.openInNewTab!(entry.path) });
-      if (md && this.host.openInNewWindow) items.push({ label: 'Open in New Window', run: () => this.host.openInNewWindow!(entry.path) });
-      // Quick Look (window.previewFile → QLPreviewPanel, #131).
-      items.push({ label: 'Quick Look', run: () => void p.quickLook?.(entry.path), disabled: !p.quickLook });
-      items.push({ separator: true });
-    }
-    items.push(
-      { label: 'New File…', run: () => void this.newFile(dir) },
-      { label: 'New Folder…', run: () => void this.newFolder(dir), disabled: !p.createDir },
-    );
-    if (entry) {
-      items.push(
-        { separator: true },
-        { label: 'Rename…', run: () => void this.rename(entry), disabled: !p.rename },
-        { label: 'Move to Trash', run: () => void this.delete(entry), disabled: !p.remove, danger: true },
-      );
-    }
-    items.push(
-      { separator: true },
-      { label: 'Copy Path', run: () => void navigator.clipboard?.writeText(entry?.path ?? this.root!) },
-      { label: 'Reveal in Finder', run: () => void p.revealInFolder?.(entry?.path ?? this.root!), disabled: !p.revealInFolder },
-      { label: 'Refresh', run: () => void (entry?.isDir ? this.refreshDir(entry.path) : this.refreshAll()) },
-    );
-    // "Undo %@" sits before the first separator, followed by its own (fe-sidebar §6).
-    const lead = this.leadingMenuItems();
-    if (lead.length) {
-      const i = items.findIndex((it) => 'separator' in it);
-      items.splice(i < 0 ? items.length : i, 0, ...lead);
-    }
-    showContextMenu(x, y, items);
+    showContextMenu(x, y, fileMenu({ ops: this.ops(), entry, view: 'tree', active: this.mode === 'list' ? 'list' : 'tree', rootDir: this.root! }));
   }
 
-  /** The "Undo %@" entry (+ its separator) for tree and Articles menus (#131). */
-  leadingMenuItems(): MenuItem[] {
-    const op = this.undoOp;
+  /** Ops surface shared with the Articles list menu (#142). */
+  ops(): SideFileOps {
+    return {
+      platform: this.host.platform,
+      open: (entry) => this.activate(entry),
+      openInNewWindow: this.host.openInNewWindow,
+      newFile: (dir) => void this.newFile(dir),
+      newFolder: (dir) => void this.newFolder(dir),
+      search: () => (this.host.openSidebarSearch ? this.host.openSidebarSearch() : this.host.notify('Search is not available.', 'info')),
+      setView: (m) => void this.host.setSidebarView?.(m),
+      duplicate: (entry) => void this.takenNames(dirname(entry.path)).then((taken) => duplicateFile(this.host.platform, entry, taken, (m, k) => this.host.notify(m, k), () => void this.refreshDir(dirname(entry.path)))),
+      rename: (entry) => void this.rename(entry),
+      getInfo: (entry) => showInfo(entry),
+      remove: (entry) => void this.delete(entry),
+      copyPath: (path) => void this.copyPath(path),
+      reveal: (path) => void extras(this.host.platform).revealInFolder?.(path),
+      undoFor: (dir) => (this.lastOp && this.lastOp.dir === dir ? this.lastOp : null),
+    };
+  }
+
+  /** "Copy File Path": platform clipboard with a web fallback. */
+  private copyPath(path: string): void {
+    const write = extras(this.host.platform).writeClipboardText;
+    if (write) void write.call(this.host.platform, path).catch(() => navigator.clipboard?.writeText(path));
+    else void navigator.clipboard?.writeText(path).catch(() => this.host.notify('Could not copy the path.', 'error'));
+  }
+
+  /** The "Undo %@" entry (+ its separator); `ops().undoFor` feeds the same step. */
+  leadingMenuItems(dir: string): MenuItem[] {
+    const op = this.ops().undoFor(dir);
     if (!op) return [];
-    return [{ label: `Undo ${op.label}`, run: () => void this.runUndo() }, { separator: true }];
-  }
-
-  private async runUndo(): Promise<void> {
-    const op = this.undoOp;
-    this.undoOp = null;
-    await op?.undo();
+    return [{ label: `Undo ${op.label}`, run: () => void op.undo() }, { separator: true }];
   }
 
   // ------------------------------------------------------- keyboard
