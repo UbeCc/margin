@@ -1,5 +1,7 @@
 //! Export helpers (#95): PDF options (paper, header/footer, bookmarks, metadata),
 //! binary export output (Export › Image) and "Open exported file".
+// PDF post-processing helpers are only called from the macOS exporter.
+#![cfg_attr(not(target_os = "macos"), allow(dead_code))]
 
 use serde::Deserialize;
 use std::collections::HashSet;
