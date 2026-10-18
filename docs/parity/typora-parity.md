@@ -14,7 +14,7 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 | missing | 52 |
 | out of scope | 8 |
 
-REA ledger `rol_edd6252bb1ccdf8cd9988aba21fbec7ab237c5cc33119e04449a9e5860cf7bd6` (closure `47bef31d94f5a376…`): status **unknown**; unowned 52, implemented 111, out-of-scope 8, unknown 5.
+REA ledger `rol_dda982661eaaa92eb3c129aded4be4dc5323680fb74d097db4f3faf75c3e931c` (closure `a11fc8712aa2497c…`): status **unknown**; unowned 52, implemented 111, out-of-scope 8, unknown 5.
 
 REA coverage boundary `margin.typora-parity`: status **unknown**; 78/163 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 52, package-proof-missing 1, verifier-missing 76, verifier-unknown 9.
 
@@ -270,9 +270,9 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `export.html` | Export › HTML (theme inlined, local images relative) | owned |  | `src/app/app.ts` `private createExports(` | `tests/e2e/app-themes.spec.ts` › export HTML inlines the theme | 8 |
 | `export.html-plain` | Export › HTML (without Styles) | owned |  | `src/app/export.ts` `export function buildPlainHtml` | `tests/e2e/parity-export.spec.ts` › export.html-plain: Export › HTML (without Styles) | 1 |
 | `export.pdf` | Export › PDF — macOS native; #14 for Windows/Linux | owned |  | `src-tauri/src/pdf_macos.rs` `pub async fn export_pdf` | none | 2 |
-| `export.pdf-options` | PDF options: paper size/margins, header/footer, page breaks, bookmarks, internal links — #15 | owned |  | `src-tauri/src/pdf_post_macos.rs` `pub fn post_process` | `tests/e2e/parity-export.spec.ts` › export.pdf-options: PDF options | 14 |
+| `export.pdf-options` | PDF options: paper size/margins, header/footer, page breaks, bookmarks, internal links — #15; native-commands §4: paper Default (→ Page Setup)/A5/A4/A3/US Letter/US Legal/Tabloid/Custom, margins Default 45/36 pt or Custom, header/footer presets, Page Break Between Top Headings, Append Extra Content | owned |  | `src-tauri/src/pdf_post_macos.rs` `pub fn post_process` | `tests/e2e/parity-export.spec.ts` › export.pdf-options: PDF options | 14 |
 | `export.image` | Export › Image (PNG/JPEG of the whole document) | owned |  | `src/app/export-image.ts` `export async function rasterizeHtml` | `tests/e2e/parity-export.spec.ts` › export.image: Export › Image | 8 |
-| `export.pandoc` | Export via Pandoc: docx/odt/rtf/epub/latex/mediawiki/rst/textile/opml — #81; feed pandoc JSON/native AST from the editor model, argv only | owned |  | `src/app/export-pandoc.ts` `export async function exportWithPandoc` | `tests/e2e/parity-export.spec.ts` › export.pandoc: Export via Pandoc | 32 |
+| `export.pandoc` | Export via Pandoc: docx/odt/rtf/epub/latex/mediawiki/rst/textile/opml — #81; feed pandoc JSON/native AST from the editor model, argv only; #90 Abort button + per-format Style Reference/Template/Chapter Level/Extra Arguments (verified by export.pandoc-options e2e) | owned |  | `src/app/export-pandoc.ts` `export async function exportWithPandoc` | `tests/e2e/parity-export.spec.ts` › export.pandoc: Export via Pandoc | 32 |
 | `export.custom` | Custom export commands and "run command after export" | owned |  | `src-tauri/src/export_custom.rs` `pub fn run_command` | `tests/e2e/parity-export.spec.ts` › export.custom: Custom export commands | 18 |
 | `export.settings` | Export settings pane: per-format options, theme, default folder, after-export action, YAML overrides | owned |  | `src/app/preferences-export.ts` `export function exportPrefsSection` | `tests/e2e/parity-export.spec.ts` › export.settings: Export settings pane | 23 |
 | `export.previous` | Export with Previous / Export and Overwrite with Previous | owned |  | `src/app/export-actions.ts` `async export(kind` | `tests/e2e/parity-export.spec.ts` › export.previous: Export with Previous | 8 |

@@ -287,6 +287,7 @@ pub fn run() {
             commands::export_pdf,
             pandoc::pandoc_detect,
             pandoc::pandoc_export,
+            pandoc::pandoc_abort,
             commands::print_window,
             commands::load_settings,
             commands::save_settings,

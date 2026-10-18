@@ -153,6 +153,8 @@ mod tests {
             doc_dir: Some(dir.path()),
             title: None,
             timeout: Duration::from_secs(60),
+            options: Default::default(),
+            cancel: None,
         };
         crate::pandoc::export(Path::new(&info.path), req).unwrap();
         let back = import(Path::new(&info.path), &docx, Some(&dir.path().join("media")), Duration::from_secs(60)).unwrap();
