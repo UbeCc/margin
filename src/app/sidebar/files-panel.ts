@@ -27,7 +27,7 @@ export class FilesPanel {
 
   constructor(private host: FilesPanelHost) {
     this.tree = new FileTree({ ...host, extraActions: () => this.actions(), refreshMode: () => this.refreshMode() });
-    this.list = new FileList({ platform: host.platform, openFile: (p) => host.openFile(p) });
+    this.list = new FileList({ platform: host.platform, openFile: (p) => host.openFile(p), leadingMenuItems: () => this.tree.leadingMenuItems() });
     this.search = new SidebarSearch({
       platform: host.platform,
       openAt: (p, q, o, n) => host.openAt(p, q, o, n),

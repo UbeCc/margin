@@ -34,6 +34,10 @@ export interface MarginSettings extends AppSettings {
   fileSearchUseRegexp: boolean;
   /** Outline: "Collapsible Outline" vs "Flat Outline". */
   outlineCollapsible: boolean;
+  /** Outline pinned in the sidebar (true) vs floating drop-down (#131). */
+  outlinePinned: boolean;
+  /** Ask "Are you sure you want to move %@" before sidebar drag-moves (suppressible). */
+  confirmSidebarMove: boolean;
   /** Auto-save delay in ms after the last edit. */
   autoSaveDelay: number;
   restoreLastFolder: boolean;
@@ -122,6 +126,8 @@ export const DEFAULT_SETTINGS: Readonly<MarginSettings> = Object.freeze({
   fileSearchWholeWord: false,
   fileSearchUseRegexp: false,
   outlineCollapsible: false,
+  outlinePinned: true,
+  confirmSidebarMove: true,
   restoreLastFolder: false,
   export: DEFAULT_EXPORT,
   pandocPath: '',
@@ -227,6 +233,8 @@ export function migrateSettings(input: unknown): MarginSettings {
     fileSearchWholeWord: bool(raw.fileSearchWholeWord, d.fileSearchWholeWord),
     fileSearchUseRegexp: bool(raw.fileSearchUseRegexp, d.fileSearchUseRegexp),
     outlineCollapsible: bool(raw.outlineCollapsible, d.outlineCollapsible),
+    outlinePinned: bool(raw.outlinePinned, d.outlinePinned),
+    confirmSidebarMove: bool(raw.confirmSidebarMove, d.confirmSidebarMove),
     restoreLastFolder: onLaunch === 'restoreAll' || onLaunch === 'restoreFolders',
     export: migrateExportSettings(raw.export),
     pandocPath: typeof raw.pandocPath === 'string' ? raw.pandocPath.trim() : '',

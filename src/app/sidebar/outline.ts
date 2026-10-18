@@ -6,6 +6,10 @@ export interface OutlineOptions {
   /** "Collapsible Outline" (true) vs "Flat Outline" (false, default). */
   collapsible: boolean;
   onCollapsibleChange?(on: boolean): void;
+  /** Pinned in the sidebar (true) vs floating drop-down (#131). */
+  pinned?: boolean;
+  /** Pin toggled: false → hide sidebar + show drop-down; true → back to sidebar. */
+  onPinnedChange?(on: boolean): void;
 }
 
 /** Index of each heading's parent (nearest previous heading with a lower level), -1 for roots. */
@@ -48,21 +52,52 @@ export class OutlineView {
   private expanded = new Set<string>();
   private filled = false;
   private collapsible: boolean;
+  private pinned: boolean;
+  private pinBtn: HTMLButtonElement;
 
   constructor(private onPick: (id: string) => void, private opts: OutlineOptions = { collapsible: false }) {
     this.collapsible = opts.collapsible;
+    this.pinned = opts.pinned ?? true;
     this.list = h('ol.outline-list', { role: 'tree', 'aria-label': 'Outline' });
     this.filterInput = h('input.outline-filter', { type: 'search', placeholder: 'Filter', 'aria-label': 'Filter', spellcheck: 'false' });
     this.filterInput.addEventListener('input', () => this.applyVisibility());
     this.filterInput.addEventListener('keydown', (e) => this.onFilterKey(e));
     const close = h('button.icon-btn.outline-filter-close', { type: 'button', title: 'Close', 'aria-label': 'Close Filter', onclick: () => this.closeFilter() }, icon('close'));
     this.filterBar = h('div.outline-header', { hidden: true }, icon('search', 'search-icon'), this.filterInput, close);
-    this.el = h('div.outline', { 'data-collapsible': String(this.collapsible) }, this.filterBar, this.list);
+    // Pin/unpin (fe-sidebar §10): unpin hides the sidebar for a drop-down
+    // outline; pin brings the sidebar outline back.
+    this.pinBtn = h('button.icon-btn.outline-pin', {
+      type: 'button',
+      title: 'Unpin Outline',
+      'aria-label': 'Unpin Outline',
+      onclick: () => this.setPinned(!this.pinned),
+    }, icon('pin'));
+    const titlebar = h('div.outline-titlebar', null, h('span.outline-title', { text: 'Outline' }), this.pinBtn);
+    this.el = h('div.outline', { 'data-collapsible': String(this.collapsible) }, titlebar, this.filterBar, this.list);
+    this.applyPinState();
     this.el.addEventListener('contextmenu', (e) => {
       if ((e.target as HTMLElement).closest('input')) return;
       e.preventDefault();
       this.showMenu(e.clientX, e.clientY);
     });
+  }
+
+  get isPinned(): boolean {
+    return this.pinned;
+  }
+
+  setPinned(on: boolean): void {
+    if (on === this.pinned) return;
+    this.pinned = on;
+    this.applyPinState();
+    this.opts.onPinnedChange?.(on);
+  }
+
+  private applyPinState(): void {
+    this.pinBtn.title = this.pinned ? 'Unpin Outline' : 'Pin Outline';
+    this.pinBtn.setAttribute('aria-label', this.pinBtn.title);
+    this.pinBtn.setAttribute('aria-pressed', String(!this.pinned));
+    this.el.dataset.pinned = String(this.pinned);
   }
 
   get isCollapsible(): boolean {
