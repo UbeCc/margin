@@ -107,6 +107,7 @@ export function uploadPrefsSection(
     portRow,
     timeoutRow,
     h('div.pref-row', null, testBtn),
+    report,
     h('p.pref-note', { text: 'The uploader must print one URL per image (http(s), ftp, file, or host.tld/path) as the last lines of its output. Test Uploader uploads two sample images and expects exactly two URLs. PicGo.app is launched by bundle id (com.molunerfinn.picgo) and contacted on 127.0.0.1 — the first connection is retried once after 5 s. uPic and Picsee run their preset command line as separate arguments (never through a shell). Use Upload Image from an image’s context menu, or Upload All Local Images from the command palette.' }),
   );
 }

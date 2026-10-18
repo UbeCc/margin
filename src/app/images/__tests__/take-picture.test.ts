@@ -24,7 +24,7 @@ function stubCamera(fn: () => Promise<MediaStream>): void {
 
 function makeHost(snippet: string | null = '![picture-20260101000000](assets/picture-20260101000000.png)') {
   return {
-    editor: fakeEditor(''),
+    editor: () => fakeEditor(''),
     store: vi.fn().mockResolvedValue(snippet),
     notify: (m: string, k: string): void => {
       notes.push([m, k]);
