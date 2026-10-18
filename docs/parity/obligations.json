@@ -2,11 +2,11 @@
  "generated_from": {
   "spec": "typora-re/parity-spec.md",
   "prose": "typora-re/sections/*.md",
-  "margin_head": "38aa5892288a69f5dd43a2f7209610d97aec87eb"
+  "margin_head": "d5cf09ef21f2b410afc38b8bfdb915c46544195d"
  },
  "summary": {
-  "head": "38aa5892288a69f5dd43a2f7209610d97aec87eb",
-  "artifact_sha256": "bc985670202e7f3d95842fca9efa186c3136fc85ffadce9ec446c771ba4f39cb",
+  "head": "d5cf09ef21f2b410afc38b8bfdb915c46544195d",
+  "artifact_sha256": "40b951e7eb0047d13da15fcf99bab9f96ceb6aea0a0481c58f1dd48f967e8b09",
   "inventory": {
    "total": 171,
    "owned": 70,
@@ -16,8 +16,8 @@
    "verified_by_test": 57
   },
   "ledger": {
-   "ledger_id": "rol_dc0e2860bd1eda070cea28efe071c54b4022873ded3ebea511592b5063bbbe56",
-   "closure_digest": "bcc9546491deadf8e9c1ddffb901268b9f033db8d37f054ef30eb676b23005b8",
+   "ledger_id": "rol_c6515a3838dd0aa0d955574d00b1e9790193389124d86a55d8566d281aab5894",
+   "closure_digest": "917f355101dfe286da4579ee9ad7065754946dd70ca70191bb2be62ddf46b7dc",
    "status": "unknown",
    "summary": {
     "total": 176,
@@ -119,7 +119,7 @@
      }
     ]
    },
-   "evidence_id": "ev_12df129967cedf07eb11355b94e08cfab957e49a35b5a3b3c238694b0a6f93c0"
+   "evidence_id": "ev_d26f451a7123c322ad23ffd2457d86efa041ac3c24c0ec2a62f4aa08cf13addd"
   },
   "coverage": {
    "status": "unknown",
@@ -172,7 +172,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "About Margin",
-    "sha256": "a2b668b318fe26b3843ec1c657f4f098af241665952f30a5d2c2a66b65a8feac"
+    "sha256": "6d224088bc3c93b35e1525f934de50995a5e9bf9c238e8b58ff2c964a5c25be2"
    },
    "verifier": null,
    "spec": {
@@ -206,7 +206,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'preferences'",
-    "sha256": "1bbe87dfcf5266ac88fdf5e133ebd273207391fc600fd93ba9bd8c10f08b9410"
+    "sha256": "cfc5a42e681b324eef76a8ba3843bba8dbc7727a798a069162ab997ff8f199d3"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -244,7 +244,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "PredefinedMenuItem::hide_others",
-    "sha256": "a2b668b318fe26b3843ec1c657f4f098af241665952f30a5d2c2a66b65a8feac"
+    "sha256": "6d224088bc3c93b35e1525f934de50995a5e9bf9c238e8b58ff2c964a5c25be2"
    },
    "verifier": null,
    "spec": {
@@ -282,7 +282,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'new'",
-    "sha256": "1bbe87dfcf5266ac88fdf5e133ebd273207391fc600fd93ba9bd8c10f08b9410"
+    "sha256": "cfc5a42e681b324eef76a8ba3843bba8dbc7727a798a069162ab997ff8f199d3"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -391,7 +391,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'open'",
-    "sha256": "1bbe87dfcf5266ac88fdf5e133ebd273207391fc600fd93ba9bd8c10f08b9410"
+    "sha256": "cfc5a42e681b324eef76a8ba3843bba8dbc7727a798a069162ab997ff8f199d3"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -438,7 +438,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'openFolder'",
-    "sha256": "1bbe87dfcf5266ac88fdf5e133ebd273207391fc600fd93ba9bd8c10f08b9410"
+    "sha256": "cfc5a42e681b324eef76a8ba3843bba8dbc7727a798a069162ab997ff8f199d3"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -485,7 +485,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "quickOpen(): void",
-    "sha256": "1bbe87dfcf5266ac88fdf5e133ebd273207391fc600fd93ba9bd8c10f08b9410"
+    "sha256": "cfc5a42e681b324eef76a8ba3843bba8dbc7727a798a069162ab997ff8f199d3"
    },
    "verifier": {
     "file": "tests/e2e/app-navigation.spec.ts",
@@ -606,7 +606,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'save'",
-    "sha256": "1bbe87dfcf5266ac88fdf5e133ebd273207391fc600fd93ba9bd8c10f08b9410"
+    "sha256": "cfc5a42e681b324eef76a8ba3843bba8dbc7727a798a069162ab997ff8f199d3"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -654,7 +654,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'saveAs'",
-    "sha256": "1bbe87dfcf5266ac88fdf5e133ebd273207391fc600fd93ba9bd8c10f08b9410"
+    "sha256": "cfc5a42e681b324eef76a8ba3843bba8dbc7727a798a069162ab997ff8f199d3"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -804,7 +804,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'reloadFromDisk'",
-    "sha256": "1bbe87dfcf5266ac88fdf5e133ebd273207391fc600fd93ba9bd8c10f08b9410"
+    "sha256": "cfc5a42e681b324eef76a8ba3843bba8dbc7727a798a069162ab997ff8f199d3"
    },
    "verifier": null,
    "spec": {
@@ -870,7 +870,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'toggleLineEnding'",
-    "sha256": "1bbe87dfcf5266ac88fdf5e133ebd273207391fc600fd93ba9bd8c10f08b9410"
+    "sha256": "cfc5a42e681b324eef76a8ba3843bba8dbc7727a798a069162ab997ff8f199d3"
    },
    "verifier": {
     "file": "src/app/__tests__/document.test.ts",
@@ -1017,7 +1017,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'print'",
-    "sha256": "1bbe87dfcf5266ac88fdf5e133ebd273207391fc600fd93ba9bd8c10f08b9410"
+    "sha256": "cfc5a42e681b324eef76a8ba3843bba8dbc7727a798a069162ab997ff8f199d3"
    },
    "verifier": null,
    "spec": {
@@ -1053,7 +1053,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'close'",
-    "sha256": "1bbe87dfcf5266ac88fdf5e133ebd273207391fc600fd93ba9bd8c10f08b9410"
+    "sha256": "cfc5a42e681b324eef76a8ba3843bba8dbc7727a798a069162ab997ff8f199d3"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -1093,7 +1093,7 @@
    "owner": {
     "path": "src/app/document.ts",
     "anchor": "missing",
-    "sha256": "6863972da52a062af61410e805f4dd033197db20bd79adbb981c90daa85fc7c5"
+    "sha256": "55eeac44b492060067b987a013685b34cd34e088aff9c4320702a0b20a6508eb"
    },
    "verifier": {
     "file": "src/app/__tests__/document.test.ts",
@@ -1147,7 +1147,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'undo'",
-    "sha256": "1bbe87dfcf5266ac88fdf5e133ebd273207391fc600fd93ba9bd8c10f08b9410"
+    "sha256": "cfc5a42e681b324eef76a8ba3843bba8dbc7727a798a069162ab997ff8f199d3"
    },
    "verifier": {
     "file": "tests/e2e/core-cases.ts",
@@ -1192,7 +1192,7 @@
    "owner": {
     "path": "src/editor/core/clipboard.ts",
     "anchor": "export function onPaste",
-    "sha256": "bfa91a163900c57dbb623e7b4a9ee0338101333ddb50664c20ef25216056db94"
+    "sha256": "65b3db5f93909732c2b36fd57c5d700ce46710e32f5a8bf2318da893a105213e"
    },
    "verifier": {
     "file": "tests/e2e/core-cases.ts",
@@ -1529,7 +1529,7 @@
    "owner": {
     "path": "src/app/preferences.ts",
     "anchor": "'Check spelling while typing'",
-    "sha256": "35a1946e886d9786efbd17fd40d1ef244f04409cb1ee957c4d6a796a4d7dfd66"
+    "sha256": "3fc45a9b0562ea74c1ae02ce4381eb92102be459013ae7de64036ecf9a59be74"
    },
    "verifier": null,
    "spec": {
@@ -2522,7 +2522,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'toggleSource'",
-    "sha256": "1bbe87dfcf5266ac88fdf5e133ebd273207391fc600fd93ba9bd8c10f08b9410"
+    "sha256": "cfc5a42e681b324eef76a8ba3843bba8dbc7727a798a069162ab997ff8f199d3"
    },
    "verifier": {
     "file": "tests/e2e/core-cases.ts",
@@ -2568,7 +2568,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'toggleFocus'",
-    "sha256": "1bbe87dfcf5266ac88fdf5e133ebd273207391fc600fd93ba9bd8c10f08b9410"
+    "sha256": "cfc5a42e681b324eef76a8ba3843bba8dbc7727a798a069162ab997ff8f199d3"
    },
    "verifier": {
     "file": "tests/e2e/app-navigation.spec.ts",
@@ -2612,7 +2612,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'toggleSidebar'",
-    "sha256": "1bbe87dfcf5266ac88fdf5e133ebd273207391fc600fd93ba9bd8c10f08b9410"
+    "sha256": "cfc5a42e681b324eef76a8ba3843bba8dbc7727a798a069162ab997ff8f199d3"
    },
    "verifier": {
     "file": "tests/e2e/app-navigation.spec.ts",
@@ -2714,7 +2714,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'zoomIn'",
-    "sha256": "1bbe87dfcf5266ac88fdf5e133ebd273207391fc600fd93ba9bd8c10f08b9410"
+    "sha256": "cfc5a42e681b324eef76a8ba3843bba8dbc7727a798a069162ab997ff8f199d3"
    },
    "verifier": null,
    "spec": {
@@ -2753,7 +2753,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "PredefinedMenuItem::fullscreen",
-    "sha256": "a2b668b318fe26b3843ec1c657f4f098af241665952f30a5d2c2a66b65a8feac"
+    "sha256": "6d224088bc3c93b35e1525f934de50995a5e9bf9c238e8b58ff2c964a5c25be2"
    },
    "verifier": null,
    "spec": {
@@ -2871,7 +2871,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "THEMES_SUBMENU_ID",
-    "sha256": "a2b668b318fe26b3843ec1c657f4f098af241665952f30a5d2c2a66b65a8feac"
+    "sha256": "6d224088bc3c93b35e1525f934de50995a5e9bf9c238e8b58ff2c964a5c25be2"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -2913,7 +2913,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'openThemesFolder'",
-    "sha256": "1bbe87dfcf5266ac88fdf5e133ebd273207391fc600fd93ba9bd8c10f08b9410"
+    "sha256": "cfc5a42e681b324eef76a8ba3843bba8dbc7727a798a069162ab997ff8f199d3"
    },
    "verifier": null,
    "spec": {
@@ -3005,7 +3005,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "PredefinedMenuItem::minimize",
-    "sha256": "a2b668b318fe26b3843ec1c657f4f098af241665952f30a5d2c2a66b65a8feac"
+    "sha256": "6d224088bc3c93b35e1525f934de50995a5e9bf9c238e8b58ff2c964a5c25be2"
    },
    "verifier": null,
    "spec": {
@@ -3039,7 +3039,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "ID_HELP_MARKDOWN",
-    "sha256": "a2b668b318fe26b3843ec1c657f4f098af241665952f30a5d2c2a66b65a8feac"
+    "sha256": "6d224088bc3c93b35e1525f934de50995a5e9bf9c238e8b58ff2c964a5c25be2"
    },
    "verifier": null,
    "spec": {
@@ -3817,7 +3817,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "private async storeImage(",
-    "sha256": "1bbe87dfcf5266ac88fdf5e133ebd273207391fc600fd93ba9bd8c10f08b9410"
+    "sha256": "cfc5a42e681b324eef76a8ba3843bba8dbc7727a798a069162ab997ff8f199d3"
    },
    "verifier": {
     "file": "src/platform/web.test.ts",
@@ -3871,7 +3871,7 @@
    "owner": {
     "path": "src/app/settings.ts",
     "anchor": "migrateImageRule",
-    "sha256": "d4d643b22518b991b04b874e59a668aedce7a6554bf910eaac1da77de98b26a0"
+    "sha256": "d919235844d0a7ac9d5e8a1f1fe9fdefae2e21d10b354b131004b13af93a48ea"
    },
    "verifier": {
     "file": "src/app/__tests__/settings.test.ts",
@@ -4259,7 +4259,7 @@
    "owner": {
     "path": "src/app/settings.ts",
     "anchor": "DEFAULT_SETTINGS",
-    "sha256": "d4d643b22518b991b04b874e59a668aedce7a6554bf910eaac1da77de98b26a0"
+    "sha256": "d919235844d0a7ac9d5e8a1f1fe9fdefae2e21d10b354b131004b13af93a48ea"
    },
    "verifier": {
     "file": "src/app/__tests__/settings.test.ts",
@@ -4343,7 +4343,7 @@
    "owner": {
     "path": "src/app/preferences.ts",
     "anchor": "'restoreLastFolder'",
-    "sha256": "35a1946e886d9786efbd17fd40d1ef244f04409cb1ee957c4d6a796a4d7dfd66"
+    "sha256": "3fc45a9b0562ea74c1ae02ce4381eb92102be459013ae7de64036ecf9a59be74"
    },
    "verifier": null,
    "spec": {
@@ -4382,7 +4382,7 @@
    "owner": {
     "path": "src/app/document.ts",
     "anchor": "autoSave",
-    "sha256": "6863972da52a062af61410e805f4dd033197db20bd79adbb981c90daa85fc7c5"
+    "sha256": "55eeac44b492060067b987a013685b34cd34e088aff9c4320702a0b20a6508eb"
    },
    "verifier": {
     "file": "src/app/__tests__/document.test.ts",
@@ -4456,7 +4456,7 @@
    "owner": {
     "path": "src/app/preferences.ts",
     "anchor": "'darkTheme'",
-    "sha256": "35a1946e886d9786efbd17fd40d1ef244f04409cb1ee957c4d6a796a4d7dfd66"
+    "sha256": "3fc45a9b0562ea74c1ae02ce4381eb92102be459013ae7de64036ecf9a59be74"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -4504,7 +4504,7 @@
    "owner": {
     "path": "src/app/preferences.ts",
     "anchor": "'Font size'",
-    "sha256": "35a1946e886d9786efbd17fd40d1ef244f04409cb1ee957c4d6a796a4d7dfd66"
+    "sha256": "3fc45a9b0562ea74c1ae02ce4381eb92102be459013ae7de64036ecf9a59be74"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -4646,7 +4646,7 @@
    "owner": {
     "path": "src/app/preferences.ts",
     "anchor": "'autoSave'",
-    "sha256": "35a1946e886d9786efbd17fd40d1ef244f04409cb1ee957c4d6a796a4d7dfd66"
+    "sha256": "3fc45a9b0562ea74c1ae02ce4381eb92102be459013ae7de64036ecf9a59be74"
    },
    "verifier": null,
    "spec": {
@@ -4685,7 +4685,7 @@
    "owner": {
     "path": "src/app/settings.ts",
     "anchor": "DEFAULT_SETTINGS",
-    "sha256": "d4d643b22518b991b04b874e59a668aedce7a6554bf910eaac1da77de98b26a0"
+    "sha256": "d919235844d0a7ac9d5e8a1f1fe9fdefae2e21d10b354b131004b13af93a48ea"
    },
    "verifier": null,
    "spec": {
@@ -4987,7 +4987,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "private createExports(",
-    "sha256": "1bbe87dfcf5266ac88fdf5e133ebd273207391fc600fd93ba9bd8c10f08b9410"
+    "sha256": "cfc5a42e681b324eef76a8ba3843bba8dbc7727a798a069162ab997ff8f199d3"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -5372,7 +5372,7 @@
    "owner": {
     "path": "src/app/export-actions.ts",
     "anchor": "async export(kind",
-    "sha256": "d543c129e85cc1a45223bfad9149ac8e6ae9f1b875aec2f374b3195de7e0740b"
+    "sha256": "cc40b0aad044f1c7affef5a2f7efe25de36ca916b62a48a9ed9f494332b55cbb"
    },
    "verifier": {
     "file": "tests/e2e/parity-export.spec.ts",
@@ -5940,7 +5940,7 @@
    "owner": {
     "path": "src/app/document.ts",
     "anchor": "external",
-    "sha256": "6863972da52a062af61410e805f4dd033197db20bd79adbb981c90daa85fc7c5"
+    "sha256": "55eeac44b492060067b987a013685b34cd34e088aff9c4320702a0b20a6508eb"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -6044,7 +6044,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "setDocumentEdited",
-    "sha256": "1bbe87dfcf5266ac88fdf5e133ebd273207391fc600fd93ba9bd8c10f08b9410"
+    "sha256": "cfc5a42e681b324eef76a8ba3843bba8dbc7727a798a069162ab997ff8f199d3"
    },
    "verifier": null,
    "spec": {
@@ -6076,7 +6076,7 @@
    "owner": {
     "path": "src-tauri/src/lib.rs",
     "anchor": "on_second_instance",
-    "sha256": "493a6ae65f0345f2b75fe033258a2e3d7c14718da2adbdba21c95d8bc2b4ec1d"
+    "sha256": "5667ccef09c6d42b9268f8f7022160ea83aef264e009836660003cab189301b1"
    },
    "verifier": null,
    "spec": {
@@ -6205,7 +6205,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "applyAppearance",
-    "sha256": "1bbe87dfcf5266ac88fdf5e133ebd273207391fc600fd93ba9bd8c10f08b9410"
+    "sha256": "cfc5a42e681b324eef76a8ba3843bba8dbc7727a798a069162ab997ff8f199d3"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -6279,7 +6279,7 @@
    "owner": {
     "path": "src/editor/core/clipboard.ts",
     "anchor": "MARGIN_HTML_ATTR",
-    "sha256": "bfa91a163900c57dbb623e7b4a9ee0338101333ddb50664c20ef25216056db94"
+    "sha256": "65b3db5f93909732c2b36fd57c5d700ce46710e32f5a8bf2318da893a105213e"
    },
    "verifier": {
     "file": "tests/e2e/core-cases.ts",

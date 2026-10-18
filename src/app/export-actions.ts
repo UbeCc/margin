@@ -37,6 +37,8 @@ export interface Exporter {
   extensions: string[];
   /** Write the export to `target`. Throw to report a failure. */
   run(target: string): Promise<void>;
+  /** Preflight: a reason the exporter cannot run here (checked before the save panel). */
+  unavailable?(): string | null;
 }
 
 export interface LastExport {
@@ -227,6 +229,11 @@ export class ExportController {
       this.host.notify(`Unknown export format: ${kind}`, 'error');
       return false;
     }
+    const why = ex.unavailable?.();
+    if (why) {
+      this.host.notify(why, 'error');
+      return false;
+    }
     const s = this.host.exportSettings();
     let target: string | null;
     if (mode === 'overwrite') {
@@ -249,6 +256,8 @@ export class ExportController {
       });
     }
     if (!target) return false;
+    // Panels on some platforms return the bare name: add the format's extension.
+    if (!ex.extensions.some((e) => target!.toLowerCase().endsWith(`.${e}`))) target = `${target}.${ex.extensions[0]}`;
     try {
       await ex.run(target);
     } catch (e) {
@@ -283,6 +292,7 @@ export function registerPandocExporters(c: ExportController, opts: { pandocPath:
     c.register(`pandoc:${format}`, (h) => ({
       label: spec.filterName,
       extensions: [spec.ext],
+      unavailable: () => (extras(h.platform).pandocExport ? null : `${spec.label} export needs Pandoc and the desktop app.`),
       run: async (target) => {
         const x = extras(h.platform);
         let error = '';

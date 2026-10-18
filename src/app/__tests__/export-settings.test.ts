@@ -179,3 +179,32 @@ describe('heading anchors', () => {
     expect(out).toContain('href="#nope"');
   });
 });
+
+describe('Pandoc exporters in the shared pipeline', () => {
+  it('preflights a missing backend, then exports + repeats with previous/overwrite', async () => {
+    const { registerPandocExporters } = await import('../export-actions');
+    const f = fakeHost();
+    const c = new ExportController(f.host);
+    registerPandocExporters(c, { pandocPath: () => '', title: () => 'Doc', progress: () => () => undefined });
+    expect(await c.export('pandoc:docx')).toBe(false);
+    expect(f.notes[f.notes.length - 1]).toMatch(/needs Pandoc/);
+    expect(f.platform.saveFileDialog).not.toHaveBeenCalled();
+    const calls: string[] = [];
+    (f.platform as unknown as { pandocExport: unknown }).pandocExport = vi.fn(async (_md: string, out: string) => {
+      calls.push(out);
+      f.files.add(out);
+      return '';
+    });
+    f.dialogs.push('/out/Doc');
+    expect(await c.export('pandoc:docx')).toBe(true);
+    expect(calls).toEqual(['/out/Doc.docx']);
+    expect(await c.export(null, 'overwrite')).toBe(true);
+    expect(calls).toEqual(['/out/Doc.docx', '/out/Doc.docx']);
+    expect(f.host.confirmOverwrite).toHaveBeenCalledWith('/out/Doc.docx');
+    (f.platform as unknown as { pandocExport: unknown }).pandocExport = vi.fn(async () => {
+      throw new Error('pandoc exited 1: boom');
+    });
+    expect(await c.export(null, 'overwrite')).toBe(false);
+    expect(f.notes[f.notes.length - 1]).toMatch(/boom/);
+  });
+});
