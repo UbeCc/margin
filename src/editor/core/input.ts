@@ -95,6 +95,8 @@ export function attachInput(ed: EditorCore): () => void {
       return true;
     }
     if (close === undefined) return false;
+    // `- [` at the start of a list item is a task box being typed (`- [ ] `), not a link.
+    if (ch === '[' && !c.slice(0, loc.off).trim() && l.chain.some((x) => x.kind === 'item')) return false;
     // Quotes and markers only pair at a word boundary (keeps "don't", snake_case, 2*3).
     if ((ch === '"' || ch === "'" || md) && /[\p{L}\p{N}]/u.test(prev) && !emptyPair) return false;
     if (next && /[\p{L}\p{N}]/u.test(next)) return false;
