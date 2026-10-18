@@ -5,7 +5,8 @@
 //! `${variables}` substituted inside each token — so a file name containing
 //! `;`, `$( )` or spaces can never become extra shell syntax. No shell is spawned.
 
-use crate::pandoc::{fallback_dirs, run};
+use crate::pandoc::{fallback_dirs, run_cancellable};
+use std::sync::atomic::AtomicBool;
 use crate::upload::split_command;
 use serde::Serialize;
 use std::collections::HashMap;
@@ -83,9 +84,21 @@ pub fn which(name: &str, path_env: Option<&OsStr>, extra: &[PathBuf]) -> Result<
 }
 
 pub fn run_command(command: &str, vars: &HashMap<String, String>, stdin: Option<String>, cwd: Option<&Path>, timeout: Duration) -> Result<CommandOutput, String> {
+    run_command_cancellable(command, vars, stdin, cwd, timeout, None)
+}
+
+/// [`run_command`] that the export sheet's Abort button can stop (#90) → `Err(pandoc::ABORTED)`.
+pub fn run_command_cancellable(
+    command: &str,
+    vars: &HashMap<String, String>,
+    stdin: Option<String>,
+    cwd: Option<&Path>,
+    timeout: Duration,
+    cancel: Option<&AtomicBool>,
+) -> Result<CommandOutput, String> {
     let argv = build_argv(command, vars)?;
     let bin = which(&argv[0], std::env::var_os("PATH").as_deref(), &fallback_dirs())?;
-    let out = run(&bin, &argv[1..], stdin, cwd.filter(|d| d.is_dir()), timeout).map_err(|e| e.replace("Pandoc", "Command").replace("pandoc", "command"))?;
+    let out = run_cancellable(&bin, &argv[1..], stdin, cwd.filter(|d| d.is_dir()), timeout, cancel).map_err(|e| e.replace("Pandoc", "Command").replace("pandoc", "command"))?;
     let stderr: String = out.stderr.trim().chars().take(4000).collect();
     if !out.status.success() {
         return Err(if stderr.is_empty() { format!("Command failed ({})", out.status) } else { format!("Command failed ({}):\n{stderr}", out.status) });
@@ -101,18 +114,25 @@ pub async fn run_export_command(
     stdin: Option<String>,
     cwd: Option<String>,
     timeout_ms: Option<u64>,
+    export_id: Option<String>,
 ) -> Result<CommandOutput, String> {
-    tauri::async_runtime::spawn_blocking(move || {
+    let cancel = export_id.as_deref().map(crate::pandoc::register);
+    let id = export_id.clone();
+    let res = tauri::async_runtime::spawn_blocking(move || {
         let timeout = timeout_ms.map(Duration::from_millis).unwrap_or(Duration::from_secs(120)).clamp(Duration::from_secs(1), Duration::from_secs(1800));
         let cwd = cwd.map(PathBuf::from).filter(|p| p.is_absolute());
-        let res = run_command(&command, &vars, stdin, cwd.as_deref(), timeout);
+        let res = run_command_cancellable(&command, &vars, stdin, cwd.as_deref(), timeout, cancel.as_deref());
         if let (Ok(_), Some(out)) = (&res, vars.get("outputPath").map(PathBuf::from).filter(|p| p.is_absolute() && p.exists())) {
             crate::export_cmds::record_export(&out);
         }
         res
     })
     .await
-    .map_err(|e| format!("export task failed: {e}"))?
+    .map_err(|e| format!("export task failed: {e}"));
+    if let Some(id) = id {
+        crate::pandoc::unregister(&id);
+    }
+    res?
 }
 
 #[cfg(test)]

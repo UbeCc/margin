@@ -6,7 +6,7 @@ import { DocumentController, type DocState } from './document';
 import { documentTitle, loadKatexCss, needsKatex } from './export';
 import { ExportController, registerPandocExporters } from './export-actions';
 import { pageCss } from './export-settings';
-import { confirmOverwriteDialog, openPageSetup } from './export-ui';
+import { confirmOverwriteDialog, openExportingSheet, openPageSetup } from './export-ui';
 import { runImport, type ImportHost } from './import';
 import { FindBar } from './findbar';
 import { extras } from './platform-extras';
@@ -719,6 +719,7 @@ export class App {
       isDarkTheme: (n) => this.themes.isDark(n),
       openThemesFolder: () => void this.openThemesFolder(),
       pickFolder: () => this.platform.openFileDialog({ directory: true }),
+      pickFile: (name, extensions) => this.platform.openFileDialog({ filters: [{ name, extensions }] }),
       detectPandoc: async (path) => {
         const detect = extras(this.platform).pandocDetect;
         if (!detect) return 'Pandoc export is only available in the desktop app.';
@@ -889,11 +890,12 @@ export class App {
       extraCss: async (body) => `${await this.wiring.loadBlocksCss()}\n${needsKatex(body) ? await loadKatexCss() : ''}`,
       notify: (m, kind, action) => void toast(m, { kind, action }),
       confirmOverwrite: (p) => confirmOverwriteDialog(p),
+      exportProgress: (abort) => openExportingSheet(abort),
     });
     registerPandocExporters(c, {
       pandocPath: () => this.settings.pandocPath,
       title: () => documentTitle(this.editor.getMarkdown(), this.doc.path ? basename(this.doc.path) : null),
-      progress: (m, abort) => toast(m, { kind: 'info', timeout: 0, action: abort ? { label: 'Abort', run: abort } : undefined }),
+      progress: (_m, abort) => openExportingSheet(abort),
     });
     return c;
   }

@@ -166,8 +166,8 @@ export class TauriPlatform implements Platform {
     return call('pandoc_import', { inputPath, pandocPath, timeoutMs });
   }
 
-  runExportCommand(command: string, vars: Record<string, string>, stdin: string | null, cwd: string | null, timeoutMs: number): Promise<{ stdout: string; stderr: string }> {
-    return call('run_export_command', { command, vars, stdin, cwd, timeoutMs });
+  runExportCommand(command: string, vars: Record<string, string>, stdin: string | null, cwd: string | null, timeoutMs: number, exportId?: string): Promise<{ stdout: string; stderr: string }> {
+    return call('run_export_command', { command, vars, stdin, cwd, timeoutMs, exportId: exportId ?? null });
   }
 
   /** Open a file exported in this session with its default application. */

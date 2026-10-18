@@ -23,6 +23,7 @@ export interface ExportPrefsHost {
   set(next: ExportSettings): void;
   themeNames(): string[];
   pickFolder(): Promise<string | null>;
+  pickFile?(name: string, extensions: string[]): Promise<string | null>;
 }
 
 type Fmt = 'general' | 'pdf' | 'html' | 'htmlPlain' | 'image';
@@ -141,10 +142,11 @@ const PANDOC_LABELS: Record<PandocFormatId, string> = {
   opml: 'OPML',
 };
 
-const FIELD_LABELS: Record<keyof PandocFormatOptions, [string, string]> = {
-  referenceDoc: ['Style Reference', 'path/to/reference.docx'],
-  template: ['Template', 'path/to/template'],
-  css: ['Style Reference', 'path/to/epub.css'],
+/** Typora's labels; file fields carry the picker filter (typora-re#9). */
+const FIELD_LABELS: Record<keyof PandocFormatOptions, [string, string, string[]?]> = {
+  referenceDoc: ['Style Reference', 'reference.docx', ['docx']],
+  template: ['Template', 'template.opendocument', ['opendocument']],
+  css: ['Custom CSS', 'epub.css', ['css']],
   epubChapterLevel: ['Chapter Level', ''],
   extraArguments: ['Extra Arguments', '--toc --number-sections'],
 };
@@ -167,7 +169,8 @@ function pandocOptionsEditor(host: ExportPrefsHost): HTMLElement {
       const [label, placeholder] = FIELD_LABELS[key];
       let el: HTMLInputElement | HTMLSelectElement;
       if (key === 'epubChapterLevel') {
-        el = h('select.select', { 'data-export': `pandoc.${f}.${key}` }, h('option', { value: '0', text: 'Default' }), ...[1, 2, 3, 4, 5, 6].map((n) => h('option', { value: String(n), text: String(n) })));
+        // 1–4, no preset: the empty choice passes no --epub-chapter-level.
+        el = h('select.select', { 'data-export': `pandoc.${f}.${key}` }, h('option', { value: '0', text: '' }), ...[1, 2, 3, 4].map((n) => h('option', { value: String(n), text: String(n) })));
         el.value = String(cur()[key]);
         el.addEventListener('change', () => save(key, Number(el.value)));
       } else {
@@ -183,7 +186,22 @@ function pandocOptionsEditor(host: ExportPrefsHost): HTMLElement {
         el.addEventListener('blur', () => commit.flush());
       }
       const hint = key === 'extraArguments' ? 'Quoted like a shell; ${outputPath} ${outputFolder} ${currentFolder} ${title}' : undefined;
-      return h('label.pref-row', null, h('span.pref-label', null, label, hint ? h('span.pref-hint', { text: hint }) : null), h('span.pref-control', null, el));
+      const exts = FIELD_LABELS[key][2];
+      const pick =
+        exts && host.pickFile
+          ? h('button.btn.btn-small', {
+              type: 'button',
+              text: 'Choose…',
+              'data-export': `pandoc.${f}.${key}.choose`,
+              onclick: async () => {
+                const p = await host.pickFile!(label, exts);
+                if (!p) return;
+                (el as HTMLInputElement).value = p;
+                save(key, p);
+              },
+            })
+          : null;
+      return h('label.pref-row', null, h('span.pref-label', null, label, hint ? h('span.pref-hint', { text: hint }) : null), h('span.pref-control', null, pick ? h('span.inline', null, el, pick) : el));
     });
     refresh();
     box.appendChild(
@@ -191,8 +209,9 @@ function pandocOptionsEditor(host: ExportPrefsHost): HTMLElement {
         'div.pandoc-format',
         { 'data-format': f },
         h('h4.pref-subsubhead', { text: PANDOC_LABELS[f] }),
-        ...fields,
+        // Typora's order: read-only Arguments, Extra Arguments, then the format's own fields.
         h('label.pref-row', null, h('span.pref-label', null, 'Arguments'), h('span.pref-control', null, preview)),
+        ...fields,
       ),
     );
   }

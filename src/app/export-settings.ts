@@ -57,8 +57,8 @@ export type PandocFormatId = (typeof PANDOC_FORMAT_IDS)[number];
 
 /**
  * Per-format Pandoc options (#90). Typora's settings page offers: docx `reference-doc`,
- * odt `template`, epub `css` + `epub-chapter-level`, and extra arguments for the
- * text formats; every field maps to one pandoc flag (`''`/0 = not passed).
+ * odt `template`, epub `css` + `epub-chapter-level` (1–4), and extra arguments for
+ * every format; every field maps to one pandoc flag (`''`/0 = not passed).
  */
 export interface PandocFormatOptions {
   referenceDoc: string;
@@ -72,9 +72,9 @@ export interface PandocFormatOptions {
 
 /** Which option fields each format shows (Typora's per-type field table). */
 export const PANDOC_FORMAT_FIELDS: Record<PandocFormatId, (keyof PandocFormatOptions)[]> = {
-  docx: ['referenceDoc'],
-  odt: ['template'],
-  epub: ['css', 'epubChapterLevel'],
+  docx: ['extraArguments', 'referenceDoc'],
+  odt: ['extraArguments', 'template'],
+  epub: ['extraArguments', 'css', 'epubChapterLevel'],
   rtf: ['extraArguments'],
   latex: ['extraArguments'],
   mediawiki: ['extraArguments'],
@@ -181,7 +181,7 @@ export function migratePandocOptions(input: unknown): Record<PandocFormatId, Pan
       referenceDoc: s(o.referenceDoc, ''),
       template: s(o.template, ''),
       css: s(o.css, ''),
-      epubChapterLevel: Math.round(n(o.epubChapterLevel, 0, 0, 6)),
+      epubChapterLevel: Math.round(n(o.epubChapterLevel, 0, 0, 4)),
       extraArguments: s(o.extraArguments, ''),
     };
   }

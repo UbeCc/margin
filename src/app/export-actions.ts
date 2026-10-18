@@ -9,7 +9,7 @@ import type { PdfExportOptions, Platform } from '../contracts';
 import { buildExportHtml, buildPlainHtml, documentTitle, exportHeadings, linkHeadingAnchors } from './export';
 import { imageFormatForPath, ImageTooLargeError, rasterizeHtml } from './export-image';
 import { expandVars, migrateExportSettings, paperSizeMm, resolveMeta, todayString, MM_TO_PT, type ExportSettings } from './export-settings';
-import { exportWithPandoc, PANDOC_FORMATS, type PandocFormat } from './export-pandoc';
+import { exportWithPandoc, newExportId, PANDOC_FORMATS, type PandocFormat } from './export-pandoc';
 import { extras } from './platform-extras';
 import { basename, dirname, extname, join, stripExt } from './util/path';
 
@@ -27,6 +27,8 @@ export interface ExportHost {
   themeCss(theme: string): string;
   extraCss(body: string): Promise<string>;
   notify(message: string, kind: 'success' | 'error' | 'info' | 'warning', action?: { label: string; run: () => void }): void;
+  /** The "Exporting..." sheet for custom commands (#90); returns its close function. */
+  exportProgress?(abort?: () => void): () => void;
   /** Overwrite confirmation; resolves 'overwrite' | 'keep-both' | 'cancel' and whether to stop asking. */
   confirmOverwrite(path: string): Promise<{ choice: 'overwrite' | 'keep-both' | 'cancel'; dontAsk: boolean }>;
 }
@@ -180,7 +182,30 @@ export class ExportController {
           stdin = buildExportHtml({ title: this.meta(s).title, body, themeCss: h.themeCss(s.html.theme), extraCss: await h.extraCss(body) });
         } else stdin = h.markdown();
         const doc = h.docPath();
-        const out = await run!.call(h.platform, c.command, this.commandVars(t || null, s), stdin, doc ? dirname(doc) : h.folder(), 120_000);
+        const x = extras(h.platform);
+        const id = x.pandocAbort ? newExportId('cmd') : undefined;
+        let aborted = false;
+        const abort = id
+          ? () => {
+              aborted = true;
+              void x.pandocAbort!.call(h.platform, id).catch(() => undefined);
+            }
+          : undefined;
+        let close: () => void = () => {};
+        try {
+          close = h.exportProgress?.(abort) ?? close;
+        } catch {
+          /* a broken sheet must not block the export */
+        }
+        let out: { stdout: string; stderr: string };
+        try {
+          out = await run!.call(h.platform, c.command, this.commandVars(t || null, s), stdin, doc ? dirname(doc) : h.folder(), 120_000, id);
+        } catch (e) {
+          if (aborted || (e instanceof Error && e.message === 'Export aborted')) throw new ExportAbortedError();
+          throw e;
+        } finally {
+          close();
+        }
         const w = out.stderr.trim();
         if (w) h.notify(`${c.name}: ${w.split('\n')[0]}`, 'warning');
       },

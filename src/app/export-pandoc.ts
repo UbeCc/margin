@@ -9,6 +9,11 @@ import type { Platform } from '../contracts';
 import type { PandocFormatOptions } from './export-settings';
 import type { PandocExportOptions, PlatformExtras } from './platform-extras';
 
+/** Id for one abortable export run (`pandocAbort`). */
+export function newExportId(prefix: string): string {
+  return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
 /** Backend error text of an aborted export (`pandoc::ABORTED`). */
 export const PANDOC_ABORTED = 'Export aborted';
 
@@ -125,7 +130,7 @@ export async function exportWithPandoc(format: PandocFormat, deps: PandocExportD
   const abortFn = deps.platform.pandocAbort;
   let abort: (() => void) | undefined;
   if (typeof abortFn === 'function') {
-    const id = `pandoc-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+    const id = newExportId('pandoc');
     opts.exportId = id;
     abort = () => {
       aborted = true;

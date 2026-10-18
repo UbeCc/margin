@@ -216,15 +216,15 @@ describe('pandoc options (#90)', () => {
     expect(d.pandoc.docx).toEqual({ referenceDoc: '', template: '', css: '', epubChapterLevel: 0, extraArguments: '' });
     const m = migrateExportSettings({ pandoc: { epub: { css: 'a.css', epubChapterLevel: '9' }, docx: { referenceDoc: 5 }, bogus: {} } });
     expect(m.pandoc.epub.css).toBe('a.css');
-    expect(m.pandoc.epub.epubChapterLevel).toBe(6);
+    expect(m.pandoc.epub.epubChapterLevel).toBe(4);
     expect(m.pandoc.docx.referenceDoc).toBe('');
     expect('bogus' in m.pandoc).toBe(false);
   });
 
   it('fields follow Typora per-format table', () => {
-    expect(PANDOC_FORMAT_FIELDS.docx).toEqual(['referenceDoc']);
-    expect(PANDOC_FORMAT_FIELDS.odt).toEqual(['template']);
-    expect(PANDOC_FORMAT_FIELDS.epub).toEqual(['css', 'epubChapterLevel']);
+    expect(PANDOC_FORMAT_FIELDS.docx).toEqual(['extraArguments', 'referenceDoc']);
+    expect(PANDOC_FORMAT_FIELDS.odt).toEqual(['extraArguments', 'template']);
+    expect(PANDOC_FORMAT_FIELDS.epub).toEqual(['extraArguments', 'css', 'epubChapterLevel']);
     for (const f of ['rtf', 'latex', 'mediawiki', 'rst', 'textile', 'opml'] as const) expect(PANDOC_FORMAT_FIELDS[f]).toEqual(['extraArguments']);
   });
 
@@ -261,5 +261,32 @@ describe('Pandoc Abort in the shared pipeline (#90)', () => {
     expect(f.notes).toEqual([]);
     expect((seen[0] as { options: { referenceDoc: string } }).options.referenceDoc).toBe('/t/ref.docx');
     expect(c.last).toBeNull();
+  });
+});
+
+describe('custom command Exporting sheet + Abort (#90)', () => {
+  it('shows the sheet, aborts by id, ends silently', async () => {
+    let abort: (() => void) | undefined;
+    let closed = 0;
+    const f = fakeHost({ exportProgress: (a) => ((abort = a), () => void closed++) });
+    f.host.updateExportSettings(migrateExportSettings({ custom: [{ id: 'x', name: 'Slow', command: 'slow ${outputPath}', extension: 'out' }] }));
+    let reject: (e: Error) => void = () => {};
+    const ids: unknown[] = [];
+    Object.assign(f.platform, {
+      runExportCommand: vi.fn((...a: unknown[]) => {
+        ids.push(a[5]);
+        return new Promise((_, r) => (reject = r));
+      }),
+      pandocAbort: vi.fn(async (id: string) => (ids.push(`abort:${id}`), reject(new Error('Export aborted')), true)),
+    });
+    const c = new ExportController(f.host);
+    f.dialogs.push('/out/Doc.out');
+    const p = c.export('custom:x');
+    for (let i = 0; i < 10 && !abort; i++) await new Promise((r) => setTimeout(r, 0));
+    abort!();
+    expect(await p).toBe(false);
+    expect(f.notes).toEqual([]);
+    expect(closed).toBe(1);
+    expect(ids[1]).toBe(`abort:${ids[0]}`);
   });
 });

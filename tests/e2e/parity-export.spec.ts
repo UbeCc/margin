@@ -271,7 +271,7 @@ test('export.pandoc: Export via Pandoc: docx/odt/rtf/epub/latex/mediawiki/rst/te
   expect(last).toMatchObject({ out: `${ROOT}/Out/Welcome.opml`, format: 'opml' });
 });
 
-test('export.pandoc-options (#90): per-format Pandoc options in Preferences, Abort button', async ({ page }) => {
+test('export.pandoc-options (#90): per-format Pandoc options in Preferences, Exporting sheet with Abort', async ({ page }) => {
   await boot(page);
   await run(page, 'exportSettings');
   const pane = page.locator('.pref-section[data-section=export]');
@@ -281,7 +281,10 @@ test('export.pandoc-options (#90): per-format Pandoc options in Preferences, Abo
   await expect(pane.locator('input[data-export="pandoc.docx.args"]')).toHaveValue('-f markdown -t docx -o ${outputPath} --reference-doc /Users/demo/ref.docx');
   await pane.locator('select[data-export="pandoc.epub.epubChapterLevel"]').selectOption('2');
   await expect(pane.locator('[data-format=odt] input[data-export="pandoc.odt.template"]')).toBeVisible();
-  await expect(pane.locator('[data-format=docx] input[data-export="pandoc.docx.extraArguments"]')).toHaveCount(0);
+  // Typora's row order: Arguments, Extra Arguments, then the format's own fields.
+  const labels = await pane.locator('[data-format=epub] .pref-label').allTextContents();
+  expect(labels.map((l) => l.replace(/Quoted.*$/, ''))).toEqual(['Arguments', 'Extra Arguments', 'Custom CSS', 'Chapter Level']);
+  expect(await pane.locator('select[data-export="pandoc.epub.epubChapterLevel"] option').allTextContents()).toEqual(['', '1', '2', '3', '4']);
   await expect.poll(() => page.evaluate(() => window.__margin!.settings.export.pandoc.epub.epubChapterLevel)).toBe(2);
   await page.keyboard.press('Escape');
 
@@ -301,11 +304,17 @@ test('export.pandoc-options (#90): per-format Pandoc options in Preferences, Abo
   });
   await queueDialog(page, `${ROOT}/Out/Welcome.docx`);
   const done = run(page, 'exportDocx');
-  const notice = page.locator('.toast', { hasText: 'Exporting file using Pandoc. This may take some time.' });
-  await expect(notice).toBeVisible();
-  await notice.locator('button.toast-action', { hasText: 'Abort' }).click();
+  const sheet = page.locator('.export-progress');
+  await expect(sheet.locator('.dialog-title')).toHaveText('Exporting...');
+  await expect(sheet.locator('.dialog-message')).toHaveText('Exporting in progress...');
+  await expect(sheet.locator('.dialog-detail')).toHaveText('This may take some time...');
+  // Escape and Return do not dismiss it; only Abort does.
+  await page.keyboard.press('Escape');
+  await page.keyboard.press('Enter');
+  await expect(sheet).toBeVisible();
+  await sheet.locator('button[data-id=abort]', { hasText: 'Abort' }).click();
   expect(await done).toBe(false);
-  await expect(notice).toHaveCount(0);
+  await expect(sheet).toHaveCount(0);
   await expect(page.locator('.toast[data-kind=error]')).toHaveCount(0);
   const calls = await page.evaluate(() => (window.__MARGIN_WEB__! as unknown as Stubbed).__calls as { o?: { options: { referenceDoc: string }; exportId: string }; abort?: string }[]);
   expect(calls[0].o!.options.referenceDoc).toBe('/Users/demo/ref.docx');

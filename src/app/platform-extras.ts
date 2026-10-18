@@ -23,10 +23,10 @@ export interface PlatformExtras {
    * Custom export / run-after-export command (#95): tokenized to argv, `${vars}`
    * expanded per token, no shell. `stdin` receives the document.
    */
-  runExportCommand?(command: string, vars: Record<string, string>, stdin: string | null, cwd: string | null, timeoutMs: number): Promise<{ stdout: string; stderr: string }>;
+  runExportCommand?(command: string, vars: Record<string, string>, stdin: string | null, cwd: string | null, timeoutMs: number, exportId?: string): Promise<{ stdout: string; stderr: string }>;
   /** Export markdown with Pandoc (#81). Resolves to pandoc's warnings ('' if none). */
   pandocExport?(markdown: string, outPath: string, opts: PandocExportOptions): Promise<string>;
-  /** Abort button (#90): stop the export started with `opts.exportId`. Resolves false if it already ended. */
+  /** Abort button (#90): stop the Pandoc export / custom command started with this export id. Resolves false if it already ended. */
   pandocAbort?(exportId: string): Promise<boolean>;
   /** Locate pandoc (configured path → PATH → common dirs) and check version ≥ 2. */
   pandocDetect?(pandocPath: string | null): Promise<{ path: string; version: string }>;

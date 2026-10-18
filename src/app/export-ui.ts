@@ -112,3 +112,48 @@ export function openPageSetup(current: PageSetup): Promise<PageSetup | null> {
     (fields.querySelector('select') as HTMLSelectElement | null)?.focus();
   });
 }
+
+/**
+ * The "Exporting..." sheet shown while Pandoc or a custom export command runs (#90):
+ * message "Exporting in progress...", detail "This may take some time...", a single
+ * "Abort" button that Return does not trigger. Not shown for PDF export. Escape and
+ * backdrop clicks do nothing (only Abort or the end of the task close it).
+ * Returns the close function (idempotent).
+ */
+export function openExportingSheet(abort?: () => void): () => void {
+  let closed = false;
+  const close = (): void => {
+    if (closed) return;
+    closed = true;
+    modal.close();
+  };
+  const body = h(
+    'div.dialog.export-progress',
+    { tabindex: '-1' },
+    h('h2.dialog-title', { text: 'Exporting...' }),
+    h('p.dialog-message', { text: 'Exporting in progress...' }),
+    h('p.dialog-detail', { text: 'This may take some time...' }),
+    abort
+      ? h(
+          'div.dialog-buttons',
+          null,
+          h('button.btn', {
+            type: 'button',
+            'data-id': 'abort',
+            text: 'Abort',
+            onclick: () => {
+              close();
+              abort();
+            },
+          }),
+        )
+      : null,
+  );
+  // Return must not press Abort: keep focus on the sheet itself, not the button.
+  body.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') e.preventDefault();
+  });
+  const modal = openModal(body, { className: 'dialog-card', label: 'Exporting...', dismissable: false });
+  body.focus();
+  return close;
+}
