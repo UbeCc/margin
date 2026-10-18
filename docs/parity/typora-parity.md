@@ -14,7 +14,7 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 | missing | 56 |
 | out of scope | 8 |
 
-REA ledger `rol_c5693b3c024ce82ddc0fff7f3473ef393692d3976c18d397995f495ad14f53db` (closure `96377f1a9e2330de…`): status **unknown**; unowned 56, implemented 107, out-of-scope 8, unknown 5.
+REA ledger `rol_ddb56e2a6a89a8a59377191b9802e73889b57e7d454ed4cb209491e201980cb1` (closure `d1dae04d08858b21…`): status **unknown**; unowned 56, implemented 107, out-of-scope 8, unknown 5.
 
 REA coverage boundary `margin.typora-parity`: status **unknown**; 74/163 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 56, package-proof-missing 1, verifier-missing 80, verifier-unknown 9.
 
@@ -61,7 +61,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `menu.file.tabs` | Tabs: New Tab, switch between opened documents, next/previous tab — #23 | **missing** | P0 | — | none | 5 |
 | `menu.file.open` | File › Open… (file dialog) | owned |  | `src/app/app.ts` `case 'open'` | `tests/e2e/app-files.spec.ts` › file tree lazily expands folders and opens files | 10 |
 | `menu.file.open-folder` | File › Open Folder… | owned |  | `src/app/app.ts` `case 'openFolder'` | `tests/e2e/app-files.spec.ts` › file tree lazily expands folders and opens files | 10 |
-| `menu.file.quick-open` | File › Open Quickly (fuzzy file finder) | owned |  | `src/app/app.ts` `quickOpen(): void` | `tests/e2e/app-navigation.spec.ts` › quick open fuzzy-finds files with highlights | 8 |
+| `menu.file.quick-open` | File › Open Quickly (fuzzy file finder) — deliberate deviations from Typora (native-commands §3, #119): every file type is searchable (Markdown ranked first), extension and name matching are case-insensitive, query text is escaped, an empty/unindexed/stale Spotlight answer falls back to the walker, deleted entries are pruned | owned |  | `src/app/app.ts` `quickOpen(): void` | `tests/e2e/app-navigation.spec.ts` › quick open fuzzy-finds files with highlights | 8 |
 | `menu.file.recent` | File › Open Recent (files + folders, clear) | owned |  | `src-tauri/src/recent.rs` `No Recent Items` | `src/app/__tests__/settings.test.ts` › dedupes and caps recent lists | 8 |
 | `menu.file.reopen-closed` | File › Reopen Closed File | **missing** | P1 | — | none | 1 |
 | `menu.file.save` | File › Save (dirty tracking, atomic write) | owned |  | `src/app/app.ts` `case 'save'` | `tests/e2e/app-files.spec.ts` › editing marks dirty, Cmd+S saves to disk | 8 |

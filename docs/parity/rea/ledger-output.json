@@ -1,5 +1,5 @@
 {
- "evidence_id": "ev_f3e3262d5d6e72232f4c0c274802f8f99d07c2c3c4c07fbd8e72e0c347498134",
+ "evidence_id": "ev_b30655f2350524ba4078a7a1a152721efbaf9e058dc36de8b216248722bf38b4",
  "subject": null,
  "provider": {
   "id": "rea-javascript-application-workflows",
@@ -10,14 +10,14 @@
  "predicate_type": "rea.reconstruction-obligation-ledger",
  "operation": "build_reconstruction_obligation_ledger",
  "parameters": {
-  "ledger_id": "rol_c5693b3c024ce82ddc0fff7f3473ef393692d3976c18d397995f495ad14f53db",
-  "closure_digest": "96377f1a9e2330de400a12241ddd79ec246518b552e8982e0bfefbf08adea04e"
+  "ledger_id": "rol_ddb56e2a6a89a8a59377191b9802e73889b57e7d454ed4cb209491e201980cb1",
+  "closure_digest": "d1dae04d08858b210ddf20d28956b9816b1be0bd4c16ed7406c0fe44df9992cc"
  },
  "raw_result": null,
  "normalized_result": {
   "schema": "ReconstructionObligationLedger",
-  "ledger_id": "rol_c5693b3c024ce82ddc0fff7f3473ef393692d3976c18d397995f495ad14f53db",
-  "closure_digest": "96377f1a9e2330de400a12241ddd79ec246518b552e8982e0bfefbf08adea04e",
+  "ledger_id": "rol_ddb56e2a6a89a8a59377191b9802e73889b57e7d454ed4cb209491e201980cb1",
+  "closure_digest": "d1dae04d08858b210ddf20d28956b9816b1be0bd4c16ed7406c0fe44df9992cc",
   "status": "unknown",
   "coverage": {
    "status": "complete"
@@ -4628,17 +4628,17 @@
     },
     "authority_references": [
      {
-      "evidence_id": "ev_5ea8b62d7fa0275680fffd007b7a0adc018e64937e88e5bfedc4cff329173298",
+      "evidence_id": "ev_b48e88d26349c0ff96d2b1bc93bdafb4a9cd53e2098383cc83304cdcbbf83476",
       "authority": "analyst-inference",
       "state": "reviewed",
-      "location": "/evidence/ev_5ea8b62d7fa0275680fffd007b7a0adc018e64937e88e5bfedc4cff329173298"
+      "location": "/evidence/ev_b48e88d26349c0ff96d2b1bc93bdafb4a9cd53e2098383cc83304cdcbbf83476"
      }
     ],
     "source_state": "reviewed",
     "observed_cases": [
      {
       "kind": "positive",
-      "evidence_id": "ev_5ea8b62d7fa0275680fffd007b7a0adc018e64937e88e5bfedc4cff329173298",
+      "evidence_id": "ev_b48e88d26349c0ff96d2b1bc93bdafb4a9cd53e2098383cc83304cdcbbf83476",
       "location": "images §4.5"
      }
     ],
@@ -4669,7 +4669,7 @@
      "original_cases": [
       {
        "kind": "positive",
-       "evidence_id": "ev_5ea8b62d7fa0275680fffd007b7a0adc018e64937e88e5bfedc4cff329173298",
+       "evidence_id": "ev_b48e88d26349c0ff96d2b1bc93bdafb4a9cd53e2098383cc83304cdcbbf83476",
        "location": "images §4.5"
       }
      ],
@@ -7518,17 +7518,17 @@
     },
     "authority_references": [
      {
-      "evidence_id": "ev_2fd5b85ac73ff628f7d789c1647937a2df0521f7b3aeacc1e1aac8d2079b2cef",
+      "evidence_id": "ev_e7390611173f00993bf347caf6bffbd32926247ef5bea0cbff339163ea90e35c",
       "authority": "analyst-inference",
       "state": "reviewed",
-      "location": "/evidence/ev_2fd5b85ac73ff628f7d789c1647937a2df0521f7b3aeacc1e1aac8d2079b2cef"
+      "location": "/evidence/ev_e7390611173f00993bf347caf6bffbd32926247ef5bea0cbff339163ea90e35c"
      }
     ],
     "source_state": "reviewed",
     "observed_cases": [
      {
       "kind": "positive",
-      "evidence_id": "ev_2fd5b85ac73ff628f7d789c1647937a2df0521f7b3aeacc1e1aac8d2079b2cef",
+      "evidence_id": "ev_e7390611173f00993bf347caf6bffbd32926247ef5bea0cbff339163ea90e35c",
       "location": "files-windows-settings §10"
      }
     ],
@@ -7557,7 +7557,7 @@
      "original_cases": [
       {
        "kind": "positive",
-       "evidence_id": "ev_2fd5b85ac73ff628f7d789c1647937a2df0521f7b3aeacc1e1aac8d2079b2cef",
+       "evidence_id": "ev_e7390611173f00993bf347caf6bffbd32926247ef5bea0cbff339163ea90e35c",
        "location": "files-windows-settings §10"
       }
      ],
@@ -15343,7 +15343,6 @@
    "ev_2bfd37b7ac78629a1a8303889452f5ff14da581c3e0147b6c135fd307638aa53",
    "ev_2cdb84bedffe598ed99053f40660572101657f97e5934d9e5610e5b8212b3456",
    "ev_2de768edb2decbc991458518769db69fa3b3b66e456768f075966f32d0518035",
-   "ev_2fd5b85ac73ff628f7d789c1647937a2df0521f7b3aeacc1e1aac8d2079b2cef",
    "ev_314ef36ad3a63a5024f1777c4c38fd700c0fe2bc2930ebc1154171876a967597",
    "ev_31b4d097d5c79785186b28ead5846b1753552c19960daf83dbeebc7c6e9f0c54",
    "ev_32ca7c3c00d03b4d93febd39acba7174ba99976aaadcc4a1c14cb13f75b2204a",
@@ -15378,7 +15377,6 @@
    "ev_5846b2ce26e08c2151229db306b0075db16fdb4e6fa383b3e95d7415c03681c1",
    "ev_596bfb2769e00f4b6f205f52b992c1e362c9ef2c165dece497fc57ee841de193",
    "ev_5cc78d49083c319c48978c753a1fe930f5af6cbc6552747bda552c47f97de264",
-   "ev_5ea8b62d7fa0275680fffd007b7a0adc018e64937e88e5bfedc4cff329173298",
    "ev_6506652db02c3a55ddb3d0536c2d559397e1bc9eadfb24bb91f2842f43d3711d",
    "ev_6698ce7f5107a3efd9ac9786b5da6daffeea20811480cbfaaac063c08fdbf414",
    "ev_66f7e76e64bc4fe44949654243e06bd7cc6eb21a79a3a9849b1df0a7f871f80f",
@@ -15439,6 +15437,7 @@
    "ev_ad8d47ce6572d2e8745c6ca03a44aafd5368e4010ec59905f5f4a2deaf275d5b",
    "ev_b0fef3dc15507fab320ae8c0e128b72c9aa7d26e2717c872411267aae628ee36",
    "ev_b19d9eb86f0e77e7e75a625d00887acf3b9f68b22561ac3bf9e237ba417e8b31",
+   "ev_b48e88d26349c0ff96d2b1bc93bdafb4a9cd53e2098383cc83304cdcbbf83476",
    "ev_b57d89025063b32dd50efae5f801519ea9bbece2a2a4861b6051efe3621d02e0",
    "ev_b714e54765b06a1decf46258c2ea7c906be6ae4b8b6fd4995febbcf396691a1b",
    "ev_b7b33e93dfb6bc6e73cd17e0c9e0f13d697089a4fd88d7eb32493e53db003453",
@@ -15464,6 +15463,7 @@
    "ev_e1210a485b4cceb4e2aab5aeceda17396238695557347cf0c0ed692fc2ef3593",
    "ev_e218f212319fb30de650901ae72a4847d9f10ead06536a74d519e9905f484d3e",
    "ev_e6f6a4aa3d587612e7e71cf37143699796c83ce2af56bef2de0121ff942305f1",
+   "ev_e7390611173f00993bf347caf6bffbd32926247ef5bea0cbff339163ea90e35c",
    "ev_e82ff7ef94f07ee767d79b6c4d10aaef9fa561b80303555d17775e549ea605a1",
    "ev_ed0ac4d04b02cebae976bcc436def8b9fce1a5ca3dfdf74cc387c40756b8379d",
    "ev_ed13ebe76a98609f4bc6d88d3be014fd9d90c5247ab07546e575e33d8fe65f5e",
@@ -15531,7 +15531,6 @@
   "ev_2bfd37b7ac78629a1a8303889452f5ff14da581c3e0147b6c135fd307638aa53",
   "ev_2cdb84bedffe598ed99053f40660572101657f97e5934d9e5610e5b8212b3456",
   "ev_2de768edb2decbc991458518769db69fa3b3b66e456768f075966f32d0518035",
-  "ev_2fd5b85ac73ff628f7d789c1647937a2df0521f7b3aeacc1e1aac8d2079b2cef",
   "ev_314ef36ad3a63a5024f1777c4c38fd700c0fe2bc2930ebc1154171876a967597",
   "ev_31b4d097d5c79785186b28ead5846b1753552c19960daf83dbeebc7c6e9f0c54",
   "ev_32ca7c3c00d03b4d93febd39acba7174ba99976aaadcc4a1c14cb13f75b2204a",
@@ -15566,7 +15565,6 @@
   "ev_5846b2ce26e08c2151229db306b0075db16fdb4e6fa383b3e95d7415c03681c1",
   "ev_596bfb2769e00f4b6f205f52b992c1e362c9ef2c165dece497fc57ee841de193",
   "ev_5cc78d49083c319c48978c753a1fe930f5af6cbc6552747bda552c47f97de264",
-  "ev_5ea8b62d7fa0275680fffd007b7a0adc018e64937e88e5bfedc4cff329173298",
   "ev_6506652db02c3a55ddb3d0536c2d559397e1bc9eadfb24bb91f2842f43d3711d",
   "ev_6698ce7f5107a3efd9ac9786b5da6daffeea20811480cbfaaac063c08fdbf414",
   "ev_66f7e76e64bc4fe44949654243e06bd7cc6eb21a79a3a9849b1df0a7f871f80f",
@@ -15627,6 +15625,7 @@
   "ev_ad8d47ce6572d2e8745c6ca03a44aafd5368e4010ec59905f5f4a2deaf275d5b",
   "ev_b0fef3dc15507fab320ae8c0e128b72c9aa7d26e2717c872411267aae628ee36",
   "ev_b19d9eb86f0e77e7e75a625d00887acf3b9f68b22561ac3bf9e237ba417e8b31",
+  "ev_b48e88d26349c0ff96d2b1bc93bdafb4a9cd53e2098383cc83304cdcbbf83476",
   "ev_b57d89025063b32dd50efae5f801519ea9bbece2a2a4861b6051efe3621d02e0",
   "ev_b714e54765b06a1decf46258c2ea7c906be6ae4b8b6fd4995febbcf396691a1b",
   "ev_b7b33e93dfb6bc6e73cd17e0c9e0f13d697089a4fd88d7eb32493e53db003453",
@@ -15652,6 +15651,7 @@
   "ev_e1210a485b4cceb4e2aab5aeceda17396238695557347cf0c0ed692fc2ef3593",
   "ev_e218f212319fb30de650901ae72a4847d9f10ead06536a74d519e9905f484d3e",
   "ev_e6f6a4aa3d587612e7e71cf37143699796c83ce2af56bef2de0121ff942305f1",
+  "ev_e7390611173f00993bf347caf6bffbd32926247ef5bea0cbff339163ea90e35c",
   "ev_e82ff7ef94f07ee767d79b6c4d10aaef9fa561b80303555d17775e549ea605a1",
   "ev_ed0ac4d04b02cebae976bcc436def8b9fce1a5ca3dfdf74cc387c40756b8379d",
   "ev_ed13ebe76a98609f4bc6d88d3be014fd9d90c5247ab07546e575e33d8fe65f5e",
