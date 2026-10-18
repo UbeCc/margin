@@ -83,6 +83,7 @@ pub fn which(name: &str, path_env: Option<&OsStr>, extra: &[PathBuf]) -> Result<
     Err(format!("Command not found: {name} (not on PATH)"))
 }
 
+#[cfg(test)]
 pub fn run_command(command: &str, vars: &HashMap<String, String>, stdin: Option<String>, cwd: Option<&Path>, timeout: Duration) -> Result<CommandOutput, String> {
     run_command_cancellable(command, vars, stdin, cwd, timeout, None)
 }
