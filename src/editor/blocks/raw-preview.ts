@@ -184,6 +184,13 @@ class RawPreviewInstance<P extends Parsed> implements WidgetInstance {
     this.renderPreview();
   }
 
+  /** `refresh` (#98 Refresh All Math Expressions / diagrams): re-render the preview. */
+  command(op: string): boolean {
+    if (op !== 'refresh') return false;
+    this.renderPreview();
+    return true;
+  }
+
   focus(at: 'start' | 'end'): void {
     this.startEditing(at);
   }

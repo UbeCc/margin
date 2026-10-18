@@ -9,6 +9,7 @@ import { insertMarkdown } from './clipboard';
 import { nextHeadingLevel, insertParagraph, taskStatus, clearFormat, insertFootnote } from './para-cmds';
 import { selectScope, deleteScope, jumpTo } from './scopes';
 import { copyAs, pastePlain } from './copy-as';
+import { tableMarkdown, tableTool, codeTool, mathTool } from './block-tools';
 
 export function undo(ed: EditorCore): boolean {
   const e = ed.hist.popUndo();
@@ -262,5 +263,13 @@ export function execCommand(ed: EditorCore, cmd: EditorCommand): boolean {
       return copyAs(ed, cmd.format);
     case 'pastePlain':
       return pastePlain(ed);
+    case 'insertTable':
+      return insertBlock(ed, tableMarkdown(cmd.rows, cmd.cols), true);
+    case 'table':
+      return tableTool(ed, cmd.op, { rows: cmd.rows, cols: cmd.cols });
+    case 'code':
+      return codeTool(ed, cmd.op);
+    case 'math':
+      return mathTool(ed, cmd.op);
   }
 }

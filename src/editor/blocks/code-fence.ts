@@ -8,6 +8,8 @@
 import type { BlockWidget, EditorSettings, WidgetContext, WidgetInstance } from '../../contracts';
 import { createCodeEditor, CodeEditor, languageNames, loadLanguage, loadedLanguage } from './cm/setup';
 import { highlightToHtml } from './cm/highlight';
+import { indentRange } from '@codemirror/language';
+import { indentSelection } from '@codemirror/commands';
 import { buildFenceRaw, FenceParts, parseFence, rawRangeToBody, withFenceInfo } from './util/delimited';
 import { escapeHtml, h, isolateEvents, offsetAtPoint } from './util/dom';
 
@@ -237,6 +239,23 @@ class CodeFenceInstance implements WidgetInstance {
 
   focus(at: 'start' | 'end'): void {
     this.ensureEditor().focus(at);
+  }
+
+  /** Code Tools (#98): Copy Code Content, Auto Indent Whole Code, Auto Indent Selected Code. */
+  command(op: string): boolean {
+    if (op === 'copy') {
+      void this.copy();
+      return true;
+    }
+    if (op !== 'indentAll' && op !== 'indentSelected') return false;
+    const { view } = this.ensureEditor();
+    if (op === 'indentSelected') indentSelection(view);
+    else {
+      const changes = indentRange(view.state, 0, view.state.doc.length);
+      if (!changes.empty) view.dispatch({ changes, userEvent: 'indent' });
+    }
+    view.focus();
+    return true;
   }
 
   select(from: number, to: number): boolean {

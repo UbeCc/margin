@@ -21,6 +21,8 @@ import {
   parseClipboardGrid,
   pasteGrid,
   parseTable,
+  prettifyTable,
+  resizeTable,
   serializeTable,
   setAlign,
   TableModel,
@@ -194,8 +196,130 @@ class TableInstance implements WidgetInstance {
       btn('+→', 'Insert column right', () => this.structural((m, p) => [insertCol(m, p.c + 1), { r: p.r, c: p.c + 1 }]), 'mb-col-right'),
       btn('−C', 'Delete column', () => this.structural((m, p) => [deleteCol(m, p.c), { r: p.r, c: Math.min(p.c, m.align.length - 2) }]), 'mb-col-del'),
       sep(),
-      btn('🗑', 'Delete table', () => this.ctx.onRemove(), 'mb-table-del'),
+      this.buildResize(btn),
+      sep(),
+      btn('🗑', 'Delete Table', () => this.ctx.onRemove(), 'mb-table-del'),
     );
+  }
+
+  /** "Resize Table" popover: Width (columns) x Height (rows incl. header) (#98). */
+  private buildResize(btn: (label: string, title: string, fn: () => void, cls?: string) => HTMLElement): HTMLElement {
+    const num = (label: string, cls: string) =>
+      h('input', { type: 'number', min: '1', max: '200', class: `mb-grid-in ${cls}`, 'aria-label': label, title: label }) as HTMLInputElement;
+    const w = num('Width', 'mb-grid-width');
+    const ht = num('Height', 'mb-grid-height');
+    const ok = h('button', { type: 'button', class: 'mb-tbtn mb-grid-ok' }, 'OK');
+    const pop = h(
+      'div',
+      { class: 'mb-grid-pop', role: 'dialog', 'aria-label': 'Resize Table', hidden: '' },
+      h('div', { class: 'mb-grid-title' }, 'Resize Table'),
+      h('label', { class: 'mb-grid-label' }, 'Width x Height'),
+      h('div', { class: 'mb-grid-row' }, w, h('span', null, '×'), ht, ok),
+    );
+    const close = (refocus: boolean) => {
+      pop.hidden = true;
+      if (refocus) this.focusCell(this.active ?? this.lastPos, 'end');
+    };
+    const apply = () => {
+      close(false);
+      this.runOp('resize', { cols: +w.value, rows: +ht.value });
+    };
+    ok.addEventListener('click', apply);
+    pop.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        apply();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        close(true);
+      }
+    });
+    const toggle = btn('⊞', 'Resize Table', () => {
+      if (!pop.hidden) return close(true);
+      w.value = String(this.model.align.length);
+      ht.value = String(this.model.rows.length);
+      pop.hidden = false;
+      w.focus();
+      w.select();
+    }, 'mb-table-resize');
+    return h('span', { class: 'mb-grid-wrap' }, toggle, pop);
+  }
+
+  /** Open the Resize Table popover (menu / palette "Resize Table…"). */
+  private openResize(): void {
+    (this.tools.querySelector('.mb-table-resize') as HTMLButtonElement | null)?.click();
+  }
+
+  /** Table tools (#98) on the cell with the caret, or the last focused cell. */
+  private runOp(op: string, args?: { rows?: number; cols?: number }): boolean {
+    const nrows = this.model.rows.length;
+    const ncols = this.model.align.length;
+    switch (op) {
+      case 'rowAbove':
+        this.structural((m, p) => [insertRow(m, Math.max(1, p.r)), { r: Math.max(1, p.r), c: p.c }]);
+        return true;
+      case 'rowBelow':
+        this.structural((m, p) => [insertRow(m, p.r + 1), { r: p.r + 1, c: p.c }]);
+        return true;
+      case 'colBefore':
+        this.structural((m, p) => [insertCol(m, p.c), { r: p.r, c: p.c }]);
+        return true;
+      case 'colAfter':
+        this.structural((m, p) => [insertCol(m, p.c + 1), { r: p.r, c: p.c + 1 }]);
+        return true;
+      case 'deleteRow':
+        this.deleteRowAt();
+        return true;
+      case 'deleteCol':
+        if (ncols <= 1) this.ctx.onRemove();
+        else this.structural((m, p) => [deleteCol(m, p.c), { r: p.r, c: Math.min(p.c, m.align.length - 2) }]);
+        return true;
+      case 'moveRowUp':
+      case 'moveRowDown': {
+        const p = this.active ?? this.lastPos;
+        const to = p.r + (op === 'moveRowUp' ? -1 : 1);
+        // the header row stays the header (GFM): body rows move among themselves
+        if (p.r >= 1 && to >= 1 && to < nrows) this.structural((m) => [moveRow(m, p.r, to), { r: to, c: p.c }]);
+        else this.focusCell(p, 'end');
+        return true;
+      }
+      case 'moveColLeft':
+      case 'moveColRight': {
+        const p = this.active ?? this.lastPos;
+        const to = p.c + (op === 'moveColLeft' ? -1 : 1);
+        if (to >= 0 && to < ncols) this.structural((m) => [moveCol(m, p.c, to), { r: p.r, c: to }]);
+        else this.focusCell(p, 'end');
+        return true;
+      }
+      case 'alignLeft':
+      case 'alignCenter':
+      case 'alignRight':
+        this.applyAlign(op.slice(5).toLowerCase() as Align);
+        return true;
+      case 'resize':
+        if (!args || args.rows === undefined || args.cols === undefined) {
+          this.openResize();
+          return true;
+        }
+        this.structural((m, p) => {
+          const n = resizeTable(m, args.rows!, args.cols!);
+          return [n, { r: Math.min(p.r, n.rows.length - 1), c: Math.min(p.c, n.align.length - 1) }];
+        });
+        return true;
+      case 'prettify': {
+        const raw = prettifyTable(this.orig, this.model);
+        const p = this.active ?? this.lastPos;
+        const changed = raw !== this.raw;
+        this.update(raw);
+        if (changed) this.ctx.onChange(raw);
+        this.focusCell(p, 'end');
+        return true;
+      }
+      case 'delete':
+        this.ctx.onRemove();
+        return true;
+    }
+    return false;
   }
 
   private buildGrid() {
@@ -495,6 +619,10 @@ class TableInstance implements WidgetInstance {
     this.active = null;
     this.buildGrid();
     if (act) this.focusCell(act, off ?? 'end');
+  }
+
+  command(op: string, args?: { rows?: number; cols?: number }): boolean {
+    return this.runOp(op, args);
   }
 
   focus(at: 'start' | 'end'): void {

@@ -312,6 +312,29 @@ export function setAlign(m: TableModel, col: number, a: Align): TableModel {
   return n;
 }
 
+/**
+ * Resize Table (#98): `rows` (incl. the header) × `cols`, both ≥ 1. Extra rows /
+ * columns are appended empty; shrinking drops trailing rows / columns.
+ */
+export function resizeTable(m: TableModel, rows: number, cols: number): TableModel {
+  const R = Math.max(1, Math.floor(rows) || 1);
+  const C = Math.max(1, Math.floor(cols) || 1);
+  const n = cloneModel(m);
+  n.rows = n.rows.slice(0, R).map((r) => (r.length >= C ? r.slice(0, C) : r.concat(Array(C - r.length).fill(''))));
+  while (n.rows.length < R) n.rows.push(Array(C).fill(''));
+  n.align = n.align.length >= C ? n.align.slice(0, C) : n.align.concat(Array(C - n.align.length).fill(null));
+  if (n.src) {
+    n.src = n.src.slice(0, R);
+    while (n.src.length < R) n.src.push(null);
+  }
+  return n;
+}
+
+/** Prettify Source Code (#98): the table re-formatted with aligned columns, keeping indent and trailing blank lines. */
+export function prettifyTable(orig: ParsedTable, model: TableModel): string {
+  return formatTable(model, orig.indent) + (orig.tail || '\n');
+}
+
 /** A fresh empty table with given size (rows includes header). */
 export function emptyTable(rows: number, cols: number): TableModel {
   return { rows: Array.from({ length: rows }, () => Array.from({ length: cols }, () => '')), align: Array(cols).fill(null) };
