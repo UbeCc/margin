@@ -296,7 +296,7 @@ button { cursor: default; }
 ::highlight(margin-find-current) { background-color: color-mix(in srgb, #ff8a00 70%, transparent); color: inherit; }
 .find-status { font-size: 11.5px; color: var(--margin-fg-muted); min-width: 0; padding: 0 4px; white-space: nowrap; }
 .findbar.no-match .find-status { color: #d9534f; }
-.find-case.on { background: var(--margin-active); color: var(--margin-accent); }
+.find-case.on, .find-word.on, .find-regex.on { background: var(--margin-active); color: var(--margin-accent); }
 
 /* ------------------------------------------------------------ status bar */
 

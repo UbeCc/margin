@@ -291,6 +291,9 @@ export const createStubEditor: CreateEditor = (host: HTMLElement, initial: Edito
       case 'task':
       case 'clearFormat':
         return false;
+      // #96 commands (scopes, copy-as…) are not emulated by the stub
+      default:
+        return false; // #96 commands (scopes, copy-as…) are not emulated by the stub
     }
   };
 

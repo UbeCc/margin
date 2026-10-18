@@ -287,7 +287,7 @@ export class EditorCore {
   }
 }
 
-function scrollParent(el: HTMLElement): HTMLElement {
+export function scrollParent(el: HTMLElement): HTMLElement {
   for (let p = el.parentElement; p; p = p.parentElement) {
     const o = getComputedStyle(p).overflowY;
     if ((o === 'auto' || o === 'scroll') && p.scrollHeight > p.clientHeight) return p;
