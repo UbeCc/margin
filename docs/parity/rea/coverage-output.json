@@ -4,7 +4,7 @@
  "summary": {
   "required_surfaces": 171,
   "required_claims": 163,
-  "reasons": 161
+  "reasons": 142
  },
  "reasons": [
   {
@@ -165,41 +165,6 @@
   {
    "code": "owner-missing",
    "subject_id": "menu.file.page-setup",
-   "detail": "Required surface has no reconstructed owner or explicit disposition."
-  },
-  {
-   "code": "owner-missing",
-   "subject_id": "menu.format.clear",
-   "detail": "Required surface has no reconstructed owner or explicit disposition."
-  },
-  {
-   "code": "owner-missing",
-   "subject_id": "menu.format.comment",
-   "detail": "Required surface has no reconstructed owner or explicit disposition."
-  },
-  {
-   "code": "owner-missing",
-   "subject_id": "menu.format.sub-sup",
-   "detail": "Required surface has no reconstructed owner or explicit disposition."
-  },
-  {
-   "code": "owner-missing",
-   "subject_id": "menu.format.underline",
-   "detail": "Required surface has no reconstructed owner or explicit disposition."
-  },
-  {
-   "code": "owner-missing",
-   "subject_id": "menu.para.heading-level",
-   "detail": "Required surface has no reconstructed owner or explicit disposition."
-  },
-  {
-   "code": "owner-missing",
-   "subject_id": "menu.para.insert-paragraph",
-   "detail": "Required surface has no reconstructed owner or explicit disposition."
-  },
-  {
-   "code": "owner-missing",
-   "subject_id": "menu.para.link-reference",
    "detail": "Required surface has no reconstructed owner or explicit disposition."
   },
   {
@@ -534,52 +499,12 @@
   },
   {
    "code": "verifier-missing",
-   "subject_id": "claim.menu.format.clear",
-   "detail": "No verifier contract covers this claim."
-  },
-  {
-   "code": "verifier-missing",
-   "subject_id": "claim.menu.format.comment",
-   "detail": "No verifier contract covers this claim."
-  },
-  {
-   "code": "verifier-missing",
    "subject_id": "claim.menu.format.image",
    "detail": "No verifier contract covers this claim."
   },
   {
    "code": "verifier-missing",
-   "subject_id": "claim.menu.format.sub-sup",
-   "detail": "No verifier contract covers this claim."
-  },
-  {
-   "code": "verifier-missing",
-   "subject_id": "claim.menu.format.underline",
-   "detail": "No verifier contract covers this claim."
-  },
-  {
-   "code": "verifier-missing",
    "subject_id": "claim.menu.help.reference",
-   "detail": "No verifier contract covers this claim."
-  },
-  {
-   "code": "verifier-missing",
-   "subject_id": "claim.menu.para.footnotes",
-   "detail": "No verifier contract covers this claim."
-  },
-  {
-   "code": "verifier-missing",
-   "subject_id": "claim.menu.para.heading-level",
-   "detail": "No verifier contract covers this claim."
-  },
-  {
-   "code": "verifier-missing",
-   "subject_id": "claim.menu.para.insert-paragraph",
-   "detail": "No verifier contract covers this claim."
-  },
-  {
-   "code": "verifier-missing",
-   "subject_id": "claim.menu.para.link-reference",
    "detail": "No verifier contract covers this claim."
   },
   {
@@ -779,27 +704,7 @@
   },
   {
    "code": "verifier-unknown",
-   "subject_id": "claim.menu.format.inline-math",
-   "detail": "Latest compatible verifier result is unknown."
-  },
-  {
-   "code": "verifier-unknown",
-   "subject_id": "claim.menu.para.front-matter",
-   "detail": "Latest compatible verifier result is unknown."
-  },
-  {
-   "code": "verifier-unknown",
-   "subject_id": "claim.menu.para.html-block",
-   "detail": "Latest compatible verifier result is unknown."
-  },
-  {
-   "code": "verifier-unknown",
    "subject_id": "claim.menu.para.table",
-   "detail": "Latest compatible verifier result is unknown."
-  },
-  {
-   "code": "verifier-unknown",
-   "subject_id": "claim.menu.para.task-status",
    "detail": "Latest compatible verifier result is unknown."
   },
   {
@@ -972,41 +877,6 @@
   {
    "operation": "reconcile_reconstruction_owner",
    "subject_id": "menu.file.page-setup",
-   "rationale": "Required surface has no reconstructed owner or explicit disposition."
-  },
-  {
-   "operation": "reconcile_reconstruction_owner",
-   "subject_id": "menu.format.clear",
-   "rationale": "Required surface has no reconstructed owner or explicit disposition."
-  },
-  {
-   "operation": "reconcile_reconstruction_owner",
-   "subject_id": "menu.format.comment",
-   "rationale": "Required surface has no reconstructed owner or explicit disposition."
-  },
-  {
-   "operation": "reconcile_reconstruction_owner",
-   "subject_id": "menu.format.sub-sup",
-   "rationale": "Required surface has no reconstructed owner or explicit disposition."
-  },
-  {
-   "operation": "reconcile_reconstruction_owner",
-   "subject_id": "menu.format.underline",
-   "rationale": "Required surface has no reconstructed owner or explicit disposition."
-  },
-  {
-   "operation": "reconcile_reconstruction_owner",
-   "subject_id": "menu.para.heading-level",
-   "rationale": "Required surface has no reconstructed owner or explicit disposition."
-  },
-  {
-   "operation": "reconcile_reconstruction_owner",
-   "subject_id": "menu.para.insert-paragraph",
-   "rationale": "Required surface has no reconstructed owner or explicit disposition."
-  },
-  {
-   "operation": "reconcile_reconstruction_owner",
-   "subject_id": "menu.para.link-reference",
    "rationale": "Required surface has no reconstructed owner or explicit disposition."
   },
   {
@@ -1341,52 +1211,12 @@
   },
   {
    "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.menu.format.clear",
-   "rationale": "No verifier contract covers this claim."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.menu.format.comment",
-   "rationale": "No verifier contract covers this claim."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
    "subject_id": "claim.menu.format.image",
    "rationale": "No verifier contract covers this claim."
   },
   {
    "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.menu.format.sub-sup",
-   "rationale": "No verifier contract covers this claim."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.menu.format.underline",
-   "rationale": "No verifier contract covers this claim."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
    "subject_id": "claim.menu.help.reference",
-   "rationale": "No verifier contract covers this claim."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.menu.para.footnotes",
-   "rationale": "No verifier contract covers this claim."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.menu.para.heading-level",
-   "rationale": "No verifier contract covers this claim."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.menu.para.insert-paragraph",
-   "rationale": "No verifier contract covers this claim."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.menu.para.link-reference",
    "rationale": "No verifier contract covers this claim."
   },
   {
@@ -1586,27 +1416,7 @@
   },
   {
    "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.menu.format.inline-math",
-   "rationale": "Latest compatible verifier result is unknown."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.menu.para.front-matter",
-   "rationale": "Latest compatible verifier result is unknown."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.menu.para.html-block",
-   "rationale": "Latest compatible verifier result is unknown."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
    "subject_id": "claim.menu.para.table",
-   "rationale": "Latest compatible verifier result is unknown."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.menu.para.task-status",
    "rationale": "Latest compatible verifier result is unknown."
   },
   {
@@ -1621,19 +1431,19 @@
   }
  ],
  "evidence_ids": [
-  "ev_00351214daad4595d58f9146fa05bb7b6f7f421284021526c44d9e10241d7b1a",
   "ev_00bb4114edf01f1a518197b3ae369906efc864b9bf1b86d7da0701bb715cc346",
   "ev_02114d36354322d9433dce565e4f78c867ff89c334e1229b635d4b07cbc5938c",
   "ev_03f90c4140cc0a05ce393b04c776bd0bcf57a2d3bfec21423ed14cdf84eb112f",
-  "ev_060aface416ddce684b51fbcce917fc8480309494beee4adf19a10cc0f1bff5d",
   "ev_063483dd2fda8f3ac743b77aed4e09f7ec7143a23645fd300f00307eba2759c0",
-  "ev_07f281d60d5445dda3b6bb698bf42019a981ebc0dcaee1311bece17e560d7719",
   "ev_0a4219b9f7b35813ceb8f2f1397ee986c641d6799886481692a17fdc221f9a97",
   "ev_0ae3160179436c03cbabbaab0c0bfd1741ad395a25a8999ff769f13ea9108ebc",
   "ev_0b0c058a264d0be17a033990aff6bcb86f6b99cf10d369786b8825f8dead1cc8",
   "ev_0bf785375486ccb2f8cdb538cc1b4d4dec38aef68dff0725831416b03a960359",
   "ev_1084abad4074c0040604dfa02b61a633f7a7574f819b72f680cb78ae4c09889f",
+  "ev_112b65177cac2e34012df57d1709b9c8c821c63988d4bf0850c808ae416f37b0",
   "ev_11a47dba26a16f3e5efecd055c1b540ddbb0cbe498c9ac9632d16d9604dabdd6",
+  "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+  "ev_1389c31ff1eea5fca723a65cbe717f5185041fb02cf5d5c2c811079a0ac290d4",
   "ev_16dcec6cae7e149c50a922e90608cc554cf5f1f06e021f544833f41ba19d5224",
   "ev_1842585d6e8c874b593690cda394d985d869016fdfaec32749b7406c41800298",
   "ev_196afff3263dd6a3ade1b0d510328293cbe1c2f21a3154d5d290f8d70c66a8df",
@@ -1654,6 +1464,7 @@
   "ev_2ab319649d59e949949a9485e16d4d185928ba330f677c8ae15fa321277a099e",
   "ev_2af20df1cce3adfeeb3d0405c0459fa04c12ca81cef9790b21d266ff208e52be",
   "ev_2b044436ed43d8afdaeb0e1662e27dd702e8bbf4e7d0fa0a339f5023162a09a6",
+  "ev_2bfd37b7ac78629a1a8303889452f5ff14da581c3e0147b6c135fd307638aa53",
   "ev_2c3a102fc016c63e88353f5e0f662201f2adcdd205e3e5eedaab2d4db3205990",
   "ev_2cdb84bedffe598ed99053f40660572101657f97e5934d9e5610e5b8212b3456",
   "ev_2de768edb2decbc991458518769db69fa3b3b66e456768f075966f32d0518035",
@@ -1664,8 +1475,10 @@
   "ev_33f77caf6930e2fa927e713e1cd6bb5627ce5e425adc2db4485b52bd524a4905",
   "ev_37dd7929399fa1a1721d9fa5ef4874d024fd721b8e2afa832eeffe97be7dca06",
   "ev_381646d18f6aa5aaf9ee14b5cb5db8ba5dfcb16f30f529e1796330e05bc7dd7a",
+  "ev_3884ad2bb7ad085952a8e7e3397ce7b70ed4f265d7ce21254d8dad24de4ea733",
   "ev_3e25944b9a7347293992d75e4d4b743294b4af36e5d2b03324da011810779920",
   "ev_3eeb5727be91775859549b34d8c14c25a2224a330d230d8ccfe7c7423a099184",
+  "ev_3f6cecf0497ef114e31557e49d950d4a6eb65c9c2d74b0aed4ab4dc6e73fc2d6",
   "ev_3fbe31f3ef6900d203bcee50d9cbdc5c4cd443e27852a297b7e2e66538779d7d",
   "ev_412d36884a7bdfa52ec4418e388fb47394351ab8e8d5a1a173bb1062527265c2",
   "ev_41a86ed70f7d352fd1fd4ee4c8fc8d5ed2b1ee32ef2fd8ceb10510601f0c962e",
@@ -1679,6 +1492,7 @@
   "ev_4b8c96bd729d6b25102d211569d1b31974d4f00977440cdb1b6697f363feed37",
   "ev_4c4966b6c6c5e491b1802aacfa5e48d94db49c9b0c16f2740962309bcf5f070a",
   "ev_4dd44280d9b826055563159fa54ec45e284fa4fb805e0533505578594fa42c6a",
+  "ev_4e9080ec95902c3dbf7b26f5172b9329ab410a3d30403598ecff6ff84bd058e6",
   "ev_4f93070e55fe06b6d47d556d39b17f116e6150a43ef23edfd2c475ece72bd39a",
   "ev_508f20b179dcd986baab2877174e054417573e968b62184ab6a3fde6a7286357",
   "ev_50a17ceb786622fa19fe628b82ffd021451e0579116cf85a24460467f3c52b83",
@@ -1692,7 +1506,6 @@
   "ev_55356aba164fd0682d5a10149c4e1e4a4deeb9f7cb8d4c6a253ff1550f6f8958",
   "ev_56ab4ebf6543cf3ffc39c332931948edb7e1fe697433bc35d1e1ac6b87d7a6a6",
   "ev_5846b2ce26e08c2151229db306b0075db16fdb4e6fa383b3e95d7415c03681c1",
-  "ev_5965b826305fab68929d1ff50af8ba1714e0c650457384498ffc42341a8ae0b2",
   "ev_5cc78d49083c319c48978c753a1fe930f5af6cbc6552747bda552c47f97de264",
   "ev_5ea8b62d7fa0275680fffd007b7a0adc018e64937e88e5bfedc4cff329173298",
   "ev_61e17ff502798725d19c6ba87351da83309abb2447a5337cee0e3ae706e9e44a",
@@ -1714,13 +1527,12 @@
   "ev_7380d0b76336f31461855d6874115d886c3a831dc93ea0d6441ab21359a17ad0",
   "ev_7432eaed3ee7dfd009c8b2a2c3d2c1dca22b46fb50860d136e3bbb628577604f",
   "ev_791885648f87b7894864a9b9ae52c86a59e4466b41a195d2977a3e28150077b3",
+  "ev_796d6950b9783c0345dc388f06ac4466c20096be7b6d76aee28667a20ce1bd5b",
   "ev_79a9624b4144fe26d326f4f8b7d253baaa660931ead28ea049c91c789dc8c35d",
   "ev_79c8b72bd7d91bcf96ded17e552bd99278d1f3bd4ae4c465d0fda85b806446c2",
   "ev_7be8a4e1a1494095a373ecab90e0d4c55638e71142f292bbf65cd4f0922e76b6",
   "ev_7d357f8d7f3748cee3fd6b9efe1da651956bc1c06c9bb51c576d60b79929ee09",
   "ev_80feb0c88fa1d739232236cf8bd062ce2a21dd29055aa00b04afa4663492ec61",
-  "ev_82a1b6b8b7cb2cb0e12deb1f7f96ca069bc9e4c880deb7d8bbfc19aafa74fe8a",
-  "ev_84b0827da798dfcefb6dbc4c21ff3c29f26e729d72a12852a50d4e92f3f1acf0",
   "ev_850fcdd430cab9577894982ed7a5b16cd99b80b458bc01d81c16d396aea0f433",
   "ev_86139ee3aea5026edd3a47b144297b3c5e22eb0ad4efbe610c994068e3be1b03",
   "ev_87ba8410842913013dae8ae11768148d649fa5c469f45d79b649a21da0f794b8",
@@ -1730,21 +1542,22 @@
   "ev_8da29279072301e931cbb4d929f58ca7e12fa459a0b7a27d91d6828d97fd40a7",
   "ev_8de892a16270deb1ccc419f5fd146f958cce7539757d66f31e9cd578af405529",
   "ev_8eca9302d018c154de14872ffe1d201b717ce853a4ed767ad811ca44fb432574",
-  "ev_901ce221009c1e4879641445b9c1b8fa86c9167e86e30c018915c84e038d0e62",
   "ev_9032119ff0893db58a0df603e6446c95ef5af97bfec8373fa8f7402d21f04525",
   "ev_9042c18ac986e3c1a3922635c73123a83054fca295ed68494324079277b171a6",
   "ev_908d33fa44e4e12fd676b14d274dcc4d9875c54c0c5fc6b80f6bbb5d2aecd452",
+  "ev_91edc524940cfebcbd14b4bfe4fe18749c85e90df2892616a05f03788146c3cf",
   "ev_92331c595d4fa9159747e59dbdd112cc1f1ea4c74e9c212ce86f660c0ddfb5fe",
   "ev_92ec16f3d5328426784c86c507d30f93af6a745d21dc96aeb9af45f0419e8a69",
   "ev_951a98145b0f38fa230c7ad8716b357351167c96bf27e1cae2ef918a2c04046c",
   "ev_95e424eaec6eda0b0640cc7543ac3325b75ce6e13b48b4e108883f92c819b564",
   "ev_96403b4d39428d03b55c055c1e4b75d07b0e17be7b6a8063f07942f9febf9fd0",
   "ev_9990fb790a9e32a73b9dad7f88024ed2b136c7839aa93e958e882267907407cc",
+  "ev_9a0e7d95519047851d43316964853f6eb023f03b5de2bda197dd72006a1fa013",
   "ev_9a1f668957617a753e914df1c0a91d4357c25b0e580651d1c7ab7490e92269b3",
   "ev_9d67164deb564f20c23f604b0fb5aaf5b58dd1c2c8277fa6572cc0479ec92a0e",
+  "ev_a0a7f9dda9d20c065da1245a39262ad4003405c6d8c836be4ea6cb1abee41e7c",
   "ev_a17159ad048ad23364cebd9732d3aee1e83eef8222819fe0a916f658ec543dbc",
   "ev_a218c2f678ee74a5dfe9f6c09b49991d9ec929b874b98c3828ea54cd3c253e5d",
-  "ev_a278b32a446ce6bea52e816056e9d7503f9a24a7933823847339a385f4be0d82",
   "ev_a3cf910ba82ea24f18199be46d2d35446a5b9aa17fb66c5b29a8c59e27c95e51",
   "ev_a5032593c38991faaf0a4f69284222085c03d9f3fda7a37e73c39a08a4d1d85b",
   "ev_a660cf59c450a93b696fb8ed4b551d92bbbbb66fe85c5a974b84cc353d6c43af",
@@ -1752,39 +1565,35 @@
   "ev_a93404de64c98f8760880a1fe66d62523847339601daf23cf3b5c9733cf038ac",
   "ev_aba54062efc760ab8ad5854cd80f2799a22894a7c857336955ad83306ff1cc5a",
   "ev_abf7e04633fba2df9e5297aca7b1890a3fe18925082eb900518ebfed66eb4645",
+  "ev_b0fef3dc15507fab320ae8c0e128b72c9aa7d26e2717c872411267aae628ee36",
   "ev_b19d9eb86f0e77e7e75a625d00887acf3b9f68b22561ac3bf9e237ba417e8b31",
   "ev_b714e54765b06a1decf46258c2ea7c906be6ae4b8b6fd4995febbcf396691a1b",
   "ev_b8e6eb071079db735ea6d6e7213f59e1c58485d155729d20d4bc6776d57ae564",
   "ev_b9702680175702c21270770e576ae0c54424a5935c65ae4947fac51586334163",
   "ev_bba0319f1204764cb88c514bd77d4f4c3cd0ddf7b0c7e77c889d3e70d78e0c61",
   "ev_bc06d84531b88fcd1b9404abb7f6781e00646fe2a355ef01c9b24bd05304281e",
-  "ev_bc23dc109d2ee24b66d7f8e4cf685e8b07cba51722981e8a5587cd068dcd172c",
   "ev_be267631b065b146e9aaea94bd9d658b9985bae8408ca71e81f3813183e29593",
   "ev_bee3f21b3c5b52f74c968e276e9406cac8669aabc7261f91c9a984930eb8c448",
   "ev_c0e554d6ff5eb0aa899fe93d25bd061e26a23f2062de7c33a773b805170c2ec4",
   "ev_c327a668b61c112fa85df30637cc48cc8ebf58987bed8664ebd73322decf07d8",
   "ev_c5ced5a7972e70ba61e5fa4dda8b054bc58edf39bf3309b9dc463772be1c96c2",
   "ev_c5d303aaf82229194c41d7c12cbb1849147cf64cfefa71bff3ed4dd7bd478be9",
-  "ev_c633d5317f88a995d01de5ffa84a921e5a82293e0bb68ef3b4f91bd4b9c98571",
   "ev_c82563a3fab5e9e34a7f17eaa66d2fb5fd7a230f8beccc5dda9b24d31c967a3b",
   "ev_cb2ae3ddcbce14d18a76639ddaf6654ea2203594f56d697c3aa82b518f447902",
   "ev_cb7b3d8e5bae24cf65f49b82b7c65c79c6a3d7333a029bf49ab6f3b5a62341f6",
   "ev_cbbff2fa81f950a2655e36d98f87416ad3d06f3aa614f4cd1ddf8a7dbfa0d952",
   "ev_ccd6f7d95f8d720b77b26ec1e6c4373229f4055155bae63630404259aaee5a38",
-  "ev_cd78215a7eb3666dd8e2cb2da37cb356eb3e7c5486712cf891c1cabed8ef3681",
   "ev_d825065e1b0fb8d6be57683cbbbba95b8b4b53f53bc71d7ab0062f0684bc0c3e",
   "ev_d845db61235a5db384bbbcf2c757424237c4a065feff8c7bcea0b67bc7ddd7ce",
-  "ev_d8f5f000cd6b0cc664d769f8f91c53d41106377f02f47ededdb0dc102e825601",
-  "ev_d8fe26ac1ddac737db5addd831d079a3f286807fa57b1a4a95d645574d254d41",
   "ev_dacf0faf0df8a387b8d87a7c1eb81deef222213ebc89ea6a307d1cd986beb8c0",
   "ev_dc285c146f7d8d13a45118d7979426832a68326baf6915ba854c14b1601d1890",
   "ev_e046fa3a88b3a8ab6966891891417352e94ef17025ff3ecbab2cd8eee6ec7730",
   "ev_e1210a485b4cceb4e2aab5aeceda17396238695557347cf0c0ed692fc2ef3593",
+  "ev_e6f6a4aa3d587612e7e71cf37143699796c83ce2af56bef2de0121ff942305f1",
   "ev_e82ff7ef94f07ee767d79b6c4d10aaef9fa561b80303555d17775e549ea605a1",
   "ev_ec77cc8a70689d0ce84dfb86b2ecb05569bfcd9b4880dee6bb06de9479eb750c",
   "ev_ed13ebe76a98609f4bc6d88d3be014fd9d90c5247ab07546e575e33d8fe65f5e",
   "ev_ed434c97506d18f834b446e072875525dcee504ad371d8e184fd7217dbbf244c",
-  "ev_f31637940d11debdc73a1d6b4001456ccd464ab1d01a7a660e62950c676c6786",
   "ev_f4157d50cf77f67ec4ec0148aa5fee7d38203171433309534b5eaeb149724f5d",
   "ev_f42b737eced29aa4fd968eef79eeccb6ac0df42503b5029f549880a0a842f172",
   "ev_f44bfff05edef5515438f3d0d1908f2c928d08c1b39ccb6df5cd274f113804cb",
@@ -1795,6 +1604,7 @@
   "ev_f915a919a67e0bd6a4da0d9cc655ad5297aa4a298fed727761388011a0eaa30f",
   "ev_f9c10eff1055cd2246addd46f5478402628d14660e97906e1be0fb96718d6af3",
   "ev_fa662c7b21b10318bfbdbb0c5b7c00db4d7f4421e7f777bd5b0c436910e04844",
+  "ev_fbff234ec48d7a423769c9e2d3ea5de846700e84dbbc2837733666f3e2eee501",
   "ev_fe338e57142604800427441025bc49375ab0296c373122ba3438368eac41354d"
  ]
 }
