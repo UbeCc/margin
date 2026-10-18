@@ -182,8 +182,10 @@ export function createEditor(host: HTMLElement, settings: EditorSettings): Edito
     exec(cmd) {
       if (source) {
         const s = source.inst;
-        if (cmd.kind === 'find') return s.find?.(cmd.query, { caseSensitive: cmd.caseSensitive, backwards: cmd.backwards }) ?? false;
-        if (cmd.kind === 'replace') return s.replace?.(cmd.query, cmd.replacement, { all: cmd.all }) ?? false;
+        if (cmd.kind === 'find')
+          return s.find?.(cmd.query, { caseSensitive: cmd.caseSensitive, backwards: cmd.backwards, wholeWord: cmd.wholeWord, regexp: cmd.regex }) ?? false;
+        if (cmd.kind === 'replace')
+          return s.replace?.(cmd.query, cmd.replacement, { all: cmd.all, caseSensitive: cmd.caseSensitive, wholeWord: cmd.wholeWord, regexp: cmd.regex }) ?? false;
         if (cmd.kind === 'undo') return s.undo?.() ?? false;
         if (cmd.kind === 'redo') return s.redo?.() ?? false;
         if (cmd.kind === 'replaceDocument') {

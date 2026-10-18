@@ -16,11 +16,29 @@ const registry = (): HighlightRegistry | null =>
   (globalThis as { CSS?: { highlights?: HighlightRegistry } }).CSS?.highlights ?? null;
 const HighlightCtor = (globalThis as { Highlight?: new (...r: Range[]) => unknown }).Highlight;
 
+export interface FindOpts {
+  caseSensitive: boolean;
+  wholeWord?: boolean;
+  regex?: boolean;
+}
+
+/** Same matcher as the editor core's find (#96): escaped literal or regex, optional whole-word guard. */
+export function queryRegExp(query: string, o: FindOpts): RegExp | null {
+  if (!query) return null;
+  let src = o.regex ? query : query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  if (o.wholeWord) src = `(?<![\\p{L}\\p{N}_])(?:${src})(?![\\p{L}\\p{N}_])`;
+  try {
+    return new RegExp(src, 'gu' + (o.caseSensitive ? '' : 'i') + (o.regex ? 'm' : ''));
+  } catch {
+    return null;
+  }
+}
+
 /** Collect ranges of `query` in the text containers under `root`, in document order. */
-export function findRanges(root: ParentNode, query: string, caseSensitive: boolean): Range[] {
-  if (!query) return [];
-  const fold = (s: string) => (caseSensitive ? s : s.toLowerCase());
-  const q = fold(query);
+export function findRanges(root: ParentNode, query: string, opts: boolean | FindOpts): Range[] {
+  const o: FindOpts = typeof opts === 'boolean' ? { caseSensitive: opts } : opts;
+  const re = queryRegExp(query, o);
+  if (!re) return [];
   const out: Range[] = [];
   for (const box of root.querySelectorAll('.md-content')) {
     const nodes: Text[] = [];
@@ -32,17 +50,21 @@ export function findRanges(root: ParentNode, query: string, caseSensitive: boole
       starts.push(text.length);
       text += n.data;
     }
-    const hay = fold(text);
-    if (hay.length !== text.length) continue; // case folding changed lengths: offsets unusable
+    if (!nodes.length) continue;
     const at = (pos: number, end: boolean): [Text, number] => {
       let k = nodes.length - 1;
       while (k > 0 && (starts[k] > pos || (end && starts[k] === pos))) k--;
       return [nodes[k], pos - starts[k]];
     };
-    for (let i = hay.indexOf(q); i >= 0; i = hay.indexOf(q, i + q.length)) {
+    re.lastIndex = 0;
+    for (let m = re.exec(text); m; m = re.exec(text)) {
+      if (!m[0].length) {
+        re.lastIndex++;
+        continue;
+      }
       const r = document.createRange();
-      r.setStart(...at(i, false));
-      r.setEnd(...at(i + q.length, true));
+      r.setStart(...at(m.index, false));
+      r.setEnd(...at(m.index + m[0].length, true));
       out.push(r);
     }
   }

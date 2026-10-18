@@ -6,7 +6,7 @@
  */
 import type { EditorCore } from './editor';
 import { isTextLeaf } from './edit';
-import { findIn } from './query';
+import { allMatches, compileQuery, findMatch, type FindOptions } from './query';
 import type { Line } from './types';
 
 /**
@@ -82,21 +82,35 @@ export function selectMatch(ed: EditorCore, from: number, to: number): void {
   ed.emitSel();
 }
 
-export function find(ed: EditorCore, q: string, cs = false, back = false, at?: { from: number; to: number }): boolean {
+export function find(ed: EditorCore, q: string, cs: boolean | FindOptions = false, back = false, at?: { from: number; to: number }): boolean {
+  const o: FindOptions = typeof cs === 'boolean' ? { caseSensitive: cs } : cs;
   const { from, to } = at ?? range(ed);
-  const i = findIn(ed.doc.text(), q, from, to, cs, back);
-  if (i < 0) return false;
-  selectMatch(ed, i, i + q.length);
+  const m = findMatch(ed.doc.text(), q, from, to, o, back);
+  if (!m) return false;
+  selectMatch(ed, m.index, m.index + m.length);
   return true;
 }
 
-export function replace(ed: EditorCore, q: string, rep: string, all = false, cs = false): boolean {
-  if (!q) return false;
+/**
+ * Replace the current match (or all). With `regex`, the replacement expands
+ * `$1`, `$<name>`, `$&` like String.prototype.replace; otherwise it is literal.
+ */
+export function replace(ed: EditorCore, q: string, rep: string, all = false, cs: boolean | FindOptions = false): boolean {
+  const o: FindOptions = typeof cs === 'boolean' ? { caseSensitive: cs } : cs;
+  const re = compileQuery(q, o);
+  if (!re) return false;
   const text = ed.doc.text();
-  const eq = (a: string) => (cs ? a === q : a.toLowerCase() === q.toLowerCase());
+  const expand = (m: RegExpExecArray) => (o.regex ? expandReplacement(rep, m) : rep);
   if (all) {
-    const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), cs ? 'g' : 'gi');
-    const next = text.replace(re, () => rep);
+    const ms = allMatches(text, re);
+    if (!ms.length) return false;
+    let next = '';
+    let p = 0;
+    for (const m of ms) {
+      next += text.slice(p, m.index) + expand(m.match);
+      p = m.index + m.length;
+    }
+    next += text.slice(p);
     if (next === text) return false;
     ed.hist.break();
     ed.change(() => {
@@ -107,14 +121,30 @@ export function replace(ed: EditorCore, q: string, rep: string, all = false, cs 
     return true;
   }
   const { from, to } = range(ed);
-  if (to - from === q.length && eq(text.slice(from, to))) {
+  // the selection is exactly a match: replace it, then move to the next one
+  const cur = allMatches(text, re).find((m) => m.index === from && m.index + m.length === to);
+  if (cur) {
     hits.delete(ed);
+    const r = expand(cur.match);
     ed.hist.break();
-    ed.replaceRange(from, to, rep, null);
+    ed.replaceRange(from, to, r, null);
     ed.hist.break();
-    const p = from + rep.length;
-    find(ed, q, cs, false, { from: p, to: p });
+    const p = from + r.length;
+    find(ed, q, o, false, { from: p, to: p });
     return true;
   }
-  return find(ed, q, cs);
+  return find(ed, q, o);
+}
+
+/** `$$`, `$&`, `$1`…`$99`, `$<name>` in a regex replacement (String.prototype.replace semantics). */
+export function expandReplacement(rep: string, m: RegExpExecArray): string {
+  return rep.replace(/\$(\$|&|\d{1,2}|<([^>]*)>)/g, (all, t: string, name?: string) => {
+    if (t === '$') return '$';
+    if (t === '&') return m[0];
+    if (name !== undefined) return m.groups?.[name] ?? '';
+    const n = Number(t);
+    if (n > 0 && n < m.length) return m[n] ?? '';
+    if (t.length === 2 && Number(t[0]) > 0 && Number(t[0]) < m.length) return (m[Number(t[0])] ?? '') + t[1];
+    return all;
+  });
 }
