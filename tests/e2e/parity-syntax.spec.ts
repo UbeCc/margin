@@ -139,7 +139,26 @@ test('syntax.save-normalize: On save: insert final newline, remap Unicode punctu
   await expect.poll(() => diskFile(page, `${ROOT}/Welcome.md`)).toBe(v + '?');
   // Remap Unicode Punctuation on Parse: preference persisted (Markdown › Smart Punctuation)
   const p = await md(page);
-  await p.locator('[data-pref=remapPunctuation]').check();
+  await p.locator('[data-pref="markdown.remapPunctuation"]').check();
   await close(page);
-  await expect.poll(() => page.evaluate(() => (window.__margin as unknown as { settings: { remapPunctuation: boolean } }).settings.remapPunctuation)).toBe(true);
+  await expect.poll(() => page.evaluate(() => (window.__margin as unknown as { settings: { markdown: { remapPunctuation: boolean } } }).settings.markdown.remapPunctuation)).toBe(true);
+  // remap ON drives the parser (#133): 〉 opens a blockquote, 【x】 is a task checkbox,
+  // full-width ＃ is a heading — and the source is never rewritten (lossless).
+  await setDoc(page, '〉quote text\n');
+  await expect(ed(page).locator('.md-block.md-in-quote')).toHaveCount(1);
+  await setDoc(page, '- 【x】 done\n');
+  await expect(ed(page).locator('input.md-task-box')).toBeChecked();
+  await setDoc(page, '＃ Title\n');
+  await expect(ed(page).locator('.md-block.md-heading.md-h1')).toHaveCount(1);
+  expect(await editorValue(page)).toBe('＃ Title\n');
+  // forced dependency (fe-preferences §7.3): Convert on Input (default) + Smart Quotes
+  // → the remap box is checked and disabled even with the stored value off
+  const p2 = await md(page);
+  await p2.locator('[data-pref="markdown.remapPunctuation"]').uncheck();
+  await p2.locator('[data-pref="markdown.smartQuote"]').check();
+  await expect(p2.locator('[data-pref="markdown.remapPunctuation"]')).toBeChecked();
+  await expect(p2.locator('[data-pref="markdown.remapPunctuation"]')).toBeDisabled();
+  await close(page);
+  await setDoc(page, '〉forced on\n');
+  await expect(ed(page).locator('.md-block.md-in-quote')).toHaveCount(1);
 });
