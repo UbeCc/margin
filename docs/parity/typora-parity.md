@@ -9,14 +9,14 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 | | surfaces |
 |---|---|
 | total | 174 |
-| owned (implemented) | 164 (with a named passing test: 151) |
-| partial | 2 |
+| owned (implemented) | 166 (with a named passing test: 153) |
+| partial | 0 |
 | missing | 0 |
 | out of scope | 8 |
 
-REA ledger `rol_1cc39528e3a14003cb6e9358f71d5a6ac32e0af1de6064efed74c518cccac397` (closure `54efde8504d54ece…`): status **unknown**; implemented 166, out-of-scope 8, unknown 5.
+REA ledger `rol_77c5b170f60e4aa814a4bd29f5e048e887cbf3ac0bef4381b8e16ed5bb5db28c` (closure `c2dcacedf913c260…`): status **unknown**; implemented 166, out-of-scope 8, unknown 5.
 
-REA coverage boundary `margin.typora-parity`: status **unknown**; 151/166 claims qualified by controlled-replay verifier Evidence. Reasons: package-proof-missing 1, verifier-missing 13, verifier-unknown 2.
+REA coverage boundary `margin.typora-parity`: status **partial**; 153/166 claims qualified by controlled-replay verifier Evidence. Reasons: package-proof-missing 1, verifier-missing 13.
 
 Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): build exit 0, cargo-test exit 0, independence exit 0, playwright exit 0, vitest exit 0. See `rea/summary.json`.
 
@@ -35,8 +35,8 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `core-cmds` Paragraph & Format menu commands (headings, inline styles, insert/convert blocks) | P0 | 0 |
 | `files` File lifecycle: tabs/windows, recent, duplicate/move/rename, encoding, versions, recovery | P0 | 0 |
 | `export` Export, import & print: image/Pandoc/custom formats, export settings, export-with-previous | P0 | 0 |
-| `clipboard` Clipboard & selection: copy-as / paste-as, selection & delete scopes, jump-to | P0 | 1 |
-| `ctx` Editor & sidebar context menus (text, link, table, image, code, math, diagram, outline, files) | P1 | 1 |
+| `clipboard` Clipboard & selection: copy-as / paste-as, selection & delete scopes, jump-to | P0 | 0 |
+| `ctx` Editor & sidebar context menus (text, link, table, image, code, math, diagram, outline, files) | P1 | 0 |
 | `tools` Table, code-fence and math tools | P1 | 0 |
 | `images` Image pipeline: insert-local, copy/move/upload, zoom, syntax switch, image root path | P1 | 0 |
 | `prefs` Preferences completeness (General, Editor, Image, Markdown, Export, Appearance panes) | P1 | 0 |
@@ -87,7 +87,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `menu.edit.cut-copy-paste` | Edit › Cut / Copy / Paste (markdown + HTML round-trip) | owned |  | `src/editor/core/clipboard.ts` `export function onPaste` | `tests/e2e/core-cases.ts` › paste HTML becomes markdown; copy gives markdown | 5 |
 | `menu.edit.delete-select-all` | Edit › Delete / Select All | owned |  | `src/editor/core/commands.ts` `case 'selectAll'` | `tests/e2e/blocks-core.spec.ts` › Cmd/Ctrl+A in a table cell selects the cell | 2 |
 | `menu.edit.find-replace` | Edit › Find / Find Next / Previous / Replace / Replace Next | owned |  | `src/app/findbar.ts` `caseSensitive` | `tests/e2e/app-navigation.spec.ts` › find keeps focus in the bar, counts and cycles matches | 15 |
-| `menu.edit.find-options` | Find options: whole word and regular expression — Match Case / Whole Word / Regular Expression ($1 replacement) done; no In Selection | **partial** | P1 | `src/editor/core/query.ts` `export function compileQuery` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.find-options: Find options: whole word and regular expression | 3 |
+| `menu.edit.find-options` | Find options: whole word and regular expression — Match Case / Whole Word / Regular Expression ($1 replacement) done; Typora 1.5.12 has no In Selection find scope — fe-sidebar-statusbar-find §85 ("In Selection" is only the word-count popover heading; margin gap #113) | owned |  | `src/editor/core/query.ts` `export function compileQuery` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.find-options: Find options: whole word and regular expression | 3 |
 | `menu.edit.copy-as` | Edit › Copy as Markdown / HTML Code / Plain Text / without Theme Styling / to MS Word — source mode: every variant copies the selected source text (#116); WKWebView execCommand refusal falls back to clipboard_write_payload | owned |  | `src/editor/core/copy-as.ts` `export function copyAs` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.copy-as: Edit › Copy as Markdown / HTML Code / Plain Text / without Theme Styling / to MS Word | 11 |
 | `menu.edit.paste-plain` | Edit › Paste as Plain Text — source mode: the system plain paste — native read + replaceSelection (#116) | owned |  | `src/editor/core/copy-as.ts` `export function pastePlain` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.paste-plain: Edit › Paste as Plain Text | 2 |
 | `menu.edit.select-scopes` | Edit › Selection: Select Word / Line-Sentence / Paragraph-Block / Styled Scope | owned |  | `src/editor/core/scopes.ts` `export function selectScope` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.select-scopes: Edit › Selection | 5 |
@@ -177,7 +177,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
 | `ctx.framework` | Context-menu framework: target-aware item lists for the editor — in-app menu (no native NSMenu merge): key lists per target, actions bound to the right-clicked element | owned |  | `src/app/ctxmenu/targets.ts` `export function contextTarget` | `tests/e2e/parity-ctx.spec.ts` › ctx.framework: | 1 |
-| `ctx.text` | Text context menu: cut/copy/paste, copy-as, insert, format, paragraph submenus, search with… — Cut/Copy/Paste + Copy / Paste As… + Search with Google; WebKit spelling suggestions, Look Up, Speech, Substitutions are not reproduced by the in-app menu | **partial** | P1 | `src/app/ctxmenu/items.ts` `label: 'Copy / Paste As…'` | `tests/e2e/parity-ctx.spec.ts` › ctx.text: | 4 |
+| `ctx.text` | Text context menu: cut/copy/paste, copy-as, insert, format, paragraph submenus, search with… — Cut/Copy/Paste + Copy / Paste As… + Search with Google; retained WebKit items per §1.2: Look Up “…” (dict: lookup), Spelling and Grammar ▸, Substitutions ▸, Speech ▸ with check state (input menus keep Speech, §6.3); engine spelling-suggestion lists are not exposed to JS — not reproduced | owned |  | `src/app/ctxmenu/items.ts` `label: 'Copy / Paste As…'` | `tests/e2e/parity-ctx.spec.ts` › ctx.text: | 4 |
 | `ctx.link` | Link context menu: Open Link / Copy Link Address / Hyperlink Actions | owned |  | `src/app/ctxmenu/items.ts` `label: 'Copy Link Address'` | `tests/e2e/parity-ctx.spec.ts` › ctx.link: | 4 |
 | `ctx.block-generic` | Block context menu: Insert Paragraph Before/After, Delete (atomic blocks) — table/HTML/math/diagram/code/atomic lists; Save Math/Image As… not yet (gap) | owned |  | `src/app/ctxmenu/items.ts` `block('para:insertBefore', 'Insert Paragraph Before')` | `tests/e2e/parity-ctx.spec.ts` › ctx.block-generic: | 9 |
 | `ctx.emoji` | Emoji/inline-math context entries (copy emoji, copy inline math, copy as image) — :smile: renders (EMOJI map); inline Copy as Image rasterizes the KaTeX node to PNG (mathimg.ts) | owned |  | `src/app/ctxmenu/items.ts` `function copyMath` | `tests/e2e/parity-ctx.spec.ts` › ctx.emoji: | 5 |
@@ -229,7 +229,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `images.copy-move-all` | Image Tools: Copy / Move All Images to… (and per-image copy/move/rename) — duplicate names get Typora stem-<last 7 digits of unix seconds>.ext; Margin deviation: identical bytes reuse the existing copy and explicit names never clobber | owned |  | `src/app/images/tools.ts` `async copyAll(move: boolean` | `tests/e2e/parity-images.spec.ts` › images.copy-move-all: Image Tools: Copy / Move All Images to… (and per-image copy/move/rename) | 15 |
 | `images.delete` | Image context: Delete Image / Delete Image File (undoable) — Delete Image File moves the file to the Trash after confirmation; removing the reference is one undo step | owned |  | `src/app/images/tools.ts` `async deleteImageFile(` | `tests/e2e/parity-images.spec.ts` › images.delete: Image context: Delete Image / Delete Image File (undoable) | 9 |
 | `images.reveal-open` | Image context: Open Image Location / Open in Browser / Copy Image Content — Open Image in Browser only for remote images (desktop openExternal allows http(s) only) | owned |  | `src/app/ctxmenu/items.ts` `Open Image Location` | `tests/e2e/parity-images.spec.ts` › images.reveal-open: Image context: Open Image Location… / Open in Browser… / Copy Image Content | 5 |
-| `images.zoom` | Image zoom (Zoom Image to N%) and switch Markdown/HTML image syntax — Typora presets 25-200% plus 1/scale (PNG pHYs / JPEG JFIF density); inline <img> renders as an image | owned |  | `src/app/images/syntax.ts` `export function setZoom` | `tests/e2e/parity-images.spec.ts` › images.zoom: Image zoom (direct entry + presets) and switch Markdown/HTML image syntax | 6 |
+| `images.zoom` | Image zoom (Zoom Image to N%) and switch Markdown/HTML image syntax — presets 25–200%; direct "Zoom Image to N%" = explicit style zoom, else 100/pixel-ratio when the DPI hint ≠ 72 (ratio prefetched at render via images.getScale, #155); inline <img> renders as an image | owned |  | `src/app/images/syntax.ts` `export function setZoom` | `tests/e2e/parity-images.spec.ts` › images.zoom: Image zoom (direct entry + presets) and switch Markdown/HTML image syntax | 6 |
 | `images.reload` | Image Tools: Reload All Images | owned |  | `src/app/images/tools.ts` `reloadAll(root: HTMLElement)` | `tests/e2e/parity-images.spec.ts` › images.reload: Image Tools: Reload All Images | 1 |
 | `images.upload` | Image upload: custom command (argv) / PicGo; upload one / all local images; test uploader — DELIBERATE DEVIATION (security): the command is tokenized to argv and run without a shell (Typora runs bash -c with only backslash and double quote escaped, so $() or backticks in file names execute); success also needs exit status 0. Same as Typora: 20 s per image, 60 s batch cap (child killed), URL lines http(s)/ftp/file/host.tld scanned from the tail, last URL for one image, exactly n for a batch, Test Uploader needs exactly 2 URLs; upload-on-insert keeps the local image on failure; Cancel kills the run | owned |  | `src-tauri/src/upload.rs` `pub fn test_upload(` | `tests/e2e/parity-images.spec.ts` › images.upload: Image upload: custom command (argv) / PicGo; upload one / all local images; test uploader | 32 |
 | `images.ipic` | iPic uploader (third-party macOS app, private pasteboard protocol) — Proprietary third-party integration with an undocumented pasteboard protocol; command/PicGo uploaders cover the use case. | out-of-scope |  | — | none | 4 |
