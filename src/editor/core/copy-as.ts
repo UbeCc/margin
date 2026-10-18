@@ -369,13 +369,3 @@ async function readClipboardPlain(ed: EditorCore): Promise<string> {
   }
 }
 
-const armed = new WeakMap<EditorCore, number>();
-/** A paste-as-plain shortcut was pressed: the next paste event (within 1 s) is plain. */
-export function armPlainPaste(ed: EditorCore): void {
-  armed.set(ed, Date.now());
-}
-export function plainPasteArmed(ed: EditorCore): boolean {
-  const t = armed.get(ed);
-  armed.delete(ed);
-  return t !== undefined && Date.now() - t < 1000;
-}

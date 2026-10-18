@@ -143,13 +143,12 @@ test.describe('parity: clipboard & selection (#96)', () => {
     // undoable in one step
     await page.keyboard.press(`${mod}+z`);
     await expect.poll(() => md(page)).toBe('Some **bold** text\n\nend\n');
-    if (browserName === 'chromium' && process.platform === 'linux') {
-      // keyboard: Chromium's own paste-and-match-style (Ctrl+Shift+V) is taken as plain
-      await caret(page, 1, 3);
-      await page.keyboard.press('Control+Shift+v');
-      await expect.poll(() => md(page)).toBe(PLAIN);
-      await page.keyboard.press(`${mod}+z`);
-    }
+    // keyboard ⇧⌘V / Ctrl+Shift+V takes the same path
+    await caret(page, 1, 3);
+    await page.keyboard.press(`${mod}+Shift+v`);
+    await expect.poll(() => md(page)).toBe(PLAIN);
+    await page.keyboard.press(`${mod}+z`);
+    await expect.poll(() => md(page)).toBe('Some **bold** text\n\nend\n');
     // a normal ⌘V still pastes rich markdown
     await caret(page, 1, 3);
     await page.keyboard.press(`${mod}+v`);
