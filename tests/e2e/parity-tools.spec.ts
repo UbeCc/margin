@@ -30,6 +30,28 @@ async function run(page: Page, cmd: EditorCommand): Promise<boolean> {
   return page.evaluate(() => (window as unknown as { __res: boolean }).__res);
 }
 
+
+/** Like `run`, but against the full app handle (`window.__margin.editor`) on the app page. */
+async function runApp(page: Page, cmd: EditorCommand): Promise<boolean> {
+  await page.evaluate((c) => {
+    const w = window as unknown as { __resA?: boolean; __cmdA: EditorCommand; __hookA?: boolean };
+    w.__cmdA = c;
+    w.__resA = undefined;
+    if (w.__hookA) return;
+    w.__hookA = true;
+    document.addEventListener(
+      'keydown',
+      (e) => {
+        if (e.key !== 'F2') return;
+        e.preventDefault();
+        w.__resA = window.__margin!.editor.exec(w.__cmdA);
+      },
+      true,
+    );
+  }, cmd);
+  await page.keyboard.press('F2');
+  return page.evaluate(() => (window as unknown as { __resA: boolean }).__resA);
+}
 async function clipboard(page: Page): Promise<Record<string, string>> {
   await page.evaluate(() => {
     const w = window as unknown as { __clip: Record<string, string> };
@@ -274,5 +296,92 @@ test.describe('parity: table, code and math tools (#98)', () => {
     expect(await run(page, { kind: 'math', op: 'refresh' })).toBe(true);
     await expect(page.locator('.katex')).toHaveCount(2);
     expect(await md(page)).toBe(before);
+  });
+
+  test('tools.math.copy-image: Copy Math ▸ Copy as Image resolves the math at the caret (#127)', async ({ page }) => {
+    await open(page, '$$\n\\frac{1}{2}\n$$\n\nInline $a^2$ here.\n', '&mathimg');
+    await page.locator('.mb-math-block').click();
+    expect(await run(page, { kind: 'math', op: 'copyImage' })).toBe(true);
+    await expect
+      .poll(() => page.evaluate(() => window.__core.mathimgs))
+      .toEqual([{ tex: '\\frac{1}{2}', display: true }]); // block math: display mode, no $$ delimiters
+    await caret(page, 1, 8); // inside the inline $a^2$
+    expect(await run(page, { kind: 'math', op: 'copyImage' })).toBe(true);
+    await expect
+      .poll(() => page.evaluate(() => window.__core.mathimgs))
+      .toEqual([
+        { tex: '\\frac{1}{2}', display: true },
+        { tex: 'a^2', display: false },
+      ]);
+    // negative: no math at the caret, and without the app rasterizer hook the op declines
+    await caret(page, 1, 2);
+    expect(await run(page, { kind: 'math', op: 'copyImage' })).toBe(false);
+    await open(page, '$$\nx\n$$\n');
+    await page.locator('.mb-math-block').click();
+    expect(await run(page, { kind: 'math', op: 'copyImage' })).toBe(false); // no copyMathImage in settings
+  });
+
+  test('tools.math.copy-image.app: the app rasterizer puts a PNG on the clipboard (#127)', async ({ page, context, browserName }) => {
+    test.skip(browserName !== 'chromium', 'image clipboard read needs Chromium permissions');
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await boot(page);
+    await page.evaluate(() => window.__margin!.editor.setMarkdown('$$\n\\frac{1}{2}\n$$\n'));
+    await page.locator('.mb-math-block').click();
+    await expect(page.locator('.mb-math-block .katex')).toBeVisible();
+    expect(await runApp(page, { kind: 'math', op: 'copyImage' })).toBe(true);
+    // rasterization is async; the PNG flavour appears once the canvas is written
+    await expect
+      .poll(() => page.evaluate(async () => (await navigator.clipboard.read()).some((i) => i.types.includes('image/png'))), { timeout: 20000 })
+      .toBe(true);
+  });
+
+  test('tools.math.copy-format: "Use LaTeX Source" keeps $$…$$ / $…$ in Copy as HTML Code (#127)', async ({ page, context, browserName }) => {
+    if (browserName === 'chromium') await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await open(page, 'A $x^2$ b.\n\n$$\n\\frac{1}{2}\n$$\n');
+    const selectAll = () =>
+      page.evaluate(() => {
+        const r = document.createRange();
+        r.selectNodeContents(document.querySelector('.md-editor')!);
+        const s = getSelection()!;
+        s.removeAllRanges();
+        s.addRange(r);
+      });
+    await selectAll();
+    await run(page, { kind: 'copyAs', format: 'html' });
+    expect((await clipboard(page))['text/plain']).toContain('katex'); // default: Use Rendered SVG
+    await page.evaluate(() => window.__core.ed.updateSettings({ markdown: { mathCopyFormat: 'latex' } }));
+    await selectAll();
+    await run(page, { kind: 'copyAs', format: 'html' });
+    const latex = (await clipboard(page))['text/plain'];
+    expect(latex).toContain('$x^2$');
+    expect(latex).toContain('$$');
+    expect(latex).not.toContain('katex');
+  });
+
+  test('tools.code.shift-tab: Shift+Tab outdents; auto-indents with the preference on (#127)', async ({ page }) => {
+    await open(page, '```js\nfunction f() {\nreturn 1;\n}\n```\n');
+    await page.locator('.mb-code').click();
+    await expect(page.locator('.mb-code .cm-content .tok-keyword').first()).toBeVisible(); // language loaded
+    await page.locator('.mb-code .cm-line').nth(1).click();
+    await page.keyboard.press('Shift+Tab');
+    await expect.poll(() => md(page)).toBe('```js\nfunction f() {\nreturn 1;\n}\n```\n'); // off (default): outdent at column 0 is a no-op
+    await page.evaluate(() => window.__core.ed.updateSettings({ markdown: { shiftTabAutoIndent: true } }));
+    await page.keyboard.press('Shift+Tab');
+    await expect.poll(() => md(page)).toBe('```js\nfunction f() {\n    return 1;\n}\n```\n'); // on: auto indent (4 = Indent Size for Code)
+  });
+
+  test('menu.code-tools.state: Code Tools palette entries enable only inside a code block (#127)', async ({ page }) => {
+    await boot(page);
+    await page.evaluate(() => window.__margin!.editor.setMarkdown('```js\nx\n```\n\nplain text\n'));
+    await caretAtText(page, 'plain', 2);
+    await page.keyboard.press(`${mod}+Shift+a`);
+    await page.locator('.palette-input').fill('Auto Indent Whole');
+    await expect(page.locator('.palette-list li').first()).toHaveClass(/disabled/);
+    await page.keyboard.press('Escape');
+    await page.locator('.mb-code').click();
+    await page.keyboard.press(`${mod}+Shift+a`);
+    await page.locator('.palette-input').fill('Auto Indent Whole');
+    await expect(page.locator('.palette-list li').first()).not.toHaveClass(/disabled/);
+    await page.keyboard.press('Escape');
   });
 });

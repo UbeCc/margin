@@ -297,6 +297,8 @@ export function migrateMarkdown(v: unknown, d: Readonly<MarkdownOptions> = TYPOR
   const ci = Number(raw.codeIndentSize);
   out.codeIndentSize = ci === 0 || ci === 2 || ci === 3 || ci === 4 ? ci : d.codeIndentSize;
   out.mathNumbering = oneOf(raw.mathNumbering, ['all', 'ams', 'none'] as const, d.mathNumbering);
+  // Typora stores 'svg' / 'latex' (key `mathFormatOnCopy`); a legacy 1 value meant rendered SVG.
+  out.mathCopyFormat = oneOf(raw.mathCopyFormat, ['svg', 'latex'] as const, raw.mathFormatOnCopy === 'latex' ? 'latex' : d.mathCopyFormat);
   out.smartPunctuation = oneOf(raw.smartPunctuation, ['input', 'rendering'] as const, d.smartPunctuation);
   out.headingStyle = oneOf(raw.headingStyle, ['atx', 'atxSuffix', 'setext', 'setextVar'] as const, d.headingStyle);
   const indent = Number(raw.indentSize);

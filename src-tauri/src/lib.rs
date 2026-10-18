@@ -462,6 +462,7 @@ pub fn run() {
             image_tools::image_scale,
             image_tools::open_images_dialog,
             clipboard_macos::clipboard_write_rich,
+            clipboard_macos::clipboard_write_image,
             clipboard_read::clipboard_read,
         ])
         .setup(|app| {

@@ -2,11 +2,11 @@
  "generated_from": {
   "spec": "typora-re/parity-spec.md",
   "prose": "typora-re/sections/*.md",
-  "margin_head": "055f5e904c18eec5a0cb4fb5dd7e20d64b3826f1"
+  "margin_head": "4f92f464dae8ae0d2b7750c03298012c154845b2"
  },
  "summary": {
-  "head": "055f5e904c18eec5a0cb4fb5dd7e20d64b3826f1",
-  "artifact_sha256": "966a5449b09371d9db82e325ebadc83929113a0097775f060f9e8ef5e77e4bd3",
+  "head": "4f92f464dae8ae0d2b7750c03298012c154845b2",
+  "artifact_sha256": "2f2871fb57f4a326104cc887f9032998bbc613ad5a3504047b225872c7dd2670",
   "inventory": {
    "total": 172,
    "owned": 145,
@@ -16,8 +16,8 @@
    "verified_by_test": 132
   },
   "ledger": {
-   "ledger_id": "rol_4ec2836a62a2db2fa34ff5cc59217fd1d63cbefa756da587b69b4aa66df7ea00",
-   "closure_digest": "a5df6894d5c2cc83c2f9aaa2e079652db10db69fd85e0b2b6b7e44b6c51a5f03",
+   "ledger_id": "rol_508665cf92a747b37b9844d688ccd77d3a6155628c85965f39ec5cfd1b70ec4b",
+   "closure_digest": "d5313efac2ca7eb37d2df5668ff0e8a89e7f768c57586380311b90661f9cdc2b",
    "status": "unknown",
    "summary": {
     "total": 177,
@@ -119,7 +119,7 @@
      }
     ]
    },
-   "evidence_id": "ev_24f83a10532d5bb0b39843da89300d6fae652ca023b7555cb38932d2f69a925a"
+   "evidence_id": "ev_4a1cb720d0c32498a5efb9a64fd486e49c1a0264d2892b31a30da7162645ae04"
   },
   "coverage": {
    "status": "unknown",
@@ -172,7 +172,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "About Margin",
-    "sha256": "b0a00b03abc7a1074bb13ffcccc2e58a3a42414b5d31ccc755ee2e09f2ed49a5"
+    "sha256": "7376ac008fdd86d2246a3bc4fd1213168ff7020c2dd28ea1723f4d84ee7d4975"
    },
    "verifier": null,
    "spec": {
@@ -206,7 +206,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'preferences'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "cf10917602c33bc199c1f22f206aa86471262aea04e50384805e0a960609e387"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -244,7 +244,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "PredefinedMenuItem::hide_others",
-    "sha256": "b0a00b03abc7a1074bb13ffcccc2e58a3a42414b5d31ccc755ee2e09f2ed49a5"
+    "sha256": "7376ac008fdd86d2246a3bc4fd1213168ff7020c2dd28ea1723f4d84ee7d4975"
    },
    "verifier": null,
    "spec": {
@@ -282,7 +282,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'new'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "cf10917602c33bc199c1f22f206aa86471262aea04e50384805e0a960609e387"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -323,7 +323,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "private async newWindow(",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "cf10917602c33bc199c1f22f206aa86471262aea04e50384805e0a960609e387"
    },
    "verifier": {
     "file": "tests/e2e/parity-files.spec.ts",
@@ -409,7 +409,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'open'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "cf10917602c33bc199c1f22f206aa86471262aea04e50384805e0a960609e387"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -456,7 +456,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'openFolder'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "cf10917602c33bc199c1f22f206aa86471262aea04e50384805e0a960609e387"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -503,7 +503,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "quickOpen(): void",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "cf10917602c33bc199c1f22f206aa86471262aea04e50384805e0a960609e387"
    },
    "verifier": {
     "file": "tests/e2e/app-navigation.spec.ts",
@@ -635,7 +635,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'save'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "cf10917602c33bc199c1f22f206aa86471262aea04e50384805e0a960609e387"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -683,7 +683,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'saveAs'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "cf10917602c33bc199c1f22f206aa86471262aea04e50384805e0a960609e387"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -930,7 +930,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'toggleLineEnding'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "cf10917602c33bc199c1f22f206aa86471262aea04e50384805e0a960609e387"
    },
    "verifier": {
     "file": "src/app/__tests__/document.test.ts",
@@ -1090,7 +1090,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'print'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "cf10917602c33bc199c1f22f206aa86471262aea04e50384805e0a960609e387"
    },
    "verifier": null,
    "spec": {
@@ -1126,7 +1126,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'close'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "cf10917602c33bc199c1f22f206aa86471262aea04e50384805e0a960609e387"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -1220,7 +1220,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'undo'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "cf10917602c33bc199c1f22f206aa86471262aea04e50384805e0a960609e387"
    },
    "verifier": {
     "file": "tests/e2e/core-cases.ts",
@@ -1265,7 +1265,7 @@
    "owner": {
     "path": "src/editor/core/clipboard.ts",
     "anchor": "export function onPaste",
-    "sha256": "3823a29547fe150ca5e59ad76cd7a258a436003c9732ae0080ce308aaa391c63"
+    "sha256": "f49ee3ca25b4d4cc41434016ab90e29bce67c37fc73861ebf32fc16d923709be"
    },
    "verifier": {
     "file": "tests/e2e/core-cases.ts",
@@ -1437,7 +1437,7 @@
    "owner": {
     "path": "src/editor/core/copy-as.ts",
     "anchor": "export function copyAs",
-    "sha256": "6ff9a5571006fdb7564ae9250deccc7c23274660b9d7c3ca94fbdab85a847f7f"
+    "sha256": "1220ef1fecab71b0f1c694e4fde02df576d105325111926a673925c9f720b249"
    },
    "verifier": {
     "file": "tests/e2e/parity-clipboard.spec.ts",
@@ -1489,7 +1489,7 @@
    "owner": {
     "path": "src/editor/core/copy-as.ts",
     "anchor": "export function pastePlain",
-    "sha256": "6ff9a5571006fdb7564ae9250deccc7c23274660b9d7c3ca94fbdab85a847f7f"
+    "sha256": "1220ef1fecab71b0f1c694e4fde02df576d105325111926a673925c9f720b249"
    },
    "verifier": {
     "file": "tests/e2e/parity-clipboard.spec.ts",
@@ -1648,7 +1648,7 @@
    "owner": {
     "path": "src/app/prefs/editor-md.ts",
     "anchor": "'Check spelling while typing'",
-    "sha256": "9d7c5f2c81ac24ba14eb69e70e9a4a21914796d9fc9dc1dfba2fb2397277ff87"
+    "sha256": "445b62b0b84a160df125c6dca25903e022e86a989e0dae56613cd33a4bb6e021"
    },
    "verifier": null,
    "spec": {
@@ -2712,7 +2712,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'toggleSource'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "cf10917602c33bc199c1f22f206aa86471262aea04e50384805e0a960609e387"
    },
    "verifier": {
     "file": "tests/e2e/core-cases.ts",
@@ -2758,7 +2758,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'toggleFocus'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "cf10917602c33bc199c1f22f206aa86471262aea04e50384805e0a960609e387"
    },
    "verifier": {
     "file": "tests/e2e/app-navigation.spec.ts",
@@ -2802,7 +2802,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'toggleSidebar'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "cf10917602c33bc199c1f22f206aa86471262aea04e50384805e0a960609e387"
    },
    "verifier": {
     "file": "tests/e2e/app-navigation.spec.ts",
@@ -2904,7 +2904,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'zoomIn'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "cf10917602c33bc199c1f22f206aa86471262aea04e50384805e0a960609e387"
    },
    "verifier": null,
    "spec": {
@@ -2943,7 +2943,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "PredefinedMenuItem::fullscreen",
-    "sha256": "b0a00b03abc7a1074bb13ffcccc2e58a3a42414b5d31ccc755ee2e09f2ed49a5"
+    "sha256": "7376ac008fdd86d2246a3bc4fd1213168ff7020c2dd28ea1723f4d84ee7d4975"
    },
    "verifier": null,
    "spec": {
@@ -3061,7 +3061,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "THEMES_SUBMENU_ID",
-    "sha256": "b0a00b03abc7a1074bb13ffcccc2e58a3a42414b5d31ccc755ee2e09f2ed49a5"
+    "sha256": "7376ac008fdd86d2246a3bc4fd1213168ff7020c2dd28ea1723f4d84ee7d4975"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -3103,7 +3103,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'openThemesFolder'",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "cf10917602c33bc199c1f22f206aa86471262aea04e50384805e0a960609e387"
    },
    "verifier": null,
    "spec": {
@@ -3195,7 +3195,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "PredefinedMenuItem::minimize",
-    "sha256": "b0a00b03abc7a1074bb13ffcccc2e58a3a42414b5d31ccc755ee2e09f2ed49a5"
+    "sha256": "7376ac008fdd86d2246a3bc4fd1213168ff7020c2dd28ea1723f4d84ee7d4975"
    },
    "verifier": null,
    "spec": {
@@ -3229,7 +3229,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "ID_HELP_MARKDOWN",
-    "sha256": "b0a00b03abc7a1074bb13ffcccc2e58a3a42414b5d31ccc755ee2e09f2ed49a5"
+    "sha256": "7376ac008fdd86d2246a3bc4fd1213168ff7020c2dd28ea1723f4d84ee7d4975"
    },
    "verifier": null,
    "spec": {
@@ -3340,7 +3340,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "label: 'Copy / Paste As…'",
-    "sha256": "21e23f483375a18c28ebc1332acb98a5d337e46aca76f9b47fba558159f9066b"
+    "sha256": "2c18b497c59c60df425e3f8e0028f998d1f4f7cedfe4ae9fa1d68ce1c43f24c4"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -3382,7 +3382,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "label: 'Copy Link Address'",
-    "sha256": "21e23f483375a18c28ebc1332acb98a5d337e46aca76f9b47fba558159f9066b"
+    "sha256": "2c18b497c59c60df425e3f8e0028f998d1f4f7cedfe4ae9fa1d68ce1c43f24c4"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -3425,7 +3425,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "block('para:insertBefore', 'Insert Paragraph Before')",
-    "sha256": "21e23f483375a18c28ebc1332acb98a5d337e46aca76f9b47fba558159f9066b"
+    "sha256": "2c18b497c59c60df425e3f8e0028f998d1f4f7cedfe4ae9fa1d68ce1c43f24c4"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -3473,7 +3473,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "function copyMath",
-    "sha256": "21e23f483375a18c28ebc1332acb98a5d337e46aca76f9b47fba558159f9066b"
+    "sha256": "2c18b497c59c60df425e3f8e0028f998d1f4f7cedfe4ae9fa1d68ce1c43f24c4"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -3757,7 +3757,7 @@
    "owner": {
     "path": "src/editor/blocks/code-fence.ts",
     "anchor": "mount",
-    "sha256": "59a9db0d8f274377f298b12f027295724ab2a84b6d4efe3c904be13a92b1e068"
+    "sha256": "2bd09e96a5472bfed97874a1357dfc53f690a98a1e474f68693137705c717514"
    },
    "verifier": {
     "file": "tests/e2e/blocks-widgets.spec.ts",
@@ -3799,7 +3799,7 @@
    "owner": {
     "path": "src/editor/blocks/code-fence.ts",
     "anchor": "command(op: string)",
-    "sha256": "59a9db0d8f274377f298b12f027295724ab2a84b6d4efe3c904be13a92b1e068"
+    "sha256": "2bd09e96a5472bfed97874a1357dfc53f690a98a1e474f68693137705c717514"
    },
    "verifier": {
     "file": "tests/e2e/parity-tools.spec.ts",
@@ -3841,7 +3841,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "'Delete Code Block'",
-    "sha256": "21e23f483375a18c28ebc1332acb98a5d337e46aca76f9b47fba558159f9066b"
+    "sha256": "2c18b497c59c60df425e3f8e0028f998d1f4f7cedfe4ae9fa1d68ce1c43f24c4"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -3881,7 +3881,7 @@
    "owner": {
     "path": "src/editor/blocks/code-fence.ts",
     "anchor": "private applyCodePrefs",
-    "sha256": "59a9db0d8f274377f298b12f027295724ab2a84b6d4efe3c904be13a92b1e068"
+    "sha256": "2bd09e96a5472bfed97874a1357dfc53f690a98a1e474f68693137705c717514"
    },
    "verifier": {
     "file": "tests/e2e/parity-prefs.spec.ts",
@@ -3960,7 +3960,7 @@
    "owner": {
     "path": "src/editor/core/block-tools.ts",
     "anchor": "export function mathTool",
-    "sha256": "e4498e4b1e1f99625958afae0ab9242d5ae63db81d8a04f0baa5c585dd278ac5"
+    "sha256": "14e422071fe136d1335821de15819726e1b0c8c21e9a8825f3188a8dd2e60b06"
    },
    "verifier": {
     "file": "tests/e2e/parity-tools.spec.ts",
@@ -4005,7 +4005,7 @@
    "owner": {
     "path": "src/editor/core/block-tools.ts",
     "anchor": "export function refreshMath",
-    "sha256": "e4498e4b1e1f99625958afae0ab9242d5ae63db81d8a04f0baa5c585dd278ac5"
+    "sha256": "14e422071fe136d1335821de15819726e1b0c8c21e9a8825f3188a8dd2e60b06"
    },
    "verifier": {
     "file": "tests/e2e/parity-tools.spec.ts",
@@ -4435,7 +4435,7 @@
    "owner": {
     "path": "src/app/images/context-menu.ts",
     "anchor": "Open Image Location",
-    "sha256": "db4fd257906a86e44b32d7ba6b924aec525cf05edf456806f6396b97a30b9487"
+    "sha256": "a32bf245297d6c54178b9750ec790b704368dac3f1f510077eec1514bd78c1f6"
    },
    "verifier": {
     "file": "tests/e2e/parity-images.spec.ts",
@@ -4557,7 +4557,7 @@
    "owner": {
     "path": "src-tauri/src/upload.rs",
     "anchor": "pub fn test_upload(",
-    "sha256": "255901199d65b0b34a15ad5989e3a71f48200350e152971cd0efceafef68010a"
+    "sha256": "67b5a1f26ab513b81f6c61f5c6ff880ddab5fe32aaf9a1ba8b4a26b438dcc4ec"
    },
    "verifier": {
     "file": "tests/e2e/parity-images.spec.ts",
@@ -4663,7 +4663,7 @@
    "owner": {
     "path": "src/app/settings.ts",
     "anchor": "DEFAULT_SETTINGS",
-    "sha256": "226224e728010c1d5e7bf56d2563cdbc64749e66e42fff95d625884f674f460c"
+    "sha256": "daf6b9405d5eece10198897f2fec0a6e48295f7c521238b7591a4d67382e3052"
    },
    "verifier": {
     "file": "src/app/__tests__/settings.test.ts",
@@ -4756,7 +4756,7 @@
    "owner": {
     "path": "src/app/settings.ts",
     "anchor": "export function launchPlan",
-    "sha256": "226224e728010c1d5e7bf56d2563cdbc64749e66e42fff95d625884f674f460c"
+    "sha256": "daf6b9405d5eece10198897f2fec0a6e48295f7c521238b7591a4d67382e3052"
    },
    "verifier": {
     "file": "tests/e2e/parity-prefs.spec.ts",
@@ -4968,7 +4968,7 @@
    "owner": {
     "path": "src/app/settings.ts",
     "anchor": "textColumnWidth",
-    "sha256": "226224e728010c1d5e7bf56d2563cdbc64749e66e42fff95d625884f674f460c"
+    "sha256": "daf6b9405d5eece10198897f2fec0a6e48295f7c521238b7591a4d67382e3052"
    },
    "verifier": {
     "file": "tests/e2e/parity-prefs.spec.ts",
@@ -5062,7 +5062,7 @@
    "owner": {
     "path": "src/app/commands.ts",
     "anchor": "export function setCustomKeys",
-    "sha256": "80b437d431a9357eb46f16b2e648db754682cf0555d4d2743cceaf9bce84a727"
+    "sha256": "3cfb43c6293c77b9ead2485e7a977bdf572c8b8bdfdde6721462f2519eaff75a"
    },
    "verifier": {
     "file": "tests/e2e/parity-prefs.spec.ts",
@@ -5099,7 +5099,7 @@
    "owner": {
     "path": "src/app/settings.ts",
     "anchor": "export function newFileEol",
-    "sha256": "226224e728010c1d5e7bf56d2563cdbc64749e66e42fff95d625884f674f460c"
+    "sha256": "daf6b9405d5eece10198897f2fec0a6e48295f7c521238b7591a4d67382e3052"
    },
    "verifier": {
     "file": "tests/e2e/parity-prefs.spec.ts",
@@ -5142,7 +5142,7 @@
    "owner": {
     "path": "src/app/settings.ts",
     "anchor": "DEFAULT_SETTINGS",
-    "sha256": "226224e728010c1d5e7bf56d2563cdbc64749e66e42fff95d625884f674f460c"
+    "sha256": "daf6b9405d5eece10198897f2fec0a6e48295f7c521238b7591a4d67382e3052"
    },
    "verifier": null,
    "spec": {
@@ -5492,7 +5492,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "private createExports(",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "cf10917602c33bc199c1f22f206aa86471262aea04e50384805e0a960609e387"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -6481,7 +6481,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "private degradeLarge(",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "cf10917602c33bc199c1f22f206aa86471262aea04e50384805e0a960609e387"
    },
    "verifier": {
     "file": "tests/e2e/parity-files.spec.ts",
@@ -6630,7 +6630,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "setDocumentEdited",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "cf10917602c33bc199c1f22f206aa86471262aea04e50384805e0a960609e387"
    },
    "verifier": null,
    "spec": {
@@ -6662,7 +6662,7 @@
    "owner": {
     "path": "src-tauri/src/lib.rs",
     "anchor": "on_second_instance",
-    "sha256": "d93d8a5f9bb5f3a16b2a8d86e940d12b9d6961b0e160e4a9084128d0d968edd3"
+    "sha256": "3fd2a4225ab0bae5bcb93e38bd32647cbbfb0c525e57f287fe25cb2715e01fb0"
    },
    "verifier": {
     "file": "tests/e2e/parity-files.spec.ts",
@@ -6840,7 +6840,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "applyAppearance",
-    "sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+    "sha256": "cf10917602c33bc199c1f22f206aa86471262aea04e50384805e0a960609e387"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -6914,7 +6914,7 @@
    "owner": {
     "path": "src/editor/core/clipboard.ts",
     "anchor": "export function onCopy",
-    "sha256": "3823a29547fe150ca5e59ad76cd7a258a436003c9732ae0080ce308aaa391c63"
+    "sha256": "f49ee3ca25b4d4cc41434016ab90e29bce67c37fc73861ebf32fc16d923709be"
    },
    "verifier": {
     "file": "tests/e2e/parity-clipboard.spec.ts",

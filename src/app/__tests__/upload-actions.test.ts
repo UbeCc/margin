@@ -122,4 +122,24 @@ describe('uploader preferences', () => {
     port.dispatchEvent(new Event('change'));
     expect(patches).toEqual([{ uploader: 'command' }, { uploadCommand: 'picgo upload' }, { picgoPort: 36678 }]);
   });
+
+  it('Typora presets (#137): PicGo.app shows the port row, presets show neither', () => {
+    const el = uploadPrefsSection({ uploader: 'none' }, () => {});
+    document.body.append(el);
+    const q = <T extends HTMLElement>(k: string) => el.querySelector<T>(`[data-pref="${k}"]`)!;
+    const rowOf = (k: string) => q(k).closest<HTMLElement>('.pref-row')!;
+    const kind = q<HTMLSelectElement>('uploader');
+    const options = [...kind.options].map((o) => `${o.value}:${o.text}`);
+    expect(options).toEqual(['none:None', 'picgo-app:PicGo.app', 'upic:uPic', 'picsee:Picsee', 'command:Custom Command', 'picgo:PicGo (local server)']);
+    kind.value = 'picgo-app';
+    kind.dispatchEvent(new Event('change'));
+    expect(rowOf('picgoPort').hidden).toBe(false);
+    expect(rowOf('uploadCommand').hidden).toBe(true);
+    expect(rowOf('uploadTimeout').hidden).toBe(false);
+    kind.value = 'upic';
+    kind.dispatchEvent(new Event('change'));
+    expect(rowOf('picgoPort').hidden).toBe(true);
+    expect(rowOf('uploadCommand').hidden).toBe(true);
+    expect(rowOf('uploadTimeout').hidden).toBe(false);
+  });
 });

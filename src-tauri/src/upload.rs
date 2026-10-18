@@ -50,6 +50,16 @@ pub enum UploadConfig {
         #[serde(default, rename = "timeoutSecs")]
         timeout_secs: Option<u64>,
     },
+    /// #137 `picgo-app`: launch PicGo.app (bundle id `com.molunerfinn.picgo`, no
+    /// activation), then POST to its server on 127.0.0.1; a first connect that gets
+    /// no response is retried once after 5 s (Typora `doUploadUsingPicgoAfterLaunch`).
+    #[serde(rename = "picgo-app")]
+    PicgoApp {
+        #[serde(default)]
+        port: Option<u16>,
+        #[serde(default, rename = "timeoutSecs")]
+        timeout_secs: Option<u64>,
+    },
 }
 
 /// Total budget for a batch: `per_image * n`, capped at Typora's 60 s — or at the
@@ -301,31 +311,112 @@ pub fn run_command(argv: &[String], paths: &[String], timeout: Duration) -> Resu
     urls_of_run(&r, paths.len(), timeout)
 }
 
-/// POST `{"list": paths}` to PicGo's built-in server on 127.0.0.1 and return its URLs.
-pub fn picgo_upload(port: u16, paths: &[String], timeout: Duration) -> Result<Vec<String>, String> {
+/// One POST to a PicGo server, keeping "no response at all" (connection refused /
+/// timed out / empty reply) apart from an answered error — Typora retries only the former.
+pub enum PicgoOutcome {
+    Ok(Vec<String>),
+    /// The server answered but the upload failed (HTTP status, body, URL count).
+    Answered(String),
+    /// Nothing came back.
+    NoResponse(String),
+}
+
+pub fn picgo_post(port: u16, paths: &[String], timeout: Duration) -> PicgoOutcome {
     let addr = SocketAddr::from((Ipv4Addr::LOCALHOST, port));
     let fail = |e: std::io::Error| format!("PicGo server on 127.0.0.1:{port}: {e}");
-    let mut s = TcpStream::connect_timeout(&addr, Duration::from_secs(3).min(timeout)).map_err(fail)?;
-    s.set_read_timeout(Some(timeout)).map_err(fail)?;
-    s.set_write_timeout(Some(timeout)).map_err(fail)?;
+    let mut s = match TcpStream::connect_timeout(&addr, Duration::from_secs(3).min(timeout)) {
+        Ok(s) => s,
+        Err(e) => return PicgoOutcome::NoResponse(fail(e)),
+    };
+    if let Err(e) = s.set_read_timeout(Some(timeout)) {
+        return PicgoOutcome::NoResponse(fail(e));
+    }
+    if let Err(e) = s.set_write_timeout(Some(timeout)) {
+        return PicgoOutcome::NoResponse(fail(e));
+    }
     let body = serde_json::json!({ "list": paths }).to_string();
     let req = format!(
         "POST /upload HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
         body.len()
     );
-    s.write_all(req.as_bytes()).map_err(fail)?;
-    let mut raw = Vec::new();
-    s.take(OUTPUT_LIMIT as u64).read_to_end(&mut raw).map_err(|e| match e.kind() {
-        std::io::ErrorKind::WouldBlock | std::io::ErrorKind::TimedOut => {
-            format!("PicGo server timed out after {}s", timeout.as_secs())
-        }
-        _ => fail(e),
-    })?;
-    let (status, body) = parse_http_response(&raw)?;
-    if status != 200 {
-        return Err(format!("PicGo server answered HTTP {status}: {}", tail(&body, 3)));
+    if let Err(e) = s.write_all(req.as_bytes()) {
+        return PicgoOutcome::NoResponse(fail(e));
     }
-    parse_picgo_body(&body, paths.len())
+    let mut raw = Vec::new();
+    match s.take(OUTPUT_LIMIT as u64).read_to_end(&mut raw) {
+        Ok(_) => {}
+        Err(e) if matches!(e.kind(), std::io::ErrorKind::WouldBlock | std::io::ErrorKind::TimedOut) => {
+            return PicgoOutcome::NoResponse(format!("PicGo server timed out after {}s", timeout.as_secs()));
+        }
+        Err(e) => return PicgoOutcome::NoResponse(fail(e)),
+    }
+    let (status, body) = match parse_http_response(&raw) {
+        Ok(r) => r,
+        Err(e) => return PicgoOutcome::NoResponse(format!("PicGo server on 127.0.0.1:{port}: {e}")),
+    };
+    if status != 200 {
+        return PicgoOutcome::Answered(format!("PicGo server answered HTTP {status}: {}", tail(&body, 3)));
+    }
+    match parse_picgo_body(&body, paths.len()) {
+        Ok(urls) => PicgoOutcome::Ok(urls),
+        Err(e) => PicgoOutcome::Answered(e),
+    }
+}
+
+/// POST `{"list": paths}` to PicGo's built-in server on 127.0.0.1 and return its URLs.
+pub fn picgo_upload(port: u16, paths: &[String], timeout: Duration) -> Result<Vec<String>, String> {
+    match picgo_post(port, paths, timeout) {
+        PicgoOutcome::Ok(u) => Ok(u),
+        PicgoOutcome::Answered(e) | PicgoOutcome::NoResponse(e) => Err(e),
+    }
+}
+
+pub const PICGO_BUNDLE_ID: &str = "com.molunerfinn.picgo";
+/// Typora retries the first POST 5 s after launching PicGo.app (`dispatch_after(5s …)`).
+pub const PICGO_APP_RETRY_WAIT: Duration = Duration::from_secs(5);
+
+/// Launch PicGo.app by bundle id without activating it (`open -b … -g` — argv, no shell).
+pub fn launch_picgo_app() -> Result<(), String> {
+    let out = Command::new("/usr/bin/open")
+        .arg("-b")
+        .arg(PICGO_BUNDLE_ID)
+        .arg("-g")
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::piped())
+        .output()
+        .map_err(|e| format!("PicGo app not found (bundle id {PICGO_BUNDLE_ID}): {e}"))?;
+    if out.status.success() {
+        Ok(())
+    } else {
+        let msg = tail(&String::from_utf8_lossy(&out.stderr), 1);
+        Err(format!("PicGo app not found (bundle id {PICGO_BUNDLE_ID}): {msg}"))
+    }
+}
+
+/// PicGo.app flow with injectable launch + post, so tests can count the single retry.
+pub fn picgo_app_upload_with(
+    launch: &mut dyn FnMut() -> Result<(), String>,
+    post: &mut dyn FnMut() -> PicgoOutcome,
+    retry_wait: Duration,
+) -> Result<Vec<String>, String> {
+    launch()?;
+    let mut attempt = post();
+    if matches!(attempt, PicgoOutcome::NoResponse(_)) {
+        std::thread::sleep(retry_wait);
+        attempt = post();
+    }
+    match attempt {
+        PicgoOutcome::Ok(u) => Ok(u),
+        PicgoOutcome::Answered(e) | PicgoOutcome::NoResponse(e) => Err(e),
+    }
+}
+
+/// Launch PicGo.app, then upload through its server (one 5 s retry on no response).
+pub fn picgo_app_upload(port: u16, paths: &[String], timeout: Duration) -> Result<Vec<String>, String> {
+    let mut launch = launch_picgo_app;
+    let mut post = || picgo_post(port, paths, timeout);
+    picgo_app_upload_with(&mut launch, &mut post, PICGO_APP_RETRY_WAIT)
 }
 
 /// Minimal HTTP/1.x response parser: status code + body (Content-Length, chunked or EOF).
@@ -412,6 +503,9 @@ pub fn upload(paths: &[String], config: &UploadConfig) -> Result<Vec<String>, St
         UploadConfig::Picgo { port, timeout_secs } => {
             picgo_upload(port.unwrap_or(DEFAULT_PICGO_PORT), paths, batch_timeout(*timeout_secs, paths.len()))
         }
+        UploadConfig::PicgoApp { port, timeout_secs } => {
+            picgo_app_upload(port.unwrap_or(DEFAULT_PICGO_PORT), paths, batch_timeout(*timeout_secs, paths.len()))
+        }
     }
 }
 
@@ -487,10 +581,15 @@ pub fn test_upload(config: &UploadConfig, paths: &[String]) -> TestReport {
                 },
             }
         }
-        UploadConfig::Picgo { port, timeout_secs } => {
+        UploadConfig::Picgo { port, timeout_secs } | UploadConfig::PicgoApp { port, timeout_secs } => {
             let port = port.unwrap_or(DEFAULT_PICGO_PORT);
             let shown = format!("POST http://127.0.0.1:{port}/upload");
-            match picgo_upload(port, paths, batch_timeout(*timeout_secs, paths.len())) {
+            let timeout = batch_timeout(*timeout_secs, paths.len());
+            let result = match config {
+                UploadConfig::PicgoApp { .. } => picgo_app_upload(port, paths, timeout),
+                _ => picgo_upload(port, paths, timeout),
+            };
+            match result {
                 Ok(urls) => TestReport { ok: true, command: shown, stdout: urls.join("\n"), stderr: String::new(), urls, message: "Successfully get uploaded image url.".into() },
                 Err(e) => fail(shown, String::new(), String::new(), e),
             }
