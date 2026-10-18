@@ -467,6 +467,14 @@ export class DocumentController {
       return;
     }
     // Revert to Saved is one undoable edit (#94): Undo brings the discarded edits back.
+    this.replaceWithDisk(text);
+  }
+
+  /**
+   * Take the disk text as the new baseline through one undoable, caret-preserving editor
+   * edit (#89) — Revert to Saved, silent reload of a clean document, Load Disk.
+   */
+  private replaceWithDisk(text: string): void {
     this.loading = true;
     try {
       this.eol = detectEol(text);
@@ -582,7 +590,7 @@ export class DocumentController {
     if (!this.dirty) {
       const scrollEl = document.querySelector('.editor-scroll');
       const top = scrollEl?.scrollTop ?? 0;
-      this.load(p, text);
+      this.replaceWithDisk(text);
       if (scrollEl) scrollEl.scrollTop = top;
       this.host.notify(`Reloaded ${this.name} (changed on disk)`, 'info');
       return;
@@ -634,13 +642,13 @@ export class DocumentController {
     if (!pend || pend.path !== this.path) return null;
     const prevMd = this.host.editor.getMarkdown();
     const prevEol = this.eol;
-    this.load(pend.path, pend.raw);
+    this.replaceWithDisk(pend.raw);
     const path = pend.path;
     return () => {
       if (this.path !== path) return;
       this.loading = true;
       try {
-        this.host.editor.setMarkdown(prevMd);
+        this.host.editor.exec({ kind: 'replaceDocument', markdown: prevMd });
         this.eol = prevEol;
       } finally {
         this.loading = false;

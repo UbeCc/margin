@@ -15,6 +15,8 @@ mod menu;
 mod pandoc;
 mod pandoc_import;
 #[cfg(target_os = "macos")]
+mod drop_macos;
+#[cfg(target_os = "macos")]
 mod pdf_macos;
 #[cfg(target_os = "macos")]
 mod pdf_post_macos;
@@ -51,6 +53,8 @@ pub const EV_MENU: &str = "margin://menu";
 pub const EV_FS: &str = "margin://fs-events";
 pub const EV_OPEN_FILES: &str = "margin://open-files";
 pub const EV_CLOSE_REQUESTED: &str = "margin://close-requested";
+#[cfg(target_os = "macos")]
+pub const EV_FILE_DROP: &str = "margin://file-drop";
 
 #[derive(Default)]
 pub struct AppState {
@@ -174,6 +178,32 @@ pub fn new_window<R: Runtime>(app: &AppHandle<R>, label: &str, path: Option<&str
         b = b.position(p.x + 28.0, p.y + 28.0);
     }
     b.build().map(|_| ())
+}
+
+/// Payload of `margin://file-drop` (#23): `FileDrop` in src/contracts.ts.
+#[cfg(target_os = "macos")]
+#[derive(Clone, Serialize)]
+pub struct FileDrop {
+    pub paths: Vec<String>,
+    pub x: f64,
+    pub y: f64,
+}
+
+/// Finder files dropped on the window whose NSWindow is `ns_window` (#23).
+#[cfg(target_os = "macos")]
+fn file_dropped<R: Runtime>(app: &AppHandle<R>, ns_window: usize, paths: Vec<String>, x: f64, y: f64) {
+    let Some(win) = app
+        .webview_windows()
+        .into_values()
+        .find(|w| w.ns_window().map(|p| p as usize == ns_window).unwrap_or(false))
+    else {
+        return;
+    };
+    for p in &paths {
+        allow_assets_for_file(app, Path::new(p));
+    }
+    let _ = win.set_focus();
+    let _ = app.emit_to(win.label(), EV_FILE_DROP, FileDrop { paths, x, y });
 }
 
 pub fn open_files<R: Runtime>(app: &AppHandle<R>, paths: Vec<PathBuf>) {
@@ -421,6 +451,11 @@ pub fn run() {
                 allow_assets(&handle, &dir, true);
             }
             open_files(&handle, cli_paths());
+            #[cfg(target_os = "macos")]
+            if let Some(w) = app.get_webview_window("main") {
+                let h = handle.clone();
+                drop_macos::install(&w, move |win, paths, x, y| file_dropped(&h, win, paths, x, y));
+            }
             #[cfg(debug_assertions)]
             maybe_pdf_selftest(&handle);
             #[cfg(debug_assertions)]

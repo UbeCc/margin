@@ -16,7 +16,7 @@ function fakeEditor(): EditorHandle & { type(s: string): void; set(s: string): v
     getOutline: () => [],
     getActiveHeadingId: () => null,
     scrollToHeading: () => undefined,
-    exec: () => false,
+    exec: (c) => (c.kind === 'replaceDocument' ? ((md = c.markdown), cbs.forEach((cb) => cb()), true) : false),
     getStats: () => countStats(md),
     setSourceMode: () => undefined,
     isSourceMode: () => false,

@@ -393,3 +393,42 @@ test('pref.general.save: General: Auto Save, save-on-switch, recover unsaved dra
   expect(await page.evaluate(() => window.__MARGIN_WEB__!.requestClose())).toBe(true);
   expect(await diskFile(page, '/drafts/main.json')).toBe('[]');
 });
+
+const dropFiles = (page: Page, paths: string[], x: number, y: number) =>
+  page.evaluate(([p, px, py]) => window.__MARGIN_WEB__!.dropFiles(p as string[], px as number, py as number), [paths, x, y] as const);
+
+test('beh.files.drop: Drop files from the OS: open Markdown/folders, insert images and links', async ({ page }) => {
+  await page.evaluate(async (root) => {
+    const p = window.__margin!.platform;
+    await p.writeTextFile(`${root}/Pics/cat photo.png`, 'png-bytes');
+    await p.writeTextFile(`${root}/spec.pdf`, 'pdf-bytes');
+  }, ROOT);
+
+  // Over the editor: the image is stored by the image rule and inserted, the PDF becomes a
+  // relative link; both land at the drop point (end of the quote line), in drop order.
+  const quote = page.locator('.md-editor', { hasText: 'Simplicity' }).getByText('Simplicity is the ultimate sophistication.');
+  const box = (await quote.boundingBox())!;
+  await dropFiles(page, [`${ROOT}/Pics/cat photo.png`, `${ROOT}/spec.pdf`, `${ROOT}/missing.png`], box.x + box.width - 1, box.y + box.height / 2);
+  await expect.poll(() => editorValue(page)).toContain('sophistication.![cat photo](assets/cat%20photo.png) [spec.pdf](spec.pdf)');
+  expect(await page.evaluate((r) => window.__margin!.platform.stat(`${r}/assets/cat photo.png`).then(Boolean, () => false), ROOT)).toBe(true);
+  // One undo removes the whole drop.
+  await page.keyboard.press(`${MOD}+z`);
+  await expect.poll(() => editorValue(page)).not.toContain('spec.pdf');
+
+  // Markdown files open as a tab wherever they are dropped; already-open ones are focused.
+  await dropFiles(page, [`${ROOT}/Ideas/Roadmap.md`], box.x + 5, box.y + 5);
+  await expect(page.locator('.title-text')).toHaveText('Roadmap');
+  await expect(tabs(page)).toHaveCount(2);
+  await dropFiles(page, [`${ROOT}/Ideas/Roadmap.md`], 2, 2);
+  await expect(tabs(page)).toHaveCount(2);
+  expect(await editorValue(page)).not.toContain('Roadmap.md');
+
+  // Non-Markdown files outside the editor are not opened.
+  await dropFiles(page, [`${ROOT}/spec.pdf`], 2, 2);
+  await expect(page.locator('.toast').last()).toContainText('only Markdown files and folders can be opened');
+  await expect(tabs(page)).toHaveCount(2);
+
+  // A folder opens in the sidebar.
+  await dropFiles(page, [`${ROOT}/Journal`], 2, 2);
+  await expect(page.locator(`.file-tree [data-path="${ROOT}/Journal/2026-10-17.md"]`)).toBeVisible();
+});

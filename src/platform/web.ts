@@ -1,4 +1,4 @@
-import type { AppSettings, DirEntry, FsEvent, ImageRule, MenuAction, PdfExportOptions, Platform } from '../contracts';
+import type { FileDrop, AppSettings, DirEntry, FsEvent, ImageRule, MenuAction, PdfExportOptions, Platform } from '../contracts';
 import {
   basename,
   builtinThemes,
@@ -146,6 +146,7 @@ export class WebPlatform implements Platform {
   private watchers = new Set<WatchEntry>();
   private menuCbs = new Set<(a: MenuAction) => void>();
   private openCbs = new Set<(paths: string[]) => void>();
+  private dropCbs = new Set<(drop: FileDrop) => void>();
   private closeCbs = new Set<() => Promise<boolean>>();
   private fileHandles = new Map<string, FsaFileHandle>();
   private dirHandles = new Map<string, FsaDirHandle>();
@@ -762,6 +763,11 @@ export class WebPlatform implements Platform {
     return () => this.openCbs.delete(cb);
   }
 
+  onFileDrop(cb: (drop: FileDrop) => void): () => void {
+    this.dropCbs.add(cb);
+    return () => this.dropCbs.delete(cb);
+  }
+
   onCloseRequested(cb: () => Promise<boolean>): () => void {
     this.closeCbs.add(cb);
     return () => this.closeCbs.delete(cb);
@@ -772,6 +778,11 @@ export class WebPlatform implements Platform {
   /** Dispatch a menu action as if chosen from the native menu. */
   triggerMenu(action: MenuAction): void {
     for (const cb of [...this.menuCbs]) cb(action);
+  }
+
+  /** Simulate dragging files from the OS onto the window at viewport point (x, y) (#23). */
+  dropFiles(paths: string[], x: number, y: number): void {
+    for (const cb of [...this.dropCbs]) cb({ paths: paths.map(normalizePath), x, y });
   }
 
   /** Simulate Finder "Open With" / CLI. */

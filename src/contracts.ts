@@ -18,6 +18,13 @@ export interface Heading {
   text: string;
 }
 
+/** OS file drop onto a window (#23). */
+export interface FileDrop {
+  paths: string[];
+  x: number;
+  y: number;
+}
+
 export interface EditorSettings {
   /** Base directory used to resolve relative image / link paths. null = unsaved doc. */
   baseDir: string | null;
@@ -150,7 +157,10 @@ export type EditorCommand =
   /** Table tools on the table with the caret (`resize` takes rows/cols, rows incl. header). */
   | { kind: 'table'; op: TableOp; rows?: number; cols?: number }
   | { kind: 'code'; op: CodeOp }
-  | { kind: 'math'; op: MathOp };
+  | { kind: 'math'; op: MathOp }
+  // #23 (additive): files dropped from Finder — insert markdown at the drop point
+  // (viewport CSS px, like MouseEvent.clientX/Y); falls back to the selection.
+  | { kind: 'insertMarkdownAt'; markdown: string; x: number; y: number };
 
 /** Table submenu / toolbar operations (#98). `prettify` = re-format the table source (aligned columns). */
 export type TableOp =
@@ -390,6 +400,11 @@ export interface Platform {
   onMenu(cb: (action: MenuAction) => void): () => void;
   /** Files opened via Finder / CLI args / drag onto dock. */
   onOpenFiles(cb: (paths: string[]) => void): () => void;
+  /**
+   * Optional (#23): files / folders dragged onto the window from the OS, with absolute
+   * paths and the drop point in viewport CSS px. Platforms without native drop paths omit it.
+   */
+  onFileDrop?(cb: (drop: FileDrop) => void): () => void;
   /** Return false from cb to cancel closing (e.g. unsaved changes). */
   onCloseRequested(cb: () => Promise<boolean>): () => void;
   /**
