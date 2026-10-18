@@ -36,7 +36,20 @@ const setDoc = (page: Page, md: string) => page.evaluate((m) => (window as unkno
 const menu = (page: Page, a: string) => page.evaluate((x) => (window as unknown as Win).__MARGIN_WEB__.triggerMenu(x), a);
 const settings = (page: Page, p: object) => page.evaluate((x) => (window as unknown as Win).__margin.updateSettings(x), p);
 const exists = (page: Page, p: string) => page.evaluate(async (x) => !!(await (window as unknown as Win).__MARGIN_WEB__.stat(x)), p);
-const rightClickImage = (page: Page, i = 0) => page.locator('.md-editor .md-image img.md-img, .md-editor .mb-html-block img').nth(i).click({ button: 'right' });
+/**
+ * Right-click the i-th rendered image. Guards first (#152): a sub-2px hit box
+ * passes Playwright's visibility check, but Linux WebKit snaps it to a zero-width
+ * hit area — the click then retries on "<div class=\"md-content\"> intercepts
+ * pointer events" until the whole 30s test budget is gone. Fail fast instead,
+ * and bound the click so any future interception surfaces quickly.
+ */
+const rightClickImage = async (page: Page, i = 0): Promise<void> => {
+  const img = page.locator('.md-editor .md-image img.md-img, .md-editor .mb-html-block img').nth(i);
+  await expect(img).toBeVisible();
+  const box = await img.boundingBox();
+  expect(box && Math.min(box.width, box.height), 'image hit box too small to right-click (#152)').toBeGreaterThanOrEqual(2);
+  await img.click({ button: 'right', timeout: 10_000 });
+};
 const ctxItem = (page: Page, label: string | RegExp) => page.locator('.context-item', { hasText: label });
 
 test.beforeEach(async ({ page }) => {
