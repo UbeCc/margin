@@ -9,14 +9,14 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 | | surfaces |
 |---|---|
 | total | 171 |
-| owned (implemented) | 82 (with a named passing test: 69) |
+| owned (implemented) | 87 (with a named passing test: 74) |
 | partial | 20 |
-| missing | 61 |
+| missing | 56 |
 | out of scope | 8 |
 
-REA ledger `rol_fe89516b35388868f919ee54f7f71e883a6cfbd1b4db2d1a650f71b935f88403` (closure `aa012a43129121c1…`): status **unknown**; unowned 61, implemented 102, out-of-scope 8, unknown 5.
+REA ledger `rol_c5693b3c024ce82ddc0fff7f3473ef393692d3976c18d397995f495ad14f53db` (closure `96377f1a9e2330de…`): status **unknown**; unowned 56, implemented 107, out-of-scope 8, unknown 5.
 
-REA coverage boundary `margin.typora-parity`: status **unknown**; 69/163 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 61, package-proof-missing 1, verifier-missing 85, verifier-unknown 9.
+REA coverage boundary `margin.typora-parity`: status **unknown**; 74/163 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 56, package-proof-missing 1, verifier-missing 80, verifier-unknown 9.
 
 Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): build exit 0, cargo-test exit 101, independence exit 0, playwright exit 0, vitest exit 0. See `rea/summary.json`.
 
@@ -40,7 +40,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `tools` Table, code-fence and math tools | P1 | 9 |
 | `images` Image pipeline: insert-local, copy/move/upload, zoom, syntax switch, image root path | P1 | 10 |
 | `prefs` Preferences completeness (General, Editor, Image, Markdown, Export, Appearance panes) | P1 | 8 |
-| `sidebar` Sidebar & outline: list view, file search, sort, collapsible outline, filter | P1 | 6 |
+| `sidebar` Sidebar & outline: list view, file search, sort, collapsible outline, filter | P1 | 1 |
 | `syntax` Markdown syntax options & whitespace/line-break settings | P2 | 5 |
 | `chrome` Window chrome & writing aids: status bar, always-on-top, spelling, substitutions, speech, emoji | P2 | 9 |
 
@@ -256,12 +256,12 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
 | `sidebar.tree` | File tree: lazy folders, open, watch, new/rename/trash/reveal/copy path | owned |  | `src/app/sidebar/filetree.ts` `'New File…'` | `tests/e2e/app-files.spec.ts` › context menu: new file, rename (open doc follows), new folder, trash | 20 |
-| `sidebar.list-view` | Articles list view (summaries, ≤400 items) and tree/list switch | **missing** | P1 | — | none | 7 |
-| `sidebar.search` | Sidebar full-text search across the folder | **missing** | P1 | — | none | 7 |
-| `sidebar.sort` | File tree sorting (name/natural/created/modified, asc/desc) | **missing** | P1 | — | none | 9 |
+| `sidebar.list-view` | Articles list view (summaries, ≤400 items) and tree/list switch | owned |  | `src/app/sidebar/filelist.ts` `export class FileList` | `tests/e2e/parity-sidebar.spec.ts` › sidebar.list-view: Articles list view | 7 |
+| `sidebar.search` | Sidebar full-text search across the folder | owned |  | `src/app/sidebar/search.ts` `export class SidebarSearch` | `tests/e2e/parity-sidebar.spec.ts` › sidebar.search: Sidebar full-text search | 7 |
+| `sidebar.sort` | File tree sorting (name/natural/created/modified, asc/desc) | owned |  | `src/app/sidebar/sort.ts` `export const SORT_OPTIONS` | `tests/e2e/parity-sidebar.spec.ts` › sidebar.sort: File tree sorting | 9 |
 | `sidebar.outline` | Outline: headings, jump, highlight current header | owned |  | `src/app/sidebar/outline.ts` `activeId` | `tests/e2e/app-navigation.spec.ts` › outline lists headings and jumps on click | 2 |
-| `sidebar.outline-collapse` | Outline: collapsible/flat outline, expand/collapse all, filter, unpin | **missing** | P1 | — | none | 7 |
-| `sidebar.drag` | Drag files from sidebar into the editor / other apps; drop files to open — #23 | **missing** | P2 | — | none | 1 |
+| `sidebar.outline-collapse` | Outline: collapsible/flat outline, expand/collapse all, filter, unpin | owned |  | `src/app/sidebar/outline.ts` `export function filterHeadings` | `tests/e2e/parity-sidebar.spec.ts` › sidebar.outline-collapse: Outline: collapsible/flat outline | 7 |
+| `sidebar.drag` | Drag files from sidebar into the editor / other apps; drop files to open — #23 | owned |  | `src/app/sidebar/drag.ts` `export function dropMarkdown` | `tests/e2e/parity-sidebar.spec.ts` › sidebar.drag: Drag files from sidebar | 1 |
 
 ## Export / print / import
 
