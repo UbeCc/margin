@@ -45,7 +45,7 @@ pub fn apply<R: Runtime>(win: &WebviewWindow<R>, style: &str) {
     let _ = win.set_decorations(style == "native");
 }
 
-#[cfg(test)]
+#[cfg(all(test, target_os = "macos"))]
 mod tests {
     use super::style_bits;
 
