@@ -13,7 +13,7 @@ import { sanitizeHtml, isSafeUrl } from '../blocks/sanitize';
 export const esc = (s: string) =>
   s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 
-const TAG: Record<string, string> = { em: 'em', strong: 'strong', del: 'del', mark: 'mark', code: 'code' };
+const TAG: Record<string, string> = { em: 'em', strong: 'strong', del: 'del', mark: 'mark', code: 'code', u: 'u', sub: 'sub', sup: 'sup' };
 
 /** Dangerous schemes (`javascript:`, `vbscript:`, `data:` documents, control-char obfuscation) → '#'. */
 function safeHref(h: string): string {

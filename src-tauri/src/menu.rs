@@ -69,17 +69,31 @@ const PARAGRAPH: &[Item] = &[
     ("heading:6", "Heading 6", Some("CmdOrCtrl+6")),
     ("heading:0", "Paragraph", Some("CmdOrCtrl+0")),
     ("-", "", None),
+    ("para:headingUp", "Increase Heading Level", None),
+    ("para:headingDown", "Decrease Heading Level", None),
+    ("-", "", None),
     ("block:table", "Table", Some("CmdOrCtrl+Alt+T")),
     ("block:code", "Code Fences", Some("CmdOrCtrl+Alt+C")),
     ("block:math", "Math Block", Some("CmdOrCtrl+Alt+B")),
+    ("block:html", "HTML Block", None),
     ("-", "", None),
     ("block:quote", "Quote", Some("CmdOrCtrl+Alt+Q")),
     ("block:ol", "Ordered List", Some("CmdOrCtrl+Alt+O")),
     ("block:ul", "Unordered List", Some("CmdOrCtrl+Alt+U")),
     ("block:task", "Task List", Some("CmdOrCtrl+Alt+X")),
+    ("task:toggle", "Toggle Task Status", None),
+    ("task:complete", "Mark as Complete", None),
+    ("task:incomplete", "Mark as Incomplete", None),
+    ("-", "", None),
+    ("para:insertBefore", "Insert Paragraph Before", None),
+    ("para:insertAfter", "Insert Paragraph After", None),
+    ("-", "", None),
+    ("block:linkRef", "Link Reference", None),
+    ("block:footnote", "Footnotes", None),
     ("-", "", None),
     ("block:hr", "Horizontal Line", Some("CmdOrCtrl+Alt+Minus")),
     ("block:toc", "Table of Contents", None),
+    ("block:front_matter", "YAML Front Matter", None),
 ];
 const FORMAT: &[Item] = &[
     ("mark:strong", "Strong", Some("CmdOrCtrl+B")),
@@ -87,8 +101,15 @@ const FORMAT: &[Item] = &[
     ("mark:code", "Code", Some("CmdOrCtrl+E")),
     ("mark:strike", "Strike", Some("CmdOrCtrl+Shift+X")),
     ("mark:highlight", "Highlight", Some("CmdOrCtrl+Shift+H")),
+    ("mark:underline", "Underline", Some("CmdOrCtrl+U")),
+    ("mark:math", "Inline Math", Some("CmdOrCtrl+Shift+M")),
+    ("mark:sup", "Superscript", None),
+    ("mark:sub", "Subscript", None),
+    ("mark:comment", "Comment", None),
     ("-", "", None),
     ("mark:link", "Hyperlink", Some("CmdOrCtrl+K")),
+    ("-", "", None),
+    ("clearFormat", "Clear Format", None),
 ];
 const VIEW: &[Item] = &[
     ("commandPalette", "Command Palette…", Some("CmdOrCtrl+Shift+A")),
@@ -305,7 +326,7 @@ mod tests {
                 "redo", "find", "replace", "toggleSidebar", "toggleSource", "toggleFocus", "toggleTypewriter",
                 "quickOpen", "zoomIn", "zoomOut", "zoomReset", "preferences", "clearRecent", "commandPalette", "showOutline",
                 "showFiles", "revealActiveFile", "reloadFromDisk", "toggleLineEnding", "exportDocx", "exportLatex",
-                "exportEpub",
+                "exportEpub", "clearFormat",
                 // #94 file lifecycle
                 "newTab", "newWindow", "nextTab", "prevTab", "reopenClosed", "saveAll", "duplicate", "renameFile",
                 "moveTo", "revealInFinder", "copyFilePath", "browseVersions", "reopenWithEncoding", "properties",
@@ -314,8 +335,22 @@ mod tests {
             .contains(&a)
                 || a.starts_with("heading:")
                 || a.starts_with("mark:")
-                || a.starts_with("block:");
+                || a.starts_with("block:")
+                || a.starts_with("para:")
+                || a.starts_with("task:");
             assert!(ok, "{a} is not a MenuAction");
+        }
+    }
+
+    #[test]
+    fn paragraph_and_format_menus_cover_parity_commands() {
+        let ids: Vec<&str> = PARAGRAPH.iter().chain(FORMAT.iter()).map(|i| i.0).collect();
+        for want in [
+            "para:headingUp", "para:headingDown", "para:insertBefore", "para:insertAfter", "block:html", "block:linkRef",
+            "block:footnote", "block:front_matter", "task:toggle", "task:complete", "task:incomplete", "mark:underline",
+            "mark:math", "mark:sup", "mark:sub", "mark:comment", "clearFormat",
+        ] {
+            assert!(ids.contains(&want), "missing menu item {want}");
         }
     }
 }

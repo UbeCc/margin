@@ -282,6 +282,18 @@ export function toggleTask(doc: Doc, i: number): boolean {
   return true;
 }
 
+/** Task state of leaf `i`'s own task box: true = checked, false = unchecked, null = no box. */
+export function taskState(doc: Doc, i: number): boolean | null {
+  const m = /\[([ xX])\][ \t]*$/.exec(doc.leaves[i].lines[0].prefix);
+  return m ? m[1] !== ' ' : null;
+}
+
+/** Check / uncheck leaf `i`'s task box. */
+export function setTask(doc: Doc, i: number, checked: boolean): boolean {
+  if (taskState(doc, i) === null || taskState(doc, i) === checked) return false;
+  return toggleTask(doc, i);
+}
+
 /** Turn widget leaf `i` into an empty paragraph (keeps container prefixes). */
 export function widgetToParagraph(doc: Doc, i: number): Caret {
   const l = doc.leaves[i];
