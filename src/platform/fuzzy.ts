@@ -9,6 +9,14 @@ export function isMarkdownPath(p: string): boolean {
   return MD_EXT.test(p);
 }
 
+/** Case-fold one char; a longer lowercase form (`İ` → `i̇`) keeps its first char. */
+const fold = (c: string): string => Array.from(c.toLowerCase())[0] ?? c;
+
+/** NFC (macOS/zip names are often NFD), no whitespace, case-folded chars. */
+export function foldQuery(query: string): string[] {
+  return Array.from(query.normalize('NFC').replace(/\s+/g, '')).map(fold);
+}
+
 function isBoundary(prev: string | undefined, cur: string): boolean {
   if (prev === undefined) return true;
   if ('/\\_-. '.includes(prev)) return true;
@@ -17,7 +25,7 @@ function isBoundary(prev: string | undefined, cur: string): boolean {
 
 function scoreIn(q: string[], text: string): number | null {
   const chars = Array.from(text);
-  const lower = chars.map((c) => c.toLowerCase());
+  const lower = chars.map(fold);
   let qi = 0;
   let end = -1;
   for (let i = 0; i < lower.length; i++) {
@@ -52,13 +60,14 @@ function scoreIn(q: string[], text: string): number | null {
 
 /** Score `candidate` (a relative path) for lowercase query chars; null = no match. */
 export function fuzzyScore(query: string, candidate: string): number | null {
-  const q = Array.from(query.replace(/\s+/g, '').toLowerCase());
+  const q = foldQuery(query);
+  candidate = candidate.normalize('NFC');
   const nameStart = candidate.lastIndexOf('/') + 1;
   const name = candidate.slice(nameStart);
   const inName = scoreIn(q, name);
   if (inName !== null) {
     const dot = name.lastIndexOf('.');
-    const stem = (dot > 0 ? name.slice(0, dot) : name).toLowerCase();
+    const stem = Array.from(dot > 0 ? name.slice(0, dot) : name).map(fold).join('');
     return inName + 40 + (stem === q.join('') ? 100 : 0);
   }
   return scoreIn(q, candidate);

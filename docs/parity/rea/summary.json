@@ -1,0 +1,157 @@
+{
+ "head": "521d0414a631d40476e3ac57da3f6628890af04d",
+ "artifact_sha256": "78708b3f6829d68d4fa93e431bb99b9294d61f02e6e96401a8a4cd5368e602be",
+ "inventory": {
+  "total": 171,
+  "owned": 64,
+  "partial": 25,
+  "missing": 74,
+  "oos": 8,
+  "verified_by_test": 51
+ },
+ "ledger": {
+  "ledger_id": "rol_e13d043bce1e3d61a0b50ed2ff1e838b2e1942006bedcd0b34c7bee08a94a39e",
+  "closure_digest": "ec9d88e2b98ad8a227149bd02fe7269758f1abd61c74b6e737044491d7c8373d",
+  "status": "unknown",
+  "summary": {
+   "total": 176,
+   "required": 168,
+   "verified": 0,
+   "required_open": 168,
+   "by_status": [
+    {
+     "key": "unowned",
+     "count": 74
+    },
+    {
+     "key": "characterized",
+     "count": 0
+    },
+    {
+     "key": "implemented",
+     "count": 89
+    },
+    {
+     "key": "verified",
+     "count": 0
+    },
+    {
+     "key": "contradicted",
+     "count": 0
+    },
+    {
+     "key": "blocked",
+     "count": 0
+    },
+    {
+     "key": "out-of-scope",
+     "count": 8
+    },
+    {
+     "key": "unknown",
+     "count": 5
+    }
+   ],
+   "by_application_layer": [
+    {
+     "key": "cli",
+     "count": 0
+    },
+    {
+     "key": "protocol",
+     "count": 0
+    },
+    {
+     "key": "electron",
+     "count": 0
+    },
+    {
+     "key": "persistence",
+     "count": 21
+    },
+    {
+     "key": "process",
+     "count": 15
+    },
+    {
+     "key": "runtime",
+     "count": 14
+    },
+    {
+     "key": "packaging",
+     "count": 0
+    },
+    {
+     "key": "native-abi",
+     "count": 0
+    },
+    {
+     "key": "application",
+     "count": 121
+    },
+    {
+     "key": "other",
+     "count": 5
+    }
+   ],
+   "by_evidence_authority": [
+    {
+     "key": "candidate",
+     "count": 0
+    },
+    {
+     "key": "observed",
+     "count": 5
+    },
+    {
+     "key": "reviewed",
+     "count": 171
+    },
+    {
+     "key": "unknown",
+     "count": 0
+    }
+   ]
+  },
+  "evidence_id": "ev_a1bfc81301b6fc05fe71bac1004183f0374e3248c474563bca14da4804be1b2d"
+ },
+ "coverage": {
+  "status": "unknown",
+  "reason_counts": {
+   "owner-missing": 74,
+   "package-proof-missing": 1,
+   "verifier-missing": 99,
+   "verifier-unknown": 13
+  },
+  "claims_total": 163,
+  "claims_qualified_by_controlled_replay": 51,
+  "evidence_ids_cited": 175
+ },
+ "verifier_runs": {
+  "build": {
+   "evidence_id": "ev_1fff77de0927975cf6c8e1ae1f4f756642727a508cab1ec65759d425f7ebbded",
+   "exit": 0,
+   "completed_at": "2026-10-18T00:53:00.964Z"
+  },
+  "cargo-test": {
+   "evidence_id": "ev_596bfb2769e00f4b6f205f52b992c1e362c9ef2c165dece497fc57ee841de193",
+   "exit": 101,
+   "completed_at": "2026-10-18T00:53:54.631Z"
+  },
+  "independence": {
+   "evidence_id": "ev_2942f8ee964e73c11f47052521654a6cd99141b30781901b1390588cbafdbff7",
+   "exit": 0,
+   "completed_at": "2026-10-18T00:56:28.244Z"
+  },
+  "playwright": {
+   "evidence_id": "ev_901ce221009c1e4879641445b9c1b8fa86c9167e86e30c018915c84e038d0e62",
+   "exit": 0,
+   "completed_at": "2026-10-18T00:52:53.213Z"
+  },
+  "vitest": {
+   "evidence_id": "ev_84b0827da798dfcefb6dbc4c21ff3c29f26e729d72a12852a50d4e92f3f1acf0",
+   "exit": 0,
+   "completed_at": "2026-10-18T00:51:50.459Z"
+  }
+ }
+}

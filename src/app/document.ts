@@ -1,4 +1,5 @@
-import type { EditorHandle, FsEvent, Platform } from '../contracts';
+import type { EditorHandle, FsEvent, ImageRule, Platform } from '../contracts';
+import { localImageSrcs } from './relocate';
 import { basename, dirname, join } from './util/path';
 import { debounce } from './util/dom';
 
@@ -31,6 +32,35 @@ export interface DocState {
 
 export type UnsavedChoice = 'save' | 'discard' | 'cancel';
 
+/**
+ * The open file changed on disk while the buffer has unsaved edits (#82).
+ * Handed to the host's non-blocking prompt; exactly one of keepMine/loadDisk resolves it.
+ */
+export interface ExternalChange {
+  path: string;
+  name: string;
+  /** LF-normalized disk content. */
+  disk: string;
+  /** Current buffer (read lazily, e.g. when the diff is opened). */
+  mine(): string;
+  /** Keep the buffer (stays dirty; next save overwrites). This disk version won't prompt again. */
+  keepMine(): void;
+  /** Replace the buffer with the disk version. Returns an undo function (null if stale). */
+  loadDisk(): (() => void) | null;
+}
+
+/** Cheap 53-bit FNV-1a style hash of a string (own-write / seen-version detection). */
+export function hashText(s: string): string {
+  let h1 = 0x811c9dc5;
+  let h2 = 0x01000193 ^ s.length;
+  for (let i = 0; i < s.length; i++) {
+    const c = s.charCodeAt(i);
+    h1 = Math.imul(h1 ^ c, 0x01000193);
+    h2 = Math.imul(h2 ^ c, 0x5bd1e995);
+  }
+  return `${(h1 >>> 0).toString(36)}.${(h2 >>> 0).toString(36)}.${s.length}`;
+}
+
 export interface DocumentHost {
   platform: Platform;
   editor: EditorHandle;
@@ -38,6 +68,11 @@ export interface DocumentHost {
   askUnsaved(name: string, reason: string): Promise<UnsavedChoice>;
   /** File changed on disk while we have edits. true = reload from disk. */
   askReloadDirty(name: string): Promise<boolean>;
+  /**
+   * Show (or, with null, hide) a non-blocking prompt for a disk change while dirty.
+   * Optional: without it the blocking `askReloadDirty` is used.
+   */
+  externalChange?(change: ExternalChange | null): void;
   notify(msg: string, kind?: 'info' | 'success' | 'error' | 'warning'): void;
   autoSave(): { enabled: boolean; delay: number };
   /** Called before setMarkdown so the editor can know the new base dir. */
@@ -46,6 +81,8 @@ export interface DocumentHost {
   onOpened(path: string): void;
   /** Folder to suggest in Save As for untitled documents. */
   defaultDir(): string | null;
+  /** Current image storage rule (for relocating images on first save). */
+  imageRule(): ImageRule;
 }
 
 /**
@@ -65,9 +102,19 @@ export class DocumentController {
   private saving: Promise<boolean> | null = null;
   private loading = false;
   private autoSaveTimer = debounce(() => void this.autoSaveNow(), 1500);
+  /** Hash of the raw on-disk text we know about (loaded, written, or explicitly kept over). */
+  private diskHash: string | null = null;
+  /** Unresolved disk change while dirty. */
+  private pending: { path: string; raw: string; hash: string } | null = null;
+  private sawRemoved = false;
+  private fsDebounce: ReturnType<typeof debounce<[]>>;
 
-  constructor(private host: DocumentHost) {
+  constructor(
+    private host: DocumentHost,
+    opts: { externalDebounceMs?: number } = {},
+  ) {
     host.editor.onChange(() => this.onEditorChange());
+    this.fsDebounce = debounce(() => void this.reconcile(), opts.externalDebounceMs ?? 60);
   }
 
   get name(): string {
@@ -97,6 +144,11 @@ export class DocumentController {
       this.dirty = d;
       this.emit();
     }
+    // Edits undone back to the old baseline while a disk change waits: nothing to lose, take it.
+    if (!d && this.pending && this.pending.path === this.path) {
+      this.loadDisk();
+      this.host.notify(`Reloaded ${this.name} (changed on disk)`, 'info');
+    }
   }, 120);
 
   private onEditorChange(): void {
@@ -116,7 +168,8 @@ export class DocumentController {
   }
 
   private async autoSaveNow(): Promise<void> {
-    if (!this.path || !this.dirty || !this.host.autoSave().enabled) return;
+    // Never auto-overwrite a disk change the user hasn't decided about yet.
+    if (!this.path || !this.dirty || !this.host.autoSave().enabled || this.pending) return;
     await this.save({ quiet: true });
   }
 
@@ -139,9 +192,11 @@ export class DocumentController {
       this.dirty = false;
       this.missing = false;
       this.savedAt = null;
+      this.diskHash = path ? hashText(text) : null;
     } finally {
       this.loading = false;
     }
+    this.clearPending();
     this.recomputeDirty.cancel();
     void this.host.platform.setDocumentEdited(false);
     this.emit();
@@ -165,7 +220,7 @@ export class DocumentController {
   async confirmLeave(reason: string): Promise<boolean> {
     if (!this.dirty) return true;
     // Auto-save may write silently, but never resurrect a file deleted behind our back.
-    if (this.path && this.host.autoSave().enabled && !this.missing) return this.save({ quiet: true });
+    if (this.path && this.host.autoSave().enabled && !this.missing && !this.pending) return this.save({ quiet: true });
     const choice = await this.host.askUnsaved(this.name, reason);
     if (choice === 'cancel') return false;
     if (choice === 'save') return this.save();
@@ -221,7 +276,9 @@ export class DocumentController {
       filters: [{ name: 'Markdown', extensions: ['md', 'markdown', 'txt'] }],
     });
     if (!target) return false;
+    const wasUntitled = !this.path;
     const ok = await this.writeTo(target, false);
+    if (ok && wasUntitled) await this.relocateImages(target);
     if (ok) {
       const changed = target !== this.path;
       this.host.willLoad(target);
@@ -236,14 +293,38 @@ export class DocumentController {
     return ok;
   }
 
+  /** After the first save, move images pasted into the untitled doc next to it (#17). */
+  private async relocateImages(target: string): Promise<void> {
+    const relocate = (this.host.platform as Platform & {
+      relocateImages?(doc: string, rule: ImageRule, srcs: string[]): Promise<Record<string, string>>;
+    }).relocateImages;
+    const srcs = localImageSrcs(this.host.editor.getMarkdown());
+    if (!relocate || !srcs.length) return;
+    try {
+      const map = await relocate.call(this.host.platform, target, this.host.imageRule(), srcs);
+      const pairs = Object.entries(map).filter(([a, b]) => a !== b);
+      for (const [from, to] of pairs) this.host.editor.exec({ kind: 'replace', query: from, replacement: to, all: true });
+      if (pairs.length) await this.writeTo(target, true);
+    } catch (e) {
+      this.host.notify(`Couldn't move images next to ${basename(target)}: ${errMsg(e)}`, 'warning');
+    }
+  }
+
   private async writeTo(path: string, quiet: boolean): Promise<boolean> {
     const md = this.host.editor.getMarkdown();
+    const raw = applyEol(md, this.eol);
+    // Remember what we write *before* the watcher can echo it back.
+    const prevHash = this.diskHash;
+    if (path === this.path) this.diskHash = hashText(raw);
     try {
-      await this.host.platform.writeTextFile(path, applyEol(md, this.eol));
+      await this.host.platform.writeTextFile(path, raw);
     } catch (e) {
+      this.diskHash = prevHash;
       this.host.notify(`Couldn't save ${basename(path)}: ${errMsg(e)}`, 'error');
       return false;
     }
+    this.diskHash = hashText(raw);
+    this.clearPending(); // our write supersedes the disk version we were asked about
     this.saved = md;
     this.savedEol = this.eol;
     this.savedAt = Date.now();
@@ -299,45 +380,65 @@ export class DocumentController {
     }
   }
 
+  /** Watch events are coalesced (editors often write via remove+create or several modifies). */
   async onFsEvents(events: FsEvent[]): Promise<void> {
     const p = this.path;
     if (!p) return;
+    let touched = false;
     for (const ev of events) {
       if (ev.kind === 'renamed') {
         if (ev.from === p) this.renamed(ev.from, ev.to);
         continue;
       }
       if (ev.path !== p) continue;
-      if (ev.kind === 'removed') {
-        if (!this.missing) {
-          this.missing = true;
-          this.recomputeDirty.cancel();
-          this.dirty = true;
-          this.emit();
-          this.host.notify(`${this.name} was deleted or moved on disk. Save to keep it.`, 'warning');
-        }
-        continue;
-      }
-      await this.checkExternal(p);
+      if (ev.kind === 'removed') this.sawRemoved = true;
+      touched = true;
     }
+    if (touched) this.fsDebounce();
   }
 
-  private async checkExternal(p: string): Promise<void> {
+  private markMissing(): void {
+    if (this.missing) return;
+    this.missing = true;
+    this.clearPending();
+    this.recomputeDirty.cancel();
+    this.dirty = true;
+    this.emit();
+    this.host.notify(`${this.name} was deleted or moved on disk. Save to keep it.`, 'warning');
+  }
+
+  private clearPending(): void {
+    if (!this.pending) return;
+    this.pending = null;
+    this.host.externalChange?.(null);
+  }
+
+  /** Settle the file's on-disk state after a burst of watch events. */
+  private async reconcile(): Promise<void> {
+    const p = this.path;
+    if (!p) return;
+    const removed = this.sawRemoved;
+    this.sawRemoved = false;
     let text: string;
     try {
       text = await this.host.platform.readTextFile(p);
     } catch {
+      if (removed && this.path === p) this.markMissing();
       return;
     }
     if (this.path !== p) return;
+    const hash = hashText(text);
     const md = normalizeEol(text);
-    if (md === this.saved) {
-      if (this.missing) {
-        this.missing = false;
-        this.dirty = this.isModified();
-        this.emit();
-      }
-      return; // our own write echoing back
+    if (this.missing) {
+      this.missing = false;
+      this.dirty = this.isModified();
+      this.emit();
+    }
+    // Our own write echoing back, a version the user already chose to keep over, or the baseline.
+    if (hash === this.diskHash || md === this.saved) {
+      this.diskHash = hash;
+      this.clearPending();
+      return;
     }
     if (!this.dirty) {
       const scrollEl = document.querySelector('.editor-scroll');
@@ -347,19 +448,76 @@ export class DocumentController {
       this.host.notify(`Reloaded ${this.name} (changed on disk)`, 'info');
       return;
     }
-    if (await this.host.askReloadDirty(this.name)) this.load(p, text);
-    else {
-      // Keep ours; now the "saved" baseline is the disk version so we stay dirty.
-      this.saved = md;
-      this.missing = false;
-      this.emit();
+    if (this.pending?.hash === hash) return; // already prompting for this version
+    this.pending = { path: p, raw: text, hash };
+    const change = this.externalChangeFor(this.pending);
+    if (this.host.externalChange) {
+      this.host.externalChange(change);
+      return;
     }
+    const reload = await this.host.askReloadDirty(this.name);
+    if (this.pending?.hash !== hash) return;
+    if (reload) change.loadDisk();
+    else change.keepMine();
+  }
+
+  private externalChangeFor(pend: { path: string; raw: string; hash: string }): ExternalChange {
+    const live = (): boolean => this.pending === pend && this.path === pend.path;
+    return {
+      path: pend.path,
+      name: basename(pend.path),
+      disk: normalizeEol(pend.raw),
+      mine: () => this.host.editor.getMarkdown(),
+      keepMine: () => {
+        if (live()) this.keepMine();
+      },
+      loadDisk: () => (live() ? this.loadDisk() : null),
+    };
+  }
+
+  /** Resolve the pending disk change by keeping the buffer; the doc stays dirty vs the disk version. */
+  keepMine(): void {
+    const pend = this.pending;
+    if (!pend) return;
+    this.saved = normalizeEol(pend.raw);
+    this.diskHash = pend.hash;
+    this.missing = false;
+    this.clearPending();
+    this.recomputeDirty.cancel();
+    this.dirty = this.isModified();
+    void this.host.platform.setDocumentEdited(this.dirty);
+    this.emit();
+  }
+
+  /** Resolve the pending disk change by loading it. Returns an undo that restores the previous buffer. */
+  loadDisk(): (() => void) | null {
+    const pend = this.pending;
+    if (!pend || pend.path !== this.path) return null;
+    const prevMd = this.host.editor.getMarkdown();
+    const prevEol = this.eol;
+    this.load(pend.path, pend.raw);
+    const path = pend.path;
+    return () => {
+      if (this.path !== path) return;
+      this.loading = true;
+      try {
+        this.host.editor.setMarkdown(prevMd);
+        this.eol = prevEol;
+      } finally {
+        this.loading = false;
+      }
+      this.recomputeDirty.cancel();
+      this.dirty = this.isModified();
+      void this.host.platform.setDocumentEdited(this.dirty);
+      this.emit();
+    };
   }
 
   dispose(): void {
     this.unwatch?.();
     this.autoSaveTimer.cancel();
     this.recomputeDirty.cancel();
+    this.fsDebounce.cancel();
   }
 }
 

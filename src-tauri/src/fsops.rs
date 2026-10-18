@@ -87,30 +87,108 @@ pub fn decode_text(bytes: &[u8]) -> String {
     }
 }
 
+/// Follow a symlink chain to the file it names. Unlike `canonicalize` this also
+/// works when the final target does not exist yet (a dangling link is "saved through").
+pub fn resolve_link_target(path: &Path) -> std::io::Result<PathBuf> {
+    let mut cur = path.to_path_buf();
+    for _ in 0..40 {
+        match fs::symlink_metadata(&cur) {
+            Ok(m) if m.file_type().is_symlink() => {
+                let to = fs::read_link(&cur)?;
+                cur = if to.is_absolute() {
+                    to
+                } else {
+                    cur.parent().map(|d| d.join(&to)).unwrap_or(to)
+                };
+            }
+            _ => return Ok(cur),
+        }
+    }
+    Err(std::io::Error::other("too many levels of symbolic links"))
+}
+
+/// Overwrite an existing file's contents without replacing the inode (keeps hard
+/// links, owner and every attribute). Not atomic: only used when a rename can't
+/// preserve the file's identity or the directory isn't writable.
+fn write_in_place(target: &Path, data: &[u8]) -> std::io::Result<()> {
+    let mut f = fs::OpenOptions::new().write(true).open(target)?;
+    f.write_all(data)?;
+    f.set_len(data.len() as u64)?;
+    f.sync_all()
+}
+
+#[cfg(unix)]
+fn needs_in_place(meta: &fs::Metadata) -> bool {
+    use std::os::unix::fs::MetadataExt;
+    // a rename would split hard links, or hand the file to us (we can't chown back)
+    meta.nlink() > 1 || (meta.uid() != crate::fsops_unix::euid() && crate::fsops_unix::euid() != 0)
+}
+#[cfg(not(unix))]
+fn needs_in_place(_meta: &fs::Metadata) -> bool {
+    false
+}
+
+fn denied(msg: &str) -> std::io::Error {
+    std::io::Error::new(std::io::ErrorKind::PermissionDenied, msg.to_string())
+}
+
 /// Atomically replace `path` with `data`: write a temp file in the same directory,
-/// fsync, copy the old file's permissions, then rename over the target.
+/// fsync, copy the old file's permissions/attributes/owner, then rename over it.
 /// If `path` is a symlink the *link target* is replaced, keeping the link intact.
+/// Falls back to an in-place write when a rename can't keep the file's identity
+/// (hard links, foreign owner) or the directory is not writable.
 /// Returns whether the file existed before.
 pub fn atomic_write(path: &Path, data: &[u8]) -> std::io::Result<bool> {
-    let target: PathBuf = match fs::symlink_metadata(path) {
-        Ok(m) if m.file_type().is_symlink() => fs::canonicalize(path)?,
-        _ => path.to_path_buf(),
-    };
+    let target = resolve_link_target(path)?;
     let dir = target
         .parent()
         .filter(|p| !p.as_os_str().is_empty())
         .map(Path::to_path_buf)
         .unwrap_or_else(|| PathBuf::from("."));
     let existing = fs::metadata(&target).ok();
-    let mut tmp = tempfile::Builder::new()
-        .prefix(TEMP_PREFIX)
-        .suffix(TEMP_SUFFIX)
-        .tempfile_in(&dir)?;
+    if let Some(meta) = &existing {
+        if meta.is_dir() {
+            return Err(std::io::Error::other(format!("{} is a directory", target.display())));
+        }
+        #[cfg(unix)]
+        let read_only = !crate::fsops_unix::writable(&target);
+        #[cfg(not(unix))]
+        let read_only = meta.permissions().readonly();
+        if read_only {
+            return Err(denied("the file is read-only"));
+        }
+        if needs_in_place(meta) {
+            write_in_place(&target, data)?;
+            return Ok(true);
+        }
+    }
+    let mut tmp = match tempfile::Builder::new().prefix(TEMP_PREFIX).suffix(TEMP_SUFFIX).tempfile_in(&dir) {
+        Ok(t) => t,
+        Err(e) if e.kind() == std::io::ErrorKind::PermissionDenied && existing.is_some() => {
+            write_in_place(&target, data)?;
+            return Ok(true);
+        }
+        Err(e) => return Err(e),
+    };
     tmp.write_all(data)?;
     tmp.as_file().sync_all()?;
     if let Some(meta) = &existing {
         // tempfile creates 0600 files; restore the original mode (and readonly flag on Windows).
         fs::set_permissions(tmp.path(), meta.permissions())?;
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::MetadataExt;
+            crate::fsops_unix::copy_metadata(&target, tmp.path());
+            let tm = tmp.as_file().metadata()?;
+            if (tm.uid(), tm.gid()) != (meta.uid(), meta.gid())
+                && std::os::unix::fs::chown(tmp.path(), Some(meta.uid()), Some(meta.gid())).is_err()
+            {
+                // e.g. a file of a group we're not in: keep its owner by writing in place
+                drop(tmp);
+                write_in_place(&target, data)?;
+                return Ok(true);
+            }
+        }
     } else {
         #[cfg(unix)]
         {
@@ -120,8 +198,15 @@ pub fn atomic_write(path: &Path, data: &[u8]) -> std::io::Result<bool> {
         }
     }
     tmp.persist(&target).map_err(|e| e.error)?;
+    #[cfg(unix)]
+    if let Ok(d) = fs::File::open(&dir) {
+        let _ = d.sync_all(); // make the rename durable
+    }
     Ok(existing.is_some())
 }
+
+#[cfg(all(unix, test))]
+pub use crate::fsops_unix::{xattr_get, xattr_set};
 
 /// Children of a directory: hidden entries (dot files) and our temp files filtered,
 /// directories first, then case-insensitive natural-ish name order.
@@ -242,26 +327,59 @@ pub fn natural_cmp(a: &str, b: &str) -> std::cmp::Ordering {
 /// Remembers paths we wrote ourselves so the watcher can drop the echo.
 #[derive(Default)]
 pub struct OwnWrites {
-    inner: Mutex<HashMap<PathBuf, (Instant, bool)>>,
+    inner: Mutex<HashMap<PathBuf, OwnWrite>>,
+}
+
+struct OwnWrite {
+    at: Instant,
+    existed: bool,
+    /// The file as we left it; an event long after the write still counts as our
+    /// echo while the file is unchanged (FSEvents can lag well past the window).
+    stamp: Option<FileStamp>,
+}
+
+#[derive(PartialEq, Clone, Copy, Debug)]
+pub struct FileStamp {
+    len: u64,
+    mtime_ns: u128,
+    id: u64,
+}
+
+pub fn file_stamp(p: &Path) -> Option<FileStamp> {
+    let m = fs::metadata(p).ok()?;
+    #[cfg(unix)]
+    let id = std::os::unix::fs::MetadataExt::ino(&m);
+    #[cfg(not(unix))]
+    let id = 0;
+    let mtime_ns = m.modified().ok()?.duration_since(UNIX_EPOCH).ok()?.as_nanos();
+    Some(FileStamp { len: m.len(), mtime_ns, id })
 }
 
 pub const OWN_WRITE_WINDOW: Duration = Duration::from_millis(300);
+/// How long an unchanged file is still attributed to our own write.
+pub const OWN_STAMP_WINDOW: Duration = Duration::from_secs(10);
 
 impl OwnWrites {
+    /// Call before and after writing: the second call captures the written state.
     pub fn record(&self, path: &Path, existed: bool) {
         let mut m = self.inner.lock().unwrap();
         let now = Instant::now();
-        m.retain(|_, (t, _)| now.duration_since(*t) < Duration::from_secs(5));
-        m.insert(normalize_key(path), (now, existed));
+        m.retain(|_, w| now.duration_since(w.at) < Duration::from_secs(30));
+        m.insert(normalize_key(path), OwnWrite { at: now, existed, stamp: file_stamp(path) });
     }
 
-    /// If `path` was written by us shortly before `at`, returns `Some(existed_before)`.
+    /// If `path` was written by us shortly before `at` (or is still exactly as we
+    /// wrote it), returns `Some(existed_before)`.
     pub fn lookup(&self, path: &Path, at: Instant) -> Option<bool> {
         let m = self.inner.lock().unwrap();
-        let (t, existed) = m.get(&normalize_key(path))?;
+        let w = m.get(&normalize_key(path))?;
         // `at` may be slightly before our timestamp (event raised while renaming).
-        let delta = if at >= *t { at - *t } else { *t - at };
-        (delta <= OWN_WRITE_WINDOW).then_some(*existed)
+        let delta = if at >= w.at { at - w.at } else { w.at - at };
+        if delta <= OWN_WRITE_WINDOW {
+            return Some(w.existed);
+        }
+        let unchanged = w.stamp.is_some() && w.stamp == file_stamp(path);
+        (unchanged && w.at.elapsed() <= OWN_STAMP_WINDOW).then_some(w.existed)
     }
 }
 
@@ -277,6 +395,10 @@ pub fn normalize_key(p: &Path) -> PathBuf {
         _ => p.to_path_buf(),
     }
 }
+
+#[cfg(test)]
+#[path = "fsops_tests.rs"]
+mod edge_tests;
 
 #[cfg(test)]
 mod tests {
@@ -350,6 +472,10 @@ mod tests {
         fs::write(&p, "").unwrap();
         ow.record(&p, true);
         assert_eq!(ow.lookup(&p, Instant::now()), Some(true));
+        // long after the window, an unchanged file is still our echo…
+        assert_eq!(ow.lookup(&p, Instant::now() + Duration::from_secs(2)), Some(true));
+        // …but not once someone else changed it
+        fs::write(&p, "external").unwrap();
         assert_eq!(ow.lookup(&p, Instant::now() + Duration::from_secs(2)), None);
     }
 }

@@ -29,10 +29,15 @@ const COMMANDS: &[&str] = &[
     "take_pending_open_files",
     "allow_asset_dir",
     "set_theme_menu",
+    "relocate_images",
     "rename_path",
     "trash_path",
     "create_dir",
     "reveal_path",
+    "upload_images",
+    "pandoc_detect",
+    "pandoc_export",
+    "clipboard_write_rich",
 ];
 
 fn main() {

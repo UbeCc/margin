@@ -18,6 +18,8 @@ use std::time::{Duration, Instant};
 pub mod spotlight_macos;
 
 pub const MAX_INDEX: usize = 50_000;
+/// Stop walking after this many files even when looking for markdown past the cap.
+pub const MAX_VISIT: usize = 400_000;
 /// Unwatched roots are re-walked when the cached index is older than this.
 pub const UNWATCHED_TTL: Duration = Duration::from_secs(10);
 const SKIP_DIRS: &[&str] = &["node_modules", "target", "__pycache__"];
@@ -36,6 +38,7 @@ pub struct Index {
 
 pub fn walk(root: &Path) -> Vec<String> {
     let mut out = Vec::new();
+    let mut visited = 0usize;
     let walker = ignore::WalkBuilder::new(root)
         .hidden(true)
         .git_ignore(true)
@@ -52,14 +55,46 @@ pub fn walk(root: &Path) -> Vec<String> {
         if !entry.file_type().is_some_and(|t| t.is_file()) {
             continue;
         }
+        visited += 1;
+        if visited > MAX_VISIT {
+            break;
+        }
         if let Ok(rel) = entry.path().strip_prefix(root) {
-            out.push(rel.to_string_lossy().replace('\\', "/"));
-            if out.len() >= MAX_INDEX {
-                break;
+            let rel = rel.to_string_lossy().replace('\\', "/");
+            // Past the cap keep collecting notes: a big asset tree must not hide them.
+            if out.len() < MAX_INDEX || (is_markdown(&rel) && out.len() < 2 * MAX_INDEX) {
+                out.push(rel);
             }
         }
     }
     out
+}
+
+/// Would `walk` have skipped `rel` (a file under `root`)? Hidden components, the
+/// skip dirs, and `.gitignore`/`.ignore` files from `root` down to the file's dir,
+/// deepest first (so a nested `!pattern` can re-include).
+pub fn is_excluded(root: &Path, rel: &str) -> bool {
+    let parts: Vec<&str> = rel.split('/').collect();
+    if parts.iter().any(|c| c.starts_with('.')) || parts[..parts.len().saturating_sub(1)].iter().any(|c| SKIP_DIRS.contains(c)) {
+        return true;
+    }
+    let full = root.join(rel);
+    for depth in (0..parts.len()).rev() {
+        let dir = parts[..depth].iter().fold(root.to_path_buf(), |p, c| p.join(c));
+        for name in [".ignore", ".gitignore"] {
+            let file = dir.join(name);
+            if !file.is_file() {
+                continue;
+            }
+            let (gi, _) = ignore::gitignore::Gitignore::new(&file);
+            match gi.matched_path_or_any_parents(&full, false) {
+                ignore::Match::Ignore(_) => return true,
+                ignore::Match::Whitelist(_) => return false,
+                ignore::Match::None => {}
+            }
+        }
+    }
+    false
 }
 
 pub struct QuickOpen {
@@ -167,11 +202,11 @@ impl QuickOpen {
 
     /// Apply watcher events to every cached index containing the path.
     pub fn on_created(&self, path: &Path, is_dir: bool) {
-        self.update(path, |files, rel| {
+        self.update_with_root(path, |root, files, rel| {
             if is_dir {
                 return false; // unknown contents: rebuild lazily
             }
-            if !files.iter().any(|f| f == rel) && !rel.split('/').any(|c| c.starts_with('.')) {
+            if !files.iter().any(|f| f == rel) && !is_excluded(root, rel) {
                 files.push(rel.to_string());
             }
             true
@@ -207,11 +242,15 @@ impl QuickOpen {
     }
 
     fn update(&self, path: &Path, f: impl Fn(&mut Vec<String>, &str) -> bool) {
+        self.update_with_root(path, |_, files, rel| f(files, rel));
+    }
+
+    fn update_with_root(&self, path: &Path, f: impl Fn(&Path, &mut Vec<String>, &str) -> bool) {
         let mut map = self.indexes.lock().unwrap();
         for (root, ix) in map.iter_mut() {
             if let Ok(rel) = path.strip_prefix(root) {
                 let rel = rel.to_string_lossy().replace('\\', "/");
-                if rel.is_empty() || !f(&mut ix.files, &rel) {
+                if rel.is_empty() || !f(root, &mut ix.files, &rel) {
                     ix.dirty = true;
                 }
             }
@@ -399,7 +438,7 @@ fn spotlight_spawn(_root: &Path, _query: &str) -> Option<mpsc::Receiver<Option<V
 /// Rank candidates. Markdown files come first, then by score, then shorter paths.
 /// Empty query: markdown files first, shallow paths first, alphabetical.
 pub fn rank(files: &[String], query: &str, limit: usize) -> Vec<String> {
-    let q: Vec<char> = query.chars().filter(|c| !c.is_whitespace()).flat_map(char::to_lowercase).collect();
+    let q: Vec<char> = fold_query(query);
     let mut scored: Vec<(bool, i64, &String)> = files
         .iter()
         .filter_map(|f| {
@@ -417,6 +456,18 @@ pub fn rank(files: &[String], query: &str, limit: usize) -> Vec<String> {
     scored.into_iter().take(limit).map(|(_, _, f)| f.clone()).collect()
 }
 
+/// Case-fold one char the same way for queries and candidates. Chars whose lowercase
+/// form is longer (`İ` → `i̇`) fold to its first char so positions stay aligned.
+pub fn fold(c: char) -> char {
+    c.to_lowercase().next().unwrap_or(c)
+}
+
+/// NFC-normalize (macOS/zip names are often NFD), drop whitespace, case-fold.
+pub fn fold_query(query: &str) -> Vec<char> {
+    use unicode_normalization::UnicodeNormalization;
+    query.nfc().filter(|c| !c.is_whitespace()).map(fold).collect()
+}
+
 fn is_boundary(prev: Option<char>, cur: char) -> bool {
     match prev {
         None => true,
@@ -427,6 +478,20 @@ fn is_boundary(prev: Option<char>, cur: char) -> bool {
 /// Fuzzy subsequence score of lowercase query `q` against `candidate`, or None.
 /// Tries a match inside the file name first (big bonus), then the whole path.
 pub fn score(q: &[char], candidate: &str) -> Option<i64> {
+    use unicode_normalization::{UnicodeNormalization, is_nfc_quick, IsNormalized};
+    let q: Vec<char> = if q.iter().copied().all(|c| (c as u32) < 0x300) {
+        q.iter().copied().map(fold).collect()
+    } else {
+        q.iter().collect::<String>().nfc().map(fold).collect()
+    };
+    let q = &q[..];
+    let normalized;
+    let candidate = if is_nfc_quick(candidate.chars()) == IsNormalized::Yes {
+        candidate
+    } else {
+        normalized = candidate.nfc().collect::<String>();
+        normalized.as_str()
+    };
     let name_start = candidate.rfind('/').map(|i| i + 1).unwrap_or(0);
     let name = &candidate[name_start..];
     if let Some(s) = score_in(q, name) {
@@ -434,8 +499,8 @@ pub fn score(q: &[char], candidate: &str) -> Option<i64> {
             .rsplit_once('.')
             .map(|(stem, _)| stem)
             .unwrap_or(name)
-            .to_lowercase()
             .chars()
+            .map(fold)
             .eq(q.iter().copied());
         return Some(s + 40 + if exact_stem { 100 } else { 0 });
     }
@@ -444,7 +509,7 @@ pub fn score(q: &[char], candidate: &str) -> Option<i64> {
 
 fn score_in(q: &[char], text: &str) -> Option<i64> {
     let chars: Vec<char> = text.chars().collect();
-    let lower: Vec<char> = chars.iter().map(|c| c.to_lowercase().next().unwrap_or(*c)).collect();
+    let lower: Vec<char> = chars.iter().map(|c| fold(*c)).collect();
     // forward pass: earliest end position
     let mut qi = 0;
     let mut end = None;

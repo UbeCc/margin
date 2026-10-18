@@ -1,0 +1,49 @@
+import { S, T, O } from './dsl.mjs';
+
+const ec = 'editor-core';
+const fw = 'files-windows-settings';
+const cc = 'clipboard-contextmenu';
+const net = 'network-updates-privacy';
+export default [
+  // ── Markdown syntax options ───────────────────────────────────────
+  S('syntax.extensions', 'Syntax support toggles: highlight, sub/sup, inline math, emoji shortcodes', 'missing', null, null, { p: 2, e: 'syntax', B: ['Markdown', 'Syntax Support', 'Syntax Preference', 'Highlight (e.g: ==key==)', 'Subscript ( e.g: H~2~O )', 'Superscript ( e.g: X^2^ )', 'Inline Math ( e.g: $\\LaTeX$ )', 'Emoji (e.g. :smile:)'], note: 'highlight/inline math always on; sub/sup/emoji not parsed' }),
+  S('syntax.strict', 'Strict Mode (closer to GFM) and list/quote style preferences', 'missing', null, null, { p: 2, e: 'syntax', B: ['Strict Mode', '(more strict to GFM spec)', '(only applies to styles created from menubar or hybrid view)', 'only apply to quotes and lists created from menu bar or hybrid view', 'Classic', 'e.g: %@'] }),
+  S('syntax.whitespace', 'Whitespace & line breaks: preserve single line break, visible <br/>, first-line indent, \\\\ line break', 'missing', null, null, { p: 2, e: 'syntax', A: ['Whitespace and Line Breaks', 'Preserve single line break', 'Visible <br/>', 'Indent first line of paragraphs'], B: ['Whitespace / Line Break', 'Ignore whitespace and single line break', 'Preserve whitespace and single line break', 'Apply Line Break at \\\\ and &#92;newline', 'These options can also be changed under "Edit→Whitespace and Line Breaks" menu'] }),
+  S('syntax.save-normalize', 'On save: insert final newline, remap Unicode punctuation on parse', 'missing', null, null, { p: 2, e: 'syntax', A: ['Insert Final New Line On Save', 'Remap Unicode Punctuation on Parse'] }),
+
+  // ── Editor-core behaviors (prose analysis) ────────────────────────
+  S('beh.core.lossless', 'Lossless block model: serialize(parse(x)) === x, raw markers preserved', 'owned', 'src/editor/core/model.ts#export class', T.core + 'lossless load, markers hidden until caret enters', { sec: [ec + ' §3.3', ec + ' §6'] }),
+  S('beh.core.md-expand', 'Hidden syntax markers revealed when caret enters (md-meta / md-expand)', 'owned', 'src/editor/core/view.ts#expandAt', T.core + 'lossless load, markers hidden until caret enters', { B: ['Display source for simple blocks (including headings, etc.) on focus'], sec: [ec + ' §5.2'] }),
+  S('beh.core.incremental', 'Incremental dirty-block reparse; per-keystroke cost independent of doc size', 'owned', 'src/editor/core/edit.ts#export function', T.qa + 'typing in a 5k-line document stays fast', { sec: [ec + ' §5.3', ec + ' §10'] }),
+  S('beh.core.input-rules', 'Typing transforms: # heading, lists, ``` fences, tables, Enter/Backspace split/merge', 'owned', 'src/editor/core/input.ts#beforeinput', T.qa + 'type a whole document from empty', { sec: [ec + ' §5.4'] }),
+  S('beh.core.ime', 'IME composition commits once (CJK), also inside table cells', 'owned', 'src/editor/core/input.ts#compositionend', T.core + 'IME composition (Chinese) commits once', { sec: [ec + ' §5.5'] }),
+  S('beh.core.undo', 'Undo stack drives dirty state; typing coalesces; widget edits share history', 'owned', 'src/editor/core/history.ts#export class', T.qa + 'undo/redo shortcuts work while focus is inside a widget', { sec: [ec + ' §5.6', fw + ' §4.2'] }),
+  S('beh.core.widgets-nav', 'Caret enter/exit across atomic widgets with arrows; doc start/end keys', 'owned', 'src/editor/core/view.ts#widget', T.keys + 'doc start lands after the heading marker', { sec: [ec + ' §7'] }),
+  S('beh.core.find-in-widgets', 'Find/replace reaches inside code, tables, math; replace-all is one undo step', 'owned', 'src/editor/core/find.ts#export function', T.wfind + 'replace-all across widgets is lossless and one undo step', { sec: [ec + ' §8.1'] }),
+  S('beh.core.html-sanitize', 'Raw HTML blocks/inline sanitized in preview, copy and export', 'owned', 'src/editor/blocks/sanitize.ts#export function', T.qa + 'export sanitizes inline HTML', { sec: [net + ' §5'] }),
+  S('beh.core.large-file', 'Oversize documents: degrade gracefully (warn / source mode)', 'missing', null, null, { p: 2, e: 'files', sec: [fw + ' §4.3'] }),
+
+  // ── Files / windows behaviors ─────────────────────────────────────
+  S('beh.files.external-change', 'External change: silent reload when clean, prompt when dirty, ignore own save echo', 'owned', O.doc + 'external', T.files + 'external change reloads silently when clean and prompts when dirty', { B: ['File content is changed by external applications. Reload content from disk ?'], C: ['document.refreshContentFromDisk'], sec: [fw + ' §5', fw + ' §11'] }),
+  S('beh.files.external-merge', 'External change prompt offers Keep mine / Load disk / Show diff', 'missing', null, null, { p: 1, e: 'files', note: '#82' }),
+  S('beh.files.folder-watch', 'Folder watcher: incremental tree updates, rename pairing, hidden/unsupported filtered', 'owned', 'src-tauri/src/watch.rs#fn ', T.web + 'suppresses own modifications but reports creations and external changes', { B: ['Auto refresh on Files Panel cannot be enabled.'], sec: [fw + ' §6.2'] }),
+  S('beh.files.title-dirty', 'Window title shows document name and edited state', 'owned', O.app + 'setDocumentEdited', null, { sec: [fw + ' §7'] }),
+  S('beh.files.single-instance', 'Single instance: opening files from Finder reuses the running app', 'partial', 'src-tauri/src/lib.rs#on_second_instance', null, { p: 1, e: 'files', sec: [fw + ' §2.1'], note: '#29 Linux' }),
+  S('beh.files.snapshot-undo', 'Reopen keeps undo history and caret (per-document snapshot)', 'missing', null, null, { p: 2, e: 'files', C: ['document.needsUpdateSnap', 'document.requestBuildSnap', 'controller.syncFullContent', 'window.refreshFullContentState'], sec: [fw + ' §4.4', fw + ' §11'] }),
+  S('beh.files.quicklook', 'Quick Look / preview of a file from the sidebar', 'missing', null, null, { p: 2, e: 'sidebar', B: ['Quick Look', 'Preview'], C: ['window.previewFile'] }),
+  S('beh.files.asset-scope', 'Asset access scoped to doc/folder (no whole-disk file:// access)', 'owned', 'src-tauri/src/commands.rs#allow_asset_dir', null, { sec: [fw + ' §3.1', fw + ' §11', net + ' §5'], note: 'prose flags Typora granting "/" read access; Margin scopes per folder (#48 open)' }),
+  S('beh.settings.inject', 'Settings available to the editor before first paint; theme background avoids white flash', 'owned', O.app + 'applyAppearance', T.themes + 'system color scheme is followed', { sec: [fw + ' §8.2', fw + ' §11'] }),
+
+  // ── Clipboard behaviors ───────────────────────────────────────────
+  S('beh.clip.paste-priority', 'Paste priority: private lossless > HTML > files > image > text; HTML→markdown; markdown heuristic', 'owned', 'src/editor/core/paste.ts#export function htmlToMarkdown', T.qa + 'paste Google Docs HTML and markdown blocks mid-paragraph', { sec: [cc + ' §4.4', cc + ' §9'] }),
+  S('beh.clip.rich-copy', 'Rich copy writes plain + HTML + RTF + private format', 'partial', O.clip + 'MARGIN_HTML_ATTR', T.core + 'paste HTML becomes markdown; copy gives markdown', { p: 0, e: 'clipboard', sec: [cc + ' §3.3', cc + ' §3.4', cc + ' §9'], note: '#79: no RTF/RTFD flavors' }),
+  S('beh.clip.rtf-paste', 'Paste RTF/RTFD from rich apps (attachments materialized)', 'missing', null, null, { p: 2, e: 'clipboard', sec: [cc + ' §3.2', cc + ' §9'] }),
+
+  // ── Out of scope (with rationale) ─────────────────────────────────
+  S('oos.license', 'Licensing / registration / trial', 'oos', null, null, { B: ['UNREGISTERED', 'This dev version of Typora is expired, please download and install a newer version.'], why: 'Commercial licensing is not a product feature; Margin is free.' }),
+  S('oos.updates', 'Auto-update (Sparkle) and version checks', 'oos', null, null, { B: ['New version available.', 'Newer version is available', 'Latest version is $1, your version is $2', "You're up to date!", 'Skip This Version', 'Remind Me Later', 'Quit and Install', 'Download and Reinstall', 'Agree and Download', 'Checking', 'You can reinstall the stable version and then disable this.', 'Typora Server', 'Use Typora Server in China'], sec: [net + ' §2'], why: 'Distribution concern, not editor behavior; Margin ships via its own release channel.' }),
+  S('oos.telemetry', 'Telemetry (Sentry, usage analytics)', 'oos', null, null, { B: ['Send Anonymous Usage Info'], C: ['setting.fetchAnalytics', 'logger.debug', 'logger.info'], sec: [net + ' §4'], why: 'Privacy: Margin collects nothing; logging is local only.' }),
+  S('oos.touchbar', 'Touch Bar integration', 'oos', null, null, { C: ['touchBar.showDialogTouchBar', 'touchBar.showFindReplaceTouchBar'], why: 'Touch Bar hardware is discontinued and Tauri exposes no NSTouchBar API.' }),
+  S('oos.platform-notes', 'Platform-specific notices (Snap packaging, old macOS versions)', 'oos', null, null, { B: ['You are using the Snap version, it may have limited access to your local executables.', 'This feature require macOS >= 10.11', 'Supported on macOS ≥ 10.15 or Windows 10 ≥ 1903'], why: 'Version gates for platforms Margin does not target.' }),
+  S('ui.generic', 'Generic dialog vocabulary (OK/Cancel/Yes/…, notices)', 'owned', 'src/app/ui/modal.ts#export function', null, { A: ['Auto', 'Click', 'Learn More'], B: ['Cancel', 'Confirm', 'Yes', 'Dismiss', 'Notice', 'Detail', 'Instructions', 'Action', 'Back', 'back to document', 'Finished', 'Finish Editing', 'Loading', 'Select', 'Stop', 'Empty', 'None', 'All', 'One More Step', 'Global Setting…', 'You could turn it off from `View` menu.', 'Enable this feature on preferences panel'], C: ['window.showDialog'], note: 'strings attached to features elsewhere where meaningful' }),
+];

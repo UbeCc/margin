@@ -49,7 +49,19 @@
             "**/.ssh/**",
             "**/.gnupg/**",
             "**/.aws/**",
-            "**/Library/Keychains/**"
+            "**/.kube/**",
+            "**/.docker/**",
+            "**/.config/gh/**",
+            "**/.config/gcloud/**",
+            "**/.azure/**",
+            "**/.password-store/**",
+            "**/.netrc",
+            "**/.git-credentials",
+            "**/.npmrc",
+            "**/.pypirc",
+            "**/Library/Keychains/**",
+            "**/Library/Cookies/**",
+            "**/.local/share/keyrings/**"
           ],
           "requireLiteralLeadingDot": false
         }
@@ -74,8 +86,7 @@
           "md",
           "markdown",
           "mdown",
-          "mkd",
-          "mkdn"
+          "mkd"
         ],
         "contentTypes": [
           "net.daringfireball.markdown"
@@ -84,6 +95,28 @@
         "description": "Markdown Document",
         "role": "Editor",
         "mimeType": "text/markdown"
+      },
+      {
+        "ext": [
+          "mkdn",
+          "mdwn",
+          "mdtxt",
+          "mdtext"
+        ],
+        "contentTypes": [
+          "dev.ubec.margin.markdown-alt"
+        ],
+        "name": "Markdown Document",
+        "description": "Markdown Document",
+        "role": "Editor",
+        "mimeType": "text/markdown",
+        "exportedType": {
+          "identifier": "dev.ubec.margin.markdown-alt",
+          "conformsTo": [
+            "net.daringfireball.markdown",
+            "public.plain-text"
+          ]
+        }
       },
       {
         "ext": [
