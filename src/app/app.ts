@@ -904,7 +904,8 @@ export class App {
       return true;
     }
     try {
-      await open.call(this.platform, path ? { path } : {});
+      // Typora: the new window keeps this window's sidebar folder (native-commands §2.3).
+      await open.call(this.platform, { ...(path ? { path } : {}), ...(this.folder ? { folder: this.folder } : {}) });
       return true;
     } catch (e) {
       toast(`Couldn't open a new window: ${e instanceof Error ? e.message : e}`, { kind: 'error' });

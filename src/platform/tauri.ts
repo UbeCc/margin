@@ -229,8 +229,8 @@ export class TauriPlatform implements Platform {
   }
 
   /** File › New Window / Open in New Window (#94). */
-  openWindow(opts: { path?: string } = {}): Promise<void> {
-    return call('open_window', { path: opts.path ?? null });
+  openWindow(opts: { path?: string; folder?: string } = {}): Promise<void> {
+    return call('open_window', { path: opts.path ?? null, folder: opts.folder ?? null });
   }
 
   /** Raw bytes for Reopen with Encoding (#94). */

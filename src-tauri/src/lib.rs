@@ -143,16 +143,21 @@ pub fn query_escape(s: &str) -> String {
 }
 
 /// URL of a secondary editor window (`window=new`, optional file to open).
-pub fn window_url(path: Option<&str>) -> String {
-    match path {
-        Some(p) => format!("index.html?window=new&open={}", query_escape(p)),
-        None => "index.html?window=new".to_string(),
+pub fn window_url(path: Option<&str>, folder: Option<&str>) -> String {
+    let mut url = "index.html?window=new".to_string();
+    if let Some(p) = path {
+        url += &format!("&open={}", query_escape(p));
     }
+    // Typora: a new window keeps the current window's sidebar folder (native-commands §2.3).
+    if let Some(f) = folder {
+        url += &format!("&folder={}", query_escape(f));
+    }
+    url
 }
 
 /// Create an editor window like the main one (same size/style, macOS tabbing group).
-pub fn new_window<R: Runtime>(app: &AppHandle<R>, label: &str, path: Option<&str>) -> tauri::Result<()> {
-    let url = tauri::WebviewUrl::App(window_url(path).into());
+pub fn new_window<R: Runtime>(app: &AppHandle<R>, label: &str, path: Option<&str>, folder: Option<&str>) -> tauri::Result<()> {
+    let url = tauri::WebviewUrl::App(window_url(path, folder).into());
     let mut b = tauri::WebviewWindowBuilder::new(app, label, url)
         .title("Margin")
         .inner_size(1100.0, 760.0)
@@ -479,11 +484,12 @@ mod window_tests {
 
     #[test]
     fn new_window_url_carries_the_file_escaped() {
-        assert_eq!(window_url(None), "index.html?window=new");
+        assert_eq!(window_url(None, None), "index.html?window=new");
         assert_eq!(
-            window_url(Some("/Users/me/My Notes/中文 & #1.md")),
+            window_url(Some("/Users/me/My Notes/中文 & #1.md"), None),
             "index.html?window=new&open=/Users/me/My%20Notes/%E4%B8%AD%E6%96%87%20%26%20%231.md"
         );
+        assert_eq!(window_url(None, Some("/a b")), "index.html?window=new&folder=/a%20b");
     }
 
     #[test]

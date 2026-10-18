@@ -65,8 +65,10 @@ test('menu.file.new-window: File › New Window / Open in New Window', async ({ 
   const [win] = await Promise.all([page.context().waitForEvent('page'), page.keyboard.press(`${MOD}+Shift+n`)]);
   await expect(win.locator('.app.ready')).toBeVisible();
   await expect(win.locator('.title-text')).toHaveText('Untitled');
-  // The new window starts empty: no folder restored, nothing to save.
-  await expect(win.locator('.file-tree .tree-title')).toHaveCount(0);
+  // The new window starts with an empty document but keeps this window's sidebar folder
+  // (Typora native-commands §2.3).
+  await expect(win.locator(`.file-tree [data-path="${ROOT}/Welcome.md"]`)).toBeVisible();
+  await expect(win.locator('.tab-bar')).toBeHidden();
   expect(await win.evaluate(() => window.__margin!.editor.getMarkdown())).toBe('');
   // The first window is untouched.
   await expect(page.locator('.title-text')).toHaveText('Welcome');

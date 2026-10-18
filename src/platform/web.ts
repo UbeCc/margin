@@ -560,9 +560,10 @@ export class WebPlatform implements Platform {
 
   /** File › New Window (#94): a second browser window on the same (localStorage) disk. */
   openedWindows: string[] = [];
-  async openWindow(opts: { path?: string } = {}): Promise<void> {
+  async openWindow(opts: { path?: string; folder?: string } = {}): Promise<void> {
     const q = new URLSearchParams({ window: 'new' });
     if (opts.path) q.set('open', normalizePath(opts.path));
+    if (opts.folder) q.set('folder', normalizePath(opts.folder));
     const url = `${location.pathname}?${q}`;
     this.openedWindows.push(url);
     this.persist();

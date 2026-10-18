@@ -525,13 +525,13 @@ pub async fn confirm_close<Rt: Runtime>(window: WebviewWindow<Rt>, state: State<
 /// File › New Window / Open in New Window (#94): another editor window. Its URL carries
 /// `window=new` (no folder restore) and optionally the file to show (`open=`).
 #[tauri::command]
-pub async fn open_window<Rt: Runtime>(app: AppHandle<Rt>, state: State<'_, AppState>, path: Option<String>) -> R<()> {
+pub async fn open_window<Rt: Runtime>(app: AppHandle<Rt>, state: State<'_, AppState>, path: Option<String>, folder: Option<String>) -> R<()> {
     if let Some(p) = &path {
         let p = abs(p)?;
         allow_assets_for_file(&app, &p);
     }
     let n = state.next_window.fetch_add(1, Ordering::SeqCst) + 1;
-    crate::new_window(&app, &format!("{}{n}", crate::WINDOW_PREFIX), path.as_deref()).map_err(err)
+    crate::new_window(&app, &format!("{}{n}", crate::WINDOW_PREFIX), path.as_deref(), folder.as_deref()).map_err(err)
 }
 
 /// Raw bytes of a file, for decoding with a chosen / detected encoding (#94).

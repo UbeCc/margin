@@ -14,7 +14,7 @@ export interface PlatformExtras {
   /** Reveal in Finder / Explorer. */
   revealInFolder?(path: string): Promise<void>;
   /** Open another app window (#94): empty, or showing `path`. */
-  openWindow?(opts?: { path?: string }): Promise<void>;
+  openWindow?(opts?: { path?: string; folder?: string }): Promise<void>;
   /** Raw file bytes, for decoding with a chosen / detected encoding (#94). */
   readFileBytes?(path: string): Promise<Uint8Array>;
   /** Write text to the system clipboard (Copy File Path). */

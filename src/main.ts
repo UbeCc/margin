@@ -23,6 +23,8 @@ async function boot(): Promise<void> {
     const folder = q.get('folder') || WEB_ROOT;
     demo = { initialFolder: folder, initialFile: q.has('open') ? null : `${folder}/Welcome.md` };
   }
+  // New Window keeps the opener's sidebar folder (?folder= on a window=new URL).
+  if (fresh && q.get('folder')) demo = { initialFolder: q.get('folder'), initialFile: null };
   await app.start({ ...demo, fresh });
 }
 
