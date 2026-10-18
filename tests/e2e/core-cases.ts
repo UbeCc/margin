@@ -40,6 +40,22 @@ export function coreCases(): void {
       expect(await md(page)).toBe("hello!\n\n world\n");
     });
 
+    test("select-all + Backspace empties the document incl. hidden markers (#91)", async ({
+      page,
+    }) => {
+      await open(page, "# Title\n\npara\n");
+      await page.locator(".md-editor h1, .md-editor .md-block").first().click();
+      await page.keyboard.press(`${mod}+a`);
+      await page.keyboard.press("Backspace");
+      expect(await md(page)).toBe("");
+      await page.keyboard.type("new");
+      expect(await md(page)).toBe("new");
+      // forward delete on a fresh select-all takes the same widened path
+      await page.keyboard.press(`${mod}+a`);
+      await page.keyboard.press("Delete");
+      expect(await md(page)).toBe("");
+    });
+
     test("lists: Enter continues, empty item exits, Tab indents, Backspace merges", async ({
       page,
     }) => {

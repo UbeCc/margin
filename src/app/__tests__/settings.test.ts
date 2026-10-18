@@ -124,6 +124,9 @@ describe('preferences completeness (#100, #102)', () => {
     expect(migrateSettings({ markdown: { mathFormatOnCopy: 'svg', mathCopyFormat: 'latex' } }).markdown.mathCopyFormat).toBe('latex');
   });
 
+  @theirs
+  });
+
   it('text column width is 0 (theme default) or 400–3000', () => {
     expect(migrateSettings({ textColumnWidth: 120 }).textColumnWidth).toBe(0);
     expect(migrateSettings({ textColumnWidth: 900 }).textColumnWidth).toBe(900);
