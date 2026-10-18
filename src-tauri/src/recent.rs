@@ -10,41 +10,62 @@ pub const SUBMENU_ID: &str = "submenu:recent";
 pub const ID_PREFIX: &str = "recent:";
 /// Forwarded to the frontend as a `MenuAction` so it clears its in-memory recents too.
 pub const ID_CLEAR: &str = "clearRecent";
-pub const MAX_ITEMS: usize = 15;
+/// File › Open Recent › Reopen Closed File (⇧⌘T), first item of the submenu.
+pub const ID_REOPEN: &str = "reopenClosed";
+/// Typora: at most 12 recent files and 10 recent folders (native-commands §2.1).
+pub const MAX_FILES: usize = 12;
+pub const MAX_FOLDERS: usize = 10;
 
 /// Paths behind the `recent:<n>` menu ids.
 #[derive(Default)]
 pub struct RecentState(pub Mutex<Vec<String>>);
 
-/// One menu entry: label and path. Files first, then folders; missing entries and
-/// duplicates dropped; at most `MAX_ITEMS`. Labels are `name — parent` and get the
-/// parent's own name too when two entries would otherwise look the same.
+/// Menu entries (label, path): up to `MAX_FILES` files, then up to `MAX_FOLDERS` folders;
+/// missing entries and duplicates dropped. Labels are the bare name; when two entries
+/// (files or folders) share a name, every one of them becomes `name — parent`, the parent
+/// abbreviated to `~/…` and the leading `~/` dropped (Typora `decideRecentMenuItemLabel`).
 pub fn entries(files: &[String], folders: &[String], home: Option<&Path>) -> Vec<(String, String)> {
-    let mut seen = Vec::new();
-    let mut out = Vec::new();
-    for p in files.iter().chain(folders) {
-        if seen.contains(p) || !Path::new(p).exists() {
-            continue;
-        }
-        seen.push(p.clone());
-        out.push((label(Path::new(p), home), p.clone()));
-        if out.len() == MAX_ITEMS {
-            break;
+    let mut seen: Vec<&String> = Vec::new();
+    let mut out: Vec<String> = Vec::new();
+    for (list, max) in [(files, MAX_FILES), (folders, MAX_FOLDERS)] {
+        let mut n = 0;
+        for p in list {
+            if n == max {
+                break;
+            }
+            if seen.contains(&p) || !Path::new(p).exists() {
+                continue;
+            }
+            seen.push(p);
+            out.push(p.clone());
+            n += 1;
         }
     }
-    out
+    let names: Vec<String> = out.iter().map(|p| name_of(Path::new(p))).collect();
+    out.into_iter()
+        .zip(names.iter())
+        .map(|(p, name)| {
+            let label = if names.iter().filter(|n| *n == name).count() > 1 { label(Path::new(&p), home) } else { name.clone() };
+            (label, p)
+        })
+        .collect()
+}
+
+fn name_of(p: &Path) -> String {
+    p.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_else(|| p.to_string_lossy().into_owned())
 }
 
 fn tilde(p: &Path, home: Option<&Path>) -> String {
     match home.and_then(|h| p.strip_prefix(h).ok()) {
         Some(rest) if rest.as_os_str().is_empty() => "~".into(),
-        Some(rest) => format!("~/{}", rest.to_string_lossy()),
+        Some(rest) => rest.to_string_lossy().into_owned(), // `~/notes` shown as `notes`
         None => p.to_string_lossy().into_owned(),
     }
 }
 
+/// Disambiguated label `name — parent`.
 pub fn label(p: &Path, home: Option<&Path>) -> String {
-    let name = p.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_else(|| p.to_string_lossy().into_owned());
+    let name = name_of(p);
     match p.parent() {
         Some(parent) if !parent.as_os_str().is_empty() => format!("{name} — {}", tilde(parent, home)),
         _ => name,
@@ -116,15 +137,24 @@ fn find_submenu<R: Runtime>(items: &[MenuItemKind<R>], id: &str) -> Option<Subme
 }
 
 pub fn fill<R: Runtime>(app: &AppHandle<R>, sub: &Submenu<R>, list: &[(String, String)]) -> tauri::Result<()> {
-    let mut items: Vec<Box<dyn IsMenuItem<R>>> = Vec::new();
-    for (i, (label, _)) in list.iter().enumerate() {
+    // Typora order: Reopen Closed File / — / files / — / folders / — / Clear Items.
+    let mut items: Vec<Box<dyn IsMenuItem<R>>> = vec![
+        Box::new(MenuItem::with_id(app, ID_REOPEN, "Reopen Closed File", true, Some("CmdOrCtrl+Shift+T"))?),
+        Box::new(PredefinedMenuItem::separator(app)?),
+    ];
+    let mut prev_folder: Option<bool> = None;
+    for (i, (label, path)) in list.iter().enumerate() {
+        let folder = Path::new(path).is_dir();
+        if prev_folder == Some(false) && folder {
+            items.push(Box::new(PredefinedMenuItem::separator(app)?));
+        }
+        prev_folder = Some(folder);
         items.push(Box::new(MenuItem::with_id(app, format!("{ID_PREFIX}{i}"), label, true, None::<&str>)?));
     }
-    if list.is_empty() {
-        items.push(Box::new(MenuItem::with_id(app, "recent:none", "No Recent Items", false, None::<&str>)?));
+    if !list.is_empty() {
+        items.push(Box::new(PredefinedMenuItem::separator(app)?));
     }
-    items.push(Box::new(PredefinedMenuItem::separator(app)?));
-    items.push(Box::new(MenuItem::with_id(app, ID_CLEAR, "Clear Menu", !list.is_empty(), None::<&str>)?));
+    items.push(Box::new(MenuItem::with_id(app, ID_CLEAR, "Clear Items", !list.is_empty(), None::<&str>)?));
     for it in &items {
         sub.append(it.as_ref())?;
     }
@@ -149,8 +179,10 @@ pub fn menu_selftest<R: Runtime>(h: &AppHandle<R>, file: &str) -> Result<(), Str
         let sub = find_submenu(&h.menu().ok_or("no menu")?.items().map_err(e)?, SUBMENU_ID).ok_or("no Open Recent submenu")?;
         Ok(sub.items().map_err(e)?.iter().map(|i| i.id().as_ref().to_string()).collect())
     };
+    // separators have generated ids: compare the named items only
+    let named = |v: Vec<String>| -> Vec<String> { v.into_iter().filter(|i| i == ID_REOPEN || i == ID_CLEAR || i.starts_with(ID_PREFIX)).collect() };
     let got = ids(h)?;
-    if got != ["recent:0", got[1].as_str(), ID_CLEAR] {
+    if got.len() != 5 || named(got.clone()) != [ID_REOPEN, "recent:0", ID_CLEAR] {
         return Err(format!("unexpected items {got:?}"));
     }
     if path_for(h, "recent:0").as_deref() != Some(file) {
@@ -158,11 +190,11 @@ pub fn menu_selftest<R: Runtime>(h: &AppHandle<R>, file: &str) -> Result<(), Str
     }
     set_menu(h, &[], &[]).map_err(e)?;
     let got = ids(h)?;
-    if got.first().map(String::as_str) != Some("recent:none") || path_for(h, "recent:0").is_some() {
+    if named(got.clone()) != [ID_REOPEN, ID_CLEAR] || path_for(h, "recent:0").is_some() {
         return Err(format!("not cleared: {got:?}"));
     }
     set_menu(h, &files, &files).map_err(e)?;
-    if ids(h)?.len() != 3 {
+    if named(ids(h)?).len() != 3 {
         return Err("duplicate file+folder entry".into());
     }
     Ok(())
@@ -189,16 +221,40 @@ mod tests {
         let paths: Vec<_> = e.iter().map(|x| x.1.clone()).collect();
         assert_eq!(paths, vec![a, b, folder]);
         let many: Vec<String> = (0..30).map(|i| mk(&format!("n{i}.md"))).collect();
-        assert_eq!(entries(&many, &[], None).len(), MAX_ITEMS);
+        assert_eq!(entries(&many, &[], None).len(), MAX_FILES);
+        let dirs: Vec<String> = (0..12)
+            .map(|i| {
+                let p = d.path().join(format!("dir{i}"));
+                fs::create_dir(&p).unwrap();
+                p.to_string_lossy().into_owned()
+            })
+            .collect();
+        let e = entries(&many, &dirs, None);
+        assert_eq!(e.len(), MAX_FILES + MAX_FOLDERS);
+        assert_eq!(e[MAX_FILES].1, dirs[0]);
     }
 
     #[test]
     fn labels_use_tilde_and_parent() {
         let home = Path::new("/Users/me");
-        assert_eq!(label(Path::new("/Users/me/notes/a.md"), Some(home)), "a.md — ~/notes");
+        assert_eq!(label(Path::new("/Users/me/notes/a.md"), Some(home)), "a.md — notes");
         assert_eq!(label(Path::new("/Users/me/a.md"), Some(home)), "a.md — ~");
         assert_eq!(label(Path::new("/tmp/x.md"), Some(home)), "x.md — /tmp");
         assert_eq!(label(Path::new("/"), None), "/");
+    }
+
+    #[test]
+    fn only_same_names_are_disambiguated() {
+        let d = tempfile::tempdir().unwrap();
+        for sub in ["notes", "work"] {
+            fs::create_dir(d.path().join(sub)).unwrap();
+            fs::write(d.path().join(sub).join("todo.md"), "").unwrap();
+        }
+        fs::write(d.path().join("solo.md"), "").unwrap();
+        let p = |r: &str| d.path().join(r).to_string_lossy().into_owned();
+        let e = entries(&[p("notes/todo.md"), p("work/todo.md"), p("solo.md")], &[p("notes")], Some(d.path()));
+        let labels: Vec<_> = e.iter().map(|x| x.0.as_str()).collect();
+        assert_eq!(labels, ["todo.md — notes", "todo.md — work", "solo.md", "notes"]);
     }
 
     #[test]

@@ -27,7 +27,6 @@ const FILE_OPEN: &[Item] = &[
 ];
 const REVEAL: &str = if cfg!(target_os = "macos") { "Reveal in Finder" } else { "Open File Location" };
 const FILE: &[Item] = &[
-    ("reopenClosed", "Reopen Closed File", Some("CmdOrCtrl+Shift+T")),
     ("quickOpen", "Quick Open…", Some("CmdOrCtrl+P")),
     ("-", "", None),
     ("save", "Save", Some("CmdOrCtrl+S")),
@@ -173,7 +172,7 @@ pub fn all_actions() -> Vec<&'static str> {
         .flat_map(|g| g.iter().map(|i| i.0))
         .filter(|id| *id != "-")
         .collect();
-    v.extend(["print", "close", "preferences", crate::recent::ID_CLEAR]);
+    v.extend(["print", "close", "preferences", crate::recent::ID_CLEAR, crate::recent::ID_REOPEN]);
     v
 }
 

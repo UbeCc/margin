@@ -432,3 +432,30 @@ test('beh.files.drop: Drop files from the OS: open Markdown/folders, insert imag
   await dropFiles(page, [`${ROOT}/Journal`], 2, 2);
   await expect(page.locator(`.file-tree [data-path="${ROOT}/Journal/2026-10-17.md"]`)).toBeVisible();
 });
+
+test('pref.general.launch: General: On Launch (restore files/folders, open new file, default folder)', async ({ page }) => {
+  // Labels and default.
+  await menu(page, 'preferences');
+  await page.locator('.pref-nav [data-section=files]').click();
+  const sel = page.locator('select[data-pref="onLaunch"]');
+  await expect(sel.locator('option')).toHaveText(['Open new file', 'Restore last closed folders', 'Restore last closed files and folders', 'Open custom folder']);
+  await expect(sel).toHaveValue('restoreFolders');
+  await page.keyboard.press('Escape');
+
+  // Restore last closed files and folders: the tabs open at the last clean close come back.
+  await openFiles(page, [`${ROOT}/Ideas/Roadmap.md`]);
+  await expect(tabs(page)).toHaveCount(2);
+  await page.evaluate(() => window.__margin!.updateSettings({ onLaunch: 'restoreFilesAndFolders' }));
+  expect(await page.evaluate(() => window.__MARGIN_WEB__!.requestClose())).toBe(true);
+  await page.goto(`/?folder=${encodeURIComponent(ROOT)}&open=`);
+  await expect(page.locator('.app.ready')).toBeVisible();
+  await expect(tabs(page)).toHaveText([/Welcome/, /Roadmap/]);
+
+  // Open custom folder: the pinned folder is mounted instead of the last one.
+  await page.evaluate((r) => window.__margin!.updateSettings({ onLaunch: 'customFolder', pinFolder: `${r}/Journal` }), ROOT);
+  expect(await page.evaluate(() => window.__MARGIN_WEB__!.requestClose())).toBe(true);
+  await page.goto('/?open=');
+  await expect(page.locator('.app.ready')).toBeVisible();
+  await expect(page.locator(`.file-tree [data-path="${ROOT}/Journal/2026-10-17.md"]`)).toBeVisible();
+  await expect(page.locator('.tab-bar')).toBeHidden(); // one blank document: no tab bar
+});

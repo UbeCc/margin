@@ -1,6 +1,6 @@
 import type { ImageRule } from '../contracts';
 import { themeLabel } from '../themes';
-import { IMAGE_RULE_PRESETS, imageRulePresetId, type MarginSettings } from './settings';
+import { IMAGE_RULE_PRESETS, imageRulePresetId, ON_LAUNCH, type MarginSettings, type OnLaunch } from './settings';
 import { h, debounce } from './util/dom';
 import { openModal } from './ui/modal';
 import { uploadPrefsSection } from './upload-prefs';
@@ -114,13 +114,34 @@ export function openPreferences(host: PreferencesHost, initial: Section = 'appea
         },
       })
     : null;
+  // General › On Launch (Typora restoreWhenLaunch + pinFolder, native-commands §2.2).
+  const pinLabel = h('span.pref-hint', { 'data-pref': 'pinFolder', text: s.pinFolder ?? 'No folder chosen' });
+  const pinBtn = h('button.btn.btn-small', {
+    type: 'button',
+    text: 'Choose Default Folder…',
+    onclick: async () => {
+      const p = await host.pickFolder();
+      if (p) {
+        pinLabel.textContent = p;
+        set({ pinFolder: p, onLaunch: 'customFolder' });
+        launchSel.value = 'customFolder';
+      }
+    },
+  });
+  const launchSel = select('onLaunch', ON_LAUNCH, s.onLaunch, (v) => {
+    set({ onLaunch: v as OnLaunch });
+    pinBox.hidden = v !== 'customFolder';
+  });
+  const pinBox = h('span.inline', null, pinBtn, pinLabel);
+  pinBox.hidden = s.onLaunch !== 'customFolder';
+  const onLaunchRow = row('On Launch', h('span.inline', null, launchSel, pinBox));
   const files = h(
     'section.pref-section',
     { 'data-section': 'files' },
     toggle('autoSave', 'Auto save', 'Save documents automatically after you stop typing'),
     row('Auto-save delay', h('span.inline', null, delay, h('span.unit', { text: 's' }))),
     toggle('saveOnSwitch', 'Save without asking when switching files', 'Switching documents from the sidebar saves the current one'),
-    toggle('restoreLastFolder', 'Reopen last folder on launch'),
+    onLaunchRow,
     host.recoverDrafts
       ? row(
           'Unsaved drafts',

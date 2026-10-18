@@ -163,6 +163,8 @@ export class App {
       if (ok) {
         this.saveDraftsSoon.cancel();
         await this.drafts.save([]); // closed cleanly: nothing to recover
+        // On Launch › Restore last closed files and folders (main window only).
+        if (!opts.fresh) this.updateSettings({ lastOpenFiles: this.docs.tabs.map((t) => t.doc.path).filter((p): p is string => !!p) });
         await this.persistSettings();
       }
       return ok;
@@ -170,10 +172,17 @@ export class App {
     window.addEventListener('blur', () => void this.doc.flushAutoSave());
 
     // Initial content
-    const folder = opts.fresh ? null : (this.settings.restoreLastFolder && this.settings.lastFolder) || opts.initialFolder || null;
+    // General › On Launch (native-commands §2.2): new file / last folders / last files and
+    // folders / a pinned folder; anything that fails to restore leaves the blank document.
+    const launch = opts.fresh ? 'newFile' : this.settings.onLaunch;
+    const launchFolder = launch === 'customFolder' ? this.settings.pinFolder : launch === 'newFile' ? null : this.settings.lastFolder;
+    const folder = launchFolder || opts.initialFolder || null;
     if (folder) await this.openFolder(folder, { quiet: true });
     if (opts.initialFile && (await this.platform.stat(opts.initialFile))) await this.docs.openPath(opts.initialFile, 'replace');
-    else this.onDocState(this.doc.state());
+    else if (launch === 'restoreFilesAndFolders' && this.settings.lastOpenFiles.length) {
+      for (const p of this.settings.lastOpenFiles) if (await this.platform.stat(p).catch(() => null)) await this.docs.openPath(p, 'tab');
+      this.onDocState(this.doc.state());
+    } else this.onDocState(this.doc.state());
     this.refreshOutline();
     this.status.setStats(this.editor.getStats());
     this.status.setSource(this.editor.isSourceMode());

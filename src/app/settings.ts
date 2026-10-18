@@ -18,7 +18,14 @@ export interface MarginSettings extends AppSettings {
   sidebarWidth: number;
   /** Auto-save delay in ms after the last edit. */
   autoSaveDelay: number;
+  /** @deprecated read by migration only; see `onLaunch`. */
   restoreLastFolder: boolean;
+  /** General › On Launch (Typora `restoreWhenLaunch` 0–3). */
+  onLaunch: OnLaunch;
+  /** Folder for `onLaunch: 'customFolder'` (Typora `pinFolder`). */
+  pinFolder: string | null;
+  /** Files open in the main window at its last clean close, for `restoreFilesAndFolders`. */
+  lastOpenFiles: string[];
   /** Pandoc binary (or its folder) for docx/latex/epub export; '' = auto-detect (#81). */
   pandocPath: string;
   /** Save a modified file without asking when switching documents from the sidebar (#94). */
@@ -26,6 +33,14 @@ export interface MarginSettings extends AppSettings {
   /** Documents larger than this (bytes) open in source mode with a warning (#94). */
   largeFileBytes: number;
 }
+
+export type OnLaunch = 'newFile' | 'restoreFolders' | 'restoreFilesAndFolders' | 'customFolder';
+export const ON_LAUNCH: [OnLaunch, string][] = [
+  ['newFile', 'Open new file'],
+  ['restoreFolders', 'Restore last closed folders'],
+  ['restoreFilesAndFolders', 'Restore last closed files and folders'],
+  ['customFolder', 'Open custom folder'],
+];
 
 export const SETTINGS_VERSION = 2;
 
@@ -50,6 +65,9 @@ export const DEFAULT_SETTINGS: Readonly<MarginSettings> = Object.freeze({
   sidebarTab: 'files',
   sidebarWidth: 260,
   restoreLastFolder: true,
+  onLaunch: 'restoreFolders' as OnLaunch,
+  pinFolder: null,
+  lastOpenFiles: [],
   pandocPath: '',
   saveOnSwitch: false,
   largeFileBytes: 2_000_000,
@@ -130,6 +148,13 @@ export function migrateSettings(input: unknown): MarginSettings {
     sidebarTab: tab === 'files' || tab === 'outline' ? tab : d.sidebarTab,
     sidebarWidth: Math.round(num(raw.sidebarWidth, d.sidebarWidth, 180, 520)),
     restoreLastFolder: bool(raw.restoreLastFolder, d.restoreLastFolder),
+    onLaunch: ON_LAUNCH.some(([v]) => v === raw.onLaunch)
+      ? (raw.onLaunch as OnLaunch)
+      : bool(raw.restoreLastFolder, d.restoreLastFolder)
+        ? 'restoreFolders'
+        : 'newFile',
+    pinFolder: typeof raw.pinFolder === 'string' && raw.pinFolder ? raw.pinFolder : null,
+    lastOpenFiles: strList(raw.lastOpenFiles),
     pandocPath: typeof raw.pandocPath === 'string' ? raw.pandocPath.trim() : '',
     saveOnSwitch: bool(raw.saveOnSwitch, d.saveOnSwitch),
     largeFileBytes: Math.round(num(raw.largeFileBytes, d.largeFileBytes, 1_000, 1_000_000_000)),
