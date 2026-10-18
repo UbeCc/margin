@@ -105,6 +105,8 @@ function containerBlock(ed: EditorCore, kind: 'quote' | 'ul' | 'ol' | 'task'): b
       ? inner.kind === 'quote'
       : inner.kind === 'item' && (kind === 'task' ? inner.task !== null : inner.task === null && inner.ordered === (kind === 'ol')));
   ed.hist.break();
+  const firstId = ed.doc.leaves[i0].id;
+  const lastId = ed.doc.leaves[i1].id;
   ed.change(() => {
     let caret: E.Caret | undefined;
     for (let i = i1; i >= i0; i--) {
@@ -122,6 +124,10 @@ function containerBlock(ed: EditorCore, kind: 'quote' | 'ul' | 'ol' | 'task'): b
       ed.doc.replace(s, s + leafRaw(l).length, lines.map((x) => x.prefix + x.text + x.eol).join(''));
       caret = { pos: s + lines[0].prefix.length + leafContent(l).length };
     }
+    // keep every touched block selected so the command can be toggled back
+    const a = ed.doc.indexOf(firstId);
+    const b = ed.doc.indexOf(lastId);
+    if (i1 > i0 && a >= 0 && b >= a) return { anchor: ed.doc.docPos(a, 0), focus: ed.doc.docPos(b, leafContent(ed.doc.leaves[b]).length) };
     return caret;
   });
   ed.hist.break();

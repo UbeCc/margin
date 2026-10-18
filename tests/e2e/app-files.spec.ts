@@ -29,11 +29,11 @@ test('editing marks dirty, Cmd+S saves to disk', async ({ page }) => {
 test('new untitled document → Save As writes file and shows it in the tree', async ({ page }) => {
   await page.keyboard.press(`${MOD}+n`);
   await expect(page.locator('.title-text')).toHaveText('Untitled');
-  await typeInEditor(page, '# Fresh idea\n\nBody');
+  await typeInEditor(page, '# Fresh idea\nBody'); // Enter in an empty new doc splits (#38)
   await queueDialog(page, `${ROOT}/Fresh idea.md`);
   await page.keyboard.press(`${MOD}+s`);
   await expect(page.locator('.title-text')).toHaveText('Fresh idea');
-  expect(await diskFile(page, `${ROOT}/Fresh idea.md`)).toBe('# Fresh idea\n\nBody');
+  expect(await diskFile(page, `${ROOT}/Fresh idea.md`)).toBe('# Fresh idea\n\nBody\n');
   await expect(page.locator(`.tree-row[data-path="${ROOT}/Fresh idea.md"]`)).toHaveClass(/active/);
 });
 
@@ -70,7 +70,7 @@ test('close request with unsaved changes can be cancelled', async ({ page }) => 
   expect(await result).toBe(false);
 });
 
-test('context menu: new file; rename disabled without platform support', async ({ page }) => {
+test('context menu: new file, rename (open doc follows), new folder, trash', async ({ page }) => {
   await page.locator(`[data-path="${ROOT}/Journal"]`).click({ button: 'right' });
   await page.locator('.context-item', { hasText: 'New File' }).click();
   const input = page.locator('.dialog .text-input');
@@ -80,7 +80,35 @@ test('context menu: new file; rename disabled without platform support', async (
   await expect(page.locator('.title-text')).toHaveText('Saturday');
   expect(await diskFile(page, `${ROOT}/Journal/Saturday.md`)).toBe('');
 
-  // Rename/delete need optional platform methods (#21); WebPlatform lacks them, so they are disabled.
+  // Rename keeps the open document attached to the file.
   await page.locator(`[data-path="${ROOT}/Journal/Saturday.md"]`).click({ button: 'right' });
-  await expect(page.locator('.context-item', { hasText: 'Rename' })).toBeDisabled();
+  await page.locator('.context-item', { hasText: 'Rename' }).click();
+  await page.locator('.dialog .text-input').fill('Sunday.md');
+  await page.keyboard.press('Enter');
+  await expect(page.locator(`.tree-row[data-path="${ROOT}/Journal/Sunday.md"]`)).toHaveClass(/active/);
+  await expect(page.locator('.title-text')).toHaveText('Sunday');
+  expect(await diskFile(page, `${ROOT}/Journal/Saturday.md`)).toBeUndefined();
+  await typeInEditor(page, 'renamed ok');
+  await page.keyboard.press(`${MOD}+s`);
+  await expect.poll(() => diskFile(page, `${ROOT}/Journal/Sunday.md`)).toContain('renamed ok');
+  expect(await diskFile(page, `${ROOT}/Journal/Saturday.md`)).toBeUndefined();
+
+  // Rename onto an existing name is refused with an error toast.
+  await page.locator(`[data-path="${ROOT}/Journal/Sunday.md"]`).click({ button: 'right' });
+  await page.locator('.context-item', { hasText: 'Rename' }).click();
+  await page.locator('.dialog .text-input').fill('2026-10-17.md');
+  await page.keyboard.press('Enter');
+  await expect(page.locator('.toast').last()).toContainText("Couldn't rename");
+
+  // New folder, then trash it.
+  await page.locator(`[data-path="${ROOT}/Journal"]`).click({ button: 'right' });
+  await page.locator('.context-item', { hasText: 'New Folder' }).click();
+  await page.locator('.dialog .text-input').fill('Drafts');
+  await page.keyboard.press('Enter');
+  const drafts = page.locator(`.tree-row[data-path="${ROOT}/Journal/Drafts"]`);
+  await expect(drafts).toBeVisible();
+  await drafts.click({ button: 'right' });
+  await page.locator('.context-item', { hasText: 'Move to Trash' }).click();
+  await page.locator('.dialog [data-id=ok]').click();
+  await expect(drafts).toHaveCount(0);
 });

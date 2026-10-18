@@ -134,6 +134,24 @@ export class TauriPlatform implements Platform {
     return call('relocate_images', { docPath, rule, srcs });
   }
 
+  // ---- optional file-tree operations (PlatformExtras, #21)
+  rename(from: string, to: string): Promise<void> {
+    return call('rename_path', { from, to });
+  }
+
+  /** Move to the Trash (never a hard delete). */
+  remove(path: string): Promise<void> {
+    return call('trash_path', { path });
+  }
+
+  createDir(path: string): Promise<void> {
+    return call('create_dir', { path });
+  }
+
+  revealInFolder(path: string): Promise<void> {
+    return call('reveal_path', { path });
+  }
+
   /** Let the webview load images from one more directory (non-recursive). */
   allowAssetDir(path: string): Promise<void> {
     return call('allow_asset_dir', { path });

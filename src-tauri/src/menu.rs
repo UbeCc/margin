@@ -28,6 +28,7 @@ const FILE: &[Item] = &[
     ("-", "", None),
     ("save", "Save", Some("CmdOrCtrl+S")),
     ("saveAs", "Save As…", Some("CmdOrCtrl+Shift+S")),
+    ("reloadFromDisk", "Revert to Saved", None),
 ];
 const EXPORT: &[Item] = &[("exportHtml", "HTML…", None), ("exportPdf", "PDF…", Some("CmdOrCtrl+Alt+E"))];
 const EDIT_TOP: &[Item] = &[("undo", "Undo", Some("CmdOrCtrl+Z")), ("redo", "Redo", Some("CmdOrCtrl+Shift+Z"))];
@@ -63,7 +64,12 @@ const FORMAT: &[Item] = &[
     ("mark:link", "Hyperlink", Some("CmdOrCtrl+K")),
 ];
 const VIEW: &[Item] = &[
+    ("commandPalette", "Command Palette…", Some("CmdOrCtrl+Shift+A")),
+    ("-", "", None),
     ("toggleSidebar", "Toggle Sidebar", Some("CmdOrCtrl+Backslash")),
+    ("showOutline", "Outline", Some("CmdOrCtrl+Shift+1")),
+    ("showFiles", "Files", Some("CmdOrCtrl+Shift+3")),
+    ("revealActiveFile", "Reveal Active File in Sidebar", None),
     ("toggleSource", "Source Code Mode", Some("CmdOrCtrl+Slash")),
     ("-", "", None),
     ("toggleFocus", "Focus Mode", Some("F8")),
@@ -72,6 +78,8 @@ const VIEW: &[Item] = &[
     ("zoomReset", "Actual Size", Some("CmdOrCtrl+Shift+0")),
     ("zoomIn", "Zoom In", Some("CmdOrCtrl+Equal")),
     ("zoomOut", "Zoom Out", Some("CmdOrCtrl+Minus")),
+    ("-", "", None),
+    ("toggleLineEnding", "Toggle Line Endings (LF / CRLF)", None),
 ];
 
 /// Every action the menu can emit (used by tests to keep Rust and TS in sync).
@@ -267,7 +275,8 @@ mod tests {
             let ok = [
                 "new", "open", "openFolder", "save", "saveAs", "close", "exportHtml", "exportPdf", "print", "undo",
                 "redo", "find", "replace", "toggleSidebar", "toggleSource", "toggleFocus", "toggleTypewriter",
-                "quickOpen", "zoomIn", "zoomOut", "zoomReset", "preferences", "clearRecent",
+                "quickOpen", "zoomIn", "zoomOut", "zoomReset", "preferences", "clearRecent", "commandPalette", "showOutline",
+                "showFiles", "revealActiveFile", "reloadFromDisk", "toggleLineEnding",
             ]
             .contains(&a)
                 || a.starts_with("heading:")

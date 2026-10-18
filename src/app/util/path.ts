@@ -155,3 +155,17 @@ export const naturalCompare = (a: string, b: string): number =>
 export function isValidFileName(name: string): boolean {
   return !!name.trim() && !/[\\/:*?"<>|\x00]/.test(name) && name !== '.' && name !== '..';
 }
+
+/**
+ * Fold macOS firmlinks so lexically different spellings of one folder compare equal
+ * (`/private/tmp` ≡ `/tmp`, also `/var`, `/etc`). Native dialogs and the file watcher
+ * report canonical paths while the user may have opened the `/tmp/...` spelling.
+ */
+export function foldFirmlinks(p: string): string {
+  return p.replace(/^\/private(?=\/(?:tmp|var|etc)(?:\/|$))/, '');
+}
+
+/** Relative path from directory `fromDir` to `to`, tolerant of firmlink spellings. */
+export function relativeFrom(fromDir: string, to: string): string {
+  return relative(foldFirmlinks(fromDir), foldFirmlinks(to));
+}

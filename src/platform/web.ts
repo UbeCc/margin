@@ -525,6 +525,42 @@ export class WebPlatform implements Platform {
     return {};
   }
 
+  // ---- optional file-tree operations (PlatformExtras, #21). Own operations emit
+  // watch events like the desktop watcher does (rename → renamed, remove → removed).
+
+  async rename(from: string, to: string): Promise<void> {
+    const f = normalizePath(from);
+    const t = normalizePath(to);
+    if (!this.nodes.has(f)) throw new Error(`ENOENT: ${from}`);
+    if (this.nodes.has(t) && f.toLowerCase() !== t.toLowerCase()) throw new Error(`EEXIST: ${to}`);
+    if (t.startsWith(f + '/')) throw new Error(`EINVAL: cannot move a folder into itself`);
+    if (f.startsWith(LOCAL_ROOT + '/')) throw new Error('unsupported: renaming files mounted from disk');
+    this.externalRename(f, t);
+  }
+
+  async remove(path: string): Promise<void> {
+    const p = normalizePath(path);
+    if (!this.nodes.has(p)) throw new Error(`ENOENT: ${path}`);
+    if (p.startsWith(LOCAL_ROOT + '/')) throw new Error('unsupported: deleting files mounted from disk');
+    this.externalRemove(p);
+  }
+
+  async createDir(path: string): Promise<void> {
+    const p = normalizePath(path);
+    if (this.nodes.has(p)) throw new Error(`EEXIST: ${path}`);
+    if (p.startsWith(LOCAL_ROOT + '/')) throw new Error('unsupported: creating folders on disk');
+    if (this.nodes.get(dirname(p))?.kind !== 'dir') throw new Error(`ENOENT: ${dirname(p)}`);
+    const created = this.ensureDir(p);
+    this.persist();
+    this.emit(created.map((c) => ({ kind: 'created', path: c })));
+  }
+
+  /** No file manager in the browser: recorded for tests. */
+  revealed: string[] = [];
+  async revealInFolder(path: string): Promise<void> {
+    this.revealed.push(normalizePath(path));
+  }
+
   async print(): Promise<void> {
     if (!navigatorIsAutomated()) window.print();
   }

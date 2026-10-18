@@ -210,6 +210,47 @@ pub use crate::fsops_unix::{xattr_get, xattr_set};
 
 /// Children of a directory: hidden entries (dot files) and our temp files filtered,
 /// directories first, then case-insensitive natural-ish name order.
+/// `rename` that refuses to replace an existing destination (std's rename overwrites files).
+/// A case-only rename of the same item (`a.md` → `A.md` on a case-insensitive volume) is allowed.
+pub fn rename_no_clobber(from: &Path, to: &Path) -> std::io::Result<()> {
+    if !from.exists() {
+        return Err(std::io::Error::new(std::io::ErrorKind::NotFound, "source does not exist"));
+    }
+    if to.exists() {
+        let same = fs::canonicalize(from).ok() == fs::canonicalize(to).ok();
+        if !same {
+            return Err(std::io::Error::new(std::io::ErrorKind::AlreadyExists, "destination already exists"));
+        }
+    }
+    if to.starts_with(from) && to != from {
+        return Err(std::io::Error::new(std::io::ErrorKind::InvalidInput, "cannot move a folder into itself"));
+    }
+    fs::rename(from, to)
+}
+
+/// Move to the Trash. macOS: NSFileManager; Linux: `gio trash`; elsewhere unsupported.
+pub fn trash(path: &Path) -> std::io::Result<()> {
+    if fs::symlink_metadata(path).is_err() {
+        return Err(std::io::Error::new(std::io::ErrorKind::NotFound, "does not exist"));
+    }
+    #[cfg(target_os = "macos")]
+    {
+        use objc2_foundation::{NSFileManager, NSString, NSURL};
+        let url = NSURL::fileURLWithPath(&NSString::from_str(&path_str(path)));
+        let fm = NSFileManager::defaultManager();
+        return fm
+            .trashItemAtURL_resultingItemURL_error(&url, None)
+            .map_err(|e| std::io::Error::other(e.localizedDescription().to_string()));
+    }
+    #[cfg(target_os = "linux")]
+    {
+        let st = std::process::Command::new("gio").arg("trash").arg(path).status()?;
+        return if st.success() { Ok(()) } else { Err(std::io::Error::other("gio trash failed")) };
+    }
+    #[allow(unreachable_code)]
+    Err(std::io::Error::new(std::io::ErrorKind::Unsupported, "unsupported: Move to Trash on this platform"))
+}
+
 pub fn list_dir(path: &Path) -> std::io::Result<Vec<DirEntry>> {
     let mut out = Vec::new();
     for item in fs::read_dir(path)? {

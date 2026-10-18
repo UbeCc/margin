@@ -63,5 +63,33 @@ test('export HTML inlines the theme', async ({ page }) => {
   const html = await page.evaluate(() => window.__MARGIN_WEB__!.exports[0].html);
   expect(html).toContain('<title>Welcome to Margin</title>');
   expect(html).toContain('--margin-accent');
-  expect(html).toContain('<h1 id="h-0">Welcome to Margin</h1>');
+  expect(html).toMatch(/<h1 id="[^"]+">Welcome to Margin<\/h1>/);
+  expect(html).toContain('<em>emphasis</em>');
+  expect(html).not.toContain('md-meta');
+});
+
+test('preferences: Theme lists light themes, Dark theme lists dark ones', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'light' });
+  await boot(page);
+  await page.keyboard.press(`${MOD}+Comma`);
+  const values = (sel: string) => page.locator(sel).locator('option').evaluateAll((os) => os.map((o) => (o as HTMLOptionElement).value));
+  expect(await values('select[data-pref=theme]')).toEqual(['paper', 'github']);
+  expect(await values('select[data-pref=darkTheme]')).toEqual(['night']);
+});
+
+test('export HTML rewrites local image srcs relative to the output file (#27)', async ({ page }) => {
+  await boot(page);
+  await page.evaluate(async (root) => {
+    await window.__MARGIN_WEB__!.writeTextFile(`${root}/Ideas/Pic.md`, '# Pic\n\n![dot](../img/dot.png) ![abs](/Shared/x.png) ![web](https://example.com/a.png)\n');
+    await window.__margin!.doc.open(`${root}/Ideas/Pic.md`);
+  }, ROOT);
+  await queueDialog(page, `${ROOT}/Export/Pic.html`);
+  await page.evaluate(() => window.__margin!.run('exportHtml'));
+  await expect(page.locator('.toast').last()).toContainText('Exported Pic.html');
+  const html = await page.evaluate(() => window.__MARGIN_WEB__!.exports.at(-1)!.html);
+  expect(html).toContain('src="../img/dot.png"');
+  expect(html).toContain('src="/Shared/x.png"');
+  expect(html).toContain('src="https://example.com/a.png"');
+  // the live editor still shows platform asset URLs
+  expect(await page.locator('.md-editor img').first().getAttribute('src')).not.toBe('../img/dot.png');
 });

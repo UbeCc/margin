@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { fuzzyFilter, fuzzyMatch, highlightSegments } from '../util/fuzzy';
 import {
-  basename, dirname, displayPath, extname, isInside, isValidFileName, join, normalize, relative, resolveDocPath, stripExt, uniqueName,
+  foldFirmlinks, relativeFrom, basename, dirname, displayPath, extname, isInside, isValidFileName, join, normalize, relative, resolveDocPath, stripExt, uniqueName,
 } from '../util/path';
 import { SHORTCUTS } from '../../platform/shortcuts';
 import { formatShortcut, matchShortcut, parseShortcut } from '../util/keymap';
@@ -129,5 +129,14 @@ describe('keymap & commands', () => {
     expect(isCommandId('save')).toBe(true);
     expect(isCommandId('theme:whatever')).toBe(true);
     expect(isCommandId('rm -rf')).toBe(false);
+  });
+});
+
+describe('firmlink-tolerant relative paths', () => {
+  it('treats /private/tmp and /tmp as the same folder', () => {
+    expect(foldFirmlinks('/private/tmp/a')).toBe('/tmp/a');
+    expect(foldFirmlinks('/private/tmpx')).toBe('/private/tmpx');
+    expect(relativeFrom('/tmp/mqa/folder', '/private/tmp/mqa/folder/img/dot.png')).toBe('img/dot.png');
+    expect(relativeFrom('/private/var/x/out', '/var/x/img/a.png')).toBe('../img/a.png');
   });
 });

@@ -30,7 +30,7 @@ Owner: **app**. Vanilla-DOM shell around `EditorHandle` + `Platform` (see `src/c
 - **Settings**: `platform.saveSettings` receives `MarginSettings`, which has extra keys. Platforms must persist unknown keys verbatim (see the ARCHITECTURE.md change log).
 - **CSS variables** set by themes: `--margin-fg/bg/accent/code-bg/border`, `--margin-font-body/heading/mono/ui`, plus the aliases read by blocks (`--margin-muted/error/mono/font/radius`) and `--margin-font-size` (set from Preferences). `html[data-scheme=light|dark]` and `html[data-theme=<name>]` are set as well.
 - **Images**: `EditorSettings.storeImage` → `platform.storeImage(doc.path, settings.imageRule, input)`. `resolveAsset` → `platform.assetUrl(resolved absolute path)` for relative or absolute local srcs; URLs pass through unchanged.
-- **Export**: HTML/PDF = `editor.renderHTML()` inside `<article class="margin-doc">` + current theme + custom CSS + `blocksCSS` + KaTeX CSS (fonts from jsDelivr), only when KaTeX markup is present. PDF passes `{ baseDir: doc dir }`. Print uses `platform.print()` with print CSS. Images outside the opened folder/doc dir are whitelisted with `platform.allowAssetDir(dir)`.
+- **Export**: HTML/PDF = `editor.renderHTML()` inside `<article class="margin-doc">` + current theme + custom CSS + `blocksCSS` + KaTeX CSS (fonts from jsDelivr), only when KaTeX markup is present. PDF passes `{ baseDir: doc dir }`. Print uses `platform.print()` with print CSS. HTML export rewrites local image srcs to paths relative to the exported file (absolute srcs stay absolute); PDF keeps asset URLs. Images outside the opened folder/doc dir are whitelisted with `platform.allowAssetDir(dir)`.
 
 ## Tests
 
@@ -40,6 +40,3 @@ Owner: **app**. Vanilla-DOM shell around `EditorHandle` + `Platform` (see `src/c
 ## Known gaps
 
 - Single document per window (Typora model). No tabs and no multi-window.
-- File-tree rename, delete and new folder need the optional platform methods. Without them those menu items are disabled.
-- Exported HTML keeps local image srcs as returned by `renderHTML()` (asset URLs are not rewritten to file paths).
-- Find shows "No results" but no match count, because the contract has no count API.

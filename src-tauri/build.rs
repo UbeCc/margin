@@ -30,6 +30,10 @@ const COMMANDS: &[&str] = &[
     "allow_asset_dir",
     "set_theme_menu",
     "relocate_images",
+    "rename_path",
+    "trash_path",
+    "create_dir",
+    "reveal_path",
 ];
 
 fn main() {
