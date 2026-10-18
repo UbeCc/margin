@@ -6,7 +6,7 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
 const out = process.argv[2] ?? 'ci-out';
-const STAGES = ['npm_ci', 'typecheck', 'vitest', 'e2e', 'cargo_test', 'clippy', 'bundle', 'smoke'];
+const STAGES = ['npm_ci', 'typecheck', 'vitest', 'e2e', 'cargo_test', 'clippy', 'bundle', 'smoke', 'native_qa'];
 const read = (f) => (existsSync(join(out, f)) ? readFileSync(join(out, f), 'utf8') : '');
 const json = (f) => { try { return JSON.parse(read(f)); } catch { return null; } };
 const ICON = { pass: '✅', fail: '❌', warn: '⚠️', skip: '⏭️', blocked: '⛔' };
@@ -45,6 +45,12 @@ function notes(stage, log) {
     return (sizes.length ? sizes : files).join(', ');
   }
   if (stage === 'smoke') return read('smoke.note').trim();
+  if (stage === 'native_qa') {
+    const rows = [...read('native-qa.txt').matchAll(/^RESULT (\S+) (\S+)/gm)];
+    const bad = rows.filter((r) => r[2] === 'fail').map((r) => r[1]);
+    const ok = rows.filter((r) => r[2] === 'pass').length;
+    return `${ok}/${rows.length} pass` + (bad.length ? `; failed: ${bad.join(', ')}` : '');
+  }
   return '';
 }
 

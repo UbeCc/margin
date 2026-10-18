@@ -125,6 +125,15 @@ export class TauriPlatform implements Platform {
     }
   }
 
+  /**
+   * After the first save of a document: copy images that were stored while it was
+   * unsaved (`<app data>/images`, absolute srcs) under `rule`. Returns
+   * `{ oldSrc: newSrc }`; rewrite those srcs in the document. Others are untouched.
+   */
+  relocateImages(docPath: string, rule: ImageRule, srcs: string[]): Promise<Record<string, string>> {
+    return call('relocate_images', { docPath, rule, srcs });
+  }
+
   // ---- optional file-tree operations (PlatformExtras, #21)
   rename(from: string, to: string): Promise<void> {
     return call('rename_path', { from, to });
