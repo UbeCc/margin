@@ -9,6 +9,7 @@ mod fsops;
 mod fsops_unix;
 mod images;
 mod menu;
+mod pandoc;
 #[cfg(target_os = "macos")]
 mod pdf_macos;
 mod quick_open;
@@ -17,6 +18,7 @@ mod remote_images;
 pub mod recent;
 mod settings;
 mod watch;
+mod upload;
 mod watch_state;
 #[cfg(test)]
 mod watch_live_tests;
@@ -273,6 +275,8 @@ pub fn run() {
             commands::save_dialog,
             commands::export_html,
             commands::export_pdf,
+            pandoc::pandoc_detect,
+            pandoc::pandoc_export,
             commands::print_window,
             commands::load_settings,
             commands::save_settings,
@@ -291,6 +295,7 @@ pub fn run() {
             commands::trash_path,
             commands::create_dir,
             commands::reveal_path,
+            upload::upload_images,
             clipboard_macos::clipboard_write_rich,
             clipboard_read::clipboard_read,
         ])

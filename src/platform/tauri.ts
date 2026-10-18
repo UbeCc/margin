@@ -1,6 +1,6 @@
 import { convertFileSrc, invoke } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
-import type { AppSettings, DirEntry, FsEvent, ImageRule, MenuAction, Platform, RichClipboardData, ClipboardSnapshot } from '../contracts';
+import type { AppSettings, DirEntry, FsEvent, ImageRule, MenuAction, Platform, RichClipboardData, ClipboardSnapshot, UploadConfig } from '../contracts';
 import { builtinThemes, normalizeSettings, printHtmlInIframe } from './common';
 
 /** Event names emitted by `src-tauri/src/lib.rs`. */
@@ -125,6 +125,19 @@ export class TauriPlatform implements Platform {
     }
   }
 
+  // ---- optional Pandoc export (PlatformExtras, #81)
+  pandocExport(
+    markdown: string,
+    outPath: string,
+    opts: { format: string; docDir: string | null; title: string | null; pandocPath: string | null; timeoutMs: number },
+  ): Promise<string> {
+    return call('pandoc_export', { markdown, outPath, ...opts });
+  }
+
+  pandocDetect(pandocPath: string | null): Promise<{ path: string; version: string }> {
+    return call('pandoc_detect', { pandocPath });
+  }
+
   /**
    * After the first save of a document: copy images that were stored while it was
    * unsaved (`<app data>/images`, absolute srcs) under `rule`. Returns
@@ -150,6 +163,11 @@ export class TauriPlatform implements Platform {
 
   revealInFolder(path: string): Promise<void> {
     return call('reveal_path', { path });
+  }
+
+  /** #80: custom command (argv, no shell) or PicGo on 127.0.0.1; one URL per path. */
+  uploadImages(paths: string[], config: UploadConfig): Promise<string[]> {
+    return call('upload_images', { paths, config });
   }
 
   /** Let the webview load images from one more directory (non-recursive). */

@@ -3,6 +3,7 @@ import { themeLabel } from '../themes';
 import { IMAGE_RULE_PRESETS, imageRulePresetId, type MarginSettings } from './settings';
 import { h, debounce } from './util/dom';
 import { openModal } from './ui/modal';
+import { uploadPrefsSection } from './upload-prefs';
 
 export interface PreferencesHost {
   settings(): MarginSettings;
@@ -11,6 +12,8 @@ export interface PreferencesHost {
   isDarkTheme(name: string): boolean;
   openThemesFolder(): void;
   pickFolder(): Promise<string | null>;
+  /** Locate pandoc for the given path ('' = auto); resolves to a status line, never rejects. */
+  detectPandoc?(path: string): Promise<string>;
 }
 
 type Section = 'appearance' | 'editor' | 'files' | 'images';
@@ -92,12 +95,31 @@ export function openPreferences(host: PreferencesHost, initial: Section = 'appea
     const v = Number(delay.value);
     if (v >= 0.3 && v <= 60) set({ autoSaveDelay: Math.round(v * 1000) });
   });
+  const pandocPath = h('input.text-input', { type: 'text', placeholder: 'Auto-detect', value: s.pandocPath, spellcheck: 'false', 'data-pref': 'pandocPath' });
+  pandocPath.addEventListener('change', () => set({ pandocPath: pandocPath.value.trim() }));
+  const pandocStatus = h('span.pref-hint', { 'data-pref-status': 'pandoc' });
+  const detect = host.detectPandoc;
+  const pandocDetect = detect
+    ? h('button.btn', {
+        type: 'button',
+        text: 'Detect',
+        onclick: () => {
+          pandocStatus.textContent = 'Checking…';
+          void detect(pandocPath.value.trim()).then(
+            (m) => (pandocStatus.textContent = m),
+            (e: unknown) => (pandocStatus.textContent = String(e)),
+          );
+        },
+      })
+    : null;
   const files = h(
     'section.pref-section',
     { 'data-section': 'files' },
     toggle('autoSave', 'Auto save', 'Save documents automatically after you stop typing'),
     row('Auto-save delay', h('span.inline', null, delay, h('span.unit', { text: 's' }))),
     toggle('restoreLastFolder', 'Reopen last folder on launch'),
+    row('Pandoc path', h('span.inline', null, pandocPath, pandocDetect), 'Used for Word, LaTeX and EPUB export'),
+    h('div.pref-block', null, pandocStatus),
     h(
       'div.pref-actions',
       null,
@@ -172,6 +194,7 @@ export function openPreferences(host: PreferencesHost, initial: Section = 'appea
       }),
     ),
     h('p.pref-note', { text: '${filename} is replaced with the document name. Unsaved documents keep images where they are until saved.' }),
+    uploadPrefsSection(s, (p) => set(p as Partial<MarginSettings>)),
   );
   absDir.addEventListener('change', applyRule);
   relDir.addEventListener('change', applyRule);
