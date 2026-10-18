@@ -279,5 +279,30 @@ mod fake {
             assert!(std::fs::metadata(&out).unwrap().len() > 20, "{fmt}");
         }
         assert!(std::fs::read_to_string(tmp.path().join("out.tex")).unwrap().contains("\\begin{document}"));
+        // #90 options against real pandoc: reference doc, epub css + chapter level, extra args.
+        let refdoc = tmp.path().join("ref.docx");
+        let o = std::process::Command::new(&bin).args(["-o", refdoc.to_str().unwrap(), "--print-default-data-file", "reference.docx"]).output().unwrap();
+        assert!(o.status.success());
+        std::fs::write(tmp.path().join("e.css"), "body{color:red}").unwrap();
+        for (fmt, ext, options) in [
+            ("docx", "docx", PandocOptions { reference_doc: "ref.docx".into(), extra_arguments: "--toc".into(), ..Default::default() }),
+            ("epub", "epub", PandocOptions { css: "${currentFolder}/e.css".into(), epub_chapter_level: 2, ..Default::default() }),
+            ("latex", "tex", PandocOptions { extra_arguments: "-V 'geometry:margin=1in' --number-sections".into(), ..Default::default() }),
+        ] {
+            let out = tmp.path().join(format!("opt.{ext}"));
+            let r = ExportRequest {
+                markdown: "# A\n\ntext\n\n## B\n".into(),
+                out: &out,
+                format: fmt,
+                doc_dir: Some(tmp.path()),
+                title: Some("T"),
+                timeout: DEFAULT_TIMEOUT,
+                options,
+                cancel: None,
+            };
+            export(&bin, r).unwrap_or_else(|e| panic!("{fmt} with options: {e}"));
+        }
+        let tex = std::fs::read_to_string(tmp.path().join("opt.tex")).unwrap();
+        assert!(tex.contains("margin=1in") && !tex.contains("\\section*{A}"), "geometry + numbered sections");
     }
 }
