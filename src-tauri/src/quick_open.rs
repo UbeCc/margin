@@ -261,12 +261,15 @@ impl QuickOpen {
 // ------------------------------------------------------------ spotlight glue
 
 /// Cap on raw Spotlight hits per query; the scorer ranks within these.
+#[cfg_attr(not(target_os = "macos"), allow(dead_code))] // pure helper, unit-tested on all OSes
 pub const SPOTLIGHT_MAX: usize = 20_000;
 /// How long an "is this folder indexed?" probe answer is trusted.
+#[cfg_attr(not(target_os = "macos"), allow(dead_code))] // pure helper, unit-tested on all OSes
 const PROBE_TTL: Duration = Duration::from_secs(60);
 
 /// Escape a literal for a double-quoted MDQuery string value. `*` and `?` are
 /// wildcards there, `\` and `"` delimit; all are backslash-escaped.
+#[cfg_attr(not(target_os = "macos"), allow(dead_code))] // pure helper, unit-tested on all OSes
 pub fn md_escape(s: &str) -> String {
     let mut out = String::with_capacity(s.len());
     for c in s.chars() {
@@ -288,6 +291,7 @@ pub fn md_escape(s: &str) -> String {
 /// with `kMDItemFSName == "*.md"c || …` clauses: each suffix clause is another
 /// scan of the volume-wide name index (measured: six of them double the query
 /// time, ~200 ms → ~420 ms on a 20k-file folder).
+#[cfg_attr(not(target_os = "macos"), allow(dead_code))] // pure helper, unit-tested on all OSes
 pub fn md_predicate(query: &str) -> Option<String> {
     let mut pat = String::from("*");
     for c in query.chars().filter(|c| !c.is_whitespace()) {
@@ -300,11 +304,13 @@ pub fn md_predicate(query: &str) -> Option<String> {
 /// Predicate used to probe whether a folder is in the Spotlight index at all:
 /// any item at all under the scope. (A bare `kMDItemFSName == "*"` matches
 /// nothing in MDQuery, so use the content-type tree.)
+#[cfg_attr(not(target_os = "macos"), allow(dead_code))] // pure helper, unit-tested on all OSes
 pub const PROBE_PREDICATE: &str = "kMDItemContentTypeTree == \"public.item\"";
 
 /// Map absolute Spotlight paths to root-relative forward-slash paths, keeping
 /// only files the walker would also index (no hidden components, no skipped
 /// dirs, not git-ignored).
+#[cfg_attr(not(target_os = "macos"), allow(dead_code))] // pure helper, unit-tested on all OSes
 pub fn filter_hits(root: &Path, hits: Vec<PathBuf>) -> Vec<String> {
     let canon = root.canonicalize().unwrap_or_else(|_| root.to_path_buf());
     let mut ignores = IgnoreCache::default();
@@ -426,6 +432,7 @@ fn spotlight_spawn(root: &Path, query: &str) -> Option<mpsc::Receiver<Option<Vec
 }
 
 #[cfg(not(target_os = "macos"))]
+#[allow(dead_code)] // only the benchmark calls it off macOS
 pub fn spotlight_hits(_root: &Path, _query: &str) -> Option<Vec<String>> {
     None
 }
