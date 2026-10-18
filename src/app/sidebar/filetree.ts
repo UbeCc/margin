@@ -1,6 +1,7 @@
 import type { DirEntry, FsEvent, Platform } from '../../contracts';
 import { duplicateFile, fileMenu, showInfo, type SideFileOps } from './file-menus';
 import { extras } from '../platform-extras';
+import { isTextBundlePath, RENAME_BUNDLE_TO_MD, RENAME_MD_TO_BUNDLE } from '../textbundle';
 import { h, icon, clearChildren } from '../util/dom';
 import { basename, dirname, isInside, isMarkdownPath, isValidFileName, join, uniqueName, extname } from '../util/path';
 import { DEFAULT_SORT, sortEntries, type SortOrder } from './sort';
@@ -234,24 +235,26 @@ export class FileTree {
 
   private renderEntry(entry: DirEntry): HTMLLIElement {
     const depth = this.depthOf(entry.path);
+    // A `.textbundle` folder is one document (fe-sidebar §1): file row, no children.
+    const asFile = !entry.isDir || isTextBundlePath(entry.path);
     const row = h(
       'div.tree-row',
       {
         role: 'treeitem',
         tabindex: '-1',
         'data-path': entry.path,
-        'data-kind': entry.isDir ? 'dir' : 'file',
+        'data-kind': asFile ? 'file' : 'dir',
         title: entry.path,
         style: `--depth:${depth}`,
       },
-      entry.isDir ? icon('chevron', 'tree-chevron') : h('span.tree-chevron-space'),
-      icon(entry.isDir ? 'folder' : 'file', 'tree-icon'),
+      asFile ? h('span.tree-chevron-space') : icon('chevron', 'tree-chevron'),
+      icon(entry.isDir && !asFile ? 'folder' : 'file', 'tree-icon'),
       h('span.tree-name', { text: entry.name }),
     );
-    if (!entry.isDir && !isMarkdownPath(entry.name)) row.classList.add('tree-other');
+    if (asFile && !isMarkdownPath(entry.name) && !isTextBundlePath(entry.path)) row.classList.add('tree-other');
     this.rows.set(entry.path, row);
     const li = h('li.tree-item', null, row);
-    if (entry.isDir) {
+    if (!asFile) {
       const existing = this.dirs.get(entry.path);
       const node = existing ?? this.makeDirNode(entry.path);
       row.setAttribute('aria-expanded', String(node.expanded));
@@ -264,10 +267,10 @@ export class FileTree {
     }
     if (entry.path === this.active) row.classList.add('active');
     makeDraggable(row, entry.path, this.host.platform);
-    if (entry.isDir) this.dropTarget(row, entry.path);
+    if (entry.isDir && !asFile) this.dropTarget(row, entry.path);
     row.addEventListener('click', (e) => {
       row.focus({ preventScroll: true });
-      if (entry.isDir) void this.toggle(entry.path);
+      if (!asFile) void this.toggle(entry.path);
       else this.activate(entry, (e.metaKey || e.ctrlKey) && !!this.host.openInNewTab);
     });
     row.addEventListener('contextmenu', (e) => {
@@ -279,7 +282,7 @@ export class FileTree {
   }
 
   private activate(entry: DirEntry, newTab = false): void {
-    if (isMarkdownPath(entry.name)) (newTab ? this.host.openInNewTab! : this.host.openFile)(entry.path);
+    if (isMarkdownPath(entry.name) || isTextBundlePath(entry.path)) (newTab ? this.host.openInNewTab! : this.host.openFile)(entry.path);
     else this.host.notify(`${extname(entry.name) || entry.name} files open in other apps`, 'info');
   }
 
@@ -392,8 +395,13 @@ export class FileTree {
   async rename(entry: DirEntry): Promise<void> {
     const rename = extras(this.host.platform).rename;
     if (!rename) return;
-    const name = await promptDialog({ title: `Rename ${entry.isDir ? 'Folder' : 'File'}`, value: entry.name, okLabel: 'Rename', selectStem: !entry.isDir, validate: nameError });
+    const name = await promptDialog({ title: `Rename ${entry.isDir && !isTextBundlePath(entry.path) ? 'Folder' : 'File'}`, value: entry.name, okLabel: 'Rename', selectStem: !entry.isDir, validate: nameError });
     if (!name || name === entry.name) return;
+    // Markdown ↔ TextBundle renames are refused unless the file is empty (fe-sidebar §5).
+    if (isTextBundlePath(entry.path) !== isTextBundlePath(join(dirname(entry.path), name)) && !(await this.isEmptyDoc(entry))) {
+      this.host.notify(isTextBundlePath(entry.path) ? RENAME_BUNDLE_TO_MD : RENAME_MD_TO_BUNDLE, 'warning');
+      return;
+    }
     const to = join(dirname(entry.path), name);
     try {
       await rename.call(this.host.platform, entry.path, to);
@@ -421,6 +429,15 @@ export class FileTree {
         await this.refreshDir(dirname(back));
       },
     };
+  }
+
+  /** Typora lets a Markdown ↔ TextBundle rename through only for an empty file (fe-sidebar §5). */
+  private async isEmptyDoc(entry: DirEntry): Promise<boolean> {
+    try {
+      return !(await this.host.platform.readTextFile(entry.path)).trim();
+    } catch {
+      return false;
+    }
   }
 
   /** Bookkeeping after `from` became `to` (keeps expansion state of moved folders). */
