@@ -52,7 +52,7 @@ test('menu.format.image: Format › Image › Insert Image / Insert Local Images
   // default rule ./assets: copied next to the document, alt = file name
   await expect.poll(() => editorValue(page)).toBe('# Pics\n\nend![shot](assets/shot.png)\n');
   expect(await exists(page, `${ROOT}/assets/shot.png`)).toBe(true);
-  expect(await exists(page, '/pics/del.png')).toBe(true);
+  expect(await exists(page, '/pics/shot.png')).toBe(true);
   await caretAtText(page, 'end', 0);
   await menu(page, 'image:insert');
   await expect.poll(() => editorValue(page)).toContain('![]()end');
