@@ -12,8 +12,8 @@ export interface SourceModeLike {
   focus(): void;
   destroy(): void;
   updateSettings?(s: EditorSettings): void;
-  find?(q: string, opts?: { caseSensitive?: boolean; backwards?: boolean }): boolean;
-  replace?(q: string, replacement: string, opts?: { caseSensitive?: boolean; all?: boolean }): boolean;
+  find?(q: string, opts?: { caseSensitive?: boolean; backwards?: boolean; wholeWord?: boolean; regexp?: boolean }): boolean;
+  replace?(q: string, replacement: string, opts?: { caseSensitive?: boolean; all?: boolean; wholeWord?: boolean; regexp?: boolean }): boolean;
   undo?(): boolean;
   redo?(): boolean;
   /** Optional caret / scroll hand-off (#35): 0-based line at the viewport top, scroll a line to the top. */

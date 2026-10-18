@@ -29,6 +29,8 @@ export interface EditorSettings {
   openLink?(href: string): void;
   /** Optional (#79): add native rich flavours (RTF) after a copy; see `RichClipboardData`. */
   writeClipboardRich?(data: RichClipboardData): Promise<boolean>;
+  /** Optional (#96): read the system clipboard outside a paste event (native menu Paste as Plain Text). */
+  readClipboard?(): Promise<ClipboardSnapshot | null>;
   spellcheck: boolean;
   /** Visual modes. */
   focusMode: boolean;
@@ -60,8 +62,23 @@ export type EditorCommand =
   | { kind: 'undo' }
   | { kind: 'redo' }
   | { kind: 'selectAll' }
-  | { kind: 'find'; query: string; caseSensitive?: boolean; backwards?: boolean }
-  | { kind: 'replace'; query: string; replacement: string; all?: boolean };
+  | { kind: 'find'; query: string; caseSensitive?: boolean; backwards?: boolean; wholeWord?: boolean; regex?: boolean }
+  | { kind: 'replace'; query: string; replacement: string; all?: boolean; caseSensitive?: boolean; wholeWord?: boolean; regex?: boolean }
+  // #96 (additive): Edit › Selection / Delete scopes, Jump To, Copy as / Paste as
+  | { kind: 'select'; scope: 'word' | 'line' | 'block' | 'styled' }
+  | { kind: 'delete'; scope: 'word' | 'line' | 'block' | 'styled' | 'range' }
+  | { kind: 'jump'; to: 'top' | 'bottom' | 'selection' }
+  | { kind: 'copyAs'; format: CopyAsFormat }
+  | { kind: 'pastePlain' };
+
+/**
+ * Edit › Copy as (#96). markdown = source only; html = the rendered HTML *source*
+ * as text; plain = rendered text without markup; unstyled = semantic HTML + plain
+ * text (no private markdown flavour); word = HTML with inline styles + RTF for
+ * word processors; tex / mathml = the math block or inline math at the caret;
+ * image = the image at the caret / in the selection as image data.
+ */
+export type CopyAsFormat = 'markdown' | 'html' | 'plain' | 'unstyled' | 'word' | 'tex' | 'mathml' | 'image';
 
 export interface EditorStats {
   words: number;
@@ -192,7 +209,13 @@ export type MenuAction =
   | 'para:headingUp' | 'para:headingDown' | 'para:insertBefore' | 'para:insertAfter'
   | 'task:toggle' | 'task:complete' | 'task:incomplete' | 'clearFormat'
   | `theme:${string}`
-  | 'preferences';
+  | 'preferences'
+  // #96 (additive): Edit › Copy as / Paste as Plain Text / Selection / Delete / Jump To
+  | `copyAs:${CopyAsFormat}`
+  | 'pastePlain'
+  | `select:${'word' | 'line' | 'block' | 'styled'}`
+  | `delete:${'word' | 'line' | 'block' | 'styled' | 'range'}`
+  | `jump:${'top' | 'bottom' | 'selection'}`;
 
 /** PDF export options (#18 baseDir; #95 page geometry, header/footer, bookmarks, metadata). All optional. */
 export interface PdfExportOptions {
@@ -257,6 +280,16 @@ export interface Platform {
   uploadImages?(paths: string[], config: UploadConfig): Promise<string[]>;
   /** Optional (#79, macOS): add public.rtf to the pasteboard after WebKit wrote `marker`'s copy. */
   writeClipboardRich?(data: RichClipboardData): Promise<boolean>;
+  /** Optional (#96, macOS): plain/HTML of the general pasteboard, plus HTML converted from RTF/RTFD. */
+  readClipboard?(): Promise<ClipboardSnapshot | null>;
+}
+
+/** System clipboard contents read natively (#96); null fields = flavour absent. */
+export interface ClipboardSnapshot {
+  plain: string | null;
+  html: string | null;
+  /** HTML generated from RTF / RTFD when the clipboard had no HTML (rich apps). */
+  rtfHtml: string | null;
 }
 
 /**

@@ -23,6 +23,7 @@ export const T = {
   util: 'src/app/__tests__/util.test.ts::',
   web: 'src/platform/web.test.ts::',
   pexp: 'tests/e2e/parity-export.spec.ts::',
+  pclip: 'tests/e2e/parity-clipboard.spec.ts::',
 };
 
 // Owner prefixes.

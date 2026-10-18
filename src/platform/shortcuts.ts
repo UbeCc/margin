@@ -64,6 +64,13 @@ export const SHORTCUTS: Shortcut[] = [
   m('zoomIn', 'Equal'),
   m('zoomOut', 'Minus'),
   m('preferences', 'Comma'),
+  // #96 Edit › Copy as / Paste as / Selection / Delete / Jump To
+  m('copyAs:markdown', 'KeyC', { shift: true }),
+  m('select:word', 'KeyD'),
+  m('select:line', 'KeyL'),
+  m('select:styled', 'KeyE', { shift: true }),
+  m('delete:word', 'KeyD', { shift: true }),
+  m('jump:selection', 'KeyJ'),
 ];
 
 /** Match a keydown against the table. Cmd on macOS, Ctrl elsewhere (either accepted). */
