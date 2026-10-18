@@ -52,7 +52,7 @@ test('menu.format.image: Format › Image › Insert Image / Insert Local Images
   // default rule ./assets: copied next to the document, alt = file name
   await expect.poll(() => editorValue(page)).toBe('# Pics\n\nend![shot](assets/shot.png)\n');
   expect(await exists(page, `${ROOT}/assets/shot.png`)).toBe(true);
-  expect(await exists(page, '/pics/shot.png')).toBe(true);
+  expect(await exists(page, '/pics/del.png')).toBe(true);
   await caretAtText(page, 'end', 0);
   await menu(page, 'image:insert');
   await expect.poll(() => editorValue(page)).toContain('![]()end');
@@ -164,19 +164,31 @@ test('images.delete: Image context: Delete Image / Delete Image File (undoable)'
   await page.keyboard.press(`${MOD}+z`);
   await expect.poll(() => editorValue(page)).toBe('a ![s](https://x.example/s.png) b\n');
 
-  await setDoc(page, 'a ![s](/pics/shot.png) b\n');
+  // A 24×24 PNG: a 1×1 image at a fractional inline offset rounds to a 0-width
+  // hit box on Linux WebKit and cannot be clicked (app renders natural size).
+  await page.evaluate(
+    (b64) => {
+      const w = window as unknown as Win;
+      const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+      void w.__MARGIN_WEB__.storeImage(null, { kind: 'absolute', dir: '/pics' }, { bytes, mime: 'image/png' }).then(async (made) => {
+        await w.__MARGIN_WEB__.rename(decodeURI(made), '/pics/del.png');
+      });
+    },
+    'iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAIAAABvFaqvAAAAH0lEQVR4nGOYcOADVRDDqEGjBo0aNGrQqEGjBg28QQDyphBMTK0GVQAAAABJRU5ErkJggg==',
+  );
+  await setDoc(page, 'a ![s](/pics/del.png) b\n');
 
   await rightClickImage(page);
   await ctxItem(page, 'Delete Image File').click();
   const dlg = page.locator('.dialog');
-  await expect(dlg).toContainText('Are you sure you want to delete shot.png?');
+  await expect(dlg).toContainText('Are you sure you want to delete del.png?');
   await dlg.locator('button[data-id=cancel]').click();
-  expect(await exists(page, '/pics/shot.png')).toBe(true);
+  expect(await exists(page, '/pics/del.png')).toBe(true);
   await rightClickImage(page);
   await ctxItem(page, 'Delete Image File').click();
   await page.locator('.dialog button[data-id=ok]').click();
   await expect.poll(() => editorValue(page)).toBe('a  b\n');
-  expect(await exists(page, '/pics/shot.png')).toBe(false);
+  expect(await exists(page, '/pics/del.png')).toBe(false);
 });
 
 test('images.reveal-open: Image context: Open Image Location… / Open in Browser… / Copy Image Content', async ({ page }) => {
