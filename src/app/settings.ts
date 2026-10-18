@@ -1,4 +1,5 @@
 import type { AppSettings, ImageRule } from '../contracts';
+import { DEFAULT_SORT, isSortOrder, type SortOrder } from './sidebar/sort';
 import { DEFAULT_EXPORT, migrateExportSettings, type ExportSettings } from './export-settings';
 
 /**
@@ -17,6 +18,22 @@ export interface MarginSettings extends AppSettings {
   sidebarVisible: boolean;
   sidebarTab: 'files' | 'outline';
   sidebarWidth: number;
+  /** File tree ordering (#101; Typora `treeSortType`). */
+  sidebarSort: SortOrder;
+  /** Articles list ordering (Typora `listSortType`, kept separately). */
+  listSort: SortOrder;
+  /** Files panel layout: lazy tree or flat Articles list (#101). */
+  sidebarFileView: 'tree' | 'list';
+  /** Tree "Group By Folder": folders first (default on). */
+  sidebarGroupByFolder: boolean;
+  /** Articles "Group By Folder": bucket articles by folder (default on). */
+  listGroupByFolder: boolean;
+  /** Sidebar folder search options (Typora `fileSearch*`). */
+  fileSearchCaseSensitive: boolean;
+  fileSearchWholeWord: boolean;
+  fileSearchUseRegexp: boolean;
+  /** Outline: "Collapsible Outline" vs "Flat Outline". */
+  outlineCollapsible: boolean;
   /** Auto-save delay in ms after the last edit. */
   autoSaveDelay: number;
   restoreLastFolder: boolean;
@@ -48,6 +65,15 @@ export const DEFAULT_SETTINGS: Readonly<MarginSettings> = Object.freeze({
   sidebarVisible: true,
   sidebarTab: 'files',
   sidebarWidth: 260,
+  sidebarSort: DEFAULT_SORT,
+  listSort: DEFAULT_SORT,
+  sidebarFileView: 'tree',
+  sidebarGroupByFolder: true,
+  listGroupByFolder: true,
+  fileSearchCaseSensitive: false,
+  fileSearchWholeWord: false,
+  fileSearchUseRegexp: false,
+  outlineCollapsible: false,
   restoreLastFolder: true,
   export: DEFAULT_EXPORT,
   pandocPath: '',
@@ -127,6 +153,15 @@ export function migrateSettings(input: unknown): MarginSettings {
     sidebarVisible: bool(raw.sidebarVisible, d.sidebarVisible),
     sidebarTab: tab === 'files' || tab === 'outline' ? tab : d.sidebarTab,
     sidebarWidth: Math.round(num(raw.sidebarWidth, d.sidebarWidth, 180, 520)),
+    sidebarSort: isSortOrder(raw.sidebarSort) ? raw.sidebarSort : d.sidebarSort,
+    sidebarFileView: raw.sidebarFileView === 'list' ? 'list' : 'tree',
+    listSort: isSortOrder(raw.listSort) ? raw.listSort : d.listSort,
+    sidebarGroupByFolder: bool(raw.sidebarGroupByFolder, d.sidebarGroupByFolder),
+    listGroupByFolder: bool(raw.listGroupByFolder, d.listGroupByFolder),
+    fileSearchCaseSensitive: bool(raw.fileSearchCaseSensitive, d.fileSearchCaseSensitive),
+    fileSearchWholeWord: bool(raw.fileSearchWholeWord, d.fileSearchWholeWord),
+    fileSearchUseRegexp: bool(raw.fileSearchUseRegexp, d.fileSearchUseRegexp),
+    outlineCollapsible: bool(raw.outlineCollapsible, d.outlineCollapsible),
     restoreLastFolder: bool(raw.restoreLastFolder, d.restoreLastFolder),
     export: migrateExportSettings(raw.export),
     pandocPath: typeof raw.pandocPath === 'string' ? raw.pandocPath.trim() : '',

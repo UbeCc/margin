@@ -9,14 +9,14 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 | | surfaces |
 |---|---|
 | total | 171 |
-| owned (implemented) | 113 (with a named passing test: 100) |
+| owned (implemented) | 118 (with a named passing test: 105) |
 | partial | 15 |
-| missing | 35 |
+| missing | 30 |
 | out of scope | 8 |
 
-REA ledger `rol_aa81eb160074b9b09e7cb8c6a814a20c4d2d0a9618bdd406d464d6c51d3c94b0` (closure `059f37a6466cfcc5…`): status **unknown**; unowned 35, implemented 128, out-of-scope 8, unknown 5.
+REA ledger `rol_f8c19f596e09d559b8a8281bb1374b2d95699b235b3f9a99774a8e51e0eb286f` (closure `8c24acfa956b80a6…`): status **unknown**; unowned 30, implemented 133, out-of-scope 8, unknown 5.
 
-REA coverage boundary `margin.typora-parity`: status **unknown**; 100/163 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 35, package-proof-missing 1, verifier-missing 56, verifier-unknown 7.
+REA coverage boundary `margin.typora-parity`: status **unknown**; 105/163 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 30, package-proof-missing 1, verifier-missing 51, verifier-unknown 7.
 
 Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): build exit 0, cargo-test exit 101, independence exit 0, playwright exit 0, vitest exit 0. See `rea/summary.json`.
 
@@ -40,7 +40,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `tools` Table, code-fence and math tools | P1 | 1 |
 | `images` Image pipeline: insert-local, copy/move/upload, zoom, syntax switch, image root path | P1 | 0 |
 | `prefs` Preferences completeness (General, Editor, Image, Markdown, Export, Appearance panes) | P1 | 8 |
-| `sidebar` Sidebar & outline: list view, file search, sort, collapsible outline, filter | P1 | 6 |
+| `sidebar` Sidebar & outline: list view, file search, sort, collapsible outline, filter | P1 | 1 |
 | `syntax` Markdown syntax options & whitespace/line-break settings | P2 | 5 |
 | `chrome` Window chrome & writing aids: status bar, always-on-top, spelling, substitutions, speech, emoji | P2 | 9 |
 
@@ -61,7 +61,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `menu.file.tabs` | Tabs: New Tab, switch between opened documents, next/previous tab — #23 | **missing** | P0 | — | none | 5 |
 | `menu.file.open` | File › Open… (file dialog) | owned |  | `src/app/app.ts` `case 'open'` | `tests/e2e/app-files.spec.ts` › file tree lazily expands folders and opens files | 10 |
 | `menu.file.open-folder` | File › Open Folder… | owned |  | `src/app/app.ts` `case 'openFolder'` | `tests/e2e/app-files.spec.ts` › file tree lazily expands folders and opens files | 10 |
-| `menu.file.quick-open` | File › Open Quickly (fuzzy file finder) | owned |  | `src/app/app.ts` `quickOpen(): void` | `tests/e2e/app-navigation.spec.ts` › quick open fuzzy-finds files with highlights | 8 |
+| `menu.file.quick-open` | File › Open Quickly (fuzzy file finder) — deliberate deviations from Typora (native-commands §3, #119): every file type is searchable (Markdown ranked first), extension and name matching are case-insensitive, query text is escaped, an empty/unindexed/stale Spotlight answer falls back to the walker, deleted entries are pruned | owned |  | `src/app/app.ts` `quickOpen(): void` | `tests/e2e/app-navigation.spec.ts` › quick open fuzzy-finds files with highlights | 9 |
 | `menu.file.recent` | File › Open Recent (files + folders, clear) | owned |  | `src-tauri/src/recent.rs` `No Recent Items` | `src/app/__tests__/settings.test.ts` › dedupes and caps recent lists | 8 |
 | `menu.file.reopen-closed` | File › Reopen Closed File | **missing** | P1 | — | none | 1 |
 | `menu.file.save` | File › Save (dirty tracking, atomic write) | owned |  | `src/app/app.ts` `case 'save'` | `tests/e2e/app-files.spec.ts` › editing marks dirty, Cmd+S saves to disk | 8 |
@@ -86,7 +86,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `menu.edit.undo-redo` | Edit › Undo / Redo | owned |  | `src/app/app.ts` `case 'undo'` | `tests/e2e/core-cases.ts` › typing, Enter split, heading shortcut, undo/redo | 7 |
 | `menu.edit.cut-copy-paste` | Edit › Cut / Copy / Paste (markdown + HTML round-trip) | owned |  | `src/editor/core/clipboard.ts` `export function onPaste` | `tests/e2e/core-cases.ts` › paste HTML becomes markdown; copy gives markdown | 5 |
 | `menu.edit.delete-select-all` | Edit › Delete / Select All | owned |  | `src/editor/core/commands.ts` `case 'selectAll'` | `tests/e2e/blocks-core.spec.ts` › Cmd/Ctrl+A in a table cell selects the cell | 2 |
-| `menu.edit.find-replace` | Edit › Find / Find Next / Previous / Replace / Replace Next | owned |  | `src/app/findbar.ts` `caseSensitive` | `tests/e2e/app-navigation.spec.ts` › find keeps focus in the bar, counts and cycles matches | 14 |
+| `menu.edit.find-replace` | Edit › Find / Find Next / Previous / Replace / Replace Next | owned |  | `src/app/findbar.ts` `caseSensitive` | `tests/e2e/app-navigation.spec.ts` › find keeps focus in the bar, counts and cycles matches | 15 |
 | `menu.edit.find-options` | Find options: whole word and regular expression — Match Case / Whole Word / Regular Expression ($1 replacement) done; no In Selection | **partial** | P1 | `src/editor/core/query.ts` `export function compileQuery` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.find-options: Find options: whole word and regular expression | 3 |
 | `menu.edit.copy-as` | Edit › Copy as Markdown / HTML Code / Plain Text / without Theme Styling / to MS Word | owned |  | `src/editor/core/copy-as.ts` `export function copyAs` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.copy-as: Edit › Copy as Markdown / HTML Code / Plain Text / without Theme Styling / to MS Word | 11 |
 | `menu.edit.paste-plain` | Edit › Paste as Plain Text | owned |  | `src/editor/core/copy-as.ts` `export function pastePlain` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.paste-plain: Edit › Paste as Plain Text | 2 |
@@ -256,12 +256,12 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
 | `sidebar.tree` | File tree: lazy folders, open, watch, new/rename/trash/reveal/copy path | owned |  | `src/app/sidebar/filetree.ts` `'New File…'` | `tests/e2e/app-files.spec.ts` › context menu: new file, rename (open doc follows), new folder, trash | 20 |
-| `sidebar.list-view` | Articles list view (summaries, ≤400 items) and tree/list switch | **missing** | P1 | — | none | 7 |
-| `sidebar.search` | Sidebar full-text search across the folder | **missing** | P1 | — | none | 7 |
-| `sidebar.sort` | File tree sorting (name/natural/created/modified, asc/desc) | **missing** | P1 | — | none | 9 |
+| `sidebar.list-view` | Articles list view (summaries, ≤400 items) and tree/list switch — Margin defaults to the tree view on every OS (Typora macOS defaults to Articles) | owned |  | `src/app/sidebar/filelist.ts` `export class FileList` | `tests/e2e/parity-sidebar.spec.ts` › sidebar.list-view: Articles list view | 7 |
+| `sidebar.search` | Sidebar full-text search across the folder — "Searching"/"Gathering more results" belong to Quick Open and "No Results" to in-document Find (fe-sidebar-statusbar-find §10); "File Results" is unused in 1.5.12 | owned |  | `src/app/sidebar/search.ts` `export class SidebarSearch` | `tests/e2e/parity-sidebar.spec.ts` › sidebar.search: Sidebar full-text search | 4 |
+| `sidebar.sort` | File tree sorting (name/natural/created/modified, asc/desc) — deliberate fix: Typora code −3 serves both natural-desc and creation-desc; Margin keeps all eight orders distinct. Sort menu sits in the files header (Typora: footer menu) | owned |  | `src/app/sidebar/sort.ts` `export const SORT_OPTIONS` | `tests/e2e/parity-sidebar.spec.ts` › sidebar.sort: File tree sorting | 9 |
 | `sidebar.outline` | Outline: headings, jump, highlight current header | owned |  | `src/app/sidebar/outline.ts` `activeId` | `tests/e2e/app-navigation.spec.ts` › outline lists headings and jumps on click | 2 |
-| `sidebar.outline-collapse` | Outline: collapsible/flat outline, expand/collapse all, filter, unpin | **missing** | P1 | — | none | 7 |
-| `sidebar.drag` | Drag files from sidebar into the editor / other apps; drop files to open — #23 | **missing** | P2 | — | none | 1 |
+| `sidebar.outline-collapse` | Outline: collapsible/flat outline, expand/collapse all, filter, unpin — pin/unpin (outline drop-down) not implemented | owned |  | `src/app/sidebar/outline.ts` `export function filterHeadings` | `tests/e2e/parity-sidebar.spec.ts` › sidebar.outline-collapse: Outline: collapsible/flat outline | 7 |
+| `sidebar.drag` | Drag files from sidebar into the editor / other apps; drop files to open — #23 | owned |  | `src/app/sidebar/drag.ts` `export function dropMarkdown` | `tests/e2e/parity-sidebar.spec.ts` › sidebar.drag: Drag files from sidebar | 1 |
 
 ## Export / print / import
 
