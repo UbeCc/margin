@@ -2,9 +2,9 @@
  "boundary_id": "margin.typora-parity",
  "status": "unknown",
  "summary": {
-  "required_surfaces": 172,
-  "required_claims": 164,
-  "reasons": 18
+  "required_surfaces": 173,
+  "required_claims": 165,
+  "reasons": 16
  },
  "reasons": [
   {
@@ -85,16 +85,6 @@
   {
    "code": "verifier-unknown",
    "subject_id": "claim.menu.edit.find-options",
-   "detail": "Latest compatible verifier result is unknown."
-  },
-  {
-   "code": "verifier-unknown",
-   "subject_id": "claim.pref.editor.general",
-   "detail": "Latest compatible verifier result is unknown."
-  },
-  {
-   "code": "verifier-unknown",
-   "subject_id": "claim.syntax.save-normalize",
    "detail": "Latest compatible verifier result is unknown."
   }
  ],
@@ -178,16 +168,6 @@
    "operation": "run_reconstruction_verifier",
    "subject_id": "claim.menu.edit.find-options",
    "rationale": "Latest compatible verifier result is unknown."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.pref.editor.general",
-   "rationale": "Latest compatible verifier result is unknown."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.syntax.save-normalize",
-   "rationale": "Latest compatible verifier result is unknown."
   }
  ],
  "evidence_ids": [
@@ -212,7 +192,6 @@
   "ev_196afff3263dd6a3ade1b0d510328293cbe1c2f21a3154d5d290f8d70c66a8df",
   "ev_1a05624c870369ebdd15bf48a8d515f6482898e461008242574fb5cd42fa40fb",
   "ev_1a8c991b9c46e063f2332b39043e18d7e103df723cb6e39f8a4cb4fe991e5157",
-  "ev_1c92d513ea60222776d3e090b1adfd71ac7a2d2369cc16083e4e49094c1c84b2",
   "ev_1f7b91f2e55c7f34f3968222d9a417eff930448fabcc8032c25b425206549002",
   "ev_1fff77de0927975cf6c8e1ae1f4f756642727a508cab1ec65759d425f7ebbded",
   "ev_210b496b7a2ca2b6eac0606fe3a5ed74764fe4084ee04c8729b0bcf59ab89760",
@@ -240,8 +219,9 @@
   "ev_3884ad2bb7ad085952a8e7e3397ce7b70ed4f265d7ce21254d8dad24de4ea733",
   "ev_38daf0ee2f412fc250e29a754aba0039c57be6b142b277be4dc2b8dbe75f1a9f",
   "ev_391cc84ed55b4e709a481b8ea9fa2d41219c67af1bc7f85c1e9072919493911c",
-  "ev_398b968a3f776bc01454b68dc33300c429913875739918ac9909f514d425f10f",
+  "ev_3ba5f1d95e8d020f5a7ba173411715f0c222b871384cea454ce7d1788477336d",
   "ev_3c0855fd39565d4264201a1d588a02aa4c4d16f198e296ca90f373834f471390",
+  "ev_3da74c48da398f9c3c2627b4e2ff057102d092cb833471f6b02161f3e8b4968a",
   "ev_3f6cecf0497ef114e31557e49d950d4a6eb65c9c2d74b0aed4ab4dc6e73fc2d6",
   "ev_3fb8b84cee7279d523a2c19c8441384de2e266aa5ed455b1a6a8c68889ae3be1",
   "ev_41a86ed70f7d352fd1fd4ee4c8fc8d5ed2b1ee32ef2fd8ceb10510601f0c962e",
@@ -344,6 +324,7 @@
   "ev_cbbff2fa81f950a2655e36d98f87416ad3d06f3aa614f4cd1ddf8a7dbfa0d952",
   "ev_ccce03989b2007515ca06a4b79ad560b9585b91ad0ca87c9df4bb12b13af90d0",
   "ev_d1f17de163f986bfe6a970f3e13c403c94264e4e7e9598910dfd95f003aa1e8f",
+  "ev_d69e477a199d07ed98e3ec1726139f7de887dc52c5fe9bfcd7db0883ef2eda33",
   "ev_d825065e1b0fb8d6be57683cbbbba95b8b4b53f53bc71d7ab0062f0684bc0c3e",
   "ev_d845db61235a5db384bbbcf2c757424237c4a065feff8c7bcea0b67bc7ddd7ce",
   "ev_d8a65e114dd0a62d01ed1519a5bb1298a931c96600f0cafbfed9177771e74847",

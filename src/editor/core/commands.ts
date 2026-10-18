@@ -58,10 +58,23 @@ function heading(ed: EditorCore, level: number): boolean {
   const off = ed.doc.locate(ed.sel().from).off;
   const [pre, body] = l.type === 'heading' ? splitBlockMeta(l, c) : ['', c];
   const text = l.setext ? body : c.slice(pre.length);
-  const np = level ? '#'.repeat(level) + ' ' : '';
+  const flat = text.replace(/\n/g, ' ');
+  // #159 Heading Style (fe-preferences §7.1) applies to syntax Typora generates:
+  // menu/shortcut-created headings. Typed `#` stays ATX; setext covers h1–h2 only,
+  // deeper levels fall back to ATX. Variable-width setext underlines match the text.
+  const style = ed.md().headingStyle;
+  const setext = level >= 1 && level <= 2 && (style === 'setext' || style === 'setextVar');
+  const content = setext
+    ? `${flat}\n${(level === 1 ? '=' : '-').repeat(style === 'setextVar' ? Math.max(1, flat.length) : 3)}`
+    : level && style === 'atxSuffix'
+      ? `${'#'.repeat(level)} ${flat} ${'#'.repeat(level)}`
+      : level
+        ? `${'#'.repeat(level)} ${flat}`
+        : flat;
+  const preLen = setext ? 0 : level ? level + 1 : 0;
   ed.change(() => {
-    ed.doc.setContent(i, np + text.replace(/\n/g, ' '));
-    return { pos: ed.doc.docPos(i, np.length + Math.max(0, off - pre.length)) };
+    ed.doc.setContent(i, content);
+    return { pos: ed.doc.docPos(i, Math.min(preLen + Math.max(0, off - pre.length), flat.length)) };
   });
   ed.hist.break();
   return true;
@@ -105,9 +118,17 @@ function mark(ed: EditorCore, m: string): boolean {
 function containerBlock(ed: EditorCore, kind: 'quote' | 'ul' | 'ol' | 'task'): boolean {
   const { from, to } = ed.sel();
   // #102: list markers created from the menu follow Preferences › Markdown (existing lists are untouched).
-  const { ulStyle: ul, olStyle } = ed.md();
-  const ol = '.';
-  if (!ed.doc.leaves.length) return insertBlock(ed, kind === 'quote' ? '> ' : kind === 'ul' ? `${ul} ` : kind === 'ol' ? `1${ol} ` : `${ul} [ ] `, false);
+  // #159 Indent Size on Save + Pretty indentation (fe-preferences §5.1): generated markers
+  // use the pattern template — marker padded so content starts at the indent width
+  // (Auto/0 → 2, Tab −1 → a literal `\t`); Pretty off = one space. Applies only to
+  // quotes/lists created from the menu bar; everything else is never rewritten.
+  const { ulStyle: ul, olStyle, indentSize, prettyIndent } = ed.md();
+  const w = indentSize === -1 || indentSize === 0 ? 2 : indentSize;
+  const pad = (marker: string) =>
+    indentSize === -1 ? `${marker}\t` : marker + ' '.repeat(prettyIndent ? Math.max(1, w - marker.length) : 1);
+  const pattern = (k: 'quote' | 'ul' | 'ol' | 'task', n = 1): string =>
+    k === 'quote' ? pad('>') : k === 'ul' ? pad(ul) : k === 'ol' ? pad(`${olStyle === 'ones' ? 1 : n}.`) : `${pad(ul)}[ ] `;
+  if (!ed.doc.leaves.length) return insertBlock(ed, pattern(kind), false);
   const i0 = ed.doc.locate(from).i;
   const i1 = ed.doc.locate(to).i;
   const first = ed.doc.leaves[i0];
@@ -129,9 +150,8 @@ function containerBlock(ed: EditorCore, kind: 'quote' | 'ul' | 'ol' | 'task'): b
         caret = E.dropContainer(ed.doc, i, 0);
         continue;
       }
-      const n = i - i0 + 1;
-      const mk = kind === 'quote' ? '> ' : kind === 'ul' ? `${ul} ` : kind === 'ol' ? `${olStyle === 'ones' ? 1 : n}${ol} ` : `${ul} [ ] `;
-      const cont = kind === 'quote' ? '> ' : ' '.repeat(kind === 'task' ? 2 : mk.length);
+      const mk = pattern(kind, i - i0 + 1);
+      const cont = kind === 'quote' ? pattern('quote') : ' '.repeat(mk.length);
       const s = ed.doc.start(i);
       const lines = l.lines.map((ln, k) => ({ ...ln, prefix: ln.prefix + (k === 0 ? mk : k < l.n ? cont : '') }));
       ed.doc.replace(s, s + leafRaw(l).length, lines.map((x) => x.prefix + x.text + x.eol).join(''));

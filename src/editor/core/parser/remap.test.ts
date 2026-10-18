@@ -1,8 +1,9 @@
 /**
- * Remap Unicode Punctuation on Parse (#133, fe-preferences §10 + editor-core §290):
- * `〉》` blockquotes, `【x】`/`【 】` tasks, full-width heading/list markers, `–—`
- * thematic breaks, curly link-title quotes — recognition only, the source stays
- * byte-identical (lossless round-trip in both option states).
+ * Remap Unicode Punctuation on Parse (#133, fe-preferences §7.3/§10 + typora-re#12):
+ * `〉》` blockquotes, `[\[【](x|X)[\]】]` task brackets, dash family (`–→--`, `—→---`
+ * front-matter/`---`-line equality + dash-first mixed thematic runs), curly
+ * link-title quotes. Full-width ＃/－＋＊/digits are INERT. Recognition only:
+ * the source stays byte-identical (lossless round-trip in both option states).
  */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { parseBlocks, serializeLeaves } from './block';
@@ -17,17 +18,18 @@ const rt = (s: string) => expect(serializeLeaves(parseBlocks(s))).toBe(s);
 const REMAP_DOCS = [
   '〉quote\n〉more\n',
   '》bq\n》》nested\n',
-  '＃ Heading\n＃＃ deep\n',
+  '＃ Heading\n＃＃ deep\n', // inert: paragraphs even with remap on
   '－ dash list\n＋ plus\n＊ star\n',
   '１． first\n２． second\n',
   '３) paren\n',
-  '- 【 】 todo\n- 【x】 done\n- 【X】 upper\n',
-  '———\n',
-  '– – –\n',
+  '- 【 】 todo\n- 【x】 done\n- 【X】 upper\n- [x】 mixed\n',
+  '—\n—-\n–—-\n––\n',
+  '—\ntitle: x\n—\n–-\na: 1\n–-\n',
+  'Title\n—\nSub\n–-\n',
   '【toc】\n\n# A\n',
   '[a](http://x “curly title”) and [b](http://y ’single’)\n',
   '》 mixed > ascii\n〉- 【x】 task in remapped quote\n',
-  '－ a\n  － nested under ascii indent\n',
+  '- a\n  - nested under ascii indent\n',
 ];
 
 afterEach(resetSyntaxOptions);
@@ -57,34 +59,52 @@ describe('remap on (#133)', () => {
     rt('〉quote\n〉more\nlazy\n');
   });
 
-  it('full-width ＃ headings keep level and source', () => {
-    const ls = parseBlocks('＃ Heading\n＃＃ deep\n');
-    expect(ls.map((l) => l.type)).toEqual(['heading', 'heading']);
-    expect(ls.map((l) => l.level)).toEqual([1, 2]);
-    rt('＃ Heading\n＃＃ deep\n');
+  it('full-width ＃ / list markers / digits are inert (typora-re#12)', () => {
+    // No block-start regex contains ＃, －＋＊, full-width digits or `．`:
+    // `＃ Heading`, `－ a`, `１． first` are paragraphs in every configuration.
+    expect(types('＃ Heading\n\n＃＃ deep\n')).toEqual(['paragraph', 'paragraph']);
+    expect(chain0('－ a\n')?.kind).not.toBe('item');
+    expect(chain0('＋ b\n')?.kind).not.toBe('item');
+    expect(chain0('＊ c\n')?.kind).not.toBe('item');
+    expect(chain0('１． first\n')?.kind).not.toBe('item');
+    expect(chain0('－－－\n')?.kind).not.toBe('item'); // full-width minus － never remaps
+    rt('＃ Heading\n－ a\n＋ b\n＊ c\n１． first\n２． second\n３) paren\n');
   });
 
-  it('full-width list markers and ordered digits parse as lists', () => {
-    expect(chain0('－ a\n')?.kind).toBe('item');
-    expect(chain0('＋ b\n')?.kind).toBe('item');
-    expect(chain0('＊ c\n')?.kind).toBe('item');
-    // A space/tab after the marker is still required (strict-mode rule (d), fe-preferences §10).
-    const ol = parseBlocks('１． first\n２． second\n');
-    expect(ol[0].chain[0]).toMatchObject({ ordered: true, start: 1 });
-    expect((ol[0].chain[0] as ItemContainer).number).toBe(2 - 1);
-    rt('－ a\n＋ b\n＊ c\n１． first\n２． second\n３) paren\n');
+  it('【x】/【 】 are task checkboxes (mixed brackets too)', () => {
+    const ls = parseBlocks('- 【 】 todo\n- 【x】 done\n- 【X】 upper\n- [x】 mixed\n- 【X] mixed\n');
+    expect(ls.map((l) => (l.chain[0] as ItemContainer).task)).toEqual([' ', 'x', 'X', 'x', 'X']);
+    rt('- 【 】 todo\n- 【x】 done\n- [x】 mixed\n');
   });
 
-  it('【x】/【 】 are task checkboxes', () => {
-    const ls = parseBlocks('- 【 】 todo\n- 【x】 done\n- 【X】 upper\n');
-    expect(ls.map((l) => (l.chain[0] as ItemContainer).task)).toEqual([' ', 'x', 'X']);
-    rt('- 【 】 todo\n- 【x】 done\n');
+  it('dash family: dash-first mixed runs are thematic breaks (V regex)', () => {
+    expect(types('—\n')).toEqual(['hr']); // em dash alone → `---`
+    expect(types('—-\n')).toEqual(['hr']);
+    expect(types('–-\n')).toEqual(['hr']);
+    expect(types('–—-\n')).toEqual(['hr']);
+    expect(types('––\n')).toEqual(['hr']); // – needs one more dash char; –– qualifies
+    expect(types('–\n')).toEqual(['paragraph']); // lone – is too short
+    expect(types('– – –\n')).toEqual(['paragraph']); // V runs are spaceless
+    expect(types('－-\n')).toEqual(['paragraph']); // full-width minus is inert
+    rt('—\n—-\n–—-\n––\n');
   });
 
-  it('– and — runs are thematic breaks', () => {
-    expect(types('———\n')).toEqual(['hr']);
-    expect(types('– – –\n')).toEqual(['hr']);
-    rt('———\n– – –\n');
+  it('dash family: front-matter fences via –→-- / —→--- equality', () => {
+    expect(types('—\ntitle: x\n—\n')).toEqual(['front_matter']);
+    expect(types('–-\ntitle: x\n–-\n')).toEqual(['front_matter']);
+    expect(types('-–\ntitle: x\n-–\n')).toEqual(['front_matter']);
+    expect(types('—-\ntitle: x\n—-\n')).toEqual(['hr', 'heading']); // `----` ≠ `---` for the fence, but V matches as break/underline
+    expect(types('––\ntitle: x\n––\n')).toEqual(['hr', 'heading']); // `––` → `----` ≠ fence; V: –– qualifies
+    expect(types('—\ntitle: x\n...\n')).toEqual(['front_matter']); // `...` still closes
+    rt('—\ntitle: x\n—\n–-\na: 1\n–-\n');
+  });
+
+  it('dash family: setext underline takes mixed runs (dash-first)', () => {
+    expect(types('Title\n—\n')).toEqual(['heading']);
+    expect(parseBlocks('Title\n–-\n')[0].level).toBe(2);
+    expect(types('Title\n–\n')).toEqual(['paragraph']); // lone – is not an underline (lazy continuation merges)
+    expect(types('Title\n－\n')).toEqual(['paragraph']); // － is inert
+    rt('Title\n—\nSub\n–-\n');
   });
 
   it('【toc】 is recognised even without remap', () => {
