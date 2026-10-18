@@ -125,8 +125,9 @@ impl QuickOpen {
 
     pub fn search(&self, root: &Path, query: &str, limit: usize, watched: bool) -> Vec<String> {
         let fuzzy = query.chars().any(|c| !c.is_whitespace());
-        if fuzzy && self.is_stale(root, watched) && self.wants_spotlight(root) {
-            if let Some(rx) = spotlight_spawn(root, query) {
+        let race = fuzzy && self.is_stale(root, watched) && self.wants_spotlight(root);
+        if let Some(rx) = race.then(|| spotlight_spawn(root, query)).flatten() {
+            {
                 // Race Spotlight against a background re-walk; take whichever
                 // answers first. Never slower than walking, faster on huge or
                 // cold trees.

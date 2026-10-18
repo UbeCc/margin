@@ -29,7 +29,7 @@ fn generate(root: &Path, n: usize) {
     for i in 0..n {
         let dir = root.join(format!("d{:02}/s{:02}", i % 50, (i / 50) % 20));
         fs::create_dir_all(&dir).unwrap();
-        let ext = if i % 5 == 0 { "png" } else { "md" };
+        let ext = ["png", "md", "md", "md", "md"][i % 5];
         let name = format!("{}-{}-{i}.{ext}", words[i % 10], words[(i / 10) % 10]);
         fs::write(dir.join(name), "# x\n").unwrap();
     }
