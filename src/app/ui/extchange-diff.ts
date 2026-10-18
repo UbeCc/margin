@@ -7,7 +7,7 @@ export type DiffChoice = 'keep' | 'load' | 'close';
 /** Rows rendered at most; beyond this the diff says how much was omitted. */
 const MAX_ROWS = 4000;
 
-function row(r: DiffRow): HTMLElement {
+export function row(r: DiffRow): HTMLElement {
   if (r.kind === 'skip') {
     return h('div.extdiff-row.extdiff-skip', null, h('span.extdiff-gutter'), h('span.extdiff-gutter'), h('span.extdiff-sign'), h('span.extdiff-text', { text: `⋯ ${r.count} unchanged line${r.count === 1 ? '' : 's'}` }));
   }

@@ -5,6 +5,9 @@ import { COMMANDS, commandForKey, commandSpec, isCommandId, setCustomKeys, type 
 import { DocumentController, type DocState } from './document';
 import { DocTabs, type DocTab, type DocHostCallbacks } from './doctabs';
 import { TabBar } from './tabs';
+import { FileOps } from './fileops';
+import { VersionStore } from './versions';
+import { DraftStore, type Draft } from './drafts';
 import { documentTitle, loadKatexCss, needsKatex } from './export';
 import { ExportController, registerPandocExporters } from './export-actions';
 import { DEFAULT_PRINT_SETUP, effectivePage, pageCss, type PrintSetup } from './export-settings';
@@ -84,6 +87,11 @@ export class App {
   private unwatchFolder: (() => void) | null = null;
   /** Non-blocking "changed on disk" prompt (#82). */
   private extBanner = new ExternalChangeBanner();
+  /** File-menu operations, version history and draft recovery (#94). */
+  versions!: VersionStore;
+  drafts!: DraftStore;
+  fileOps!: FileOps;
+  private saveDraftsSoon = debounce(() => void this.saveDrafts(), 800);
   private lastKeyAction: { id: string; t: number } | null = null;
   private saveSettingsSoon = debounce(() => void this.persistSettings(), 400);
   private refreshOutlineSoon = debounce(() => this.refreshOutline(), 250);
@@ -130,6 +138,15 @@ export class App {
       saveOnSwitch: () => this.settings.saveOnSwitch,
       notify: (m, k) => void toast(m, { kind: k }),
     });
+    this.versions = new VersionStore(this.platform);
+    this.drafts = new DraftStore(this.platform, opts.fresh ? `window-${Date.now().toString(36)}` : 'main');
+    this.fileOps = new FileOps({
+      platform: this.platform,
+      docs: this.docs,
+      versions: this.versions,
+      drafts: this.drafts,
+      renamed: (from, to) => this.fileRenamed(from, to),
+    });
     this.exports = this.createExports();
     // #80: "Upload Image" context menu + "Upload All Local Images" command.
     this.uploader = new ImageUploader({
@@ -173,7 +190,11 @@ export class App {
     this.platform.onOpenFiles((paths) => void this.openPaths(paths));
     this.platform.onCloseRequested(async () => {
       const ok = await this.docs.confirmAll('before closing the window');
-      if (ok) await this.persistSettings();
+      if (ok) {
+        this.saveDraftsSoon.cancel();
+        await this.drafts.save([]); // closed cleanly: nothing to recover
+        await this.persistSettings();
+      }
       return ok;
     });
     window.addEventListener('blur', () => void this.doc.flushAutoSave());
@@ -189,12 +210,14 @@ export class App {
     this.status.setStats(this.editor.getStats());
     this.status.setSource(this.editor.isSourceMode());
     this.root.classList.add('ready');
+    if (!opts.fresh) void this.offerDrafts();
   }
 
   /** One editor per tab; chrome refreshes only follow the active one. */
   private createTabEditor(host: HTMLElement, tab: DocTab): EditorHandle {
     const ed = this.wiring.createEditor(host, this.editorSettings(tab));
     ed.onChange(() => {
+      if (tab.doc?.dirty) this.saveDraftsSoon();
       if (this.docs.active !== tab) return;
       this.syncImagesSoon();
       this.refreshFindSoon();
@@ -228,11 +251,80 @@ export class App {
       onState: (s) => {
         if (this.docs.active === tab) this.onDocState(s);
         this.renderTabs();
+        this.saveDraftsSoon();
       },
-      onOpened: (p) => this.onOpened(p),
+      onOpened: (p) => {
+        this.onOpened(p);
+        void this.versions.record(p, tab.doc.savedText, { quiet: false });
+      },
+      onSaved: (p, text, quiet) => void this.versions.record(p, text, { quiet }),
+      askCreateMissing: (p) => this.askCreateMissing(p),
+      willLoadText: (_p, text) => this.degradeLarge(tab, text),
       defaultDir: () => this.folder,
       defaultEol: () => newFileEol(this.settings.defaultLineEnding),
     };
+  }
+
+  /** A file we track was renamed or moved (sidebar or File › Rename / Move To). */
+  private fileRenamed(from: string, to: string): void {
+    for (const t of this.docs.tabs) t.doc.renamed(from, to);
+    this.settings.recentFiles = this.settings.recentFiles.map((r) => (isInside(from, r) ? to + r.slice(from.length) : r));
+    this.saveSettingsSoon();
+    if (this.folder && isInside(this.folder, to)) void this.tree.reveal(to);
+    void this.versions.moved(from, to);
+  }
+
+  private async askCreateMissing(path: string): Promise<boolean> {
+    const r = await ask({
+      title: 'File does not exist',
+      message: `File does not exist at ${displayPath(path)}. Do you want to create one at that path?`,
+      buttons: [
+        { id: 'cancel', label: 'Cancel' },
+        { id: 'create', label: 'Create', primary: true },
+      ],
+      cancelId: 'cancel',
+    });
+    if (r !== 'create' && this.settings.recentFiles.includes(path)) {
+      this.updateSettings({ recentFiles: this.settings.recentFiles.filter((x) => x !== path) });
+    }
+    return r === 'create';
+  }
+
+  /** Oversize documents open in source code mode (#94, Typora's "oversize" mode). */
+  private degradeLarge(tab: DocTab, text: string): void {
+    const size = new Blob([text]).size;
+    if (size <= this.settings.largeFileBytes) return;
+    if (!tab.editor.isSourceMode()) tab.editor.setSourceMode(true);
+    if (this.docs.active === tab) {
+      this.status.setSource(true);
+      this.root.classList.add('source-mode');
+    }
+    toast(`This document is large (${(size / 1024 / 1024).toFixed(1)} MB), so it opened in source code mode.`, { kind: 'warning', timeout: 6000 });
+  }
+
+  /** Snapshot every modified document for crash recovery. */
+  private async saveDrafts(): Promise<void> {
+    const drafts: Draft[] = [];
+    for (const t of this.docs.tabs) {
+      if (!t.doc.dirty) continue;
+      const content = t.editor.getMarkdown();
+      if (!t.doc.path && !content.trim()) continue;
+      drafts.push({ path: t.doc.path, name: t.doc.name, content, time: Date.now() });
+    }
+    await this.drafts.save(drafts);
+  }
+
+  /** Main window start: drafts left by a window that didn't close cleanly. */
+  private async offerDrafts(): Promise<void> {
+    const slots = await this.drafts.leftovers();
+    this.fileOps.pendingDrafts = slots;
+    const n = slots.reduce((a, s) => a + s.drafts.length, 0);
+    if (!n) return;
+    toast(`${n} unsaved draft${n > 1 ? 's' : ''} from the last session can be recovered.`, {
+      kind: 'warning',
+      timeout: 15000,
+      action: { label: 'Recover…', run: () => void this.fileOps.recoverDrafts() },
+    });
   }
 
   private onTabActivated(tab: DocTab): void {
@@ -283,11 +375,7 @@ export class App {
       openFile: (p) => void this.docs.openPath(p, 'replace'),
       openInNewTab: (p) => void this.docs.openPath(p, 'tab'),
       openInNewWindow: (p) => void this.newWindow(p),
-      onRenamed: (from, to) => {
-        this.doc.renamed(from, to);
-        this.settings.recentFiles = this.settings.recentFiles.map((r) => (isInside(from, r) ? to + r.slice(from.length) : r));
-        this.saveSettingsSoon();
-      },
+      onRenamed: (from, to) => this.fileRenamed(from, to),
       onDeleted: () => undefined,
       notify: (m, k) => void toast(m, { kind: k }),
       openFolderDialog: () => void this.run('openFolder'),
@@ -757,6 +845,24 @@ export class App {
       }
       case 'newWindow':
         return this.newWindow();
+      case 'duplicate':
+        return this.fileOps.duplicate();
+      case 'renameFile':
+        return this.fileOps.rename();
+      case 'moveTo':
+        return this.fileOps.moveTo();
+      case 'revealInFinder':
+        return this.fileOps.reveal();
+      case 'copyFilePath':
+        return this.fileOps.copyPath();
+      case 'properties':
+        return this.fileOps.properties();
+      case 'reopenWithEncoding':
+        return this.fileOps.reopenWithEncoding();
+      case 'browseVersions':
+        return this.fileOps.browseVersions();
+      case 'recoverDrafts':
+        return this.fileOps.recoverDrafts();
       case 'reloadFromDisk':
         await this.doc.reloadFromDisk();
         return true;
@@ -928,6 +1034,7 @@ export class App {
       isDarkTheme: (n) => this.themes.isDark(n),
       openThemesFolder: () => void this.openThemesFolder(),
       pickFolder: () => this.platform.openFileDialog({ directory: true }),
+      recoverDrafts: () => void this.fileOps.recoverDrafts(),
       pickFile: (name, extensions) => this.platform.openFileDialog({ filters: [{ name, extensions }] }),
       detectPandoc: async (path) => {
         const detect = extras(this.platform).pandocDetect;

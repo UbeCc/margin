@@ -22,6 +22,8 @@ export interface PreferencesHost {
   pickFile?(name: string, extensions: string[]): Promise<string | null>;
   /** Locate pandoc for the given path ('' = auto); resolves to a status line, never rejects. */
   detectPandoc?(path: string): Promise<string>;
+  /** General › Recover Unsaved Drafts (#94). */
+  recoverDrafts?(): void;
   /** #92: Preferences › Images › Test Uploader (desktop). */
   testUploader?(config: UploadConfig): Promise<UploaderTestReport>;
 }
@@ -155,7 +157,7 @@ export function openPreferences(host: PreferencesHost, initial: Section = 'gener
 
   // ---------------------------------------------------------------- shell
   const sections: Record<Section, [string, HTMLElement]> = {
-    general: ['General', generalPane(kit, { pickFolder: () => host.pickFolder(), confirm: (t, m) => confirmDialog(t, m, 'Revert', true) })],
+    general: ['General', generalPane(kit, { pickFolder: () => host.pickFolder(), confirm: (t, m) => confirmDialog(t, m, 'Revert', true), ...(host.recoverDrafts ? { recoverDrafts: () => (close(), host.recoverDrafts!()) } : {}) })],
     appearance: ['Appearance', appearance],
     editor: ['Editor', editorPane(kit)],
     images: ['Image', images],

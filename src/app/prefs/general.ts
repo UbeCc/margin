@@ -6,6 +6,8 @@ import type { PrefKit } from './kit';
 export interface GeneralHost {
   pickFolder(): Promise<string | null>;
   confirm(title: string, message?: string): Promise<boolean>;
+  /** Save & Recover › Recover Unsaved Drafts (#94). */
+  recoverDrafts?(): void;
 }
 
 /** Keys the advanced-settings editor never touches (history / window state). */
@@ -134,6 +136,14 @@ export function generalPane(k: PrefKit, host: GeneralHost): HTMLElement {
       'Save & Recover',
       k.toggle('autoSave', 'Auto Save', 'Save documents automatically after you stop typing'),
       k.row('Auto-save delay', h('span.inline', null, delay, h('span.unit', { text: 's' }))),
+      k.toggle('saveOnSwitch', 'Save without asking when switch files on side panel', 'Switching documents from the sidebar saves the current one (#94)'),
+      host.recoverDrafts
+        ? k.row(
+            'Unsaved drafts',
+            h('button.btn', { type: 'button', 'data-pref': 'recoverDrafts', text: 'Recover Unsaved Drafts…', onclick: () => host.recoverDrafts!() }),
+            'Drafts of modified documents are kept until the window closes cleanly',
+          )
+        : null,
     ),
     k.group(
       'Language',

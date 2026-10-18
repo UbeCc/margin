@@ -9,16 +9,16 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 | | surfaces |
 |---|---|
 | total | 171 |
-| owned (implemented) | 128 (with a named passing test: 115) |
-| partial | 16 |
-| missing | 19 |
+| owned (implemented) | 144 (with a named passing test: 131) |
+| partial | 10 |
+| missing | 9 |
 | out of scope | 8 |
 
-REA ledger `rol_73274b0de3d961d80e49e72fa2e0b0ce1c04a3fb88b2cdc2fc9210af8d29c53d` (closure `fa8897917a61e227…`): status **unknown**; unowned 19, implemented 144, out-of-scope 8, unknown 5.
+REA ledger `rol_d425b18bd6461a30b6e9f0f65ce5a041b47e541362679fe99014f2ad9d079c0c` (closure `0a7901943d6419f4…`): status **unknown**; unowned 9, implemented 154, out-of-scope 8, unknown 5.
 
-REA coverage boundary `margin.typora-parity`: status **unknown**; 115/163 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 19, package-proof-missing 1, verifier-missing 38, verifier-unknown 10.
+REA coverage boundary `margin.typora-parity`: status **unknown**; 131/163 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 9, package-proof-missing 1, verifier-missing 25, verifier-unknown 7.
 
-Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): build exit 0, cargo-test exit 101, independence exit 0, playwright exit 0, vitest exit 0. See `rea/summary.json`.
+Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): build exit 0, cargo-test exit 0, independence exit 0, playwright exit 0, vitest exit 0. See `rea/summary.json`.
 
 ### Why nothing is REA-"verified" (and what would change that)
 
@@ -33,7 +33,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | epic | priority | open surfaces |
 |---|---|---|
 | `core-cmds` Paragraph & Format menu commands (headings, inline styles, insert/convert blocks) | P0 | 0 |
-| `files` File lifecycle: tabs/windows, recent, duplicate/move/rename, encoding, versions, recovery | P0 | 16 |
+| `files` File lifecycle: tabs/windows, recent, duplicate/move/rename, encoding, versions, recovery | P0 | 0 |
 | `export` Export, import & print: image/Pandoc/custom formats, export settings, export-with-previous | P0 | 0 |
 | `clipboard` Clipboard & selection: copy-as / paste-as, selection & delete scopes, jump-to | P0 | 2 |
 | `ctx` Editor & sidebar context menus (text, link, table, image, code, math, diagram, outline, files) | P1 | 3 |
@@ -57,27 +57,27 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
 | `menu.file.new` | File › New (untitled document) | owned |  | `src/app/app.ts` `case 'new'` | `tests/e2e/app-files.spec.ts` › new untitled document → Save As writes file | 5 |
-| `menu.file.new-window` | File › New Window / Open in New Window — one document per window today (#16, #23) | **missing** | P0 | — | none | 6 |
-| `menu.file.tabs` | Tabs: New Tab, switch between opened documents, next/previous tab — #23 | **missing** | P0 | — | none | 5 |
+| `menu.file.new-window` | File › New Window / Open in New Window | owned |  | `src/app/app.ts` `private async newWindow(` | `tests/e2e/parity-files.spec.ts` › menu.file.new-window: File › New Window / Open in New Window | 6 |
+| `menu.file.tabs` | Tabs: New Tab, switch between opened documents, next/previous tab | owned |  | `src/app/doctabs.ts` `export class DocTabs` | `tests/e2e/parity-files.spec.ts` › menu.file.tabs: Tabs: New Tab, switch between opened documents, next/previous tab | 5 |
 | `menu.file.open` | File › Open… (file dialog) | owned |  | `src/app/app.ts` `case 'open'` | `tests/e2e/app-files.spec.ts` › file tree lazily expands folders and opens files | 10 |
 | `menu.file.open-folder` | File › Open Folder… | owned |  | `src/app/app.ts` `case 'openFolder'` | `tests/e2e/app-files.spec.ts` › file tree lazily expands folders and opens files | 10 |
 | `menu.file.quick-open` | File › Open Quickly (fuzzy file finder) — deliberate deviations from Typora (native-commands §3, #119): every file type is searchable (Markdown ranked first), extension and name matching are case-insensitive, query text is escaped, an empty/unindexed/stale Spotlight answer falls back to the walker, deleted entries are pruned | owned |  | `src/app/app.ts` `quickOpen(): void` | `tests/e2e/app-navigation.spec.ts` › quick open fuzzy-finds files with highlights | 9 |
 | `menu.file.recent` | File › Open Recent (files + folders, clear) | owned |  | `src-tauri/src/recent.rs` `No Recent Items` | `src/app/__tests__/settings.test.ts` › dedupes and caps recent lists | 8 |
-| `menu.file.reopen-closed` | File › Reopen Closed File | **missing** | P1 | — | none | 1 |
+| `menu.file.reopen-closed` | File › Reopen Closed File | owned |  | `src/app/doctabs.ts` `async reopenClosed()` | `tests/e2e/parity-files.spec.ts` › menu.file.reopen-closed: File › Reopen Closed File | 1 |
 | `menu.file.save` | File › Save (dirty tracking, atomic write) | owned |  | `src/app/app.ts` `case 'save'` | `tests/e2e/app-files.spec.ts` › editing marks dirty, Cmd+S saves to disk | 8 |
 | `menu.file.save-as` | File › Save As… | owned |  | `src/app/app.ts` `case 'saveAs'` | `tests/e2e/app-files.spec.ts` › new untitled document → Save As writes file | 4 |
-| `menu.file.save-all` | File › Save All — needs multi-document (tabs/windows) | **missing** | P1 | — | none | 1 |
-| `menu.file.duplicate` | File › Duplicate | **missing** | P1 | — | none | 2 |
-| `menu.file.rename-move` | File › Rename… / Move To… for the current document — sidebar rename exists; no File-menu Rename/Move To for the open document | **partial** | P1 | `src/app/sidebar/filetree.ts` `'Rename…'` | `tests/e2e/app-files.spec.ts` › context menu: new file, rename (open doc follows) | 16 |
-| `menu.file.revert-versions` | File › Revert To / Browse All Versions (version history) — only "Revert to Saved"; no version browser | **partial** | P1 | `src/app/app.ts` `case 'reloadFromDisk'` | none | 2 |
-| `menu.file.encoding` | File › Reopen with Encoding | **missing** | P1 | — | none | 2 |
+| `menu.file.save-all` | File › Save All | owned |  | `src/app/doctabs.ts` `async saveAll()` | `tests/e2e/parity-files.spec.ts` › menu.file.save-all: File › Save All | 1 |
+| `menu.file.duplicate` | File › Duplicate | owned |  | `src/app/fileops.ts` `duplicate(): boolean` | `tests/e2e/parity-files.spec.ts` › menu.file.duplicate: File › Duplicate | 2 |
+| `menu.file.rename-move` | File › Rename… / Move To… for the current document | owned |  | `src/app/fileops.ts` `async moveTo()` | `tests/e2e/parity-files.spec.ts` › menu.file.rename-move: File › Rename… / Move To… for the current document | 16 |
+| `menu.file.revert-versions` | File › Revert To / Browse All Versions (version history) | owned |  | `src/app/versions.ts` `export class VersionStore` | `tests/e2e/parity-files.spec.ts` › menu.file.revert-versions: File › Revert To / Browse All Versions (version history) | 2 |
+| `menu.file.encoding` | File › Reopen with Encoding | owned |  | `src/app/encoding.ts` `export function detectEncoding` | `tests/e2e/parity-files.spec.ts` › menu.file.encoding: File › Reopen with Encoding | 2 |
 | `menu.file.line-endings` | File › Line Endings (LF / CRLF), preserved on save | owned |  | `src/app/app.ts` `case 'toggleLineEnding'` | `src/app/__tests__/document.test.ts` › toggling EOL marks dirty and toggling back cleans | 3 |
-| `menu.file.properties` | File › Properties / Get Info (word count, size, dates) | **missing** | P2 | — | none | 3 |
-| `menu.file.reveal` | File › Reveal in Finder / Open File Location / Copy File Path (current doc) — only from the sidebar context menu | **partial** | P1 | `src/app/sidebar/filetree.ts` `'Reveal in Finder'` | none | 8 |
+| `menu.file.properties` | File › Properties / Get Info (word count, size, dates) | owned |  | `src/app/fileops.ts` `async properties()` | `tests/e2e/parity-files.spec.ts` › menu.file.properties: File › Properties / Get Info (word count, size, dates) | 3 |
+| `menu.file.reveal` | File › Reveal in Finder / Open File Location / Copy File Path (current doc) | owned |  | `src/app/fileops.ts` `async copyPath()` | `tests/e2e/parity-files.spec.ts` › menu.file.reveal: File › Reveal in Finder / Open File Location / Copy File Path (current doc) | 8 |
 | `menu.file.page-setup` | File › Page Setup (paper size for print/PDF) | owned |  | `src/app/export-ui.ts` `export function openPageSetup` | `tests/e2e/parity-export.spec.ts` › menu.file.page-setup: File › Page Setup | 1 |
 | `menu.file.print` | File › Print | owned |  | `src/app/app.ts` `case 'print'` | none | 2 |
 | `menu.file.close` | File › Close (asks to save dirty docs) | owned |  | `src/app/app.ts` `case 'close'` | `tests/e2e/app-files.spec.ts` › close request with unsaved changes can be cancelled | 4 |
-| `menu.file.errors` | Open/save error reporting (missing file, open failed, create prompt) | **partial** | P1 | `src/app/document.ts` `missing` | `src/app/__tests__/document.test.ts` › marks missing on delete and follows renames | 17 |
+| `menu.file.errors` | Open/save error reporting (missing file, open failed, create prompt) | owned |  | `src/app/document.ts` `askCreateMissing` | `tests/e2e/parity-files.spec.ts` › menu.file.errors: Open/save error reporting (missing file, open failed, create prompt) | 17 |
 
 ## Edit menu
 
@@ -241,7 +241,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `pref.storage` | Settings storage: defaults, validation, migration, unknown keys kept | owned |  | `src/app/settings.ts` `DEFAULT_SETTINGS` | `src/app/__tests__/settings.test.ts` › keeps unknown keys for forward compatibility | 5 |
 | `pref.advanced` | Advanced settings: open/reset config file, reset dialog warnings — advanced settings JSON editor + reset (Typora: Windows/Linux only); Reset All Dialog Warnings | owned |  | `src/app/prefs/general.ts` `Reset All Dialog Warnings` | `tests/e2e/parity-prefs.spec.ts` › pref.advanced: Advanced settings: open/reset config file, reset dialog warnings | 14 |
 | `pref.general.launch` | General: On Launch (restore files/folders, open new file, default folder) — quit-on-last-window persisted only (desktop native, applied after restart) | owned |  | `src/app/settings.ts` `export function launchPlan` | `tests/e2e/parity-prefs.spec.ts` › pref.general.launch: General: On Launch | 8 |
-| `pref.general.save` | General: Auto Save, save-on-switch, recover unsaved drafts — auto-save exists; draft recovery missing | **partial** | P0 | `src/app/document.ts` `autoSave` | `src/app/__tests__/document.test.ts` › auto-saves after the delay when enabled | 9 |
+| `pref.general.save` | General: Auto Save, save-on-switch, recover unsaved drafts | owned |  | `src/app/drafts.ts` `export class DraftStore` | `tests/e2e/parity-files.spec.ts` › pref.general.save: General: Auto Save, save-on-switch, recover unsaved drafts | 9 |
 | `pref.general.language` | General: UI language — only English strings ship | owned |  | `src/app/prefs/general.ts` `System Language` | `tests/e2e/parity-prefs.spec.ts` › pref.general.language: General: UI language | 1 |
 | `pref.appearance.theme` | Appearance: theme, separate dark theme, follow system | owned |  | `src/app/preferences.ts` `'darkTheme'` | `tests/e2e/app-themes.spec.ts` › preferences: Theme lists light themes, Dark theme lists dark ones | 10 |
 | `pref.appearance.font` | Appearance: font size, custom CSS | owned |  | `src/app/preferences.ts` `'Font size'` | `tests/e2e/app-themes.spec.ts` › command palette theme entry and custom CSS | 3 |
@@ -300,18 +300,18 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `beh.core.widgets-nav` | Caret enter/exit across atomic widgets with arrows; doc start/end keys | owned |  | `src/editor/core/view.ts` `widget` | `tests/e2e/core-nav-keys.spec.ts` › doc start lands after the heading marker | 0 |
 | `beh.core.find-in-widgets` | Find/replace reaches inside code, tables, math; replace-all is one undo step | owned |  | `src/editor/core/find.ts` `export function` | `tests/e2e/core-widget-find.spec.ts` › replace-all across widgets is lossless and one undo step | 0 |
 | `beh.core.html-sanitize` | Raw HTML blocks/inline sanitized in preview, copy and export | owned |  | `src/editor/blocks/sanitize.ts` `export function` | `tests/e2e/core-qa.spec.ts` › export sanitizes inline HTML | 0 |
-| `beh.core.large-file` | Oversize documents: degrade gracefully (warn / source mode) | **missing** | P2 | — | none | 0 |
+| `beh.core.large-file` | Oversize documents: degrade gracefully (warn / source mode) | owned |  | `src/app/app.ts` `private degradeLarge(` | `tests/e2e/parity-files.spec.ts` › beh.core.large-file: Oversize documents: degrade gracefully (warn / source mode) | 0 |
 
 ## Behaviors — files & windows
 
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
 | `beh.files.external-change` | External change: silent reload when clean, prompt when dirty, ignore own save echo | owned |  | `src/app/document.ts` `external` | `tests/e2e/app-files.spec.ts` › external change reloads silently when clean and prompts when dirty | 2 |
-| `beh.files.external-merge` | External change prompt offers Keep mine / Load disk / Show diff — #82 | **missing** | P1 | — | none | 0 |
+| `beh.files.external-merge` | External change prompt offers Keep mine / Load disk / Show diff | owned |  | `src/app/ui/extchange.ts` `export class ExternalChangeBanner` | `tests/e2e/parity-files.spec.ts` › beh.files.external-merge: External change prompt offers Keep mine / Load disk / Show diff | 0 |
 | `beh.files.folder-watch` | Folder watcher: incremental tree updates, rename pairing, hidden/unsupported filtered | owned |  | `src-tauri/src/watch.rs` `fn ` | `src/platform/web.test.ts` › suppresses own modifications but reports creations and external changes | 1 |
 | `beh.files.title-dirty` | Window title shows document name and edited state | owned |  | `src/app/app.ts` `setDocumentEdited` | none | 0 |
-| `beh.files.single-instance` | Single instance: opening files from Finder reuses the running app — #29 Linux | **partial** | P1 | `src-tauri/src/lib.rs` `on_second_instance` | none | 0 |
-| `beh.files.snapshot-undo` | Reopen keeps undo history and caret (per-document snapshot) | **missing** | P2 | — | none | 4 |
+| `beh.files.single-instance` | Single instance: opening files from Finder reuses the running app | owned |  | `src-tauri/src/lib.rs` `on_second_instance` | `tests/e2e/parity-files.spec.ts` › beh.files.single-instance: Single instance: opening files from Finder reuses the running app | 0 |
+| `beh.files.snapshot-undo` | Reopen keeps undo history and caret (per-document snapshot) | owned |  | `src/app/doctabs.ts` `private async revive(` | `tests/e2e/parity-files.spec.ts` › beh.files.snapshot-undo: Reopen keeps undo history and caret (per-document snapshot) | 4 |
 | `beh.files.quicklook` | Quick Look / preview of a file from the sidebar | **missing** | P2 | — | none | 3 |
 | `beh.files.asset-scope` | Asset access scoped to doc/folder (no whole-disk file:// access) — prose flags Typora granting "/" read access; Margin scopes per folder (#48 open) | owned |  | `src-tauri/src/commands.rs` `allow_asset_dir` | none | 0 |
 

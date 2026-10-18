@@ -2,22 +2,22 @@
  "generated_from": {
   "spec": "typora-re/parity-spec.md",
   "prose": "typora-re/sections/*.md",
-  "margin_head": "2d12d8fd074dd9ce1022271c501a2a10c6956663"
+  "margin_head": "dd5f8a58144f848da74e8f2cf64aae4ca1ae22e9"
  },
  "summary": {
-  "head": "2d12d8fd074dd9ce1022271c501a2a10c6956663",
-  "artifact_sha256": "356b1f35c6df1019e4b640fea9be3f3d28b65c052bf444fac4292fa2dfd22b9f",
+  "head": "dd5f8a58144f848da74e8f2cf64aae4ca1ae22e9",
+  "artifact_sha256": "46ce07df4cfaa7cadfb9df88289e1d143b5ca77bfd3692368cff5fb4a6d898cd",
   "inventory": {
    "total": 171,
-   "owned": 128,
-   "partial": 16,
-   "missing": 19,
+   "owned": 144,
+   "partial": 10,
+   "missing": 9,
    "oos": 8,
-   "verified_by_test": 115
+   "verified_by_test": 131
   },
   "ledger": {
-   "ledger_id": "rol_73274b0de3d961d80e49e72fa2e0b0ce1c04a3fb88b2cdc2fc9210af8d29c53d",
-   "closure_digest": "fa8897917a61e2277fd8b7a93ba6659beb35dcdf14f983bd13f98e6243803e00",
+   "ledger_id": "rol_d425b18bd6461a30b6e9f0f65ce5a041b47e541362679fe99014f2ad9d079c0c",
+   "closure_digest": "0a7901943d6419f4fd31b1eaed9f1c13c67ef488e00c3085807f94ea31c8ff68",
    "status": "unknown",
    "summary": {
     "total": 176,
@@ -27,7 +27,7 @@
     "by_status": [
      {
       "key": "unowned",
-      "count": 19
+      "count": 9
      },
      {
       "key": "characterized",
@@ -35,7 +35,7 @@
      },
      {
       "key": "implemented",
-      "count": 144
+      "count": 154
      },
      {
       "key": "verified",
@@ -119,18 +119,18 @@
      }
     ]
    },
-   "evidence_id": "ev_a7ada07b1a1fdebdd80ebd7307d03c8c8bb9907b2279111379e9add371cb54d2"
+   "evidence_id": "ev_19a1e95c9aa1e43ce89871850c8da5513ea340b77c81b4e72f996b632871a345"
   },
   "coverage": {
    "status": "unknown",
    "reason_counts": {
-    "owner-missing": 19,
+    "owner-missing": 9,
     "package-proof-missing": 1,
-    "verifier-missing": 38,
-    "verifier-unknown": 10
+    "verifier-missing": 25,
+    "verifier-unknown": 7
    },
    "claims_total": 163,
-   "claims_qualified_by_controlled_replay": 115,
+   "claims_qualified_by_controlled_replay": 131,
    "evidence_ids_cited": 175
   },
   "verifier_runs": {
@@ -140,9 +140,9 @@
     "completed_at": "2026-10-18T00:53:00.964Z"
    },
    "cargo-test": {
-    "evidence_id": "ev_596bfb2769e00f4b6f205f52b992c1e362c9ef2c165dece497fc57ee841de193",
-    "exit": 101,
-    "completed_at": "2026-10-18T00:53:54.631Z"
+    "evidence_id": "ev_25f3c3dbdf50fedba08b00fb0472f24af2c02c1caddaaa5cbe371074a29e875d",
+    "exit": 0,
+    "completed_at": "2026-10-18T06:41:37.870Z"
    },
    "independence": {
     "evidence_id": "ev_2942f8ee964e73c11f47052521654a6cd99141b30781901b1390588cbafdbff7",
@@ -150,14 +150,14 @@
     "completed_at": "2026-10-18T00:56:28.244Z"
    },
    "playwright": {
-    "evidence_id": "ev_901ce221009c1e4879641445b9c1b8fa86c9167e86e30c018915c84e038d0e62",
+    "evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
     "exit": 0,
-    "completed_at": "2026-10-18T00:52:53.213Z"
+    "completed_at": "2026-10-18T06:42:19.907Z"
    },
    "vitest": {
-    "evidence_id": "ev_84b0827da798dfcefb6dbc4c21ff3c29f26e729d72a12852a50d4e92f3f1acf0",
+    "evidence_id": "ev_fbff234ec48d7a423769c9e2d3ea5de846700e84dbbc2837733666f3e2eee501",
     "exit": 0,
-    "completed_at": "2026-10-18T00:51:50.459Z"
+    "completed_at": "2026-10-18T06:41:23.264Z"
    }
   }
  },
@@ -206,7 +206,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'preferences'",
-    "sha256": "c06648b6c3af3ce0cf1038650bc1ce12220ccfba57bf0d3925cc17232c2b389b"
+    "sha256": "157c80fd7ad21bfb35a8314bfde8fad8f87a2b20b9b1307ccbfeeacc95536c82"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -282,7 +282,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'new'",
-    "sha256": "c06648b6c3af3ce0cf1038650bc1ce12220ccfba57bf0d3925cc17232c2b389b"
+    "sha256": "157c80fd7ad21bfb35a8314bfde8fad8f87a2b20b9b1307ccbfeeacc95536c82"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -317,11 +317,19 @@
    "obligation_id": "typora.menu.file.new-window",
    "id": "menu.file.new-window",
    "title": "File › New Window / Open in New Window",
-   "status": "missing",
-   "priority": "P0",
-   "epic": "files",
-   "owner": null,
-   "verifier": null,
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/app.ts",
+    "anchor": "private async newWindow(",
+    "sha256": "157c80fd7ad21bfb35a8314bfde8fad8f87a2b20b9b1307ccbfeeacc95536c82"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-files.spec.ts",
+    "test": "menu.file.new-window: File › New Window / Open in New Window",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [
      "New Window",
@@ -339,25 +347,34 @@
      "files-windows-settings §7"
     ]
    },
-   "note": "one document per window today (#16, #23)",
+   "note": null,
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.menu.file.tabs",
    "id": "menu.file.tabs",
    "title": "Tabs: New Tab, switch between opened documents, next/previous tab",
-   "status": "missing",
-   "priority": "P0",
-   "epic": "files",
-   "owner": null,
-   "verifier": null,
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/doctabs.ts",
+    "anchor": "export class DocTabs",
+    "sha256": "a8e6fdae98e2bafce0bfac40b18e242f5f8b646227f6d3f692eefa7e9c99df52"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-files.spec.ts",
+    "test": "menu.file.tabs: Tabs: New Tab, switch between opened documents, next/previous tab",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [
      "New Tab",
@@ -371,15 +388,16 @@
     ],
     "prose": []
    },
-   "note": "#23",
+   "note": null,
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.menu.file.open",
@@ -391,7 +409,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'open'",
-    "sha256": "c06648b6c3af3ce0cf1038650bc1ce12220ccfba57bf0d3925cc17232c2b389b"
+    "sha256": "157c80fd7ad21bfb35a8314bfde8fad8f87a2b20b9b1307ccbfeeacc95536c82"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -438,7 +456,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'openFolder'",
-    "sha256": "c06648b6c3af3ce0cf1038650bc1ce12220ccfba57bf0d3925cc17232c2b389b"
+    "sha256": "157c80fd7ad21bfb35a8314bfde8fad8f87a2b20b9b1307ccbfeeacc95536c82"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -485,7 +503,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "quickOpen(): void",
-    "sha256": "c06648b6c3af3ce0cf1038650bc1ce12220ccfba57bf0d3925cc17232c2b389b"
+    "sha256": "157c80fd7ad21bfb35a8314bfde8fad8f87a2b20b9b1307ccbfeeacc95536c82"
    },
    "verifier": {
     "file": "tests/e2e/app-navigation.spec.ts",
@@ -573,11 +591,19 @@
    "obligation_id": "typora.menu.file.reopen-closed",
    "id": "menu.file.reopen-closed",
    "title": "File › Reopen Closed File",
-   "status": "missing",
-   "priority": "P1",
-   "epic": "files",
-   "owner": null,
-   "verifier": null,
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/doctabs.ts",
+    "anchor": "async reopenClosed()",
+    "sha256": "a8e6fdae98e2bafce0bfac40b18e242f5f8b646227f6d3f692eefa7e9c99df52"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-files.spec.ts",
+    "test": "menu.file.reopen-closed: File › Reopen Closed File",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [
      "Reopen Closed File"
@@ -590,13 +616,14 @@
    },
    "note": null,
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.menu.file.save",
@@ -608,7 +635,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'save'",
-    "sha256": "c06648b6c3af3ce0cf1038650bc1ce12220ccfba57bf0d3925cc17232c2b389b"
+    "sha256": "157c80fd7ad21bfb35a8314bfde8fad8f87a2b20b9b1307ccbfeeacc95536c82"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -656,7 +683,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'saveAs'",
-    "sha256": "c06648b6c3af3ce0cf1038650bc1ce12220ccfba57bf0d3925cc17232c2b389b"
+    "sha256": "157c80fd7ad21bfb35a8314bfde8fad8f87a2b20b9b1307ccbfeeacc95536c82"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -691,11 +718,19 @@
    "obligation_id": "typora.menu.file.save-all",
    "id": "menu.file.save-all",
    "title": "File › Save All",
-   "status": "missing",
-   "priority": "P1",
-   "epic": "files",
-   "owner": null,
-   "verifier": null,
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/doctabs.ts",
+    "anchor": "async saveAll()",
+    "sha256": "a8e6fdae98e2bafce0bfac40b18e242f5f8b646227f6d3f692eefa7e9c99df52"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-files.spec.ts",
+    "test": "menu.file.save-all: File › Save All",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [
      "Save All"
@@ -704,25 +739,34 @@
     "bridge": [],
     "prose": []
    },
-   "note": "needs multi-document (tabs/windows)",
+   "note": null,
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.menu.file.duplicate",
    "id": "menu.file.duplicate",
    "title": "File › Duplicate",
-   "status": "missing",
-   "priority": "P1",
-   "epic": "files",
-   "owner": null,
-   "verifier": null,
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/fileops.ts",
+    "anchor": "duplicate(): boolean",
+    "sha256": "09ed3276ba2197951a6a2e6c5263e233b4399a08fe9f740cc00a002ef9a179a7"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-files.spec.ts",
+    "test": "menu.file.duplicate: File › Duplicate",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [
      "Duplicate"
@@ -735,29 +779,30 @@
    },
    "note": null,
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.menu.file.rename-move",
    "id": "menu.file.rename-move",
    "title": "File › Rename… / Move To… for the current document",
-   "status": "partial",
-   "priority": "P1",
-   "epic": "files",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
    "owner": {
-    "path": "src/app/sidebar/filetree.ts",
-    "anchor": "'Rename…'",
-    "sha256": "90dcfd7b4785d50da3d5c72435990ca145be3222595506a50bf3c82e34f18777"
+    "path": "src/app/fileops.ts",
+    "anchor": "async moveTo()",
+    "sha256": "09ed3276ba2197951a6a2e6c5263e233b4399a08fe9f740cc00a002ef9a179a7"
    },
    "verifier": {
-    "file": "tests/e2e/app-files.spec.ts",
-    "test": "context menu: new file, rename (open doc follows)",
+    "file": "tests/e2e/parity-files.spec.ts",
+    "test": "menu.file.rename-move: File › Rename… / Move To… for the current document",
     "kind": "e2e"
    },
    "spec": {
@@ -785,30 +830,34 @@
     ],
     "prose": []
    },
-   "note": "sidebar rename exists; no File-menu Rename/Move To for the open document",
+   "note": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-case",
-    "missing-verifier",
     "static-only",
-    "weak-original-case-authority"
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.menu.file.revert-versions",
    "id": "menu.file.revert-versions",
    "title": "File › Revert To / Browse All Versions (version history)",
-   "status": "partial",
-   "priority": "P1",
-   "epic": "files",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
    "owner": {
-    "path": "src/app/app.ts",
-    "anchor": "case 'reloadFromDisk'",
-    "sha256": "c06648b6c3af3ce0cf1038650bc1ce12220ccfba57bf0d3925cc17232c2b389b"
+    "path": "src/app/versions.ts",
+    "anchor": "export class VersionStore",
+    "sha256": "4e89e88523814d5742af4c14eff2508a8a6ae97238780a7552219d47dc2f6c39"
    },
-   "verifier": null,
+   "verifier": {
+    "file": "tests/e2e/parity-files.spec.ts",
+    "test": "menu.file.revert-versions: File › Revert To / Browse All Versions (version history)",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [
      "Revert To",
@@ -820,26 +869,34 @@
      "files-windows-settings §4.6"
     ]
    },
-   "note": "only \"Revert to Saved\"; no version browser",
+   "note": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-case",
-    "missing-verifier",
     "static-only",
-    "weak-original-case-authority"
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.menu.file.encoding",
    "id": "menu.file.encoding",
    "title": "File › Reopen with Encoding",
-   "status": "missing",
-   "priority": "P1",
-   "epic": "files",
-   "owner": null,
-   "verifier": null,
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/encoding.ts",
+    "anchor": "export function detectEncoding",
+    "sha256": "dcba870347052d6ac747f566157830079422eab6115cc1e2a53adf69b86e3838"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-files.spec.ts",
+    "test": "menu.file.encoding: File › Reopen with Encoding",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [
      "Reopen with Encoding"
@@ -854,13 +911,14 @@
    },
    "note": null,
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.menu.file.line-endings",
@@ -872,7 +930,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'toggleLineEnding'",
-    "sha256": "c06648b6c3af3ce0cf1038650bc1ce12220ccfba57bf0d3925cc17232c2b389b"
+    "sha256": "157c80fd7ad21bfb35a8314bfde8fad8f87a2b20b9b1307ccbfeeacc95536c82"
    },
    "verifier": {
     "file": "src/app/__tests__/document.test.ts",
@@ -904,11 +962,19 @@
    "obligation_id": "typora.menu.file.properties",
    "id": "menu.file.properties",
    "title": "File › Properties / Get Info (word count, size, dates)",
-   "status": "missing",
-   "priority": "P2",
-   "epic": "files",
-   "owner": null,
-   "verifier": null,
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/fileops.ts",
+    "anchor": "async properties()",
+    "sha256": "09ed3276ba2197951a6a2e6c5263e233b4399a08fe9f740cc00a002ef9a179a7"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-files.spec.ts",
+    "test": "menu.file.properties: File › Properties / Get Info (word count, size, dates)",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [
      "Properties",
@@ -922,27 +988,32 @@
    },
    "note": null,
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.menu.file.reveal",
    "id": "menu.file.reveal",
    "title": "File › Reveal in Finder / Open File Location / Copy File Path (current doc)",
-   "status": "partial",
-   "priority": "P1",
-   "epic": "files",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
    "owner": {
-    "path": "src/app/sidebar/filetree.ts",
-    "anchor": "'Reveal in Finder'",
-    "sha256": "90dcfd7b4785d50da3d5c72435990ca145be3222595506a50bf3c82e34f18777"
+    "path": "src/app/fileops.ts",
+    "anchor": "async copyPath()",
+    "sha256": "09ed3276ba2197951a6a2e6c5263e233b4399a08fe9f740cc00a002ef9a179a7"
    },
-   "verifier": null,
+   "verifier": {
+    "file": "tests/e2e/parity-files.spec.ts",
+    "test": "menu.file.reveal: File › Reveal in Finder / Open File Location / Copy File Path (current doc)",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [
      "Reveal in Finder",
@@ -960,16 +1031,16 @@
     ],
     "prose": []
    },
-   "note": "only from the sidebar context menu",
+   "note": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-case",
-    "missing-verifier",
     "static-only",
-    "weak-original-case-authority"
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.menu.file.page-setup",
@@ -1019,7 +1090,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'print'",
-    "sha256": "c06648b6c3af3ce0cf1038650bc1ce12220ccfba57bf0d3925cc17232c2b389b"
+    "sha256": "157c80fd7ad21bfb35a8314bfde8fad8f87a2b20b9b1307ccbfeeacc95536c82"
    },
    "verifier": null,
    "spec": {
@@ -1055,7 +1126,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'close'",
-    "sha256": "c06648b6c3af3ce0cf1038650bc1ce12220ccfba57bf0d3925cc17232c2b389b"
+    "sha256": "157c80fd7ad21bfb35a8314bfde8fad8f87a2b20b9b1307ccbfeeacc95536c82"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -1089,18 +1160,18 @@
    "obligation_id": "typora.menu.file.errors",
    "id": "menu.file.errors",
    "title": "Open/save error reporting (missing file, open failed, create prompt)",
-   "status": "partial",
-   "priority": "P1",
-   "epic": "files",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
    "owner": {
     "path": "src/app/document.ts",
-    "anchor": "missing",
-    "sha256": "46d3fbc51abcdb1ca0ed97000dd99b704d2f62c4e6b8d1b4e55b46dda69165f8"
+    "anchor": "askCreateMissing",
+    "sha256": "8dd6c118aae0c4e8499a7e7665ca5c54b6e81746394301cd5cc3e4f3a47c5c71"
    },
    "verifier": {
-    "file": "src/app/__tests__/document.test.ts",
-    "test": "marks missing on delete and follows renames",
-    "kind": "unit"
+    "file": "tests/e2e/parity-files.spec.ts",
+    "test": "menu.file.errors: Open/save error reporting (missing file, open failed, create prompt)",
+    "kind": "e2e"
    },
    "spec": {
     "menu": [
@@ -1132,12 +1203,12 @@
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-case",
-    "missing-verifier",
     "static-only",
-    "weak-original-case-authority"
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.menu.edit.undo-redo",
@@ -1149,7 +1220,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'undo'",
-    "sha256": "c06648b6c3af3ce0cf1038650bc1ce12220ccfba57bf0d3925cc17232c2b389b"
+    "sha256": "157c80fd7ad21bfb35a8314bfde8fad8f87a2b20b9b1307ccbfeeacc95536c82"
    },
    "verifier": {
     "file": "tests/e2e/core-cases.ts",
@@ -2641,7 +2712,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'toggleSource'",
-    "sha256": "c06648b6c3af3ce0cf1038650bc1ce12220ccfba57bf0d3925cc17232c2b389b"
+    "sha256": "157c80fd7ad21bfb35a8314bfde8fad8f87a2b20b9b1307ccbfeeacc95536c82"
    },
    "verifier": {
     "file": "tests/e2e/core-cases.ts",
@@ -2687,7 +2758,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'toggleFocus'",
-    "sha256": "c06648b6c3af3ce0cf1038650bc1ce12220ccfba57bf0d3925cc17232c2b389b"
+    "sha256": "157c80fd7ad21bfb35a8314bfde8fad8f87a2b20b9b1307ccbfeeacc95536c82"
    },
    "verifier": {
     "file": "tests/e2e/app-navigation.spec.ts",
@@ -2731,7 +2802,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'toggleSidebar'",
-    "sha256": "c06648b6c3af3ce0cf1038650bc1ce12220ccfba57bf0d3925cc17232c2b389b"
+    "sha256": "157c80fd7ad21bfb35a8314bfde8fad8f87a2b20b9b1307ccbfeeacc95536c82"
    },
    "verifier": {
     "file": "tests/e2e/app-navigation.spec.ts",
@@ -2833,7 +2904,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'zoomIn'",
-    "sha256": "c06648b6c3af3ce0cf1038650bc1ce12220ccfba57bf0d3925cc17232c2b389b"
+    "sha256": "157c80fd7ad21bfb35a8314bfde8fad8f87a2b20b9b1307ccbfeeacc95536c82"
    },
    "verifier": null,
    "spec": {
@@ -3032,7 +3103,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'openThemesFolder'",
-    "sha256": "c06648b6c3af3ce0cf1038650bc1ce12220ccfba57bf0d3925cc17232c2b389b"
+    "sha256": "157c80fd7ad21bfb35a8314bfde8fad8f87a2b20b9b1307ccbfeeacc95536c82"
    },
    "verifier": null,
    "spec": {
@@ -4635,7 +4706,7 @@
    "owner": {
     "path": "src/app/prefs/general.ts",
     "anchor": "Reset All Dialog Warnings",
-    "sha256": "4d55e81778e6bb864d11f21912eed1e7a3aac13be29d54034549f306e86d83d7"
+    "sha256": "7a9c5b1759886760ec9f1bced4e2b94f5e78eef77bfa56bb2d2e321ed72bf764"
    },
    "verifier": {
     "file": "tests/e2e/parity-prefs.spec.ts",
@@ -4722,18 +4793,18 @@
    "obligation_id": "typora.pref.general.save",
    "id": "pref.general.save",
    "title": "General: Auto Save, save-on-switch, recover unsaved drafts",
-   "status": "partial",
-   "priority": "P0",
-   "epic": "files",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
    "owner": {
-    "path": "src/app/document.ts",
-    "anchor": "autoSave",
-    "sha256": "46d3fbc51abcdb1ca0ed97000dd99b704d2f62c4e6b8d1b4e55b46dda69165f8"
+    "path": "src/app/drafts.ts",
+    "anchor": "export class DraftStore",
+    "sha256": "31308aabdb2987f46c23c86cb7de09413fa16b268d9e57140aaa5fd893131a8d"
    },
    "verifier": {
-    "file": "src/app/__tests__/document.test.ts",
-    "test": "auto-saves after the delay when enabled",
-    "kind": "unit"
+    "file": "tests/e2e/parity-files.spec.ts",
+    "test": "pref.general.save: General: Auto Save, save-on-switch, recover unsaved drafts",
+    "kind": "e2e"
    },
    "spec": {
     "menu": [],
@@ -4754,16 +4825,16 @@
      "files-windows-settings §4.6"
     ]
    },
-   "note": "auto-save exists; draft recovery missing",
+   "note": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-case",
-    "missing-verifier",
     "static-only",
-    "weak-original-case-authority"
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.pref.general.language",
@@ -4775,7 +4846,7 @@
    "owner": {
     "path": "src/app/prefs/general.ts",
     "anchor": "System Language",
-    "sha256": "4d55e81778e6bb864d11f21912eed1e7a3aac13be29d54034549f306e86d83d7"
+    "sha256": "7a9c5b1759886760ec9f1bced4e2b94f5e78eef77bfa56bb2d2e321ed72bf764"
    },
    "verifier": {
     "file": "tests/e2e/parity-prefs.spec.ts",
@@ -4811,7 +4882,7 @@
    "owner": {
     "path": "src/app/preferences.ts",
     "anchor": "'darkTheme'",
-    "sha256": "991d27bda8a8160e27857cdfdf6a751360ddc8c759cd7baf9f6e11323ef01fb2"
+    "sha256": "dddc56a06b52de2af1b6015128f783dbaed7c569a6227f46f706b0d947bcd6e2"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -4859,7 +4930,7 @@
    "owner": {
     "path": "src/app/preferences.ts",
     "anchor": "'Font size'",
-    "sha256": "991d27bda8a8160e27857cdfdf6a751360ddc8c759cd7baf9f6e11323ef01fb2"
+    "sha256": "dddc56a06b52de2af1b6015128f783dbaed7c569a6227f46f706b0d947bcd6e2"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -5421,7 +5492,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "private createExports(",
-    "sha256": "c06648b6c3af3ce0cf1038650bc1ce12220ccfba57bf0d3925cc17232c2b389b"
+    "sha256": "157c80fd7ad21bfb35a8314bfde8fad8f87a2b20b9b1307ccbfeeacc95536c82"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -6044,7 +6115,7 @@
    "owner": {
     "path": "src/app/document.ts",
     "anchor": "Insert Final New Line On Save",
-    "sha256": "46d3fbc51abcdb1ca0ed97000dd99b704d2f62c4e6b8d1b4e55b46dda69165f8"
+    "sha256": "8dd6c118aae0c4e8499a7e7665ca5c54b6e81746394301cd5cc3e4f3a47c5c71"
    },
    "verifier": {
     "file": "tests/e2e/parity-syntax.spec.ts",
@@ -6404,11 +6475,19 @@
    "obligation_id": "typora.beh.core.large-file",
    "id": "beh.core.large-file",
    "title": "Oversize documents: degrade gracefully (warn / source mode)",
-   "status": "missing",
-   "priority": "P2",
-   "epic": "files",
-   "owner": null,
-   "verifier": null,
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/app.ts",
+    "anchor": "private degradeLarge(",
+    "sha256": "157c80fd7ad21bfb35a8314bfde8fad8f87a2b20b9b1307ccbfeeacc95536c82"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-files.spec.ts",
+    "test": "beh.core.large-file: Oversize documents: degrade gracefully (warn / source mode)",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [],
     "panel": [],
@@ -6419,13 +6498,14 @@
    },
    "note": null,
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.beh.files.external-change",
@@ -6437,7 +6517,7 @@
    "owner": {
     "path": "src/app/document.ts",
     "anchor": "external",
-    "sha256": "46d3fbc51abcdb1ca0ed97000dd99b704d2f62c4e6b8d1b4e55b46dda69165f8"
+    "sha256": "8dd6c118aae0c4e8499a7e7665ca5c54b6e81746394301cd5cc3e4f3a47c5c71"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -6472,26 +6552,35 @@
    "obligation_id": "typora.beh.files.external-merge",
    "id": "beh.files.external-merge",
    "title": "External change prompt offers Keep mine / Load disk / Show diff",
-   "status": "missing",
-   "priority": "P1",
-   "epic": "files",
-   "owner": null,
-   "verifier": null,
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/ui/extchange.ts",
+    "anchor": "export class ExternalChangeBanner",
+    "sha256": "d7c2c6f5fc28189f17d0c60df90455dba98fa4d50eab951ac9e4031197228aca"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-files.spec.ts",
+    "test": "beh.files.external-merge: External change prompt offers Keep mine / Load disk / Show diff",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [],
     "panel": [],
     "bridge": [],
     "prose": []
    },
-   "note": "#82",
+   "note": null,
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.beh.files.folder-watch",
@@ -6541,7 +6630,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "setDocumentEdited",
-    "sha256": "c06648b6c3af3ce0cf1038650bc1ce12220ccfba57bf0d3925cc17232c2b389b"
+    "sha256": "157c80fd7ad21bfb35a8314bfde8fad8f87a2b20b9b1307ccbfeeacc95536c82"
    },
    "verifier": null,
    "spec": {
@@ -6567,15 +6656,19 @@
    "obligation_id": "typora.beh.files.single-instance",
    "id": "beh.files.single-instance",
    "title": "Single instance: opening files from Finder reuses the running app",
-   "status": "partial",
-   "priority": "P1",
-   "epic": "files",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
    "owner": {
     "path": "src-tauri/src/lib.rs",
     "anchor": "on_second_instance",
     "sha256": "bcd8360d39f153537610d0803ac82c0dd4d8dc3a34631feeaf65b18054f0834a"
    },
-   "verifier": null,
+   "verifier": {
+    "file": "tests/e2e/parity-files.spec.ts",
+    "test": "beh.files.single-instance: Single instance: opening files from Finder reuses the running app",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [],
     "panel": [],
@@ -6584,26 +6677,34 @@
      "files-windows-settings §2.1"
     ]
    },
-   "note": "#29 Linux",
+   "note": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-case",
-    "missing-verifier",
     "static-only",
-    "weak-original-case-authority"
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.beh.files.snapshot-undo",
    "id": "beh.files.snapshot-undo",
    "title": "Reopen keeps undo history and caret (per-document snapshot)",
-   "status": "missing",
-   "priority": "P2",
-   "epic": "files",
-   "owner": null,
-   "verifier": null,
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/doctabs.ts",
+    "anchor": "private async revive(",
+    "sha256": "a8e6fdae98e2bafce0bfac40b18e242f5f8b646227f6d3f692eefa7e9c99df52"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-files.spec.ts",
+    "test": "beh.files.snapshot-undo: Reopen keeps undo history and caret (per-document snapshot)",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [],
     "panel": [],
@@ -6620,13 +6721,14 @@
    },
    "note": null,
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.beh.files.quicklook",
@@ -6702,7 +6804,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "applyAppearance",
-    "sha256": "c06648b6c3af3ce0cf1038650bc1ce12220ccfba57bf0d3925cc17232c2b389b"
+    "sha256": "157c80fd7ad21bfb35a8314bfde8fad8f87a2b20b9b1307ccbfeeacc95536c82"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",

@@ -15,15 +15,20 @@ const layerOf = (id) => {
 const oid = (s) => `typora.${s.id}`;
 
 export async function buildReaInputs({ repo, inv, reaDist, specPath, sectionsDir, artifactSha256, headSha }) {
-  const { createEvidence } = await import(join(reaDist, 'domain/evidence.js'));
+  const { createEvidence, parseEvidence } = await import(join(reaDist, 'domain/evidence.js'));
   const { createEvidenceBundle } = await import(join(reaDist, 'domain/evidenceBundle.js'));
   const { createReconstructionVerifierContract } = await import(join(reaDist, 'domain/reconstructionCoverage.js'));
 
   // Genuine REA process captures (verifier runs + package proofs).
   const capDir = join(repo, 'docs/parity/rea/evidence');
   const captures = {};
+  // Re-parse through REA's schema: stored captures may carry a different key order (older
+  // ones were written key-sorted, `rea capture-process` emits schema order). The bundle
+  // dedupes manifests (environments/providers) by serialized JSON, so mixing orders yields
+  // two "different" entries that collapse on REA's re-authentication → "Evidence bundle
+  // manifests are not canonical". Parsing gives every record REA's canonical form.
   for (const f of readdirSync(capDir).filter((n) => n.endsWith('.json.gz')))
-    captures[basename(f, '.json.gz').replace(/^capture-/, '')] = JSON.parse(gunzipSync(readFileSync(join(capDir, f))).toString('utf8'));
+    captures[basename(f, '.json.gz').replace(/^capture-/, '')] = parseEvidence(JSON.parse(gunzipSync(readFileSync(join(capDir, f))).toString('utf8')));
   const cap = (k) => captures[k].evidence_id;
   const capturedAt = (k) => captures[k].normalized_result.manifest.completed_at;
 
