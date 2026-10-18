@@ -139,6 +139,7 @@ export class App {
       resolveAsset: (src) => this.resolveAsset(src),
       storeImage: (input) => this.storeImage(input),
       openLink: (href) => void this.openLink(href),
+      ...(this.platform.writeClipboardRich ? { writeClipboardRich: (d) => this.platform.writeClipboardRich!(d) } : {}),
       spellcheck: this.settings.spellcheck,
       focusMode: this.settings.focusMode,
       typewriterMode: this.settings.typewriterMode,
