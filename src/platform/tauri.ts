@@ -117,16 +117,21 @@ export class TauriPlatform implements Platform {
   }
 
   /**
-   * macOS: paginated PDF via WebKit's print pipeline (hidden window). Relative
-   * `src`s resolve against the output file's directory; asset URLs work as-is.
-   * Other platforms: falls back to the system print dialog (user picks "Save as PDF").
+   * Native PDF via the platform webview's print pipeline in a hidden window
+   * (macOS WKWebView, Windows WebView2 PrintToPdf, Linux WebKitPrintOperation).
+   * Relative `src`s resolve against the output file's directory. Falls back to
+   * the system print dialog (user picks "Save as PDF") when the platform has no
+   * native path or the runtime is too old for it (#14).
    */
   async exportPdf(html: string, outPath: string, opts?: PdfExportOptions): Promise<void> {
     try {
       const { baseDir, ...options } = opts ?? {};
       await call('export_pdf', { html, outPath, baseDir: baseDir ?? null, options });
     } catch (e) {
-      if (String((e as Error).message).startsWith('unsupported')) return printHtmlInIframe(withPrintPageCss(html, opts));
+      const msg = String((e as Error).message);
+      if (msg.startsWith('unsupported') || msg.includes('WebView2 runtime too old')) {
+        return printHtmlInIframe(withPrintPageCss(html, opts));
+      }
       throw e;
     }
   }
@@ -344,6 +349,11 @@ export class TauriPlatform implements Platform {
   /** #23: Finder drops, intercepted natively (src-tauri/src/drop_macos.rs) so paths are known. */
   onFileDrop(cb: (drop: FileDrop) => void): () => void {
     return subscribe<FileDrop>(EV.fileDrop, cb);
+  }
+
+  /** #129: begin a native drag of `paths` from the current mouse gesture (sidebar rows). */
+  startFileDrag(paths: string[]): void {
+    if (paths.length) void call('start_file_drag', { paths }).catch(() => {});
   }
 
   onCloseRequested(cb: () => Promise<boolean>): () => void {

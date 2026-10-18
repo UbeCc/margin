@@ -197,6 +197,7 @@ export function createEditor(host: HTMLElement, settings: EditorSettings): Edito
           ed.emitChange();
           return true;
         }
+        if (cmd.kind === 'insertMarkdownAt') return source.inst.insertAt?.(cmd.markdown, cmd.x, cmd.y) ?? false;
         return false;
       }
       try {

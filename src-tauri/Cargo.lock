@@ -2118,6 +2118,7 @@ version = "0.1.0"
 dependencies = [
  "block2",
  "chrono",
+ "gtk",
  "ignore",
  "libc",
  "log",
@@ -2138,6 +2139,10 @@ dependencies = [
  "tauri-plugin-single-instance",
  "tempfile",
  "unicode-normalization",
+ "webkit2gtk",
+ "webview2-com",
+ "windows",
+ "windows-core",
 ]
 
 [[package]]

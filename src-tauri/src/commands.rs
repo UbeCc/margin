@@ -351,19 +351,24 @@ pub async fn export_pdf_impl<Rt: Runtime>(
     base_dir: Option<PathBuf>,
     options: crate::export_cmds::PdfOptions,
 ) -> R<()> {
+    let base = base_dir
+        .or_else(|| out.parent().map(Path::to_path_buf))
+        .unwrap_or_else(|| PathBuf::from("/"));
+    allow_assets(app, &base, true);
     #[cfg(target_os = "macos")]
     {
-        let base = base_dir.or_else(|| out.parent().map(Path::to_path_buf)).unwrap_or_else(|| PathBuf::from("/"));
-        allow_assets(app, &base, true);
         crate::pdf_macos::export_pdf(app, html, base, out.clone(), options).await?;
-        crate::export_cmds::record_export(&out);
-        Ok(())
     }
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(target_os = "linux")]
     {
-        let _ = (app, html, out, base_dir, options);
-        Err("unsupported: native PDF export is macOS-only; use the print dialog".into())
+        crate::pdf_linux::export_pdf(app, html, base, out.clone(), options).await?;
     }
+    #[cfg(target_os = "windows")]
+    {
+        crate::pdf_windows::export_pdf(app, html, base, out.clone(), options).await?;
+    }
+    crate::export_cmds::record_export(&out);
+    Ok(())
 }
 
 #[tauri::command]
@@ -382,6 +387,30 @@ pub async fn export_pdf<Rt: Runtime>(
 #[tauri::command]
 pub async fn print_window<Rt: Runtime>(window: WebviewWindow<Rt>) -> R<()> {
     window.print().map_err(err)
+}
+
+/// Begin a native drag of `paths` from the current mouse gesture (#129).
+#[tauri::command]
+#[allow(unused_variables)]
+pub fn start_file_drag<Rt: Runtime>(window: WebviewWindow<Rt>, paths: Vec<String>) -> R<bool> {
+    #[cfg(target_os = "macos")]
+    {
+        use objc2::MainThreadMarker;
+        if let Some(mtm) = MainThreadMarker::new() {
+            return Ok(crate::start_drag_macos::start_drag(mtm, &paths));
+        }
+        return Ok(false);
+    }
+    #[cfg(target_os = "linux")]
+    {
+        return Ok(crate::start_drag_linux::start_drag(&window, &paths));
+    }
+    #[cfg(target_os = "windows")]
+    {
+        return crate::start_drag_windows::start_drag(&paths);
+    }
+    #[allow(unreachable_code)]
+    Ok(false)
 }
 
 // ------------------------------------------------------------------ settings & themes

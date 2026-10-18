@@ -415,6 +415,16 @@ test('beh.files.drop: Drop files from the OS: open Markdown/folders, insert imag
   await page.keyboard.press(`${MOD}+z`);
   await expect.poll(() => editorValue(page)).not.toContain('spec.pdf');
 
+  // Source mode: the drop inserts at the drop point in the source text (#129).
+  await page.evaluate(() => window.__margin!.editor.setSourceMode(true));
+  const srcText = page.locator('.md-source-host .cm-line', { hasText: 'sophistication.' }).getByText('sophistication.');
+  const sbox = (await srcText.boundingBox())!;
+  await dropFiles(page, [`${ROOT}/Pics/cat photo.png`], sbox.x + sbox.width + 2, sbox.y + sbox.height / 2);
+  await expect.poll(() => editorValue(page)).toContain('sophistication.![cat photo](assets/cat%20photo.png)');
+  await page.keyboard.press(`${MOD}+z`);
+  await expect.poll(() => editorValue(page)).not.toContain('cat%20photo');
+  await page.evaluate(() => window.__margin!.editor.setSourceMode(false));
+
   // Markdown files open as a tab wherever they are dropped; already-open ones are focused.
   await dropFiles(page, [`${ROOT}/Ideas/Roadmap.md`], box.x + 5, box.y + 5);
   await expect(page.locator('.title-text')).toHaveText('Roadmap');

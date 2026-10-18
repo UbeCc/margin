@@ -2,11 +2,11 @@
  "generated_from": {
   "spec": "typora-re/parity-spec.md",
   "prose": "typora-re/sections/*.md",
-  "margin_head": "27314b91b3c72879a2187bda1c1f163c658ba2bd"
+  "margin_head": "2c31422a1b5ff681972dade8c874a5ad500f0fbf"
  },
  "summary": {
-  "head": "27314b91b3c72879a2187bda1c1f163c658ba2bd",
-  "artifact_sha256": "68330bd6d9618f78c65225490f3d33b21e9f5f6eadd636d60713e804cc377ff5",
+  "head": "2c31422a1b5ff681972dade8c874a5ad500f0fbf",
+  "artifact_sha256": "d73813f251e64c655b45fef955e8797fc516fb7ce268952dc6c78794cb878bdb",
   "inventory": {
    "total": 172,
    "owned": 146,
@@ -16,8 +16,8 @@
    "verified_by_test": 133
   },
   "ledger": {
-   "ledger_id": "rol_94466f25a53e05275e23898a3c583fa2f33cdcec735610c1409a02e509dc01c3",
-   "closure_digest": "4d5f641666d246344f3d803193053aecd97d7b7e8320e474145011c685919265",
+   "ledger_id": "rol_0593c8c93705c46bcf1a8fdf0aba12b7fd79ce450269726e3ef876b0980121f3",
+   "closure_digest": "5b3f8e28be7039e8a62d185b2b27b837d61a0a8f7d3a5be8bcacbdc36ff095ea",
    "status": "unknown",
    "summary": {
     "total": 177,
@@ -119,7 +119,7 @@
      }
     ]
    },
-   "evidence_id": "ev_ce2fc029d090e18946de1514ec97f13f305902e74f45350a9636b9b566d13f09"
+   "evidence_id": "ev_2c6b2b148503cafba7edae6ca2bb881a45cf35c9be2d030e61dfacd0c018cacd"
   },
   "coverage": {
    "status": "unknown",
@@ -3163,7 +3163,7 @@
    "owner": {
     "path": "src-tauri/src/commands.rs",
     "anchor": "set_theme_menu",
-    "sha256": "142e87c9cb8c10d7ac460a6298ca1500dcc1291adb568939dc7c8ba110e05a83"
+    "sha256": "3d242e50b622d22e1ef55a6a066314c70ede19a5b86c62a3caf4d10df0f6979a"
    },
    "verifier": null,
    "spec": {
@@ -5176,7 +5176,7 @@
    "owner": {
     "path": "src/app/sidebar/filetree.ts",
     "anchor": "'New File…'",
-    "sha256": "5841c9b4f3a64d9eba890a89537b9de1a371a296dfda47b1fb919e98fd26ce21"
+    "sha256": "828060243a3550a39bb1841a5a9afff19700ae0d081506e50854935abbf69f5e"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -5237,7 +5237,7 @@
    "owner": {
     "path": "src/app/sidebar/filelist.ts",
     "anchor": "export class FileList",
-    "sha256": "65ab235fc790600d5f661b3d64a25177352d7abee9edf89b9b1272c29619b881"
+    "sha256": "b6d605402adb1585fac4e4701ebd1b96c42d8eea7afe7c8bbdddc979561b84c0"
    },
    "verifier": {
     "file": "tests/e2e/parity-sidebar.spec.ts",
@@ -5457,7 +5457,7 @@
    "owner": {
     "path": "src/app/sidebar/drag.ts",
     "anchor": "export function dropMarkdown",
-    "sha256": "ed280d2af33458d82b7ed63fc8d05652c87901c59c788c230447ae8525f0a958"
+    "sha256": "fa335e1534f6c86b587adc05084b97dcc83674acbd966bae80fa6a9a2547bd88"
    },
    "verifier": {
     "file": "tests/e2e/parity-sidebar.spec.ts",
@@ -6663,7 +6663,7 @@
    "owner": {
     "path": "src-tauri/src/lib.rs",
     "anchor": "on_second_instance",
-    "sha256": "a47a6dec729c022bdb267635b8492aefc49725d4e80519a17a210c09e4831d03"
+    "sha256": "38664c04a0870abc4fca61c28b28a924715116817fb59a9443f81836f851fe7c"
    },
    "verifier": {
     "file": "tests/e2e/parity-files.spec.ts",
@@ -6714,7 +6714,7 @@
      "files-windows-settings §2.1"
     ]
    },
-   "note": "#23; macOS native paths via src-tauri/src/drop_macos.rs; Linux/Windows drops not intercepted yet",
+   "note": "#23 #129; native paths on all platforms (src-tauri/src/drop_macos.rs, drop_linux.rs, drop_windows.rs); source mode inserts at the drop point (source-mode.ts insertAt)",
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6818,7 +6818,7 @@
    "owner": {
     "path": "src-tauri/src/commands.rs",
     "anchor": "allow_asset_dir",
-    "sha256": "142e87c9cb8c10d7ac460a6298ca1500dcc1291adb568939dc7c8ba110e05a83"
+    "sha256": "3d242e50b622d22e1ef55a6a066314c70ede19a5b86c62a3caf4d10df0f6979a"
    },
    "verifier": null,
    "spec": {

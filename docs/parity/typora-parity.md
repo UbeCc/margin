@@ -14,7 +14,7 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 | missing | 8 |
 | out of scope | 8 |
 
-REA ledger `rol_94466f25a53e05275e23898a3c583fa2f33cdcec735610c1409a02e509dc01c3` (closure `4d5f641666d24634…`): status **unknown**; unowned 8, implemented 156, out-of-scope 8, unknown 5.
+REA ledger `rol_0593c8c93705c46bcf1a8fdf0aba12b7fd79ce450269726e3ef876b0980121f3` (closure `5b3f8e28be7039e8…`): status **unknown**; unowned 8, implemented 156, out-of-scope 8, unknown 5.
 
 REA coverage boundary `margin.typora-parity`: status **unknown**; 133/164 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 8, package-proof-missing 1, verifier-missing 24, verifier-unknown 7.
 
@@ -311,7 +311,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `beh.files.folder-watch` | Folder watcher: incremental tree updates, rename pairing, hidden/unsupported filtered | owned |  | `src-tauri/src/watch.rs` `fn ` | `src/platform/web.test.ts` › suppresses own modifications but reports creations and external changes | 1 |
 | `beh.files.title-dirty` | Window title shows document name and edited state | owned |  | `src/app/app.ts` `setDocumentEdited` | none | 0 |
 | `beh.files.single-instance` | Single instance: opening files from Finder reuses the running app | owned |  | `src-tauri/src/lib.rs` `on_second_instance` | `tests/e2e/parity-files.spec.ts` › beh.files.single-instance: Single instance: opening files from Finder reuses the running app | 0 |
-| `beh.files.drop` | Drop files from the OS: open Markdown/folders, insert images and links — #23; macOS native paths via src-tauri/src/drop_macos.rs; Linux/Windows drops not intercepted yet | owned |  | `src/app/filedrop.ts` `export async function handleFileDrop(` | `tests/e2e/parity-files.spec.ts` › beh.files.drop: Drop files from the OS: open Markdown/folders, insert images and links | 0 |
+| `beh.files.drop` | Drop files from the OS: open Markdown/folders, insert images and links — #23 #129; native paths on all platforms (src-tauri/src/drop_macos.rs, drop_linux.rs, drop_windows.rs); source mode inserts at the drop point (source-mode.ts insertAt) | owned |  | `src/app/filedrop.ts` `export async function handleFileDrop(` | `tests/e2e/parity-files.spec.ts` › beh.files.drop: Drop files from the OS: open Markdown/folders, insert images and links | 0 |
 | `beh.files.snapshot-undo` | Reopen keeps undo history and caret (per-document snapshot) | owned |  | `src/app/doctabs.ts` `private async revive(` | `tests/e2e/parity-files.spec.ts` › beh.files.snapshot-undo: Reopen keeps undo history and caret (per-document snapshot) | 4 |
 | `beh.files.quicklook` | Quick Look / preview of a file from the sidebar — #131: shared QLPreviewPanel via main-thread bridge; Space on a focused row, tree + Articles menus | owned |  | `src-tauri/src/quicklook_macos.rs` `pub fn quick_look_file` | `tests/e2e/parity-sidebar-r3.spec.ts` › sidebar.quicklook: Quick Look in tree/list menus and Space on a focused row | 3 |
 | `beh.files.asset-scope` | Asset access scoped to doc/folder (no whole-disk file:// access) — prose flags Typora granting "/" read access; Margin scopes per folder (#48 open) | owned |  | `src-tauri/src/commands.rs` `allow_asset_dir` | none | 0 |
