@@ -252,14 +252,14 @@ test.describe('parity: table, code and math tools (#98)', () => {
     await page.locator('.mb-code').click();
     await expect(page.locator('.mb-code .cm-content .tok-keyword').first()).toBeVisible(); // language loaded
     expect(await run(page, { kind: 'code', op: 'indentAll' })).toBe(true);
-    await expect.poll(() => md(page)).toBe('```js\nfunction f() {\n  if (x) {\n    return 1;\n  }\n}\n```\n');
+    await expect.poll(() => md(page)).toBe('```js\nfunction f() {\n    if (x) {\n        return 1;\n    }\n}\n```\n'); // Indent Size for Code default 4 (#100)
     await undo(page);
     expect(await run(page, { kind: 'code', op: 'copy' })).toBe(true);
     expect((await clipboard(page))['text/plain']).toContain('function f() {');
     // Auto Indent Selected Code only touches the selected line
     await page.locator('.mb-code .cm-line').nth(1).click();
     await run(page, { kind: 'code', op: 'indentSelected' });
-    await expect.poll(() => md(page)).toContain('{\n  if (x) {\nreturn 1;');
+    await expect.poll(() => md(page)).toContain('{\n    if (x) {\nreturn 1;');
     // negative: no code block at the caret
     await open(page, 'plain\n');
     await caret(page, 0, 1);

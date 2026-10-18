@@ -367,7 +367,7 @@ test('beh.core.large-file: Oversize documents: degrade gracefully (warn / source
 test('pref.general.save: General: Auto Save, save-on-switch, recover unsaved drafts', async ({ page }) => {
   // Save without asking when switching files.
   await page.keyboard.press(`${MOD}+Comma`);
-  await page.locator('.pref-nav [data-section=files]').click();
+  await page.locator('.pref-nav [data-section=general]').click();
   await page.locator('input[data-pref=saveOnSwitch]').check();
   await page.keyboard.press('Escape');
   await typeInEditor(page, '\nsaved on switch');

@@ -23,7 +23,10 @@ export interface EditorSettings {
   baseDir: string | null;
   /** Resolve a document-relative src to something the webview can load. */
   resolveAsset(src: string): string;
-  /** Called when the user pastes / drops image data or files. Returns the markdown src to insert. */
+  /**
+   * Called when the user pastes / drops image data or files. Returns the markdown src to insert,
+   * or (#99) a complete image snippet (`![alt](src)` / `<img …>`) that is inserted verbatim.
+   */
   storeImage?(input: { bytes?: Uint8Array; mime?: string; path?: string; name?: string }): Promise<string | null>;
   /** Open an external link. */
   openLink?(href: string): void;
@@ -37,7 +40,72 @@ export interface EditorSettings {
   typewriterMode: boolean;
   /** "light" | "dark" — widgets (code highlight, mermaid) follow it. */
   colorScheme: 'light' | 'dark';
+  /** Optional (#100/#102): Markdown syntax / editing preferences. Missing keys = `DEFAULT_MARKDOWN_OPTIONS`. */
+  markdown?: Partial<MarkdownOptions>;
 }
+
+/** Preferences › Markdown / Editor options consumed by the editing core and widgets (#100, #102). */
+export interface MarkdownOptions {
+  /** Syntax Support: `==mark==`, `~sub~`, `^sup^`, `$inline math$`; `:emoji:` shortcodes (always on in Typora). */
+  highlight: boolean;
+  subscript: boolean;
+  superscript: boolean;
+  inlineMath: boolean;
+  emoji: boolean;
+  /** Strict Mode (more strict to GFM spec): when false, `#Heading` without a space is a heading. */
+  strict: boolean;
+  /** Markers written by menu commands / hybrid view (existing source is never rewritten). */
+  ulStyle: '-' | '*' | '+';
+  /** Ordered List: `1. 2. 3.` (increment) or `1. 1. 1.` (ones). */
+  olStyle: 'increment' | 'ones';
+  /** Whitespace and Line Breaks: false = "Ignore whitespace and single line break" (soft breaks render as spaces). */
+  preserveLineBreak: boolean;
+  /** Visible <br/>: show `<br>` tags as a visible marker (off = hidden, they still break the line). */
+  visibleBr: boolean;
+  indentFirstLine: boolean;
+  /** Editor › Auto Pair. */
+  autoPairBrackets: boolean;
+  autoPairMarkdown: boolean;
+  /** Display source (e.g. `#`) of simple blocks such as headings when the caret is in them. */
+  expandSimpleBlock: boolean;
+  /** Code Fences. */
+  codeLineNumbers: boolean;
+  codeLineWrap: boolean;
+  /** Spaces per tab in code fences; 0 = Preserve tabs. */
+  codeIndentSize: 0 | 2 | 3 | 4;
+  /** Math: equation numbering, physics macros, "Apply Line Break at \\ and \newline" in display math. */
+  mathNumbering: 'all' | 'ams' | 'none';
+  mathPhysics: boolean;
+  mathLineBreaks: boolean;
+}
+
+/**
+ * Core defaults when an editor is created without `markdown` (tests, embedders): everything
+ * Margin rendered before #102. The app applies Typora's fresh-install defaults instead
+ * (`TYPORA_MARKDOWN_DEFAULTS` in src/app/settings.ts).
+ */
+export const DEFAULT_MARKDOWN_OPTIONS: Readonly<MarkdownOptions> = Object.freeze({
+  highlight: true,
+  subscript: false,
+  superscript: false,
+  inlineMath: true,
+  emoji: false,
+  strict: true,
+  ulStyle: '-',
+  olStyle: 'increment',
+  preserveLineBreak: true,
+  visibleBr: true,
+  indentFirstLine: false,
+  autoPairBrackets: true,
+  autoPairMarkdown: false,
+  expandSimpleBlock: true,
+  codeLineNumbers: false,
+  codeLineWrap: true,
+  codeIndentSize: 4,
+  mathNumbering: 'ams',
+  mathPhysics: false,
+  mathLineBreaks: true,
+});
 
 /** Inline formats toggled by Format menu commands (`underline`/`sub`/`sup` = `<u>`/`<sub>`/`<sup>`, `math` = `$…$`, `comment` = `<!-- … -->`). */
 export type InlineMark = 'strong' | 'em' | 'code' | 'strike' | 'highlight' | 'link' | 'underline' | 'sub' | 'sup' | 'math' | 'comment';
@@ -72,6 +140,8 @@ export type EditorCommand =
   | { kind: 'jump'; to: 'top' | 'bottom' | 'selection' }
   | { kind: 'copyAs'; format: CopyAsFormat }
   | { kind: 'pastePlain' }
+  // #99 (additive): replace markdown offsets [from, to) of getMarkdown() with text, as one undo step.
+  | { kind: 'replaceRange'; from: number; to: number; text: string }
   // #97 (additive): copy the block at the caret — markdown source, or the inner text of a code / math fence
   | { kind: 'copyBlock'; part: 'source' | 'content' }
   // #98 (additive): block tools — Paragraph › Table / Code Tools / Math Tools
@@ -196,6 +266,8 @@ export interface DirEntry {
   isDir: boolean;
   /** ms since epoch */
   mtime: number;
+  /** Creation (birth) time, ms since epoch, when the platform knows it (#101 sort). */
+  ctime?: number;
   size: number;
 }
 
@@ -229,7 +301,7 @@ export type MenuAction =
   | 'undo' | 'redo' | 'find' | 'replace'
   | 'toggleSidebar' | 'toggleSource' | 'toggleFocus' | 'toggleTypewriter' | 'quickOpen'
   | 'zoomIn' | 'zoomOut' | 'zoomReset'
-  | 'clearRecent' | 'commandPalette' | 'showOutline' | 'showFiles' | 'revealActiveFile' | 'reloadFromDisk' | 'toggleLineEnding'
+  | 'clearRecent' | 'commandPalette' | 'showOutline' | 'showFiles' | 'showArticles' | 'sidebarSearch' | 'revealActiveFile' | 'reloadFromDisk' | 'toggleLineEnding'
   // File lifecycle (#94): tabs / windows / file operations on the current document
   | 'newTab' | 'newWindow' | 'nextTab' | 'prevTab' | 'reopenClosed' | 'saveAll' | 'duplicate'
   | 'renameFile' | 'moveTo' | 'revealInFinder' | 'copyFilePath' | 'browseVersions' | 'reopenWithEncoding'
@@ -251,7 +323,17 @@ export type MenuAction =
   | 'table:insert'
   | `table:${TableOp}`
   | `code:${CodeOp}`
-  | `math:${MathOp}`;
+  | `math:${MathOp}`
+  // #99 (additive): Format › Image submenu
+  | `image:${ImageMenuAction}`;
+
+/** Format › Image entries (#99), in Typora's menu order; per-image ones act on the image at the caret. */
+export type ImageMenuAction =
+  | 'insert' | 'insertLocal' | 'openLocation' | 'copyContent'
+  | `zoom-${25 | 33 | 50 | 67 | 80 | 100 | 150 | 200}`
+  | 'syntaxMarkdown' | 'syntaxHtml' | 'deleteFile' | 'copyTo' | 'moveTo' | 'upload'
+  | 'copyAll' | 'moveAll' | 'uploadAll' | 'reloadAll'
+  | 'insertCopyToFolder' | 'insertUpload' | 'rootPath' | 'settings';
 
 /** PDF export options (#18 baseDir; #95 page geometry, header/footer, bookmarks, metadata). All optional. */
 export interface PdfExportOptions {

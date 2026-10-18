@@ -71,6 +71,40 @@ export function attachInput(ed: EditorCore): () => void {
     ed.hist.break();
   };
 
+  /** Editor › Auto Pair (#100): insert the closing bracket/quote/marker, or step over an existing one. */
+  const autoPair = (pos: number, ch: string, key: string): boolean => {
+    const o = ed.md();
+    // Markdown pairing only works together with bracket pairing (Typora disables the box otherwise).
+    const md = o.autoPairBrackets && o.autoPairMarkdown && MD_PAIRS.includes(ch);
+    if (!o.autoPairBrackets && !md) return false;
+    const loc = ed.doc.locate(pos);
+    const l = ed.doc.leaves[loc.i];
+    if (!l || !E.isTextLeaf(l) || ed.doc.docPos(loc.i, loc.off) !== pos) return false;
+    const c = leafContent(l);
+    const prev = c[loc.off - 1] ?? '';
+    const next = c[loc.off] ?? '';
+    const close = md ? ch : o.autoPairBrackets ? BRACKETS[ch] : undefined;
+    let k = loc.off;
+    while (k > 0 && c[k - 1] === ch) k--;
+    const emptyPair = prev === ch && !/[\p{L}\p{N}]/u.test(c[k - 1] ?? '');
+    if (md && next === ch && !emptyPair) {
+      ed.setSel({ pos: pos + 1 }); // step over the auto-inserted closing marker
+      return true;
+    }
+    if (!md && o.autoPairBrackets && CLOSERS.includes(ch) && next === ch) {
+      ed.setSel({ pos: pos + 1 });
+      return true;
+    }
+    if (close === undefined) return false;
+    // `- [` at the start of a list item is a task box being typed (`- [ ] `), not a link.
+    if (ch === '[' && !c.slice(0, loc.off).trim() && l.chain.some((x) => x.kind === 'item')) return false;
+    // Quotes and markers only pair at a word boundary (keeps "don't", snake_case, 2*3).
+    if ((ch === '"' || ch === "'" || md) && /[\p{L}\p{N}]/u.test(prev) && !emptyPair) return false;
+    if (next && /[\p{L}\p{N}]/u.test(next)) return false;
+    ed.replaceRange(pos, pos, ch + close, key, close.length);
+    return true;
+  };
+
   const onBeforeInput = (e: InputEvent) => {
     if (inWidget(e.target) || ed.composing || e.isComposing) return;
     const t = e.inputType;
@@ -94,7 +128,9 @@ export function attachInput(ed: EditorCore): () => void {
         if (r.from === r.to) return; // nothing selected by the browser: structural cases are handled on keydown
       }
       e.preventDefault();
-      ed.replaceRange(r.from, r.to, text, (t.startsWith('delete') ? 'del:' : 'type:') + (caretBlock()?.id ?? ''));
+      const key = (t.startsWith('delete') ? 'del:' : 'type:') + (caretBlock()?.id ?? '');
+      if (t === 'insertText' && r.from === r.to && text.length === 1 && autoPair(r.from, text, key)) return;
+      ed.replaceRange(r.from, r.to, text, key);
       return;
     }
     if (t === 'insertFromPaste' || t === 'insertFromDrop' || t === 'insertFromComposition' || t === 'deleteCompositionText') return;
@@ -377,3 +413,7 @@ function onEdgeLine(ed: EditorCore, id: string, top: boolean): boolean {
   const lh = parseFloat(getComputedStyle(content).lineHeight) || r.height || 16;
   return top ? r.top - box.top < lh * 0.8 : box.bottom - r.bottom < lh * 0.8;
 }
+
+const BRACKETS: Record<string, string> = { '(': ')', '[': ']', '{': '}', '"': '"', "'": "'" };
+const CLOSERS = [')', ']', '}', '"', "'"];
+const MD_PAIRS = ['*', '_', '`', '~'];

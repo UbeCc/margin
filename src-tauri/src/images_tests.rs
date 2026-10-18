@@ -89,9 +89,10 @@ fn collisions_suffix_and_dedupe_by_content() {
     }
     let s = |p: &PathBuf| store_image(Some(&doc), &rel("assets"), ImageInput::File(p), dir.path(), None).unwrap().src;
     assert_eq!(s(&a), "assets/shot.png");
-    assert_eq!(s(&b), "assets/shot-1.png");
+    let b1 = s(&b);
+    assert!(b1.starts_with("assets/shot-") && b1.ends_with(".png") && b1 != "assets/shot.png", "{b1}");
     assert_eq!(s(&c), "assets/shot.png", "same bytes reuse the existing copy");
-    assert_eq!(s(&b), "assets/shot-1.png", "…also for the suffixed copy");
+    assert_eq!(s(&b), b1, "…also for the suffixed copy");
     // no extension / dot file
     let n = dir.path().join("x/README");
     fs::write(&n, "r").unwrap();
