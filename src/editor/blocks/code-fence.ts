@@ -8,8 +8,10 @@
 import { DEFAULT_MARKDOWN_OPTIONS, type BlockWidget, type EditorSettings, type WidgetContext, type WidgetInstance } from '../../contracts';
 import { createCodeEditor, CodeEditor, languageNames, loadLanguage, loadedLanguage } from './cm/setup';
 import { highlightToHtml } from './cm/highlight';
+import { indentRange } from '@codemirror/language';
+import { indentSelection } from '@codemirror/commands';
 import { buildFenceRaw, FenceParts, parseFence, rawRangeToBody, withFenceInfo } from './util/delimited';
-import { escapeHtml, h, isolateEvents, offsetAtPoint } from './util/dom';
+import { copyText, escapeHtml, h, isolateEvents, offsetAtPoint } from './util/dom';
 
 export interface CodeFenceOptions {
   /** Show line numbers in every fence (per-fence: info `{.numberLines}`). */
@@ -204,17 +206,9 @@ class CodeFenceInstance implements WidgetInstance {
     this.editor?.setLineNumbers(wantsLineNumbers(this.parts.info, this.lineNumbersPref()));
   }
 
-  private async copy() {
-    const text = this.parts.body;
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch {
-      const ta = h('textarea', null, text);
-      document.body.append(ta);
-      ta.select();
-      document.execCommand('copy');
-      ta.remove();
-    }
+  private copy() {
+    const lang = this.parts.lang ? ` lang="${escapeHtml(this.parts.lang)}"` : '';
+    copyText(this.parts.body, `<pre${lang}><code>${escapeHtml(this.parts.body)}</code></pre>`);
     this.copyBtn.textContent = 'Copied';
     this.copyBtn.classList.add('mb-done');
     setTimeout(() => {
@@ -239,6 +233,23 @@ class CodeFenceInstance implements WidgetInstance {
 
   focus(at: 'start' | 'end'): void {
     this.ensureEditor().focus(at);
+  }
+
+  /** Code Tools (#98): Copy Code Content, Auto Indent Whole Code, Auto Indent Selected Code. */
+  command(op: string): boolean {
+    if (op === 'copy') {
+      this.copy();
+      return true;
+    }
+    if (op !== 'indentAll' && op !== 'indentSelected') return false;
+    const { view } = this.ensureEditor();
+    if (op === 'indentSelected') indentSelection(view);
+    else {
+      const changes = indentRange(view.state, 0, view.state.doc.length);
+      if (!changes.empty) view.dispatch({ changes, userEvent: 'indent' });
+    }
+    view.focus();
+    return true;
   }
 
   select(from: number, to: number): boolean {

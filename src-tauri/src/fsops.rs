@@ -16,6 +16,9 @@ pub struct DirEntry {
     pub path: String,
     pub is_dir: bool,
     pub mtime: f64,
+    /// Birth time (ms) where the filesystem records one; sidebar "Sort by Creation Date".
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ctime: Option<f64>,
     pub size: u64,
 }
 
@@ -49,6 +52,11 @@ pub fn entry_for(path: &Path) -> std::io::Result<DirEntry> {
         path: path_str(path),
         is_dir: meta.is_dir(),
         mtime: mtime_ms(&meta),
+        ctime: meta
+            .created()
+            .ok()
+            .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
+            .map(|d| d.as_millis() as f64),
         size: if meta.is_dir() { 0 } else { meta.len() },
     })
 }

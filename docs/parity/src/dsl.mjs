@@ -24,6 +24,9 @@ export const T = {
   web: 'src/platform/web.test.ts::',
   pexp: 'tests/e2e/parity-export.spec.ts::',
   pclip: 'tests/e2e/parity-clipboard.spec.ts::',
+  psb: 'tests/e2e/parity-sidebar.spec.ts::',
+  pimg: 'tests/e2e/parity-images.spec.ts::',
+  pctx: 'tests/e2e/parity-ctx.spec.ts::',
 };
 
 // Owner prefixes.
@@ -40,6 +43,8 @@ export const O = {
   table: 'src/editor/blocks/table.ts#',
   fence: 'src/editor/blocks/code-fence.ts#',
   math: 'src/editor/blocks/math.ts#',
+  ctxt: 'src/app/ctxmenu/targets.ts#',
+  ctxi: 'src/app/ctxmenu/items.ts#',
 };
 
 export const EPICS = {

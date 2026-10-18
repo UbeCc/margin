@@ -157,14 +157,17 @@ test.describe('table', () => {
     // alignment: center column 0
     await h.locator('.mb-align[data-align="center"]').click();
     expect((await raw(page, 'table')).split('\n')[1]).toMatch(/^\| :-+: \|/);
-    // add column right of col 0
+    // add column right of col 0 (More Actions = the Table menu)
+    await h.locator('.mb-table-more-btn').click();
     await h.locator('.mb-col-right').click();
     expect((await raw(page, 'table')).split('\n')[0].split('|').length).toBe(6);
     // delete it again
+    await h.locator('.mb-table-more-btn').click();
     await h.locator('.mb-col-del').click();
     expect((await raw(page, 'table')).split('\n')[0].split('|').length).toBe(5);
     // delete row
     await cell(3, 0).click();
+    await h.locator('.mb-table-more-btn').click();
     await h.locator('.mb-row-del').click();
     expect((await raw(page, 'table')).trim().split('\n').length).toBe(4);
   });

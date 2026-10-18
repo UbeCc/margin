@@ -104,9 +104,11 @@ const PARAGRAPH: &[Item] = &[
     ("para:headingUp", "Increase Heading Level", None),
     ("para:headingDown", "Decrease Heading Level", None),
     ("-", "", None),
-    ("block:table", "Table", Some("CmdOrCtrl+Alt+T")),
+    ("@table", "Table", None),
     ("block:code", "Code Fences", Some("CmdOrCtrl+Alt+C")),
+    ("@codeTools", "Code Tools", None),
     ("block:math", "Math Block", Some("CmdOrCtrl+Alt+B")),
+    ("@mathTools", "Math Tools", None),
     ("block:html", "HTML Block", None),
     ("-", "", None),
     ("block:quote", "Quote", Some("CmdOrCtrl+Alt+Q")),
@@ -127,6 +129,51 @@ const PARAGRAPH: &[Item] = &[
     ("block:toc", "Table of Contents", None),
     ("block:front_matter", "YAML Front Matter", None),
 ];
+// #98 Paragraph › Table / Code Tools / Math Tools (ops act on the block with the caret).
+// Add Row Below (⌘↩) / Delete Row (⌘⇧⌫) stay table-cell keys so they never steal
+// Cmd+Enter / Cmd+Shift+Backspace from other blocks; only the labels mention them.
+const PARA_TABLE: &[Item] = &[
+    ("block:table", "Insert Table…", Some("CmdOrCtrl+Alt+T")),
+    ("-", "", None),
+    ("table:rowAbove", "Add Row Above", None),
+    ("table:rowBelow", "Add Row Below", None),
+    ("-", "", None),
+    ("table:colBefore", "Add Column Before", None),
+    ("table:colAfter", "Add Column After", None),
+    ("-", "", None),
+    ("table:moveRowUp", "Move Row Up", None),
+    ("table:moveRowDown", "Move Row Down", None),
+    ("table:moveColLeft", "Move Column Left", None),
+    ("table:moveColRight", "Move Column Right", None),
+    ("-", "", None),
+    ("table:deleteRow", "Delete Row", None),
+    ("table:deleteCol", "Delete Column", None),
+    ("-", "", None),
+    ("table:alignLeft", "Align Left", None),
+    ("table:alignCenter", "Align Center", None),
+    ("table:alignRight", "Align Right", None),
+    ("table:resize", "Resize Table…", None),
+    ("-", "", None),
+    ("table:copy", "Copy Table", None),
+    ("table:prettify", "Prettify Source Code", None),
+    ("table:delete", "Delete Table", None),
+];
+const PARA_CODE_TOOLS: &[Item] = &[
+    ("code:copy", "Copy Code Content", None),
+    ("code:indentAll", "Auto Indent Whole Code", None),
+    ("code:indentSelected", "Auto Indent Selected Code", None),
+];
+const PARA_MATH_TOOLS: &[Item] = &[
+    ("math:copyTex", "Copy as Tex", None),
+    ("math:copyMathML", "Copy as MathML", None),
+    ("-", "", None),
+    ("math:delete", "Delete Math", None),
+    ("-", "", None),
+    ("math:refresh", "Refresh All Math Expressions", None),
+];
+/// `@name` markers in an item list expand to these submenus.
+const SUBMENUS: &[(&str, &[Item])] = &[("@table", PARA_TABLE), ("@codeTools", PARA_CODE_TOOLS), ("@mathTools", PARA_MATH_TOOLS)];
+
 const FORMAT: &[Item] = &[
     ("mark:strong", "Strong", Some("CmdOrCtrl+B")),
     ("mark:em", "Emphasis", Some("CmdOrCtrl+I")),
@@ -143,12 +190,50 @@ const FORMAT: &[Item] = &[
     ("-", "", None),
     ("clearFormat", "Clear Format", None),
 ];
+// Format › Image (#99): Typora's menu order; per-image entries act on the image at the caret.
+const IMAGE_TOP: &[Item] = &[
+    ("image:insert", "Insert Image", None),
+    ("image:insertLocal", "Insert Local Images…", None),
+    ("-", "", None),
+    ("image:openLocation", "Open Image Location…", None),
+    ("image:copyContent", "Copy Image Content", None),
+];
+const IMAGE_ZOOM: &[Item] = &[
+    ("image:zoom-25", "25%", None),
+    ("image:zoom-33", "33%", None),
+    ("image:zoom-50", "50%", None),
+    ("image:zoom-67", "67%", None),
+    ("image:zoom-80", "80%", None),
+    ("image:zoom-100", "100%", None),
+    ("image:zoom-150", "150%", None),
+    ("image:zoom-200", "200%", None),
+];
+const IMAGE_SYNTAX: &[Item] = &[("image:syntaxMarkdown", "Markdown Style", None), ("image:syntaxHtml", "HTML Style", None)];
+const IMAGE_FILE: &[Item] = &[
+    ("image:deleteFile", "Delete Image File", None),
+    ("image:copyTo", "Copy Image to…", None),
+    ("image:moveTo", "Rename or Move Image to…", None),
+    ("image:upload", "Upload Image", None),
+    ("-", "", None),
+    ("image:copyAll", "Copy All Images to…", None),
+    ("image:moveAll", "Move All Images to…", None),
+    ("image:uploadAll", "Upload All Local Images", None),
+    ("image:reloadAll", "Reload All Images", None),
+    ("-", "", None),
+];
+const IMAGE_WHEN_INSERT: &[Item] = &[("image:insertCopyToFolder", "Copy Image File to Folder…", None), ("image:insertUpload", "Upload Image", None)];
+const IMAGE_BOTTOM: &[Item] = &[("image:rootPath", "Use Image Root Path", None), ("image:settings", "Global Image Settings…", None)];
+#[cfg(test)]
+const IMAGE_ALL: &[&[Item]] = &[IMAGE_TOP, IMAGE_ZOOM, IMAGE_SYNTAX, IMAGE_FILE, IMAGE_WHEN_INSERT, IMAGE_BOTTOM];
+
 const VIEW: &[Item] = &[
     ("commandPalette", "Command Palette…", Some("CmdOrCtrl+Shift+A")),
     ("-", "", None),
     ("toggleSidebar", "Toggle Sidebar", Some("CmdOrCtrl+Backslash")),
     ("showOutline", "Outline", Some("CmdOrCtrl+Shift+1")),
+    ("showArticles", "Articles", Some("CmdOrCtrl+Shift+2")),
     ("showFiles", "Files", Some("CmdOrCtrl+Shift+3")),
+    ("sidebarSearch", "Search", Some("CmdOrCtrl+Shift+F")),
     ("revealActiveFile", "Reveal Active File in Sidebar", None),
     ("toggleSource", "Source Code Mode", Some("CmdOrCtrl+Slash")),
     ("-", "", None),
@@ -168,8 +253,10 @@ pub fn all_actions() -> Vec<&'static str> {
     let mut v: Vec<&'static str> = [FILE_OPEN, FILE, EXPORT, EXPORT_MORE, EDIT_TOP, EDIT_FIND, PARAGRAPH, FORMAT, VIEW]
         .iter()
         .chain(EDIT_EXTRA.iter())
+        .chain(IMAGE_ALL.iter())
+        .chain(SUBMENUS.iter().map(|(_, items)| items))
         .flat_map(|g| g.iter().map(|i| i.0))
-        .filter(|id| *id != "-")
+        .filter(|id| *id != "-" && !id.starts_with('@'))
         .collect();
     v.extend(["pageSetup", "print", "close", "preferences", crate::recent::ID_CLEAR]);
     v
@@ -183,6 +270,8 @@ fn add_items<'a, R: Runtime>(
     for (id, label, accel) in items {
         b = if *id == "-" {
             b.separator()
+        } else if let Some((_, sub)) = SUBMENUS.iter().find(|(m, _)| m == id) {
+            b.item(&add_items(app, SubmenuBuilder::new(app, *label), sub)?.build()?)
         } else {
             b.item(&MenuItem::with_id(app, *id, *label, true, *accel)?)
         };
@@ -284,7 +373,14 @@ pub fn build<R: Runtime>(
     menu = menu.item(&edit);
 
     menu = menu.item(&add_items(app, SubmenuBuilder::new(app, "Paragraph"), PARAGRAPH)?.build()?);
-    menu = menu.item(&add_items(app, SubmenuBuilder::new(app, "Format"), FORMAT)?.build()?);
+    let image = add_items(app, SubmenuBuilder::new(app, "Image"), IMAGE_TOP)?
+        .item(&add_items(app, SubmenuBuilder::new(app, "Zoom Image"), IMAGE_ZOOM)?.build()?)
+        .item(&add_items(app, SubmenuBuilder::new(app, "Switch Image Syntax"), IMAGE_SYNTAX)?.build()?);
+    let image = add_items(app, image.separator(), IMAGE_FILE)?
+        .item(&add_items(app, SubmenuBuilder::new(app, "When Insert Local Image"), IMAGE_WHEN_INSERT)?.build()?);
+    let image = add_items(app, image, IMAGE_BOTTOM)?.build()?;
+    let format = add_items(app, SubmenuBuilder::new(app, "Format"), FORMAT)?.separator().item(&image);
+    menu = menu.item(&format.build()?);
     let view = add_items(app, SubmenuBuilder::new(app, "View"), VIEW)?
         .separator()
         .item(&PredefinedMenuItem::fullscreen(app, None)?)
@@ -348,7 +444,11 @@ mod tests {
     #[test]
     fn accelerators_are_unique() {
         let mut seen = std::collections::HashSet::new();
-        for g in [FILE_OPEN, FILE, EXPORT, EXPORT_MORE, EDIT_TOP, EDIT_FIND, PARAGRAPH, FORMAT, VIEW].iter().chain(EDIT_EXTRA.iter()) {
+        for g in [FILE_OPEN, FILE, EXPORT, EXPORT_MORE, EDIT_TOP, EDIT_FIND, PARAGRAPH, FORMAT, VIEW]
+            .iter()
+            .chain(EDIT_EXTRA.iter())
+            .chain(SUBMENUS.iter().map(|(_, items)| items))
+        {
             for (_, _, a) in g.iter() {
                 if let Some(a) = a {
                     assert!(seen.insert(*a), "duplicate accelerator {a}");
@@ -365,7 +465,7 @@ mod tests {
                 "new", "open", "openFolder", "save", "saveAs", "close", "exportHtml", "exportPdf", "print", "undo",
                 "redo", "find", "replace", "toggleSidebar", "toggleSource", "toggleFocus", "toggleTypewriter",
                 "quickOpen", "zoomIn", "zoomOut", "zoomReset", "preferences", "clearRecent", "commandPalette", "showOutline",
-                "showFiles", "revealActiveFile", "reloadFromDisk", "toggleLineEnding", "exportHtmlPlain", "exportImage",
+                "showFiles", "showArticles", "sidebarSearch", "revealActiveFile", "reloadFromDisk", "toggleLineEnding", "exportHtmlPlain", "exportImage",
                 "exportPrevious", "exportOverwrite", "exportSettings", "pageSetup",
                 "exportDocx", "exportLatex",
                 "exportEpub", "clearFormat", "exportOdt", "exportRtf", "exportMediawiki", "exportRst", "exportTextile", "exportOpml",
@@ -380,7 +480,11 @@ mod tests {
                 || ["pastePlain", "jump:top", "jump:bottom", "jump:selection"].contains(&a)
                 || a.starts_with("copyAs:")
                 || a.starts_with("select:")
-                || a.starts_with("delete:");
+                || a.starts_with("delete:")
+                || a.starts_with("table:")
+                || a.starts_with("code:")
+                || a.starts_with("math:")
+                || a.starts_with("image:");
             assert!(ok, "{a} is not a MenuAction");
         }
     }
@@ -394,6 +498,15 @@ mod tests {
             "mark:math", "mark:sup", "mark:sub", "mark:comment", "clearFormat",
         ] {
             assert!(ids.contains(&want), "missing menu item {want}");
+        }
+    }
+
+    #[test]
+    fn paragraph_tool_submenus_are_wired() {
+        let markers: Vec<&str> = PARAGRAPH.iter().map(|i| i.0).filter(|id| id.starts_with('@')).collect();
+        assert_eq!(markers, ["@table", "@codeTools", "@mathTools"]);
+        for want in ["block:table", "table:moveRowUp", "table:resize", "table:copy", "code:indentAll", "math:copyMathML", "math:refresh"] {
+            assert!(all_actions().contains(&want), "missing menu item {want}");
         }
     }
 }

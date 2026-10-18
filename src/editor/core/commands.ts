@@ -6,9 +6,11 @@ import * as E from './edit';
 import { splitBlockMeta } from './render-inline';
 import { find, replace } from './find';
 import { insertMarkdown } from './clipboard';
+import { copyBlock } from './block-copy';
 import { nextHeadingLevel, insertParagraph, taskStatus, clearFormat, insertFootnote } from './para-cmds';
 import { selectScope, deleteScope, jumpTo } from './scopes';
 import { copyAs, pastePlain } from './copy-as';
+import { tableMarkdown, tableTool, codeTool, mathTool } from './block-tools';
 
 export function undo(ed: EditorCore): boolean {
   const e = ed.hist.popUndo();
@@ -146,6 +148,36 @@ function containerBlock(ed: EditorCore, kind: 'quote' | 'ul' | 'ol' | 'task'): b
 }
 
 /** Insert a block after the current leaf (or into it when it is an empty paragraph). */
+/**
+ * Insert Table (#98): like Typora, a top-level paragraph / heading is split at the caret
+ * and the table goes between the halves (a selection is deleted first); otherwise the
+ * table is inserted like any other block.
+ */
+function insertTableAtCaret(ed: EditorCore, md: string): boolean {
+  const doc = ed.doc;
+  let { from, to } = ed.sel();
+  if (from !== to && doc.leaves.length) {
+    ed.hist.break();
+    ed.replaceRange(from, to, '', null);
+    to = from;
+  }
+  if (!doc.leaves.length) return insertBlock(ed, md, true);
+  const { i, off } = doc.locate(from);
+  const l = doc.leaves[i];
+  const len = l && E.isTextLeaf(l) ? leafContent(l).length : 0;
+  if (!l || !(l.type === 'paragraph' || l.type === 'heading') || l.chain.length || off <= 0 || off >= len) return insertBlock(ed, md, true);
+  const EOL = doc.eol;
+  ed.hist.break();
+  ed.change(() => {
+    const at = doc.docPos(i, off);
+    doc.replace(at, at, EOL + EOL + md + EOL + EOL);
+    const nl = doc.leaves[doc.locate(at + 2 * EOL.length).i];
+    return nl && !E.isTextLeaf(nl) ? { widget: nl.id, at: 'start' as const } : { pos: at };
+  });
+  ed.hist.break();
+  return true;
+}
+
 function insertBlock(ed: EditorCore, md: string, focusWidget: boolean, caretOff?: number): boolean {
   const doc = ed.doc;
   const i = curLeaf(ed);
@@ -265,5 +297,21 @@ export function execCommand(ed: EditorCore, cmd: EditorCommand): boolean {
       return copyAs(ed, cmd.format);
     case 'pastePlain':
       return pastePlain(ed);
+    case 'replaceRange': {
+      const n = ed.doc.text().length;
+      if (!(cmd.from >= 0 && cmd.from <= cmd.to && cmd.to <= n)) return false;
+      ed.replaceRange(cmd.from, cmd.to, cmd.text, null);
+      return true;
+    }
+    case 'copyBlock':
+      return copyBlock(ed, cmd.part);
+    case 'insertTable':
+      return insertTableAtCaret(ed, tableMarkdown(cmd.rows, cmd.cols));
+    case 'table':
+      return tableTool(ed, cmd.op, { rows: cmd.rows, cols: cmd.cols });
+    case 'code':
+      return codeTool(ed, cmd.op);
+    case 'math':
+      return mathTool(ed, cmd.op);
   }
 }

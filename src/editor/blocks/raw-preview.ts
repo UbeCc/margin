@@ -9,7 +9,9 @@
  */
 import type { BlockWidget, EditorSettings, WidgetBlockType, WidgetContext, WidgetInstance } from '../../contracts';
 import { createCodeEditor, CodeEditor } from './cm/setup';
-import { debounce, h, isolateEvents } from './util/dom';
+import { indentRange } from '@codemirror/language';
+import { indentSelection } from '@codemirror/commands';
+import { copyText, debounce, h, isolateEvents } from './util/dom';
 import { rawRangeToBody, type Envelope } from './util/delimited';
 
 export interface Parsed {
@@ -185,6 +187,29 @@ class RawPreviewInstance<P extends Parsed> implements WidgetInstance {
     this.label.textContent = this.spec.label?.(this.parsed) ?? '';
     this.scheduleRender.cancel();
     this.renderPreview();
+  }
+
+  /** `refresh` (#98 Refresh All Math Expressions / diagrams): re-render the preview. */
+  /** Code Tools on math / HTML blocks (#98): Copy Code Content, Auto Indent Whole / Selected Code. */
+  command(op: string): boolean {
+    if (op === 'refresh') {
+      this.renderPreview();
+      return true;
+    }
+    if (op === 'copy') {
+      copyText(this.parsed.body);
+      return true;
+    }
+    if (op !== 'indentAll' && op !== 'indentSelected') return false;
+    if (!this.editing) this.startEditing('end');
+    const { view } = this.ensureEditor();
+    if (op === 'indentSelected') indentSelection(view);
+    else {
+      const changes = indentRange(view.state, 0, view.state.doc.length);
+      if (!changes.empty) view.dispatch({ changes, userEvent: 'indent' });
+    }
+    view.focus();
+    return true;
   }
 
   focus(at: 'start' | 'end'): void {

@@ -1,6 +1,7 @@
-import type { ImageRule } from '../contracts';
+import type { UploadConfig } from '../contracts';
+import type { UploaderTestReport } from './platform-extras';
 import { themeLabel } from '../themes';
-import { IMAGE_RULE_PRESETS, imageRulePresetId, type MarginSettings } from './settings';
+import type { MarginSettings } from './settings';
 import { h, debounce } from './util/dom';
 import { confirmDialog, openModal } from './ui/modal';
 import { exportPrefsSection } from './preferences-export';
@@ -8,6 +9,7 @@ import { uploadPrefsSection } from './upload-prefs';
 import { prefKit } from './prefs/kit';
 import { generalPane } from './prefs/general';
 import { editorPane, markdownPane } from './prefs/editor-md';
+import { imageRulesSection } from './images/prefs';
 
 export interface PreferencesHost {
   settings(): MarginSettings;
@@ -20,6 +22,8 @@ export interface PreferencesHost {
   pickFile?(name: string, extensions: string[]): Promise<string | null>;
   /** Locate pandoc for the given path ('' = auto); resolves to a status line, never rejects. */
   detectPandoc?(path: string): Promise<string>;
+  /** #92: Preferences › Images › Test Uploader (desktop). */
+  testUploader?(config: UploadConfig): Promise<UploaderTestReport>;
 }
 
 /** Pane order follows Typora: General, Appearance, Editor, Image, Markdown, Export (#100). */
@@ -141,70 +145,13 @@ export function openPreferences(host: PreferencesHost, initial: Section = 'gener
     h('div.pref-block', null, pandocStatus),
   );
 
-  // ---------------------------------------------------------------- images
-  const current = imageRulePresetId(s.imageRule);
-  const absDir = h('input.text-input', {
-    type: 'text',
-    placeholder: '/path/to/images',
-    value: s.imageRule.kind === 'absolute' ? s.imageRule.dir : '',
-    'data-pref': 'imageAbsDir',
-  });
-  const relDir = h('input.text-input', {
-    type: 'text',
-    placeholder: './images',
-    value: current === 'custom' && s.imageRule.kind === 'relative' ? s.imageRule.dir : '',
-    'data-pref': 'imageRelDir',
-  });
-  const radios: HTMLInputElement[] = [];
-  const presets = [...IMAGE_RULE_PRESETS.slice(0, 2), { id: 'custom', label: 'Copy to relative folder…', rule: { kind: 'relative', dir: '' } as ImageRule }, ...IMAGE_RULE_PRESETS.slice(2)];
-  const applyRule = (): void => {
-    const id = radios.find((r) => r.checked)?.value;
-    const preset = presets.find((p) => p.id === id);
-    if (!preset) return;
-    let rule: ImageRule = preset.rule;
-    if (id === 'absolute') {
-      if (!absDir.value.trim()) return;
-      rule = { kind: 'absolute', dir: absDir.value.trim() };
-    } else if (id === 'custom') {
-      if (!relDir.value.trim()) return;
-      const d = relDir.value.trim();
-      rule = { kind: 'relative', dir: d.startsWith('.') ? d : `./${d}` };
-    }
-    set({ imageRule: rule });
-  };
-  const browse = h('button.btn.btn-small', {
-    type: 'button',
-    text: 'Choose…',
-    onclick: async () => {
-      const p = await host.pickFolder();
-      if (p) {
-        absDir.value = p;
-        radios.find((r) => r.value === 'absolute')!.checked = true;
-        applyRule();
-      }
-    },
-  });
+  // ---------------------------------------------------------------- images (#99, src/app/images/prefs.ts)
   const images = h(
     'section.pref-section',
     { 'data-section': 'images' },
-    h('div.pref-label', { text: 'When inserting or pasting images' }),
-    h(
-      'div.radio-group',
-      { role: 'radiogroup' },
-      ...presets.map((p) => {
-        const r = h('input', { type: 'radio', name: 'imageRule', value: p.id });
-        r.checked = p.id === current;
-        r.addEventListener('change', applyRule);
-        radios.push(r);
-        const extra = p.id === 'absolute' ? h('span.inline', null, absDir, browse) : p.id === 'custom' ? relDir : null;
-        return h('label.radio', null, r, h('span', { text: p.label }), extra);
-      }),
-    ),
-    h('p.pref-note', { text: '${filename} is replaced with the document name. Unsaved documents keep images where they are until saved.' }),
-    uploadPrefsSection(s, (p) => set(p as Partial<MarginSettings>)),
+    imageRulesSection(s, (p) => set(p as Partial<MarginSettings>), () => host.pickFolder()),
+    uploadPrefsSection(s, (p) => set(p as Partial<MarginSettings>), host.testUploader),
   );
-  absDir.addEventListener('change', applyRule);
-  relDir.addEventListener('change', applyRule);
 
   // ---------------------------------------------------------------- shell
   const sections: Record<Section, [string, HTMLElement]> = {

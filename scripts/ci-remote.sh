@@ -45,7 +45,7 @@ status pending "running on $HOST${QUICK:+ (quick)}"
 git archive --format=tar "$SHA" | ssh "$HOST" "mkdir -p $DIR/runs/$SHORT && tar -m -C $DIR/runs/$SHORT -xf -"
 T0=$SECONDS
 set +e
-ssh "$HOST" "cd $DIR/runs/$SHORT && flock $DIR/ci.lock bash scripts/linux-docker.sh ci . work $QUICK" \
+ssh "$HOST" "cd $DIR/runs/$SHORT && flock $DIR/ci.lock bash scripts/linux-docker.sh ci . work $QUICK; rc=\$?; touch .ci-done; exit \$rc" \
   > >(tee "/tmp/margin-ci-$SHORT.log") 2>&1
 RC=$?
 set -e
@@ -55,7 +55,9 @@ rm -rf "$LOCAL_OUT"; mkdir -p "$LOCAL_OUT"
 EXCL="--exclude bundle --exclude e2e-test-results"
 [ "${CI_FETCH_BUNDLES:-0}" = 1 ] && EXCL=""
 rsync -a $EXCL "$HOST:$DIR/runs/$SHORT/ci-out/" "$LOCAL_OUT/" 2>/dev/null || true
-ssh "$HOST" "cd $DIR/runs && ls -1t | tail -n +6 | xargs -r rm -rf"   # keep the last 5 runs
+# Keep the last 5 *finished* runs. Runs still queued on the flock have no .ci-done
+# marker and must never be pruned (that deleted their cwd → exit 127).
+ssh "$HOST" "cd $DIR/runs && for d in \$(ls -1t); do [ -f \$d/.ci-done ] && echo \$d; done | tail -n +6 | xargs -r rm -rf"
 
 if [ -f "$LOCAL_OUT/summary.md" ]; then
   ok=$(node -e "console.log(require('./$LOCAL_OUT/summary.json').ok)" 2>/dev/null || echo false)

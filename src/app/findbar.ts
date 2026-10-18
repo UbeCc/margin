@@ -110,6 +110,27 @@ export class FindBar {
     this.refresh();
   }
 
+  /** Open the bar with `query` (sidebar search results) and select its first match. */
+  searchFor(query: string, o: FindOpts, occurrence = 0): boolean {
+    this.el.hidden = false;
+    this.el.classList.remove('with-replace');
+    this.query.value = query;
+    if (o.caseSensitive !== this.caseSensitive) this.toggleCase();
+    const set = (b: HTMLButtonElement, on: boolean): void => {
+      b.setAttribute('aria-pressed', String(on));
+      b.classList.toggle('on', on);
+    };
+    this.wholeWord = !!o.wholeWord;
+    this.regex = !!o.regex;
+    set(this.wordBtn, this.wholeWord);
+    set(this.regexBtn, this.regex);
+    this.editor().exec({ kind: 'jump', to: 'top' });
+    let ok = false;
+    for (let i = 0; i <= occurrence; i++) ok = this.find();
+    this.refresh();
+    return ok;
+  }
+
   close(): void {
     if (this.el.hidden) return;
     this.el.hidden = true;

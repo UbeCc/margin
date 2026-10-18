@@ -23,7 +23,10 @@ export interface EditorSettings {
   baseDir: string | null;
   /** Resolve a document-relative src to something the webview can load. */
   resolveAsset(src: string): string;
-  /** Called when the user pastes / drops image data or files. Returns the markdown src to insert. */
+  /**
+   * Called when the user pastes / drops image data or files. Returns the markdown src to insert,
+   * or (#99) a complete image snippet (`![alt](src)` / `<img …>`) that is inserted verbatim.
+   */
   storeImage?(input: { bytes?: Uint8Array; mime?: string; path?: string; name?: string }): Promise<string | null>;
   /** Open an external link. */
   openLink?(href: string): void;
@@ -134,7 +137,28 @@ export type EditorCommand =
   | { kind: 'delete'; scope: 'word' | 'line' | 'block' | 'styled' | 'range' }
   | { kind: 'jump'; to: 'top' | 'bottom' | 'selection' }
   | { kind: 'copyAs'; format: CopyAsFormat }
-  | { kind: 'pastePlain' };
+  | { kind: 'pastePlain' }
+  // #99 (additive): replace markdown offsets [from, to) of getMarkdown() with text, as one undo step.
+  | { kind: 'replaceRange'; from: number; to: number; text: string }
+  // #97 (additive): copy the block at the caret — markdown source, or the inner text of a code / math fence
+  | { kind: 'copyBlock'; part: 'source' | 'content' }
+  // #98 (additive): block tools — Paragraph › Table / Code Tools / Math Tools
+  /** Insert a `rows`×`cols` table (rows include the header row). */
+  | { kind: 'insertTable'; rows: number; cols: number }
+  /** Table tools on the table with the caret (`resize` takes rows/cols, rows incl. header). */
+  | { kind: 'table'; op: TableOp; rows?: number; cols?: number }
+  | { kind: 'code'; op: CodeOp }
+  | { kind: 'math'; op: MathOp };
+
+/** Table submenu / toolbar operations (#98). `prettify` = re-format the table source (aligned columns). */
+export type TableOp =
+  | 'rowAbove' | 'rowBelow' | 'colBefore' | 'colAfter' | 'deleteRow' | 'deleteCol'
+  | 'moveRowUp' | 'moveRowDown' | 'moveColLeft' | 'moveColRight'
+  | 'alignLeft' | 'alignCenter' | 'alignRight' | 'resize' | 'copy' | 'prettify' | 'delete';
+/** Code Tools (#98): copy the fence body; re-indent the whole body / the selected lines. */
+export type CodeOp = 'copy' | 'indentAll' | 'indentSelected';
+/** Math Tools (#98): copy the math at the caret as TeX / MathML, delete it, re-render all math. */
+export type MathOp = 'copyTex' | 'copyMathML' | 'delete' | 'refresh';
 
 /**
  * Edit › Copy as (#96). markdown = source only; html = the rendered HTML *source*
@@ -216,6 +240,11 @@ export interface WidgetInstance {
    * the whole widget as before).
    */
   select?(from: number, to: number): boolean;
+  /**
+   * Block tools (#98): run a table/code/math op (`TableOp` | `CodeOp` | `'refresh'`) on
+   * this widget. Return false when the op does not apply; the core may then fall back.
+   */
+  command?(op: string, args?: { rows?: number; cols?: number }): boolean;
   destroy(): void;
 }
 
@@ -235,6 +264,8 @@ export interface DirEntry {
   isDir: boolean;
   /** ms since epoch */
   mtime: number;
+  /** Creation (birth) time, ms since epoch, when the platform knows it (#101 sort). */
+  ctime?: number;
   size: number;
 }
 
@@ -268,7 +299,7 @@ export type MenuAction =
   | 'undo' | 'redo' | 'find' | 'replace'
   | 'toggleSidebar' | 'toggleSource' | 'toggleFocus' | 'toggleTypewriter' | 'quickOpen'
   | 'zoomIn' | 'zoomOut' | 'zoomReset'
-  | 'clearRecent' | 'commandPalette' | 'showOutline' | 'showFiles' | 'revealActiveFile' | 'reloadFromDisk' | 'toggleLineEnding'
+  | 'clearRecent' | 'commandPalette' | 'showOutline' | 'showFiles' | 'showArticles' | 'sidebarSearch' | 'revealActiveFile' | 'reloadFromDisk' | 'toggleLineEnding'
   | `heading:${0 | 1 | 2 | 3 | 4 | 5 | 6}`
   | `mark:${InlineMark}`
   | `block:${BlockKind}`
@@ -281,7 +312,22 @@ export type MenuAction =
   | 'pastePlain'
   | `select:${'word' | 'line' | 'block' | 'styled'}`
   | `delete:${'word' | 'line' | 'block' | 'styled' | 'range'}`
-  | `jump:${'top' | 'bottom' | 'selection'}`;
+  | `jump:${'top' | 'bottom' | 'selection'}`
+  // #98 (additive): Paragraph › Table (Insert Table… opens the rows×columns dialog) / Code Tools / Math Tools
+  | 'table:insert'
+  | `table:${TableOp}`
+  | `code:${CodeOp}`
+  | `math:${MathOp}`
+  // #99 (additive): Format › Image submenu
+  | `image:${ImageMenuAction}`;
+
+/** Format › Image entries (#99), in Typora's menu order; per-image ones act on the image at the caret. */
+export type ImageMenuAction =
+  | 'insert' | 'insertLocal' | 'openLocation' | 'copyContent'
+  | `zoom-${25 | 33 | 50 | 67 | 80 | 100 | 150 | 200}`
+  | 'syntaxMarkdown' | 'syntaxHtml' | 'deleteFile' | 'copyTo' | 'moveTo' | 'upload'
+  | 'copyAll' | 'moveAll' | 'uploadAll' | 'reloadAll'
+  | 'insertCopyToFolder' | 'insertUpload' | 'rootPath' | 'settings';
 
 /** PDF export options (#18 baseDir; #95 page geometry, header/footer, bookmarks, metadata). All optional. */
 export interface PdfExportOptions {
