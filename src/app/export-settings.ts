@@ -5,22 +5,38 @@
  */
 import type { ImageFormat, ImageQuality } from './export-image';
 
-export type PaperName = 'A3' | 'A4' | 'A5' | 'B5' | 'Letter' | 'Legal' | 'Tabloid' | 'custom';
+/** `default` = no paper in the export settings: File › Page Setup decides (Typora's "Default"). */
+export type PaperName = 'default' | 'A5' | 'A4' | 'A3' | 'Letter' | 'Legal' | 'Tabloid' | 'custom';
+export type NamedPaper = Exclude<PaperName, 'default' | 'custom'>;
 export type Orientation = 'portrait' | 'landscape';
 export type PageBreaks = 'none' | 'h1' | 'h2';
 
-/** Page geometry shared by File › Page Setup, Print and PDF export. Lengths in mm. */
+/**
+ * PDF page geometry from Preferences › Export › PDF (lengths in mm). Typora: a non-empty
+ * paper here wins over File › Page Setup; margins always come from here (Page Setup
+ * has none); orientation only from Page Setup (`orientation` is the resolved value
+ * in `effectivePage`, ignored in the stored settings).
+ */
 export interface PageSetup {
   paper: PaperName;
   /** Custom paper [width, height] in mm (used when paper = 'custom'). */
   custom: [number, number];
   orientation: Orientation;
+  /** 'default' = 45 pt top/bottom, 36 pt left/right. */
+  marginMode: 'default' | 'custom';
   margins: { top: number; right: number; bottom: number; left: number };
+}
+
+/** File › Page Setup (session-only, like Typora's shared NSPrintInfo; not saved in settings). */
+export interface PrintSetup {
+  paper: Exclude<PaperName, 'default'>;
+  custom: [number, number];
+  orientation: Orientation;
 }
 
 export interface ExportSettings {
   general: {
-    /** Where the save panel starts: next to the document, a fixed folder, or the last used folder. */
+    /** Where the save panel starts: 'last' = Typora's "Auto" (last export folder, else the document's), 'same' = the document's folder, 'custom'. */
     folder: 'same' | 'custom' | 'last';
     customFolder: string;
     /** After a successful export. */
@@ -44,6 +60,8 @@ export interface ExportSettings {
     /** Add a bookmark outline built from the headings. */
     outline: boolean;
     author: string;
+    /** "Append Extra Content (HTML)" at the end of the body. */
+    appendBody: string;
   };
   html: { theme: string; appendHead: string; appendBody: string };
   htmlPlain: { appendHead: string; appendBody: string };
@@ -106,38 +124,61 @@ export const CUSTOM_EXPORT_TEMPLATES: Omit<CustomExport, 'id'>[] = [
   { name: 'Pandoc (custom format)', command: 'pandoc -f markdown -t asciidoc -s -o ${outputPath}', extension: 'adoc', input: 'markdown', saveDialog: true },
 ];
 
-export const PAPER_SIZES: Record<Exclude<PaperName, 'custom'>, [number, number]> = {
+export const PAPER_SIZES: Record<NamedPaper, [number, number]> = {
   A3: [297, 420],
   A4: [210, 297],
   A5: [148, 210],
-  B5: [176, 250],
   Letter: [215.9, 279.4],
   Legal: [215.9, 355.6],
   Tabloid: [279.4, 431.8],
 };
 
+/** Preferences › Export › PDF paper choices, in Typora's order. */
 export const PAPER_LABELS: [PaperName, string][] = [
+  ['default', 'Default'],
+  ['A5', 'A5'],
   ['A4', 'A4'],
   ['A3', 'A3'],
-  ['A5', 'A5'],
-  ['B5', 'B5'],
   ['Letter', 'US Letter'],
   ['Legal', 'US Legal'],
   ['Tabloid', 'Tabloid'],
-  ['custom', 'Custom…'],
+  ['custom', 'Custom'],
 ];
 
+const PT_TO_MM = 25.4 / 72;
+/** Typora's default margins: 45 pt top/bottom, 36 pt left/right. */
+export const DEFAULT_MARGINS = Object.freeze({ top: 45 * PT_TO_MM, right: 36 * PT_TO_MM, bottom: 45 * PT_TO_MM, left: 36 * PT_TO_MM });
+
 export const DEFAULT_PAGE: Readonly<PageSetup> = Object.freeze({
-  paper: 'A4',
+  paper: 'default',
   custom: [210, 297] as [number, number],
   orientation: 'portrait',
-  margins: { top: 16, right: 13, bottom: 16, left: 13 },
+  marginMode: 'default',
+  margins: { ...DEFAULT_MARGINS },
 });
 
+export const DEFAULT_PRINT_SETUP: Readonly<PrintSetup> = Object.freeze({ paper: 'A4', custom: [210, 297] as [number, number], orientation: 'portrait' });
+
+/** Preset menus of the PDF Header / Footer fields (empty = "None"). */
+export const HEADER_PRESETS = ['${title}', '${author}', '${pageNo}', '${today}'];
+export const FOOTER_PRESETS = ['${title}', 'No. ${pageNo} / ${totalPages}', 'Written in Margin', 'CONFIDENTIAL'];
+
+/** Geometry actually used for print / PDF: export settings over Page Setup. */
+export function effectivePage(pdf: PageSetup, ps: PrintSetup = DEFAULT_PRINT_SETUP): PageSetup {
+  const own = pdf.paper !== 'default';
+  return {
+    paper: own ? pdf.paper : ps.paper,
+    custom: own ? pdf.custom : ps.custom,
+    orientation: ps.orientation,
+    marginMode: 'custom',
+    margins: pdf.marginMode === 'custom' ? { ...pdf.margins } : { ...DEFAULT_MARGINS },
+  };
+}
+
 export const DEFAULT_EXPORT: Readonly<ExportSettings> = Object.freeze({
-  general: { folder: 'same', customFolder: '', afterExport: 'none', allowYamlOverrides: true, noOverwriteWarning: false, runAfterExport: '' },
+  general: { folder: 'last', customFolder: '', afterExport: 'none', allowYamlOverrides: true, noOverwriteWarning: false, runAfterExport: '' },
   custom: [],
-  pdf: { page: DEFAULT_PAGE, theme: '', pageBreaks: 'none', header: '', footer: '', outline: true, author: '' },
+  pdf: { page: DEFAULT_PAGE, theme: '', pageBreaks: 'none', header: '', footer: '', outline: true, author: '', appendBody: '' },
   html: { theme: '', appendHead: '', appendBody: '' },
   htmlPlain: { appendHead: '', appendBody: '' },
   image: { width: 800, quality: 'high', format: 'png', theme: '', fontSize: 16 },
@@ -154,21 +195,41 @@ const n = (v: unknown, d: number, min: number, max: number): number => {
 };
 const oneOf = <T extends string>(v: unknown, all: readonly T[], d: T): T => (all.includes(v as T) ? (v as T) : d);
 
+const PAPERS = ['default', 'A5', 'A4', 'A3', 'Letter', 'Legal', 'Tabloid', 'custom'] as const;
+
 export function migratePageSetup(input: unknown): PageSetup {
   const r = obj(input);
   const d = DEFAULT_PAGE;
   const m = obj(r.margins);
   const c = Array.isArray(r.custom) ? r.custom : [];
+  const margins = {
+    top: n(m.top, d.margins.top, 0, 100),
+    right: n(m.right, d.margins.right, 0, 100),
+    bottom: n(m.bottom, d.margins.bottom, 0, 100),
+    left: n(m.left, d.margins.left, 0, 100),
+  };
+  // Settings saved before "Default" existed: A4 + 16/13 mm was the old default.
+  const legacy = r.marginMode === undefined && 'paper' in r;
+  const oldDefaultMargins = margins.top === 16 && margins.bottom === 16 && margins.left === 13 && margins.right === 13;
+  let paper = oneOf(r.paper, PAPERS, d.paper);
+  if (legacy && r.paper === 'A4') paper = 'default';
   return {
-    paper: oneOf(r.paper, ['A3', 'A4', 'A5', 'B5', 'Letter', 'Legal', 'Tabloid', 'custom'] as const, d.paper),
+    paper,
     custom: [n(c[0], d.custom[0], 50, 2000), n(c[1], d.custom[1], 50, 2000)],
     orientation: oneOf(r.orientation, ['portrait', 'landscape'] as const, d.orientation),
-    margins: {
-      top: n(m.top, d.margins.top, 0, 100),
-      right: n(m.right, d.margins.right, 0, 100),
-      bottom: n(m.bottom, d.margins.bottom, 0, 100),
-      left: n(m.left, d.margins.left, 0, 100),
-    },
+    marginMode: legacy ? (oldDefaultMargins || m.top === undefined ? 'default' : 'custom') : oneOf(r.marginMode, ['default', 'custom'] as const, 'default'),
+    margins: legacy && oldDefaultMargins ? { ...DEFAULT_MARGINS } : margins,
+  };
+}
+
+export function migratePrintSetup(input: unknown): PrintSetup {
+  const r = obj(input);
+  const d = DEFAULT_PRINT_SETUP;
+  const c = Array.isArray(r.custom) ? r.custom : [];
+  return {
+    paper: oneOf(r.paper, ['A5', 'A4', 'A3', 'Letter', 'Legal', 'Tabloid', 'custom'] as const, d.paper),
+    custom: [n(c[0], d.custom[0], 50, 2000), n(c[1], d.custom[1], 50, 2000)],
+    orientation: oneOf(r.orientation, ['portrait', 'landscape'] as const, d.orientation),
   };
 }
 
@@ -236,6 +297,7 @@ export function migrateExportSettings(input: unknown): ExportSettings {
       footer: s(p.footer, ''),
       outline: b(p.outline, true),
       author: s(p.author, ''),
+      appendBody: s(p.appendBody, ''),
     },
     html: { theme: s(hh.theme, ''), appendHead: s(hh.appendHead, ''), appendBody: s(hh.appendBody, '') },
     htmlPlain: { appendHead: s(hp.appendHead, ''), appendBody: s(hp.appendBody, '') },
@@ -271,9 +333,9 @@ export function pandocArgsPreview(format: PandocFormatId, o: PandocFormatOptions
   return a.join(' ');
 }
 
-/** Paper size in mm after applying orientation. */
-export function paperSizeMm(page: PageSetup): [number, number] {
-  const [w, h] = page.paper === 'custom' ? page.custom : PAPER_SIZES[page.paper];
+/** Paper size in mm after applying orientation ('default' alone: A4). */
+export function paperSizeMm(page: Pick<PageSetup, 'paper' | 'custom' | 'orientation'>): [number, number] {
+  const [w, h] = page.paper === 'custom' ? page.custom : PAPER_SIZES[page.paper === 'default' ? 'A4' : page.paper];
   return page.orientation === 'landscape' ? [Math.max(w, h), Math.min(w, h)] : [Math.min(w, h), Math.max(w, h)];
 }
 

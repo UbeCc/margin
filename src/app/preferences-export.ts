@@ -5,6 +5,8 @@
 import { themeLabel } from '../themes';
 import {
   CUSTOM_EXPORT_TEMPLATES,
+  FOOTER_PRESETS,
+  HEADER_PRESETS,
   migrateExportSettings,
   pandocArgsPreview,
   PANDOC_FORMAT_FIELDS,
@@ -15,7 +17,7 @@ import {
   type PandocFormatOptions,
 } from './export-settings';
 import { confirmDialog } from './ui/modal';
-import { pageSetupFields } from './export-ui';
+import { pdfPaperFields } from './export-ui';
 import { h, debounce } from './util/dom';
 
 export interface ExportPrefsHost {
@@ -85,30 +87,44 @@ export function exportPrefsSection(host: ExportPrefsHost): HTMLElement {
     },
   });
   const folder = sel('general', 'folder', [
-    ['same', 'Same folder as the document'],
-    ['last', 'Last used export folder'],
-    ['custom', 'Custom folder…'],
+    ['last', 'Auto'],
+    ['same', 'Same folder with current file'],
+    ['custom', 'Custom location'],
   ]);
 
   const vars = 'Variables: ${title} ${author} ${today} ${currentFileName} ${pageNo} ${totalPages}';
+  // Header / Footer: free text with Typora's preset list; empty shows "None".
+  const preset = (key: 'header' | 'footer', presets: string[]): HTMLElement => {
+    const el = text('pdf', key, 'None') as HTMLInputElement;
+    const id = `export-pdf-${key}-presets`;
+    el.setAttribute('list', id);
+    return h('span.inline', null, el, h('datalist', { id }, ...presets.map((p) => h('option', { value: p }))));
+  };
+  const pageBreak = (): HTMLInputElement => {
+    const el = h('input.switch', { type: 'checkbox', role: 'switch', 'data-export': 'pdf.pageBreaks' });
+    el.checked = host.get().pdf.pageBreaks !== 'none';
+    el.addEventListener('change', () => patch('pdf', 'pageBreaks', el.checked ? 'h1' : 'none'));
+    return el;
+  };
   return h(
     'section.pref-section',
     { 'data-section': 'export' },
     heading('General'),
     row('Default Folder for Exported File', folder),
     row('Custom folder', h('span.inline', null, customFolder, browse)),
-    row('After Export', sel('general', 'afterExport', [['none', 'Do nothing'], ['open', 'Open exported file'], ['reveal', 'Reveal in folder']])),
-    row('Allow YAML front matter to override export settings', check('general', 'allowYamlOverrides'), 'title, author, subject, keywords, header, footer'),
+    row('After Export', sel('general', 'afterExport', [['none', 'Do nothing'], ['open', 'Open exported file'], ['reveal', 'Open exported file location']])),
+    row('Read and overwrite export settings from YAML front matters', check('general', 'allowYamlOverrides'), 'title, author, subject, keywords, header, footer'),
     row('Do not warn before “Export and Overwrite with Previous”', check('general', 'noOverwriteWarning')),
     row('Run command after export', text('general', 'runAfterExport', 'open -R ${outputPath}'), 'Executable and arguments; no shell. ${outputPath} ${outputFolder} ${currentPath} …'),
     heading('PDF'),
-    pageSetupFields(host.get().pdf.page, (page) => patch('pdf', 'page', page)),
+    pdfPaperFields(host.get().pdf.page, (page) => patch('pdf', 'page', page)),
     row('Theme', sel('pdf', 'theme', themes)),
-    row('Page Breaks', sel('pdf', 'pageBreaks', [['none', 'None'], ['h1', 'Before each Heading 1'], ['h2', 'Before each Heading 1 and 2']])),
-    row('Header', text('pdf', 'header', '${title}'), vars),
-    row('Footer', text('pdf', 'footer', '${pageNo} / ${totalPages}')),
+    row('Page Break Between Top Headings', pageBreak()),
+    row('Header', preset('header', HEADER_PRESETS), vars),
+    row('Footer', preset('footer', FOOTER_PRESETS)),
     row('Bookmarks (outline from headings)', check('pdf', 'outline')),
     row('Author', text('pdf', 'author')),
+    row('Append Extra Content (HTML)', text('pdf', 'appendBody', '', true)),
     heading('HTML'),
     row('Theme', sel('html', 'theme', themes)),
     row('Append in <head>', text('html', 'appendHead', '<meta name="robots" content="noindex">', true)),

@@ -5,7 +5,7 @@ import { COMMANDS, commandForKey, commandSpec, isCommandId, type CommandId } fro
 import { DocumentController, type DocState } from './document';
 import { documentTitle, loadKatexCss, needsKatex } from './export';
 import { ExportController, registerPandocExporters } from './export-actions';
-import { pageCss } from './export-settings';
+import { DEFAULT_PRINT_SETUP, effectivePage, pageCss, type PrintSetup } from './export-settings';
 import { confirmOverwriteDialog, openExportingSheet, openPageSetup } from './export-ui';
 import { runImport, type ImportHost } from './import';
 import { FindBar } from './findbar';
@@ -436,6 +436,8 @@ export class App {
 
   /** While rendering an HTML export: directory of the output file (srcs become relative to it). */
   private exportDir: string | null = null;
+  /** File › Page Setup (session only, like Typora's shared print info). */
+  private printSetup: PrintSetup = { ...DEFAULT_PRINT_SETUP };
 
   private resolveAsset(src: string): string {
     const p = resolveDocPath(src, this.doc?.dir ?? null);
@@ -613,9 +615,12 @@ export class App {
         this.preferences('export');
         return true;
       case 'pageSetup': {
-        const page = await openPageSetup(this.settings.export.pdf.page);
-        if (page) this.updateSettings({ export: { ...this.settings.export, pdf: { ...this.settings.export.pdf, page } } });
-        return !!page;
+        const ps = await openPageSetup(this.printSetup);
+        if (ps) {
+          this.printSetup = ps;
+          this.applyPrintPageCss();
+        }
+        return !!ps;
       }
       case 'exportDocx':
       case 'exportLatex':
@@ -891,6 +896,7 @@ export class App {
       notify: (m, kind, action) => void toast(m, { kind, action }),
       confirmOverwrite: (p) => confirmOverwriteDialog(p),
       exportProgress: (abort) => openExportingSheet(abort),
+      printSetup: () => this.printSetup,
     });
     registerPandocExporters(c, {
       pandocPath: () => this.settings.pandocPath,
@@ -908,7 +914,7 @@ export class App {
       el.id = 'margin-print-page';
       document.head.appendChild(el);
     }
-    el.textContent = pageCss(this.settings.export.pdf.page, this.settings.export.pdf.pageBreaks);
+    el.textContent = pageCss(effectivePage(this.settings.export.pdf.page, this.printSetup), this.settings.export.pdf.pageBreaks);
   }
 
   private exportPandoc(format: PandocFormat): Promise<boolean> {

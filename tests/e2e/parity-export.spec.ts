@@ -147,29 +147,69 @@ test('menu.file.page-setup: File › Page Setup (paper size for print/PDF)', asy
   void run(page, 'pageSetup');
   const dlg = page.locator('.page-setup');
   await expect(dlg).toBeVisible();
+  // Page Setup has paper + orientation only (no "Default", no margins).
+  expect(await dlg.locator('select[data-page=paper] option').allTextContents()).toEqual(['A5', 'A4', 'A3', 'US Letter', 'US Legal', 'Tabloid', 'Custom']);
+  await expect(dlg.locator('input[data-page=marginLeft]')).toHaveCount(0);
   await dlg.locator('select[data-page=paper]').selectOption('custom');
   await expect(dlg.locator('.page-custom')).toBeVisible();
-  await dlg.locator('input[data-page=customWidth]').fill('100');
-  await dlg.locator('input[data-page=customWidth]').dispatchEvent('change');
   await dlg.locator('button[data-id=cancel]').click();
-  expect(await page.evaluate(() => window.__margin!.settings.export.pdf.page.paper)).toBe('A4');
 
   void run(page, 'pageSetup');
   await dlg.locator('select[data-page=paper]').selectOption('Letter');
   await dlg.locator('select[data-page=orientation]').selectOption('landscape');
-  await dlg.locator('input[data-page=marginLeft]').fill('25');
-  await dlg.locator('input[data-page=marginLeft]').dispatchEvent('change');
   await expect(dlg.locator('.page-size')).toHaveText('279.4 × 215.9 mm');
   await dlg.locator('button[data-id=ok]').click();
-  const pg = await page.evaluate(() => window.__margin!.settings.export.pdf.page);
-  expect(pg).toMatchObject({ paper: 'Letter', orientation: 'landscape', margins: { left: 25 } });
-  // Print applies it as an @page rule; PDF export passes it as paper geometry.
+  // Like Typora it writes no export setting (session print info only).
+  expect(await page.evaluate(() => window.__margin!.settings.export.pdf.page.paper)).toBe('default');
+  // Print applies it as an @page rule with Typora's default margins (45/36 pt); PDF export uses it.
   await run(page, 'print');
   await expect.poll(() => page.evaluate(() => document.getElementById('margin-print-page')?.textContent ?? '')).toContain('size: 279.4mm 215.9mm');
   await queueDialog(page, `${ROOT}/Welcome.pdf`);
   await run(page, 'exportPdf');
   await expect.poll(async () => (await lastExport(page)).kind).toBe('pdf');
-  expect((await lastExport(page)).opts.paper.width).toBeCloseTo(792, 0);
+  let e = await lastExport(page);
+  expect(e.opts.paper.width).toBeCloseTo(792, 0);
+  expect(e.opts.paper.margins.top).toBeCloseTo(45, 1);
+  expect(e.opts.paper.margins.left).toBeCloseTo(36, 1);
+
+  // A paper chosen in Preferences › Export › PDF wins over Page Setup; orientation stays.
+  await run(page, 'exportSettings');
+  const pane = page.locator('.pref-section[data-section=export]');
+  expect(await pane.locator('select[data-page=paper] option').allTextContents()).toEqual(['Default', 'A5', 'A4', 'A3', 'US Letter', 'US Legal', 'Tabloid', 'Custom']);
+  await pane.locator('select[data-page=paper]').selectOption('A5');
+  await pane.locator('select[data-page=marginMode]').selectOption('custom');
+  await pane.locator('input[data-page=marginLeft]').fill('25');
+  await pane.locator('input[data-page=marginLeft]').dispatchEvent('change');
+  await page.keyboard.press('Escape');
+  await queueDialog(page, `${ROOT}/Welcome2.pdf`);
+  await run(page, 'exportPdf');
+  await expect.poll(async () => (await lastExport(page)).path).toBe(`${ROOT}/Welcome2.pdf`);
+  e = await lastExport(page);
+  expect(e.opts.paper.width).toBeCloseTo((210 * 72) / 25.4, 0);
+  expect(e.opts.paper.height).toBeCloseTo((148 * 72) / 25.4, 0);
+  expect(e.opts.paper.margins.left).toBeCloseTo((25 * 72) / 25.4, 1);
+});
+
+test('export.pdf-prefs: PDF header/footer presets, page break toggle, extra content (native-commands §4)', async ({ page }) => {
+  await boot(page);
+  await run(page, 'exportSettings');
+  const pane = page.locator('.pref-section[data-section=export]');
+  const header = pane.locator('input[data-export="pdf.header"]');
+  await expect(header).toHaveAttribute('placeholder', 'None');
+  expect(await pane.locator('#export-pdf-header-presets option').evaluateAll((o) => o.map((x) => (x as HTMLOptionElement).value))).toEqual(['${title}', '${author}', '${pageNo}', '${today}']);
+  expect(await pane.locator('#export-pdf-footer-presets option').evaluateAll((o) => o.map((x) => (x as HTMLOptionElement).value))).toEqual(['${title}', 'No. ${pageNo} / ${totalPages}', 'Written in Margin', 'CONFIDENTIAL']);
+  await pane.locator('input[data-export="pdf.pageBreaks"]').check();
+  const extra = pane.locator('textarea[data-export="pdf.appendBody"]');
+  await extra.fill('<p class="sig">${title}</p>');
+  await extra.blur();
+  await expect.poll(() => page.evaluate(() => window.__margin!.settings.export.pdf.pageBreaks)).toBe('h1');
+  await page.keyboard.press('Escape');
+  await queueDialog(page, `${ROOT}/Welcome.pdf`);
+  await run(page, 'exportPdf');
+  await expect.poll(async () => (await lastExport(page)).kind).toBe('pdf');
+  const e = await lastExport(page);
+  expect(e.html).toContain('break-before: page');
+  expect(e.html).toMatch(/<p class="sig">[^<]+<\/p>/);
 });
 
 test('export.html-plain: Export › HTML (without Styles)', async ({ page }) => {

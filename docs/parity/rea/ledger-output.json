@@ -1,5 +1,5 @@
 {
- "evidence_id": "ev_be0802fc6158bd5ec311c7509d4827fcb8403379b817d88341dc11f0b13d08fc",
+ "evidence_id": "ev_588520324585a9fa1cadba27347f8fed0ac566b714673aa26eb54e802e9dae3f",
  "subject": null,
  "provider": {
   "id": "rea-javascript-application-workflows",
@@ -10,14 +10,14 @@
  "predicate_type": "rea.reconstruction-obligation-ledger",
  "operation": "build_reconstruction_obligation_ledger",
  "parameters": {
-  "ledger_id": "rol_8ffd39a0adc074f15da671542940c1d3e10f6deeb55f35d68b562bbaf41dc105",
-  "closure_digest": "335f2b166c41d9c7622e1e8e66e31c77ea4d4519bb3875b86f4f5d187f73764d"
+  "ledger_id": "rol_dda982661eaaa92eb3c129aded4be4dc5323680fb74d097db4f3faf75c3e931c",
+  "closure_digest": "a11fc8712aa2497c3f66659e75872baf4636cfae960407dc584a2c97259fabfa"
  },
  "raw_result": null,
  "normalized_result": {
   "schema": "ReconstructionObligationLedger",
-  "ledger_id": "rol_8ffd39a0adc074f15da671542940c1d3e10f6deeb55f35d68b562bbaf41dc105",
-  "closure_digest": "335f2b166c41d9c7622e1e8e66e31c77ea4d4519bb3875b86f4f5d187f73764d",
+  "ledger_id": "rol_dda982661eaaa92eb3c129aded4be4dc5323680fb74d097db4f3faf75c3e931c",
+  "closure_digest": "a11fc8712aa2497c3f66659e75872baf4636cfae960407dc584a2c97259fabfa",
   "status": "unknown",
   "coverage": {
    "status": "complete"
@@ -3194,7 +3194,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "setDocumentEdited",
-      "owner_sha256": "e545f11b5084f93e12751ee4d0c3b128ce32dfd40a00ba440274b7d2ea76469d"
+      "owner_sha256": "56709347f88346e76ad243325c5e78e4093c4c2f4efe9cfa168f6b6bc6231ac1"
      },
      "parser_type": null,
      "original_cases": [
@@ -3275,7 +3275,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "applyAppearance",
-      "owner_sha256": "e545f11b5084f93e12751ee4d0c3b128ce32dfd40a00ba440274b7d2ea76469d"
+      "owner_sha256": "56709347f88346e76ad243325c5e78e4093c4c2f4efe9cfa168f6b6bc6231ac1"
      },
      "parser_type": null,
      "original_cases": [
@@ -3715,7 +3715,7 @@
      "owner": {
       "module_path": "src-tauri/src/export_custom.rs",
       "symbol": "pub fn run_command",
-      "owner_sha256": "626d3ffa977190b2278a07a9224a191c59447242216eb81d23a836fd2e2283de"
+      "owner_sha256": "02c9634413374d5d8d96eb615576c32ff8c0ed4036eb76082d05d5a549a008d0"
      },
      "parser_type": null,
      "original_cases": [
@@ -3819,7 +3819,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "private createExports(",
-      "owner_sha256": "e545f11b5084f93e12751ee4d0c3b128ce32dfd40a00ba440274b7d2ea76469d"
+      "owner_sha256": "56709347f88346e76ad243325c5e78e4093c4c2f4efe9cfa168f6b6bc6231ac1"
      },
      "parser_type": null,
      "original_cases": [
@@ -4235,7 +4235,7 @@
      "owner": {
       "module_path": "src/app/export-pandoc.ts",
       "symbol": "export async function exportWithPandoc",
-      "owner_sha256": "e0761c10d3679653d9ae3cfbb9ecf1d347719dfd225bc95224e02e4a6a2b2aef"
+      "owner_sha256": "96e77e6cf2cae76059f9d6f7afb6c48c57301fc0e5038f0eb36dfa57505ea2c2"
      },
      "parser_type": null,
      "original_cases": [
@@ -4525,7 +4525,7 @@
      "owner": {
       "module_path": "src/app/export-actions.ts",
       "symbol": "async export(kind",
-      "owner_sha256": "65ac1a13a1b3b482bb2faab3ac661793d98ebc7ab72e211a9066a626b6a9782e"
+      "owner_sha256": "b68611b8eb304b321374c1cbe7916daaf909cbb16f7cbf0e53a3afeee5e99afc"
      },
      "parser_type": null,
      "original_cases": [
@@ -4629,7 +4629,7 @@
      "owner": {
       "module_path": "src/app/preferences-export.ts",
       "symbol": "export function exportPrefsSection",
-      "owner_sha256": "9a9bf4cb82eaae4a80ae596de4f7c7ec3971636b33e2a2149941bff8ec09dad8"
+      "owner_sha256": "f739073051c34b96ba7d26fc6281f98c48766813ca591d522d67e44afe0fb283"
      },
      "parser_type": null,
      "original_cases": [
@@ -4901,7 +4901,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "private async storeImage(",
-      "owner_sha256": "e545f11b5084f93e12751ee4d0c3b128ce32dfd40a00ba440274b7d2ea76469d"
+      "owner_sha256": "56709347f88346e76ad243325c5e78e4093c4c2f4efe9cfa168f6b6bc6231ac1"
      },
      "parser_type": null,
      "original_cases": [
@@ -5028,17 +5028,17 @@
     },
     "authority_references": [
      {
-      "evidence_id": "ev_5ea8b62d7fa0275680fffd007b7a0adc018e64937e88e5bfedc4cff329173298",
+      "evidence_id": "ev_b48e88d26349c0ff96d2b1bc93bdafb4a9cd53e2098383cc83304cdcbbf83476",
       "authority": "analyst-inference",
       "state": "reviewed",
-      "location": "/evidence/ev_5ea8b62d7fa0275680fffd007b7a0adc018e64937e88e5bfedc4cff329173298"
+      "location": "/evidence/ev_b48e88d26349c0ff96d2b1bc93bdafb4a9cd53e2098383cc83304cdcbbf83476"
      }
     ],
     "source_state": "reviewed",
     "observed_cases": [
      {
       "kind": "positive",
-      "evidence_id": "ev_5ea8b62d7fa0275680fffd007b7a0adc018e64937e88e5bfedc4cff329173298",
+      "evidence_id": "ev_b48e88d26349c0ff96d2b1bc93bdafb4a9cd53e2098383cc83304cdcbbf83476",
       "location": "images §4.5"
      }
     ],
@@ -5069,7 +5069,7 @@
      "original_cases": [
       {
        "kind": "positive",
-       "evidence_id": "ev_5ea8b62d7fa0275680fffd007b7a0adc018e64937e88e5bfedc4cff329173298",
+       "evidence_id": "ev_b48e88d26349c0ff96d2b1bc93bdafb4a9cd53e2098383cc83304cdcbbf83476",
        "location": "images §4.5"
       }
      ],
@@ -5532,7 +5532,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'preferences'",
-      "owner_sha256": "e545f11b5084f93e12751ee4d0c3b128ce32dfd40a00ba440274b7d2ea76469d"
+      "owner_sha256": "56709347f88346e76ad243325c5e78e4093c4c2f4efe9cfa168f6b6bc6231ac1"
      },
      "parser_type": null,
      "original_cases": [
@@ -6746,7 +6746,7 @@
      "owner": {
       "module_path": "src/app/preferences.ts",
       "symbol": "'Check spelling while typing'",
-      "owner_sha256": "3fc45a9b0562ea74c1ae02ce4381eb92102be459013ae7de64036ecf9a59be74"
+      "owner_sha256": "2598c950890734aa93d518f31c5e8df372b228743f96af117b28c7485d39fb39"
      },
      "parser_type": null,
      "original_cases": [
@@ -6883,7 +6883,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'undo'",
-      "owner_sha256": "e545f11b5084f93e12751ee4d0c3b128ce32dfd40a00ba440274b7d2ea76469d"
+      "owner_sha256": "56709347f88346e76ad243325c5e78e4093c4c2f4efe9cfa168f6b6bc6231ac1"
      },
      "parser_type": null,
      "original_cases": [
@@ -6987,7 +6987,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'close'",
-      "owner_sha256": "e545f11b5084f93e12751ee4d0c3b128ce32dfd40a00ba440274b7d2ea76469d"
+      "owner_sha256": "56709347f88346e76ad243325c5e78e4093c4c2f4efe9cfa168f6b6bc6231ac1"
      },
      "parser_type": null,
      "original_cases": [
@@ -7285,7 +7285,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'toggleLineEnding'",
-      "owner_sha256": "e545f11b5084f93e12751ee4d0c3b128ce32dfd40a00ba440274b7d2ea76469d"
+      "owner_sha256": "56709347f88346e76ad243325c5e78e4093c4c2f4efe9cfa168f6b6bc6231ac1"
      },
      "parser_type": null,
      "original_cases": [
@@ -7389,7 +7389,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'new'",
-      "owner_sha256": "e545f11b5084f93e12751ee4d0c3b128ce32dfd40a00ba440274b7d2ea76469d"
+      "owner_sha256": "56709347f88346e76ad243325c5e78e4093c4c2f4efe9cfa168f6b6bc6231ac1"
      },
      "parser_type": null,
      "original_cases": [
@@ -7549,7 +7549,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'open'",
-      "owner_sha256": "e545f11b5084f93e12751ee4d0c3b128ce32dfd40a00ba440274b7d2ea76469d"
+      "owner_sha256": "56709347f88346e76ad243325c5e78e4093c4c2f4efe9cfa168f6b6bc6231ac1"
      },
      "parser_type": null,
      "original_cases": [
@@ -7653,7 +7653,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'openFolder'",
-      "owner_sha256": "e545f11b5084f93e12751ee4d0c3b128ce32dfd40a00ba440274b7d2ea76469d"
+      "owner_sha256": "56709347f88346e76ad243325c5e78e4093c4c2f4efe9cfa168f6b6bc6231ac1"
      },
      "parser_type": null,
      "original_cases": [
@@ -7757,7 +7757,7 @@
      "owner": {
       "module_path": "src/app/export-ui.ts",
       "symbol": "export function openPageSetup",
-      "owner_sha256": "3cd41904e2988ebfb61980c845ee3dbbf31d34b9105bcd70d9c3bb7822171898"
+      "owner_sha256": "e07b825f505e11339e0126d8999d4d76df25b954ae31bd199f7a62d62acfaa7d"
      },
      "parser_type": null,
      "original_cases": [
@@ -7862,7 +7862,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'print'",
-      "owner_sha256": "e545f11b5084f93e12751ee4d0c3b128ce32dfd40a00ba440274b7d2ea76469d"
+      "owner_sha256": "56709347f88346e76ad243325c5e78e4093c4c2f4efe9cfa168f6b6bc6231ac1"
      },
      "parser_type": null,
      "original_cases": [
@@ -7999,7 +7999,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "quickOpen(): void",
-      "owner_sha256": "e545f11b5084f93e12751ee4d0c3b128ce32dfd40a00ba440274b7d2ea76469d"
+      "owner_sha256": "56709347f88346e76ad243325c5e78e4093c4c2f4efe9cfa168f6b6bc6231ac1"
      },
      "parser_type": null,
      "original_cases": [
@@ -8430,7 +8430,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'reloadFromDisk'",
-      "owner_sha256": "e545f11b5084f93e12751ee4d0c3b128ce32dfd40a00ba440274b7d2ea76469d"
+      "owner_sha256": "56709347f88346e76ad243325c5e78e4093c4c2f4efe9cfa168f6b6bc6231ac1"
      },
      "parser_type": null,
      "original_cases": [
@@ -8511,7 +8511,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'save'",
-      "owner_sha256": "e545f11b5084f93e12751ee4d0c3b128ce32dfd40a00ba440274b7d2ea76469d"
+      "owner_sha256": "56709347f88346e76ad243325c5e78e4093c4c2f4efe9cfa168f6b6bc6231ac1"
      },
      "parser_type": null,
      "original_cases": [
@@ -8671,7 +8671,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'saveAs'",
-      "owner_sha256": "e545f11b5084f93e12751ee4d0c3b128ce32dfd40a00ba440274b7d2ea76469d"
+      "owner_sha256": "56709347f88346e76ad243325c5e78e4093c4c2f4efe9cfa168f6b6bc6231ac1"
      },
      "parser_type": null,
      "original_cases": [
@@ -11506,7 +11506,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'openThemesFolder'",
-      "owner_sha256": "e545f11b5084f93e12751ee4d0c3b128ce32dfd40a00ba440274b7d2ea76469d"
+      "owner_sha256": "56709347f88346e76ad243325c5e78e4093c4c2f4efe9cfa168f6b6bc6231ac1"
      },
      "parser_type": null,
      "original_cases": [
@@ -11755,7 +11755,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'toggleFocus'",
-      "owner_sha256": "e545f11b5084f93e12751ee4d0c3b128ce32dfd40a00ba440274b7d2ea76469d"
+      "owner_sha256": "56709347f88346e76ad243325c5e78e4093c4c2f4efe9cfa168f6b6bc6231ac1"
      },
      "parser_type": null,
      "original_cases": [
@@ -11997,7 +11997,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'toggleSidebar'",
-      "owner_sha256": "e545f11b5084f93e12751ee4d0c3b128ce32dfd40a00ba440274b7d2ea76469d"
+      "owner_sha256": "56709347f88346e76ad243325c5e78e4093c4c2f4efe9cfa168f6b6bc6231ac1"
      },
      "parser_type": null,
      "original_cases": [
@@ -12101,7 +12101,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'toggleSource'",
-      "owner_sha256": "e545f11b5084f93e12751ee4d0c3b128ce32dfd40a00ba440274b7d2ea76469d"
+      "owner_sha256": "56709347f88346e76ad243325c5e78e4093c4c2f4efe9cfa168f6b6bc6231ac1"
      },
      "parser_type": null,
      "original_cases": [
@@ -12289,7 +12289,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'zoomIn'",
-      "owner_sha256": "e545f11b5084f93e12751ee4d0c3b128ce32dfd40a00ba440274b7d2ea76469d"
+      "owner_sha256": "56709347f88346e76ad243325c5e78e4093c4c2f4efe9cfa168f6b6bc6231ac1"
      },
      "parser_type": null,
      "original_cases": [
@@ -12788,7 +12788,7 @@
      "owner": {
       "module_path": "src/app/preferences.ts",
       "symbol": "'Font size'",
-      "owner_sha256": "3fc45a9b0562ea74c1ae02ce4381eb92102be459013ae7de64036ecf9a59be74"
+      "owner_sha256": "2598c950890734aa93d518f31c5e8df372b228743f96af117b28c7485d39fb39"
      },
      "parser_type": null,
      "original_cases": [
@@ -12892,7 +12892,7 @@
      "owner": {
       "module_path": "src/app/preferences.ts",
       "symbol": "'darkTheme'",
-      "owner_sha256": "3fc45a9b0562ea74c1ae02ce4381eb92102be459013ae7de64036ecf9a59be74"
+      "owner_sha256": "2598c950890734aa93d518f31c5e8df372b228743f96af117b28c7485d39fb39"
      },
      "parser_type": null,
      "original_cases": [
@@ -13166,7 +13166,7 @@
      "owner": {
       "module_path": "src/app/preferences.ts",
       "symbol": "'autoSave'",
-      "owner_sha256": "3fc45a9b0562ea74c1ae02ce4381eb92102be459013ae7de64036ecf9a59be74"
+      "owner_sha256": "2598c950890734aa93d518f31c5e8df372b228743f96af117b28c7485d39fb39"
      },
      "parser_type": null,
      "original_cases": [
@@ -13305,7 +13305,7 @@
      "owner": {
       "module_path": "src/app/preferences.ts",
       "symbol": "'restoreLastFolder'",
-      "owner_sha256": "3fc45a9b0562ea74c1ae02ce4381eb92102be459013ae7de64036ecf9a59be74"
+      "owner_sha256": "2598c950890734aa93d518f31c5e8df372b228743f96af117b28c7485d39fb39"
      },
      "parser_type": null,
      "original_cases": [
@@ -15478,7 +15478,7 @@
      "owner": {
       "module_path": "src/app/ui/modal.ts",
       "symbol": "export function",
-      "owner_sha256": "e4112f8834e21de5a3d9df0824ca342443c188d81c200ad3f58e95ccb464967c"
+      "owner_sha256": "529c19cd6027e4066cea0f8084ca0989b652ba36b67cff5c1ac7295b5923f116"
      },
      "parser_type": null,
      "original_cases": [
@@ -15587,7 +15587,6 @@
    "ev_5846b2ce26e08c2151229db306b0075db16fdb4e6fa383b3e95d7415c03681c1",
    "ev_596bfb2769e00f4b6f205f52b992c1e362c9ef2c165dece497fc57ee841de193",
    "ev_5cc78d49083c319c48978c753a1fe930f5af6cbc6552747bda552c47f97de264",
-   "ev_5ea8b62d7fa0275680fffd007b7a0adc018e64937e88e5bfedc4cff329173298",
    "ev_6506652db02c3a55ddb3d0536c2d559397e1bc9eadfb24bb91f2842f43d3711d",
    "ev_6698ce7f5107a3efd9ac9786b5da6daffeea20811480cbfaaac063c08fdbf414",
    "ev_66f7e76e64bc4fe44949654243e06bd7cc6eb21a79a3a9849b1df0a7f871f80f",
@@ -15650,6 +15649,7 @@
    "ev_b0fef3dc15507fab320ae8c0e128b72c9aa7d26e2717c872411267aae628ee36",
    "ev_b19d9eb86f0e77e7e75a625d00887acf3b9f68b22561ac3bf9e237ba417e8b31",
    "ev_b20611cf4ada7071507dbdcac0ad0c8a7800a8b31ba76fd010a9d70f51130a24",
+   "ev_b48e88d26349c0ff96d2b1bc93bdafb4a9cd53e2098383cc83304cdcbbf83476",
    "ev_b57d89025063b32dd50efae5f801519ea9bbece2a2a4861b6051efe3621d02e0",
    "ev_b714e54765b06a1decf46258c2ea7c906be6ae4b8b6fd4995febbcf396691a1b",
    "ev_bba0319f1204764cb88c514bd77d4f4c3cd0ddf7b0c7e77c889d3e70d78e0c61",
@@ -15775,7 +15775,6 @@
   "ev_5846b2ce26e08c2151229db306b0075db16fdb4e6fa383b3e95d7415c03681c1",
   "ev_596bfb2769e00f4b6f205f52b992c1e362c9ef2c165dece497fc57ee841de193",
   "ev_5cc78d49083c319c48978c753a1fe930f5af6cbc6552747bda552c47f97de264",
-  "ev_5ea8b62d7fa0275680fffd007b7a0adc018e64937e88e5bfedc4cff329173298",
   "ev_6506652db02c3a55ddb3d0536c2d559397e1bc9eadfb24bb91f2842f43d3711d",
   "ev_6698ce7f5107a3efd9ac9786b5da6daffeea20811480cbfaaac063c08fdbf414",
   "ev_66f7e76e64bc4fe44949654243e06bd7cc6eb21a79a3a9849b1df0a7f871f80f",
@@ -15838,6 +15837,7 @@
   "ev_b0fef3dc15507fab320ae8c0e128b72c9aa7d26e2717c872411267aae628ee36",
   "ev_b19d9eb86f0e77e7e75a625d00887acf3b9f68b22561ac3bf9e237ba417e8b31",
   "ev_b20611cf4ada7071507dbdcac0ad0c8a7800a8b31ba76fd010a9d70f51130a24",
+  "ev_b48e88d26349c0ff96d2b1bc93bdafb4a9cd53e2098383cc83304cdcbbf83476",
   "ev_b57d89025063b32dd50efae5f801519ea9bbece2a2a4861b6051efe3621d02e0",
   "ev_b714e54765b06a1decf46258c2ea7c906be6ae4b8b6fd4995febbcf396691a1b",
   "ev_bba0319f1204764cb88c514bd77d4f4c3cd0ddf7b0c7e77c889d3e70d78e0c61",

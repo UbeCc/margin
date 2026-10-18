@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { Platform } from '../../contracts';
 import { ExportController, keepBothPath, type ExportHost } from '../export-actions';
 import { checkImageSize, imageDimensions, imageFormatForPath, ImageTooLargeError, qualitySettings } from '../export-image';
-import { DEFAULT_EXPORT, expandVars, frontMatter, migrateExportSettings, pageCss, pandocArgsPreview, PANDOC_FORMAT_FIELDS, PANDOC_FORMAT_IDS, paperSizeMm, resolveMeta, type ExportSettings } from '../export-settings';
+import { DEFAULT_EXPORT, DEFAULT_PRINT_SETUP, effectivePage, expandVars, FOOTER_PRESETS, HEADER_PRESETS, migratePageSetup, MM_TO_PT, PAPER_LABELS, frontMatter, migrateExportSettings, pageCss, pandocArgsPreview, PANDOC_FORMAT_FIELDS, PANDOC_FORMAT_IDS, paperSizeMm, resolveMeta, type ExportSettings } from '../export-settings';
 import { printPageCss, withPrintPageCss } from '../../platform/common';
 import { buildPlainHtml } from '../export';
 import { migrateSettings } from '../settings';
@@ -11,7 +11,7 @@ describe('export settings', () => {
   it('migrates garbage to defaults and clamps values', () => {
     expect(migrateExportSettings(undefined)).toEqual(DEFAULT_EXPORT);
     const m = migrateExportSettings({ general: { folder: 'nope', afterExport: 'open' }, image: { width: 99999, quality: 'ultra', format: 'jpeg' }, pdf: { page: { paper: 'Letter', margins: { top: -4 } }, pageBreaks: 'h2' } });
-    expect(m.general.folder).toBe('same');
+    expect(m.general.folder).toBe('last'); // Typora's default "Auto"
     expect(m.general.afterExport).toBe('open');
     expect(m.image).toMatchObject({ width: 4000, quality: 'high', format: 'jpeg' });
     expect(m.pdf.page.paper).toBe('Letter');
@@ -30,6 +30,27 @@ describe('export settings', () => {
     expect(pageCss({ ...page, paper: 'Letter' }, 'h1')).toContain('size: 215.9mm 279.4mm');
     expect(pageCss(page, 'h1')).toContain('break-before: page');
     expect(pageCss(page, 'none')).not.toContain('break-before');
+  });
+  it('Typora paper/margin defaults and Page Setup precedence (native-commands §4)', () => {
+    const d = migrateExportSettings({}).pdf.page;
+    expect(d).toMatchObject({ paper: 'default', marginMode: 'default' });
+    expect(PAPER_LABELS.map(([, l]) => l)).toEqual(['Default', 'A5', 'A4', 'A3', 'US Letter', 'US Legal', 'Tabloid', 'Custom']);
+    // Default paper → Page Setup's paper and orientation; default margins 45/36 pt.
+    const e = effectivePage(d, { paper: 'Letter', custom: [1, 1], orientation: 'landscape' });
+    expect(paperSizeMm(e)).toEqual([279.4, 215.9]);
+    expect(e.margins.top * MM_TO_PT).toBeCloseTo(45, 6);
+    expect(e.margins.left * MM_TO_PT).toBeCloseTo(36, 6);
+    // A paper in the export settings wins; orientation still from Page Setup; custom margins kept.
+    const own = effectivePage({ ...d, paper: 'A5', marginMode: 'custom', margins: { top: 1, right: 2, bottom: 3, left: 4 } }, { ...DEFAULT_PRINT_SETUP, paper: 'Letter', orientation: 'landscape' });
+    expect(paperSizeMm(own)).toEqual([210, 148]);
+    expect(own.margins).toEqual({ top: 1, right: 2, bottom: 3, left: 4 });
+    expect(effectivePage(d).paper).toBe('A4');
+    // Legacy settings: old A4 + 16/13 mm default becomes Default/Default; B5 is gone.
+    expect(migratePageSetup({ paper: 'A4', margins: { top: 16, right: 13, bottom: 16, left: 13 } })).toMatchObject({ paper: 'default', marginMode: 'default' });
+    expect(migratePageSetup({ paper: 'Letter', margins: { top: 20, right: 13, bottom: 16, left: 13 } })).toMatchObject({ paper: 'Letter', marginMode: 'custom', margins: { top: 20 } });
+    expect(migratePageSetup({ paper: 'B5' }).paper).toBe('default');
+    expect(HEADER_PRESETS).toEqual(['${title}', '${author}', '${pageNo}', '${today}']);
+    expect(FOOTER_PRESETS[1]).toBe('No. ${pageNo} / ${totalPages}');
   });
 });
 

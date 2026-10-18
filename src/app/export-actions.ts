@@ -8,7 +8,7 @@
 import type { PdfExportOptions, Platform } from '../contracts';
 import { buildExportHtml, buildPlainHtml, documentTitle, exportHeadings, linkHeadingAnchors } from './export';
 import { imageFormatForPath, ImageTooLargeError, rasterizeHtml } from './export-image';
-import { expandVars, migrateExportSettings, paperSizeMm, resolveMeta, todayString, MM_TO_PT, type ExportSettings } from './export-settings';
+import { effectivePage, expandVars, migrateExportSettings, paperSizeMm, resolveMeta, todayString, MM_TO_PT, type ExportSettings, type PrintSetup } from './export-settings';
 import { exportWithPandoc, newExportId, PANDOC_FORMATS, type PandocFormat } from './export-pandoc';
 import { extras } from './platform-extras';
 import { basename, dirname, extname, join, stripExt } from './util/path';
@@ -27,6 +27,8 @@ export interface ExportHost {
   themeCss(theme: string): string;
   extraCss(body: string): Promise<string>;
   notify(message: string, kind: 'success' | 'error' | 'info' | 'warning', action?: { label: string; run: () => void }): void;
+  /** File › Page Setup (session); export settings' paper wins when not "Default". */
+  printSetup?(): PrintSetup;
   /** The "Exporting..." sheet for custom commands (#90); returns its close function. */
   exportProgress?(abort?: () => void): () => void;
   /** Overwrite confirmation; resolves 'overwrite' | 'keep-both' | 'cancel' and whether to stop asking. */
@@ -220,9 +222,17 @@ export class ExportController {
     const vars = { ...this.vars(target), title: meta.title, author: meta.author };
     const brk = s.pdf.pageBreaks;
     const breakCss = brk === 'none' ? '' : `@media print { .margin-doc h1${brk === 'h2' ? ', .margin-doc h2' : ''} { break-before: page; } .margin-doc > :first-child { break-before: auto !important; } }`;
-    const html = buildExportHtml({ title: meta.title, body, themeCss: h.themeCss(s.pdf.theme), extraCss: `${await h.extraCss(body)}\n${breakCss}`, bodyClass: 'margin-export-pdf' });
-    const [w, ht] = paperSizeMm(s.pdf.page);
-    const m = s.pdf.page.margins;
+    const html = buildExportHtml({
+      title: meta.title,
+      body,
+      themeCss: h.themeCss(s.pdf.theme),
+      extraCss: `${await h.extraCss(body)}\n${breakCss}`,
+      bodyClass: 'margin-export-pdf',
+      appendBody: s.pdf.appendBody ? expandVars(s.pdf.appendBody, vars) : undefined,
+    });
+    const page = effectivePage(s.pdf.page, h.printSetup?.());
+    const [w, ht] = paperSizeMm(page);
+    const m = page.margins;
     const pt = (x: number): number => Math.round(x * MM_TO_PT * 100) / 100;
     const doc = h.docPath();
     return {
