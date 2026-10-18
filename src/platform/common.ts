@@ -125,12 +125,20 @@ export function extForImage(mime?: string, name?: string): string {
 
 /** `image-YYYYMMDD-HHMMSS-xxx.ext` */
 export function generatedImageName(ext: string, now = new Date()): string {
-  const p = (n: number) => String(n).padStart(2, '0');
-  const stamp = `${now.getFullYear()}${p(now.getMonth() + 1)}${p(now.getDate())}-${p(now.getHours())}${p(now.getMinutes())}${p(now.getSeconds())}`;
-  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  let rnd = '';
-  for (let i = 0; i < 3; i++) rnd += chars[Math.floor(Math.random() * chars.length)];
-  return `image-${stamp}-${rnd}.${ext}`;
+  // Typora's pasted-image name: image-yyyyMMddHHmmssSSS.ext
+  const p = (n: number, w = 2) => String(n).padStart(w, '0');
+  const stamp = `${now.getFullYear()}${p(now.getMonth() + 1)}${p(now.getDate())}${p(now.getHours())}${p(now.getMinutes())}${p(now.getSeconds())}${p(now.getMilliseconds(), 3)}`;
+  return `image-${stamp}.${ext}`;
+}
+
+/** Typora's duplicate-name candidates: `name`, `stem-<last 7 digits of unix seconds>.ext`, then `-1`, `-2`, … */
+export function* duplicateNames(name: string, nowMs = Date.now()): Generator<string> {
+  yield name;
+  const dot = name.lastIndexOf('.');
+  const [stem, ext] = dot > 0 ? [name.slice(0, dot), name.slice(dot)] : [name, ''];
+  const ts = String(Math.floor(nowMs / 1000)).slice(-7);
+  yield `${stem}-${ts}${ext}`;
+  for (let i = 1; ; i++) yield `${stem}-${ts}-${i}${ext}`;
 }
 
 /** Best-effort print of an HTML string through a hidden iframe. */

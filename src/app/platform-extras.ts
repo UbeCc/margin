@@ -1,4 +1,4 @@
-import type { Platform } from '../contracts';
+import type { Platform, UploadConfig } from '../contracts';
 
 /**
  * Optional Platform capabilities the shell uses when present (feature-detected).
@@ -17,6 +17,30 @@ export interface PlatformExtras {
   pandocExport?(markdown: string, outPath: string, opts: PandocExportOptions): Promise<string>;
   /** Locate pandoc (configured path → PATH → common dirs) and check version ≥ 2. */
   pandocDetect?(pandocPath: string | null): Promise<{ path: string; version: string }>;
+  /**
+   * #99: copy (or move) an image file into `dir` (created when missing). Without
+   * `name`, a clash gets Typora's `stem-<7 digits>.ext` suffix (identical bytes are
+   * reused); with `name` an existing file is refused. Resolves to the absolute destination.
+   */
+  copyImage?(src: string, dir: string, opts?: { name?: string; move?: boolean }): Promise<string>;
+  /** #99: device pixels per point of an image file (2 for Retina screenshots; 1 when unknown). */
+  imageScale?(path: string): Promise<number>;
+  /** #99: multi-select image picker ("Select image from local file"). */
+  openImagesDialog?(): Promise<string[]>;
+  /** #92: upload two bundled sample images with this config (Preferences › Test Uploader). */
+  testUploader?(config: UploadConfig): Promise<UploaderTestReport>;
+  /** #92: abort in-flight uploads. */
+  cancelUpload?(): Promise<void>;
+}
+
+export interface UploaderTestReport {
+  ok: boolean;
+  /** argv as run (display form; never run through a shell). */
+  command: string;
+  stdout: string;
+  stderr: string;
+  urls: string[];
+  message: string;
 }
 
 export interface PandocExportOptions {
