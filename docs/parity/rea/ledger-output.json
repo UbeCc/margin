@@ -1,5 +1,5 @@
 {
- "evidence_id": "ev_54cdcd1faa6b18cbd34175e8e3044dc53052ee2ea37a8dc1da134d584dd51ef3",
+ "evidence_id": "ev_555753f9fb9311c9c99e924593d819ad44424805f9b76e5f100724016be4cc8a",
  "subject": null,
  "provider": {
   "id": "rea-javascript-application-workflows",
@@ -10,14 +10,14 @@
  "predicate_type": "rea.reconstruction-obligation-ledger",
  "operation": "build_reconstruction_obligation_ledger",
  "parameters": {
-  "ledger_id": "rol_b3bdbe0556251c73dd5ebd00b04fcdd3b329411d8e70d3d9669fe934b6387589",
-  "closure_digest": "9578f16632db20f9f33758c22208161b877cdf380aa3bff9837bdd5f0c6c5919"
+  "ledger_id": "rol_e09e3c15b1411c2391bce30882a1c5d03cd7165c6a19ba0f6450fa0d273509cf",
+  "closure_digest": "ba7eefa04824816d43e85c0c8f06f1846ed393d4b6ac2ed8675b7d4bca49b24f"
  },
  "raw_result": null,
  "normalized_result": {
   "schema": "ReconstructionObligationLedger",
-  "ledger_id": "rol_b3bdbe0556251c73dd5ebd00b04fcdd3b329411d8e70d3d9669fe934b6387589",
-  "closure_digest": "9578f16632db20f9f33758c22208161b877cdf380aa3bff9837bdd5f0c6c5919",
+  "ledger_id": "rol_e09e3c15b1411c2391bce30882a1c5d03cd7165c6a19ba0f6450fa0d273509cf",
+  "closure_digest": "ba7eefa04824816d43e85c0c8f06f1846ed393d4b6ac2ed8675b7d4bca49b24f",
   "status": "unknown",
   "coverage": {
    "status": "complete"
@@ -152,7 +152,6 @@
     "typora.menu.view.fullscreen",
     "typora.menu.view.zoom",
     "typora.menu.window",
-    "typora.pref.editor.general",
     "typora.pref.privacy",
     "typora.ui.generic"
    ],
@@ -856,6 +855,11 @@
     "symbol": "case 'toc'"
    },
    {
+    "obligation_id": "typora.pref.editor.general",
+    "module_path": "src/editor/core/commands.ts",
+    "symbol": "const pattern"
+   },
+   {
     "obligation_id": "typora.menu.edit.copy-as",
     "module_path": "src/editor/core/copy-as.ts",
     "symbol": "export function copyAs"
@@ -899,11 +903,6 @@
     "obligation_id": "typora.menu.para.indent",
     "module_path": "src/editor/core/input.ts",
     "symbol": "Tab"
-   },
-   {
-    "obligation_id": "typora.pref.editor.general",
-    "module_path": "src/editor/core/input.ts",
-    "symbol": "const autoPair"
    },
    {
     "obligation_id": "typora.beh.core.lossless",
@@ -2175,7 +2174,7 @@
      "owner": {
       "module_path": "src/editor/core/edit.ts",
       "symbol": "export function",
-      "owner_sha256": "45cbad300407e5a270e409ff57331b1ec62a9f25684f719692a68a1d1f099e5b"
+      "owner_sha256": "92cb703dc0e63b66598c3d0a353641674181e03f3dbfbdd86631af3ce7725dc3"
      },
      "parser_type": null,
      "original_cases": [
@@ -7195,7 +7194,7 @@
      "owner": {
       "module_path": "src/editor/core/commands.ts",
       "symbol": "case 'selectAll'",
-      "owner_sha256": "05a2647bfcdba992b0d736663d1802a5d260c6e90e08836610ab43cb53b30952"
+      "owner_sha256": "c0e64b3d8049c4dd42910a0978e788060795c8dff24375fdf8bcbf6efdc66e73"
      },
      "parser_type": null,
      "original_cases": [
@@ -10583,7 +10582,7 @@
      "owner": {
       "module_path": "src/editor/core/commands.ts",
       "symbol": "case 'mark'",
-      "owner_sha256": "05a2647bfcdba992b0d736663d1802a5d260c6e90e08836610ab43cb53b30952"
+      "owner_sha256": "c0e64b3d8049c4dd42910a0978e788060795c8dff24375fdf8bcbf6efdc66e73"
      },
      "parser_type": null,
      "original_cases": [
@@ -10791,7 +10790,7 @@
      "owner": {
       "module_path": "src/editor/core/commands.ts",
       "symbol": "comment: ['<!-- ', ' -->']",
-      "owner_sha256": "05a2647bfcdba992b0d736663d1802a5d260c6e90e08836610ab43cb53b30952"
+      "owner_sha256": "c0e64b3d8049c4dd42910a0978e788060795c8dff24375fdf8bcbf6efdc66e73"
      },
      "parser_type": null,
      "original_cases": [
@@ -10895,7 +10894,7 @@
      "owner": {
       "module_path": "src/editor/core/commands.ts",
       "symbol": "case 'mark'",
-      "owner_sha256": "05a2647bfcdba992b0d736663d1802a5d260c6e90e08836610ab43cb53b30952"
+      "owner_sha256": "c0e64b3d8049c4dd42910a0978e788060795c8dff24375fdf8bcbf6efdc66e73"
      },
      "parser_type": null,
      "original_cases": [
@@ -11103,7 +11102,7 @@
      "owner": {
       "module_path": "src/editor/core/commands.ts",
       "symbol": "math: ['$', '$']",
-      "owner_sha256": "05a2647bfcdba992b0d736663d1802a5d260c6e90e08836610ab43cb53b30952"
+      "owner_sha256": "c0e64b3d8049c4dd42910a0978e788060795c8dff24375fdf8bcbf6efdc66e73"
      },
      "parser_type": null,
      "original_cases": [
@@ -11207,7 +11206,7 @@
      "owner": {
       "module_path": "src/editor/core/commands.ts",
       "symbol": "sub: ['<sub>', '</sub>']",
-      "owner_sha256": "05a2647bfcdba992b0d736663d1802a5d260c6e90e08836610ab43cb53b30952"
+      "owner_sha256": "c0e64b3d8049c4dd42910a0978e788060795c8dff24375fdf8bcbf6efdc66e73"
      },
      "parser_type": null,
      "original_cases": [
@@ -11311,7 +11310,7 @@
      "owner": {
       "module_path": "src/editor/core/commands.ts",
       "symbol": "underline: ['<u>', '</u>']",
-      "owner_sha256": "05a2647bfcdba992b0d736663d1802a5d260c6e90e08836610ab43cb53b30952"
+      "owner_sha256": "c0e64b3d8049c4dd42910a0978e788060795c8dff24375fdf8bcbf6efdc66e73"
      },
      "parser_type": null,
      "original_cases": [
@@ -11553,7 +11552,7 @@
      "owner": {
       "module_path": "src/editor/core/commands.ts",
       "symbol": "case 'code'",
-      "owner_sha256": "05a2647bfcdba992b0d736663d1802a5d260c6e90e08836610ab43cb53b30952"
+      "owner_sha256": "c0e64b3d8049c4dd42910a0978e788060795c8dff24375fdf8bcbf6efdc66e73"
      },
      "parser_type": null,
      "original_cases": [
@@ -11657,7 +11656,7 @@
      "owner": {
       "module_path": "src/editor/core/commands.ts",
       "symbol": "case 'quote'",
-      "owner_sha256": "05a2647bfcdba992b0d736663d1802a5d260c6e90e08836610ab43cb53b30952"
+      "owner_sha256": "c0e64b3d8049c4dd42910a0978e788060795c8dff24375fdf8bcbf6efdc66e73"
      },
      "parser_type": null,
      "original_cases": [
@@ -11865,7 +11864,7 @@
      "owner": {
       "module_path": "src/editor/core/commands.ts",
       "symbol": "case 'front_matter'",
-      "owner_sha256": "05a2647bfcdba992b0d736663d1802a5d260c6e90e08836610ab43cb53b30952"
+      "owner_sha256": "c0e64b3d8049c4dd42910a0978e788060795c8dff24375fdf8bcbf6efdc66e73"
      },
      "parser_type": null,
      "original_cases": [
@@ -11969,7 +11968,7 @@
      "owner": {
       "module_path": "src/editor/core/commands.ts",
       "symbol": "case 'headingLevel'",
-      "owner_sha256": "05a2647bfcdba992b0d736663d1802a5d260c6e90e08836610ab43cb53b30952"
+      "owner_sha256": "c0e64b3d8049c4dd42910a0978e788060795c8dff24375fdf8bcbf6efdc66e73"
      },
      "parser_type": null,
      "original_cases": [
@@ -12073,7 +12072,7 @@
      "owner": {
       "module_path": "src/editor/core/commands.ts",
       "symbol": "case 'heading'",
-      "owner_sha256": "05a2647bfcdba992b0d736663d1802a5d260c6e90e08836610ab43cb53b30952"
+      "owner_sha256": "c0e64b3d8049c4dd42910a0978e788060795c8dff24375fdf8bcbf6efdc66e73"
      },
      "parser_type": null,
      "original_cases": [
@@ -12177,7 +12176,7 @@
      "owner": {
       "module_path": "src/editor/core/commands.ts",
       "symbol": "case 'hr'",
-      "owner_sha256": "05a2647bfcdba992b0d736663d1802a5d260c6e90e08836610ab43cb53b30952"
+      "owner_sha256": "c0e64b3d8049c4dd42910a0978e788060795c8dff24375fdf8bcbf6efdc66e73"
      },
      "parser_type": null,
      "original_cases": [
@@ -12281,7 +12280,7 @@
      "owner": {
       "module_path": "src/editor/core/commands.ts",
       "symbol": "case 'html'",
-      "owner_sha256": "05a2647bfcdba992b0d736663d1802a5d260c6e90e08836610ab43cb53b30952"
+      "owner_sha256": "c0e64b3d8049c4dd42910a0978e788060795c8dff24375fdf8bcbf6efdc66e73"
      },
      "parser_type": null,
      "original_cases": [
@@ -12593,7 +12592,7 @@
      "owner": {
       "module_path": "src/editor/core/commands.ts",
       "symbol": "case 'linkRef'",
-      "owner_sha256": "05a2647bfcdba992b0d736663d1802a5d260c6e90e08836610ab43cb53b30952"
+      "owner_sha256": "c0e64b3d8049c4dd42910a0978e788060795c8dff24375fdf8bcbf6efdc66e73"
      },
      "parser_type": null,
      "original_cases": [
@@ -12697,7 +12696,7 @@
      "owner": {
       "module_path": "src/editor/core/commands.ts",
       "symbol": "case 'math'",
-      "owner_sha256": "05a2647bfcdba992b0d736663d1802a5d260c6e90e08836610ab43cb53b30952"
+      "owner_sha256": "c0e64b3d8049c4dd42910a0978e788060795c8dff24375fdf8bcbf6efdc66e73"
      },
      "parser_type": null,
      "original_cases": [
@@ -13009,7 +13008,7 @@
      "owner": {
       "module_path": "src/editor/core/commands.ts",
       "symbol": "case 'toc'",
-      "owner_sha256": "05a2647bfcdba992b0d736663d1802a5d260c6e90e08836610ab43cb53b30952"
+      "owner_sha256": "c0e64b3d8049c4dd42910a0978e788060795c8dff24375fdf8bcbf6efdc66e73"
      },
      "parser_type": null,
      "original_cases": [
@@ -15096,17 +15095,17 @@
     },
     "authority_references": [
      {
-      "evidence_id": "ev_398b968a3f776bc01454b68dc33300c429913875739918ac9909f514d425f10f",
+      "evidence_id": "ev_d69e477a199d07ed98e3ec1726139f7de887dc52c5fe9bfcd7db0883ef2eda33",
       "authority": "analyst-inference",
       "state": "reviewed",
-      "location": "/evidence/ev_398b968a3f776bc01454b68dc33300c429913875739918ac9909f514d425f10f"
+      "location": "/evidence/ev_d69e477a199d07ed98e3ec1726139f7de887dc52c5fe9bfcd7db0883ef2eda33"
      }
     ],
     "source_state": "reviewed",
     "observed_cases": [
      {
       "kind": "positive",
-      "evidence_id": "ev_398b968a3f776bc01454b68dc33300c429913875739918ac9909f514d425f10f",
+      "evidence_id": "ev_d69e477a199d07ed98e3ec1726139f7de887dc52c5fe9bfcd7db0883ef2eda33",
       "location": "typora-re/parity-spec.md"
      }
     ],
@@ -15122,44 +15121,66 @@
     "residual_unknown_ids": [],
     "unavailable_authority": [],
     "required_next_evidence": [
-     "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules.",
-     "Implement: auto pair (markdown pairing depends on bracket pairing) + display source on focus; Indent Size on Save / Pretty indentation and Heading Style pending (gap issue)"
+     "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules."
     ],
     "binding": {
      "obligation_id": "typora.pref.editor.general",
      "owner": {
-      "module_path": "src/editor/core/input.ts",
-      "symbol": "const autoPair",
-      "owner_sha256": "8fc840381159e18db075ff2ff1538a1f35ce3613e699fb663b47d88ff4d76152"
+      "module_path": "src/editor/core/commands.ts",
+      "symbol": "const pattern",
+      "owner_sha256": "c0e64b3d8049c4dd42910a0978e788060795c8dff24375fdf8bcbf6efdc66e73"
      },
      "parser_type": null,
      "original_cases": [
       {
        "kind": "positive",
-       "evidence_id": "ev_398b968a3f776bc01454b68dc33300c429913875739918ac9909f514d425f10f",
+       "evidence_id": "ev_d69e477a199d07ed98e3ec1726139f7de887dc52c5fe9bfcd7db0883ef2eda33",
        "location": "typora-re/parity-spec.md"
       }
      ],
-     "fixtures": [],
-     "verifier": null
+     "fixtures": [
+      {
+       "fixture_id": "pref.editor.general.positive",
+       "case_kind": "positive",
+       "authority": "renderer",
+       "evidence_ids": [
+        "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       ]
+      }
+     ],
+     "verifier": {
+      "verifier_id": "margin.playwright.pref.editor.general",
+      "claim_id": "claim.pref.editor.general",
+      "command": "npx playwright test tests/e2e/parity-prefs.spec.ts -g \"pref.editor.general: Editor: auto pair brackets/markdown, display source on focus, heading style, indent\"",
+      "authority": "renderer",
+      "status": "pass",
+      "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+      "enumerated_obligation_ids": [
+       "typora.pref.editor.general"
+      ],
+      "nondeterminism": {
+       "mode": "total-order",
+       "specification": "Single deterministic suite run; pass = suite exited 0 with the named test not skipped."
+      }
+     }
     },
     "status": "implemented",
     "diagnostics": [
-     {
-      "code": "missing-case",
-      "detail": "Required positive fixture is missing."
-     },
-     {
-      "code": "missing-verifier",
-      "detail": "No verifier claim is bound to this obligation."
-     },
      {
       "code": "static-only",
       "detail": "No static authority characterizes the original finite behavior."
      },
      {
+      "code": "weak-fixture-authority",
+      "detail": "positive fixture lacks renderer authority or authenticated Evidence."
+     },
+     {
       "code": "weak-original-case-authority",
       "detail": "Original positive behavior lacks static Evidence."
+     },
+     {
+      "code": "weak-verifier-authority",
+      "detail": "Verifier authority does not satisfy renderer."
      }
     ]
    },
@@ -18810,7 +18831,6 @@
    "ev_3884ad2bb7ad085952a8e7e3397ce7b70ed4f265d7ce21254d8dad24de4ea733",
    "ev_38daf0ee2f412fc250e29a754aba0039c57be6b142b277be4dc2b8dbe75f1a9f",
    "ev_391cc84ed55b4e709a481b8ea9fa2d41219c67af1bc7f85c1e9072919493911c",
-   "ev_398b968a3f776bc01454b68dc33300c429913875739918ac9909f514d425f10f",
    "ev_3ba5f1d95e8d020f5a7ba173411715f0c222b871384cea454ce7d1788477336d",
    "ev_3c0855fd39565d4264201a1d588a02aa4c4d16f198e296ca90f373834f471390",
    "ev_3da74c48da398f9c3c2627b4e2ff057102d092cb833471f6b02161f3e8b4968a",
@@ -18916,6 +18936,7 @@
    "ev_cbbff2fa81f950a2655e36d98f87416ad3d06f3aa614f4cd1ddf8a7dbfa0d952",
    "ev_ccce03989b2007515ca06a4b79ad560b9585b91ad0ca87c9df4bb12b13af90d0",
    "ev_d1f17de163f986bfe6a970f3e13c403c94264e4e7e9598910dfd95f003aa1e8f",
+   "ev_d69e477a199d07ed98e3ec1726139f7de887dc52c5fe9bfcd7db0883ef2eda33",
    "ev_d825065e1b0fb8d6be57683cbbbba95b8b4b53f53bc71d7ab0062f0684bc0c3e",
    "ev_d845db61235a5db384bbbcf2c757424237c4a065feff8c7bcea0b67bc7ddd7ce",
    "ev_d8a65e114dd0a62d01ed1519a5bb1298a931c96600f0cafbfed9177771e74847",
@@ -19000,7 +19021,6 @@
   "ev_3884ad2bb7ad085952a8e7e3397ce7b70ed4f265d7ce21254d8dad24de4ea733",
   "ev_38daf0ee2f412fc250e29a754aba0039c57be6b142b277be4dc2b8dbe75f1a9f",
   "ev_391cc84ed55b4e709a481b8ea9fa2d41219c67af1bc7f85c1e9072919493911c",
-  "ev_398b968a3f776bc01454b68dc33300c429913875739918ac9909f514d425f10f",
   "ev_3ba5f1d95e8d020f5a7ba173411715f0c222b871384cea454ce7d1788477336d",
   "ev_3c0855fd39565d4264201a1d588a02aa4c4d16f198e296ca90f373834f471390",
   "ev_3da74c48da398f9c3c2627b4e2ff057102d092cb833471f6b02161f3e8b4968a",
@@ -19106,6 +19126,7 @@
   "ev_cbbff2fa81f950a2655e36d98f87416ad3d06f3aa614f4cd1ddf8a7dbfa0d952",
   "ev_ccce03989b2007515ca06a4b79ad560b9585b91ad0ca87c9df4bb12b13af90d0",
   "ev_d1f17de163f986bfe6a970f3e13c403c94264e4e7e9598910dfd95f003aa1e8f",
+  "ev_d69e477a199d07ed98e3ec1726139f7de887dc52c5fe9bfcd7db0883ef2eda33",
   "ev_d825065e1b0fb8d6be57683cbbbba95b8b4b53f53bc71d7ab0062f0684bc0c3e",
   "ev_d845db61235a5db384bbbcf2c757424237c4a065feff8c7bcea0b67bc7ddd7ce",
   "ev_d8a65e114dd0a62d01ed1519a5bb1298a931c96600f0cafbfed9177771e74847",

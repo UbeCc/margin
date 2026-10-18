@@ -113,7 +113,10 @@ export function enter(doc: Doc, i: number, off: number, soft = false): Caret {
   if (inner && !c.trim() && isTextType(l.type)) return exitContainer(doc, i);
   const pos = doc.docPos(i, off);
   if (inner?.kind === 'item' && l.type !== 'indented_code') {
-    let mk = inner.ordered ? `${inner.number + 1}${inner.delim} ` : `${inner.delim} `;
+    // #159: the next item mirrors this item's marker spacing, so pretty markers
+    // created from the menu (`-   `) keep their alignment on Enter.
+    const spacing = /^[ \t]*/.exec(inner.markerText.replace(inner.ordered ? /^\d{1,9}[.)]/ : /^[-+*]/, ''))![0] || ' ';
+    let mk = inner.ordered ? `${inner.number + 1}${inner.delim}${spacing}` : `${inner.delim}${spacing}`;
     if (inner.task !== null) mk += '[ ] ';
     const ins = E + contPrefix(l.chain.slice(0, -1)) + mk;
     doc.replace(pos, pos, ins);

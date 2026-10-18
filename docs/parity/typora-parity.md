@@ -9,14 +9,14 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 | | surfaces |
 |---|---|
 | total | 173 |
-| owned (implemented) | 162 (with a named passing test: 149) |
-| partial | 3 |
+| owned (implemented) | 163 (with a named passing test: 150) |
+| partial | 2 |
 | missing | 0 |
 | out of scope | 8 |
 
-REA ledger `rol_b3bdbe0556251c73dd5ebd00b04fcdd3b329411d8e70d3d9669fe934b6387589` (closure `9578f16632db20f9…`): status **unknown**; implemented 165, out-of-scope 8, unknown 5.
+REA ledger `rol_e09e3c15b1411c2391bce30882a1c5d03cd7165c6a19ba0f6450fa0d273509cf` (closure `ba7eefa04824816d…`): status **unknown**; implemented 165, out-of-scope 8, unknown 5.
 
-REA coverage boundary `margin.typora-parity`: status **unknown**; 149/165 claims qualified by controlled-replay verifier Evidence. Reasons: package-proof-missing 1, verifier-missing 13, verifier-unknown 3.
+REA coverage boundary `margin.typora-parity`: status **unknown**; 150/165 claims qualified by controlled-replay verifier Evidence. Reasons: package-proof-missing 1, verifier-missing 13, verifier-unknown 2.
 
 Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): build exit 0, cargo-test exit 0, independence exit 0, playwright exit 0, vitest exit 0. See `rea/summary.json`.
 
@@ -39,7 +39,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `ctx` Editor & sidebar context menus (text, link, table, image, code, math, diagram, outline, files) | P1 | 1 |
 | `tools` Table, code-fence and math tools | P1 | 0 |
 | `images` Image pipeline: insert-local, copy/move/upload, zoom, syntax switch, image root path | P1 | 0 |
-| `prefs` Preferences completeness (General, Editor, Image, Markdown, Export, Appearance panes) | P1 | 1 |
+| `prefs` Preferences completeness (General, Editor, Image, Markdown, Export, Appearance panes) | P1 | 0 |
 | `sidebar` Sidebar & outline: list view, file search, sort, collapsible outline, filter | P1 | 0 |
 | `syntax` Markdown syntax options & whitespace/line-break settings | P2 | 0 |
 | `chrome` Window chrome & writing aids: status bar, always-on-top, spelling, substitutions, speech, emoji | P2 | 0 |
@@ -246,7 +246,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `pref.appearance.theme` | Appearance: theme, separate dark theme, follow system | owned |  | `src/app/preferences.ts` `'darkTheme'` | `tests/e2e/app-themes.spec.ts` › preferences: Theme lists light themes, Dark theme lists dark ones | 10 |
 | `pref.appearance.font` | Appearance: font size, custom CSS | owned |  | `src/app/preferences.ts` `'Font size in px'` | `tests/e2e/app-themes.spec.ts` › command palette theme entry and custom CSS | 3 |
 | `pref.appearance.window` | Appearance: window style (seamless/unibody/native), text column width, outline panel — #134: style stored per settings and applied when each window is created (macOS titlebar bits in window_style.rs; seamless is the fresh-install default per fe-preferences §4.1); native/titlebar path itself is macOS-only by design (Typora 1.5.12 macOS) | owned |  | `src-tauri/src/window_style.rs` `pub fn apply` | `tests/e2e/parity-prefs.spec.ts` › pref.appearance.window: Appearance: window style (seamless/unibody/native), text column width, outline panel | 13 |
-| `pref.editor.general` | Editor: auto pair brackets/markdown, display source on focus, heading style, indent — auto pair (markdown pairing depends on bracket pairing) + display source on focus; Indent Size on Save / Pretty indentation and Heading Style pending (gap issue) | **partial** | P1 | `src/editor/core/input.ts` `const autoPair` | `tests/e2e/parity-prefs.spec.ts` › pref.editor.general: Editor: auto pair brackets/markdown, display source on focus, heading style, indent | 10 |
+| `pref.editor.general` | Editor: auto pair brackets/markdown, display source on focus, heading style, indent — #159: auto pair (markdown pairing depends on bracket pairing) + display source on focus; Indent Size on Save (Auto/0→2, 2–5, Tab = literal \t) + Pretty indentation shape menu-created quote/list markers via the pattern template (content aligned to the width, e.g. width 4 → `>   Quote`, `1.  item`); Enter mirrors the item marker spacing; Heading Style (atx / atx-with-suffix / setext / variable-width setext, h3–h6 fall back to ATX) shapes Paragraph-menu headings. Generated syntax only — existing text is never rewritten | owned |  | `src/editor/core/commands.ts` `const pattern` | `tests/e2e/parity-prefs.spec.ts` › pref.editor.general: Editor: auto pair brackets/markdown, display source on focus, heading style, indent | 10 |
 | `pref.editor.shortcuts` | Custom shortcut keys — in-app JSON key map for the JS keymap (Typora macOS opens a help page); native menu accelerators unchanged | owned |  | `src/app/commands.ts` `export function setCustomKeys` | `tests/e2e/parity-prefs.spec.ts` › pref.editor.shortcuts: Custom shortcut keys | 2 |
 | `pref.files.defaults` | Files: default line ending, default folder, file extensions — line ending for new files; default folder via On Launch | owned |  | `src/app/settings.ts` `export function newFileEol` | `tests/e2e/parity-prefs.spec.ts` › pref.files.defaults: Files: default line ending | 8 |
 | `pref.privacy` | Privacy/security toggles (no telemetry; local-only network) — Margin sends no telemetry by construction | owned |  | `src/app/settings.ts` `DEFAULT_SETTINGS` | none | 1 |

@@ -98,6 +98,48 @@ test('pref.editor.general: Editor: auto pair brackets/markdown, display source o
   await caretAtText(page, "* __", 4);
   await page.keyboard.type(' [');
   expect(await editorValue(page)).toBe("# Title\n\ntext (a) don't * __ [\n");
+  // #159 Heading Style (Markdown › Syntax Preference): generated headings follow it.
+  const mp = await pane(page, 'markdown');
+  await mp.locator('select[data-pref="markdown.headingStyle"]').selectOption('setext');
+  await close(page);
+  await setDoc(page, 'plain words\n');
+  await caretAtText(page, 'plain words', 0);
+  await page.evaluate(() => window.__margin!.editor.exec({ kind: 'heading', level: 1 }));
+  expect(await editorValue(page)).toBe('plain words\n===\n');
+  const mp2 = await pane(page, 'markdown');
+  await mp2.locator('select[data-pref="markdown.headingStyle"]').selectOption('atxSuffix');
+  await close(page);
+  await page.evaluate(() => window.__margin!.editor.exec({ kind: 'heading', level: 4 }));
+  expect(await editorValue(page)).toBe('#### plain words ####\n'); // setext has no h4 → ATX fallback
+  // #159 Indent Size on Save + Pretty indentation (Editor pane): menu-created
+  // quotes/lists use the marker pattern (fe-preferences §5.1 preview: width 4 → `>   Quote`).
+  const ep = await pane(page, 'editor');
+  await ep.locator('select[data-pref="markdown.indentSize"]').selectOption('4');
+  await ep.locator('[data-pref="markdown.prettyIndent"]').check();
+  await close(page);
+  await setDoc(page, 'Quote\n');
+  await caretAtText(page, 'Quote', 0);
+  await page.evaluate(() => window.__margin!.editor.exec({ kind: 'block', block: 'quote' }));
+  expect(await editorValue(page)).toBe('>   Quote\n');
+  await setDoc(page, 'item\n');
+  await caretAtText(page, 'item', 0);
+  await page.evaluate(() => window.__margin!.editor.exec({ kind: 'block', block: 'ol' }));
+  expect(await editorValue(page)).toBe('1.  item\n'); // marker `1.` + 2 spaces → content at column 4
+  // Enter mirrors the pretty spacing: the next item keeps the alignment
+  await setDoc(page, '-   item\n');
+  await caretAtText(page, 'item', 4);
+  await page.keyboard.press('Enter');
+  await page.keyboard.type('two');
+  expect(await editorValue(page)).toBe('-   item\n-   two\n');
+  // Pretty off → one space; Tab option → literal tab characters
+  const ep2 = await pane(page, 'editor');
+  await ep2.locator('[data-pref="markdown.prettyIndent"]').uncheck();
+  await ep2.locator('select[data-pref="markdown.indentSize"]').selectOption('-1');
+  await close(page);
+  await setDoc(page, 'item\n');
+  await caretAtText(page, 'item', 0);
+  await page.evaluate(() => window.__margin!.editor.exec({ kind: 'block', block: 'ul' }));
+  expect(await editorValue(page)).toBe('-\titem\n');
 });
 
 test('pref.files.defaults: Files: default line ending, default folder, file extensions', async ({ page }) => {
