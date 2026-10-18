@@ -2,22 +2,22 @@
  "generated_from": {
   "spec": "typora-re/parity-spec.md",
   "prose": "typora-re/sections/*.md",
-  "margin_head": "462814bbbd60838a9a28098d043b4323722f3a4b"
+  "margin_head": "1366a387a51b8f6174790f811a8ad8c7b95560d3"
  },
  "summary": {
-  "head": "462814bbbd60838a9a28098d043b4323722f3a4b",
-  "artifact_sha256": "2491191748b667e40df75da48cca12dd918bd8a79d02e0d11bd87d30d1e240db",
+  "head": "1366a387a51b8f6174790f811a8ad8c7b95560d3",
+  "artifact_sha256": "97c54e9c9b2fbcd856e110ca5f309f8a0892f5e7fb3e61c8e7e97235e7ebb477",
   "inventory": {
    "total": 172,
-   "owned": 145,
-   "partial": 10,
-   "missing": 9,
+   "owned": 147,
+   "partial": 9,
+   "missing": 8,
    "oos": 8,
-   "verified_by_test": 132
+   "verified_by_test": 134
   },
   "ledger": {
-   "ledger_id": "rol_125b3c35399a73ff066ca1fd4d97f70d4e52aca7cf0c0fdb9b7965ceff79bed4",
-   "closure_digest": "e05e595be51ec1abdc72886fa0c9da6f19905926f31429c60a793a5236caa798",
+   "ledger_id": "rol_49f54e05ee0a3e17e3faa3e5e4bd5401853fb633722d4cd5e0246204d09bd6a9",
+   "closure_digest": "19b82cb79ece67e66e9ac1eb777fb9e5ba66ab0e2e25a03b6daf53dd096bc5d8",
    "status": "unknown",
    "summary": {
     "total": 177,
@@ -27,7 +27,7 @@
     "by_status": [
      {
       "key": "unowned",
-      "count": 9
+      "count": 8
      },
      {
       "key": "characterized",
@@ -35,7 +35,7 @@
      },
      {
       "key": "implemented",
-      "count": 155
+      "count": 156
      },
      {
       "key": "verified",
@@ -119,18 +119,18 @@
      }
     ]
    },
-   "evidence_id": "ev_dfa97df7bdad786fa7be050f39ad85c588e647f438d0c6cbd5feccb9fd17685e"
+   "evidence_id": "ev_44ce844de7cd1e443610c924cbd273f2931ac4e26833293d8153e0e1ac9a54aa"
   },
   "coverage": {
    "status": "unknown",
    "reason_counts": {
-    "owner-missing": 9,
+    "owner-missing": 8,
     "package-proof-missing": 1,
-    "verifier-missing": 25,
-    "verifier-unknown": 7
+    "verifier-missing": 24,
+    "verifier-unknown": 6
    },
    "claims_total": 164,
-   "claims_qualified_by_controlled_replay": 132,
+   "claims_qualified_by_controlled_replay": 134,
    "evidence_ids_cited": 176
   },
   "verifier_runs": {
@@ -3340,7 +3340,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "label: 'Copy / Paste As…'",
-    "sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
+    "sha256": "a21158ebb028c6f9311b9730e68711e71eb0459cbc78a0d4d856218e4b6e3423"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -3382,7 +3382,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "label: 'Copy Link Address'",
-    "sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
+    "sha256": "a21158ebb028c6f9311b9730e68711e71eb0459cbc78a0d4d856218e4b6e3423"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -3425,7 +3425,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "block('para:insertBefore', 'Insert Paragraph Before')",
-    "sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
+    "sha256": "a21158ebb028c6f9311b9730e68711e71eb0459cbc78a0d4d856218e4b6e3423"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -3466,14 +3466,14 @@
   {
    "obligation_id": "typora.ctx.emoji",
    "id": "ctx.emoji",
-   "title": "Emoji/inline-math context entries (copy emoji, copy inline math)",
-   "status": "partial",
-   "priority": "P2",
+   "title": "Emoji/inline-math context entries (copy emoji, copy inline math, copy as image)",
+   "status": "owned",
+   "priority": null,
    "epic": "ctx",
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "function copyMath",
-    "sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
+    "sha256": "a21158ebb028c6f9311b9730e68711e71eb0459cbc78a0d4d856218e4b6e3423"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -3485,7 +3485,8 @@
      "Copy '%@'",
      "Copy Math",
      "Copy as Tex",
-     "Copy as MathML"
+     "Copy as MathML",
+     "Copy as Image"
     ],
     "panel": [],
     "bridge": [],
@@ -3494,26 +3495,34 @@
      "fe-contextmenus-tools §1.2"
     ]
    },
-   "note": "inline math Copy Math ▸ Tex/MathML; Margin renders no :emoji: shortcodes, inline Copy as Image disabled",
+   "note": ":smile: renders (EMOJI map); inline Copy as Image rasterizes the KaTeX node to PNG (mathimg.ts)",
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-case",
-    "missing-verifier",
     "static-only",
-    "weak-original-case-authority"
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.ctx.media",
    "id": "ctx.media",
-   "title": "Media context entries: play / pause / download video",
-   "status": "missing",
-   "priority": "P2",
+   "title": "Video context entries: Save Video As… after the system items",
+   "status": "owned",
+   "priority": null,
    "epic": "ctx",
-   "owner": null,
-   "verifier": null,
+   "owner": {
+    "path": "src/app/ctxmenu/targets.ts",
+    "anchor": "closest?.('video')",
+    "sha256": "43daadbadb25c0206fe4887ce668f1fd4d153eabf43e73d25f61bb3da46c00e4"
+   },
+   "verifier": {
+    "file": "src/app/__tests__/ctxmenu.test.ts",
+    "test": "video and emoji targets",
+    "kind": "unit"
+   },
    "spec": {
     "menu": [
      "Play",
@@ -3526,17 +3535,20 @@
      "Download failed"
     ],
     "bridge": [],
-    "prose": []
+    "prose": [
+     "fe-contextmenus-tools §1.2"
+    ]
    },
-   "note": null,
+   "note": "§1.2 video menu = system items | Save Video As…; no Play/Pause context items in Typora (spec A labels accounted, not shown); download-progress strings not reproduced",
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.tools.table.rows-cols",
@@ -3841,7 +3853,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "'Delete Code Block'",
-    "sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
+    "sha256": "a21158ebb028c6f9311b9730e68711e71eb0459cbc78a0d4d856218e4b6e3423"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -4435,7 +4447,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "Open Image Location",
-    "sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
+    "sha256": "a21158ebb028c6f9311b9730e68711e71eb0459cbc78a0d4d856218e4b6e3423"
    },
    "verifier": {
     "file": "tests/e2e/parity-images.spec.ts",

@@ -4,17 +4,12 @@
  "summary": {
   "required_surfaces": 172,
   "required_claims": 164,
-  "reasons": 42
+  "reasons": 39
  },
  "reasons": [
   {
    "code": "owner-missing",
    "subject_id": "beh.files.quicklook",
-   "detail": "Required surface has no reconstructed owner or explicit disposition."
-  },
-  {
-   "code": "owner-missing",
-   "subject_id": "ctx.media",
    "detail": "Required surface has no reconstructed owner or explicit disposition."
   },
   {
@@ -74,11 +69,6 @@
   },
   {
    "code": "verifier-missing",
-   "subject_id": "claim.ctx.media",
-   "detail": "No verifier contract covers this claim."
-  },
-  {
-   "code": "verifier-missing",
    "subject_id": "claim.export.pdf",
    "detail": "No verifier contract covers this claim."
   },
@@ -189,11 +179,6 @@
   },
   {
    "code": "verifier-unknown",
-   "subject_id": "claim.ctx.emoji",
-   "detail": "Latest compatible verifier result is unknown."
-  },
-  {
-   "code": "verifier-unknown",
    "subject_id": "claim.ctx.text",
    "detail": "Latest compatible verifier result is unknown."
   },
@@ -222,11 +207,6 @@
   {
    "operation": "reconcile_reconstruction_owner",
    "subject_id": "beh.files.quicklook",
-   "rationale": "Required surface has no reconstructed owner or explicit disposition."
-  },
-  {
-   "operation": "reconcile_reconstruction_owner",
-   "subject_id": "ctx.media",
    "rationale": "Required surface has no reconstructed owner or explicit disposition."
   },
   {
@@ -286,11 +266,6 @@
   },
   {
    "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.ctx.media",
-   "rationale": "No verifier contract covers this claim."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
    "subject_id": "claim.export.pdf",
    "rationale": "No verifier contract covers this claim."
   },
@@ -397,11 +372,6 @@
   {
    "operation": "run_reconstruction_verifier",
    "subject_id": "claim.beh.clip.rtf-paste",
-   "rationale": "Latest compatible verifier result is unknown."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.ctx.emoji",
    "rationale": "Latest compatible verifier result is unknown."
   },
   {
@@ -470,6 +440,7 @@
   "ev_2bfd37b7ac78629a1a8303889452f5ff14da581c3e0147b6c135fd307638aa53",
   "ev_2c3a102fc016c63e88353f5e0f662201f2adcdd205e3e5eedaab2d4db3205990",
   "ev_2cdb84bedffe598ed99053f40660572101657f97e5934d9e5610e5b8212b3456",
+  "ev_2dcfdda5e64014a5fbf45717baa72124a923220a54ed60b65b332207313f588c",
   "ev_2de768edb2decbc991458518769db69fa3b3b66e456768f075966f32d0518035",
   "ev_314ef36ad3a63a5024f1777c4c38fd700c0fe2bc2930ebc1154171876a967597",
   "ev_31b4d097d5c79785186b28ead5846b1753552c19960daf83dbeebc7c6e9f0c54",
@@ -490,7 +461,6 @@
   "ev_3fb8b84cee7279d523a2c19c8441384de2e266aa5ed455b1a6a8c68889ae3be1",
   "ev_41a86ed70f7d352fd1fd4ee4c8fc8d5ed2b1ee32ef2fd8ceb10510601f0c962e",
   "ev_4341a61451354b6c0655830d4b36b6e65cf1f0ef15713d67825e30b7d9413a49",
-  "ev_43cbeb858316569ae8f19d45e01657b3791c4fe35633c693f5f4e495cf98c9ef",
   "ev_458ac6b997a37b852f60228dfea7c1aa22be6b22d999b4a80609d9d097c768ed",
   "ev_48cef36056f7d963046645e2256be9bd5ddb6f50a2d84c19aca934e0903f489a",
   "ev_4ac8f85846afce7299ee1995f6c9d771aa25470f2e3edce8a921a5a5631c0504",
@@ -588,7 +558,6 @@
   "ev_d8a65e114dd0a62d01ed1519a5bb1298a931c96600f0cafbfed9177771e74847",
   "ev_dacf0faf0df8a387b8d87a7c1eb81deef222213ebc89ea6a307d1cd986beb8c0",
   "ev_decd579e1e9bdbe5b174eda3e5d9f2b7ed739be69527caf274c4ef71c5494fb3",
-  "ev_df4f5480f4a90274b4e671edb7c9b27feeb5d50b392911d4892fac5827c1a140",
   "ev_e046fa3a88b3a8ab6966891891417352e94ef17025ff3ecbab2cd8eee6ec7730",
   "ev_e1210a485b4cceb4e2aab5aeceda17396238695557347cf0c0ed692fc2ef3593",
   "ev_e3541f91887a80c9fa7e848ff27b7846123160ed2e35712802f54c516e7b3ab4",
@@ -600,6 +569,7 @@
   "ev_ed434c97506d18f834b446e072875525dcee504ad371d8e184fd7217dbbf244c",
   "ev_f4157d50cf77f67ec4ec0148aa5fee7d38203171433309534b5eaeb149724f5d",
   "ev_f50c83ee06941fa3a6c18b39b820330dbb4967ec16e8cdfc6bc7de5255b66ace",
+  "ev_f55ba63d73378d6805d3d6f54d96454f4f4f0d74c1e79ebd932216334cb7330b",
   "ev_f72a1c6a65fe42351288b9ad61ee6cc16ee4dbcd560fc19cde83666d7e2256fd",
   "ev_f915a919a67e0bd6a4da0d9cc655ad5297aa4a298fed727761388011a0eaa30f",
   "ev_f9c10eff1055cd2246addd46f5478402628d14660e97906e1be0fb96718d6af3",

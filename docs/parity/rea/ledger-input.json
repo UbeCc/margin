@@ -2570,14 +2570,14 @@
   {
    "obligation_id": "typora.ctx.emoji",
    "obligation_version": 1,
-   "title": "Emoji/inline-math context entries (copy emoji, copy inline math)",
+   "title": "Emoji/inline-math context entries (copy emoji, copy inline math, copy as image)",
    "application_layer": "application",
    "family": "ctx.emoji",
    "target": {
     "artifact_sha256": null,
     "application_node_id": null,
     "semantic_node_id": null,
-    "location": "Emoji/inline-math context entries (copy emoji, copy inline math)"
+    "location": "Emoji/inline-math context entries (copy emoji, copy inline math, copy as image)"
    },
    "required": true,
    "required_case_kinds": [
@@ -2591,45 +2591,42 @@
    "residual_unknown_ids": [],
    "unavailable_authority": [],
    "required_next_evidence": [
-    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules.",
-    "Implement: inline math Copy Math ▸ Tex/MathML; Margin renders no :emoji: shortcodes, inline Copy as Image disabled"
+    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules."
    ],
    "disposition": "active",
    "review_evidence_ids": [
-    "ev_df4f5480f4a90274b4e671edb7c9b27feeb5d50b392911d4892fac5827c1a140"
+    "ev_2dcfdda5e64014a5fbf45717baa72124a923220a54ed60b65b332207313f588c"
    ]
   },
   {
    "obligation_id": "typora.ctx.media",
    "obligation_version": 1,
-   "title": "Media context entries: play / pause / download video",
+   "title": "Video context entries: Save Video As… after the system items",
    "application_layer": "application",
    "family": "ctx.media",
    "target": {
     "artifact_sha256": null,
     "application_node_id": null,
     "semantic_node_id": null,
-    "location": "Media context entries: play / pause / download video"
+    "location": "Video context entries: Save Video As… after the system items"
    },
    "required": true,
    "required_case_kinds": [
     "positive"
    ],
    "required_original_authority": "static",
-   "required_fixture_authority": "renderer",
-   "required_verifier_authority": "renderer",
+   "required_fixture_authority": "unit",
+   "required_verifier_authority": "unit",
    "requires_parser_type": false,
    "dependency_obligation_ids": [],
    "residual_unknown_ids": [],
    "unavailable_authority": [],
    "required_next_evidence": [
-    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules.",
-    "Add an e2e verifier that enumerates this obligation.",
-    "Implement: Media context entries: play / pause / download video"
+    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules."
    ],
    "disposition": "active",
    "review_evidence_ids": [
-    "ev_43cbeb858316569ae8f19d45e01657b3791c4fe35633c693f5f4e495cf98c9ef"
+    "ev_f55ba63d73378d6805d3d6f54d96454f4f4f0d74c1e79ebd932216334cb7330b"
    ]
   },
   {
@@ -8004,7 +8001,7 @@
     "owner": {
      "module_path": "src/app/ctxmenu/items.ts",
      "symbol": "label: 'Copy / Paste As…'",
-     "owner_sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
+     "owner_sha256": "a21158ebb028c6f9311b9730e68711e71eb0459cbc78a0d4d856218e4b6e3423"
     },
     "parser_type": null,
     "original_cases": [
@@ -8022,7 +8019,7 @@
     "owner": {
      "module_path": "src/app/ctxmenu/items.ts",
      "symbol": "label: 'Copy Link Address'",
-     "owner_sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
+     "owner_sha256": "a21158ebb028c6f9311b9730e68711e71eb0459cbc78a0d4d856218e4b6e3423"
     },
     "parser_type": null,
     "original_cases": [
@@ -8063,7 +8060,7 @@
     "owner": {
      "module_path": "src/app/ctxmenu/items.ts",
      "symbol": "block('para:insertBefore', 'Insert Paragraph Before')",
-     "owner_sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
+     "owner_sha256": "a21158ebb028c6f9311b9730e68711e71eb0459cbc78a0d4d856218e4b6e3423"
     },
     "parser_type": null,
     "original_cases": [
@@ -8104,18 +8101,82 @@
     "owner": {
      "module_path": "src/app/ctxmenu/items.ts",
      "symbol": "function copyMath",
-     "owner_sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
+     "owner_sha256": "a21158ebb028c6f9311b9730e68711e71eb0459cbc78a0d4d856218e4b6e3423"
     },
     "parser_type": null,
     "original_cases": [
      {
       "kind": "positive",
-      "evidence_id": "ev_df4f5480f4a90274b4e671edb7c9b27feeb5d50b392911d4892fac5827c1a140",
+      "evidence_id": "ev_2dcfdda5e64014a5fbf45717baa72124a923220a54ed60b65b332207313f588c",
       "location": "clipboard-contextmenu §6.1"
      }
     ],
-    "fixtures": [],
-    "verifier": null
+    "fixtures": [
+     {
+      "fixture_id": "ctx.emoji.positive",
+      "case_kind": "positive",
+      "authority": "renderer",
+      "evidence_ids": [
+       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+      ]
+     }
+    ],
+    "verifier": {
+     "verifier_id": "margin.playwright.ctx.emoji",
+     "claim_id": "claim.ctx.emoji",
+     "command": "npx playwright test tests/e2e/parity-ctx.spec.ts -g \"ctx.emoji:\"",
+     "authority": "renderer",
+     "status": "pass",
+     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "enumerated_obligation_ids": [
+      "typora.ctx.emoji"
+     ],
+     "nondeterminism": {
+      "mode": "total-order",
+      "specification": "Single deterministic suite run; pass = suite exited 0 with the named test not skipped."
+     }
+    }
+   },
+   {
+    "obligation_id": "typora.ctx.media",
+    "owner": {
+     "module_path": "src/app/ctxmenu/targets.ts",
+     "symbol": "closest?.('video')",
+     "owner_sha256": "43daadbadb25c0206fe4887ce668f1fd4d153eabf43e73d25f61bb3da46c00e4"
+    },
+    "parser_type": null,
+    "original_cases": [
+     {
+      "kind": "positive",
+      "evidence_id": "ev_f55ba63d73378d6805d3d6f54d96454f4f4f0d74c1e79ebd932216334cb7330b",
+      "location": "fe-contextmenus-tools §1.2"
+     }
+    ],
+    "fixtures": [
+     {
+      "fixture_id": "ctx.media.positive",
+      "case_kind": "positive",
+      "authority": "unit",
+      "evidence_ids": [
+       "ev_fbff234ec48d7a423769c9e2d3ea5de846700e84dbbc2837733666f3e2eee501"
+      ]
+     }
+    ],
+    "verifier": {
+     "verifier_id": "margin.vitest.ctx.media",
+     "claim_id": "claim.ctx.media",
+     "command": "npx vitest run src/app/__tests__/ctxmenu.test.ts -t \"video and emoji targets\"",
+     "authority": "unit",
+     "status": "pass",
+     "result_evidence_id": "ev_fbff234ec48d7a423769c9e2d3ea5de846700e84dbbc2837733666f3e2eee501",
+     "enumerated_obligation_ids": [
+      "typora.ctx.media"
+     ],
+     "nondeterminism": {
+      "mode": "total-order",
+      "specification": "Single deterministic suite run; pass = suite exited 0 with the named test not skipped."
+     }
+    }
    },
    {
     "obligation_id": "typora.tools.table.rows-cols",
@@ -8409,7 +8470,7 @@
     "owner": {
      "module_path": "src/app/ctxmenu/items.ts",
      "symbol": "'Delete Code Block'",
-     "owner_sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
+     "owner_sha256": "a21158ebb028c6f9311b9730e68711e71eb0459cbc78a0d4d856218e4b6e3423"
     },
     "parser_type": null,
     "original_cases": [
@@ -8942,7 +9003,7 @@
     "owner": {
      "module_path": "src/app/ctxmenu/items.ts",
      "symbol": "Open Image Location",
-     "owner_sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
+     "owner_sha256": "a21158ebb028c6f9311b9730e68711e71eb0459cbc78a0d4d856218e4b6e3423"
     },
     "parser_type": null,
     "original_cases": [

@@ -1,5 +1,5 @@
 {
- "evidence_id": "ev_dfa97df7bdad786fa7be050f39ad85c588e647f438d0c6cbd5feccb9fd17685e",
+ "evidence_id": "ev_44ce844de7cd1e443610c924cbd273f2931ac4e26833293d8153e0e1ac9a54aa",
  "subject": null,
  "provider": {
   "id": "rea-javascript-application-workflows",
@@ -10,14 +10,14 @@
  "predicate_type": "rea.reconstruction-obligation-ledger",
  "operation": "build_reconstruction_obligation_ledger",
  "parameters": {
-  "ledger_id": "rol_125b3c35399a73ff066ca1fd4d97f70d4e52aca7cf0c0fdb9b7965ceff79bed4",
-  "closure_digest": "e05e595be51ec1abdc72886fa0c9da6f19905926f31429c60a793a5236caa798"
+  "ledger_id": "rol_49f54e05ee0a3e17e3faa3e5e4bd5401853fb633722d4cd5e0246204d09bd6a9",
+  "closure_digest": "19b82cb79ece67e66e9ac1eb777fb9e5ba66ab0e2e25a03b6daf53dd096bc5d8"
  },
  "raw_result": null,
  "normalized_result": {
   "schema": "ReconstructionObligationLedger",
-  "ledger_id": "rol_125b3c35399a73ff066ca1fd4d97f70d4e52aca7cf0c0fdb9b7965ceff79bed4",
-  "closure_digest": "e05e595be51ec1abdc72886fa0c9da6f19905926f31429c60a793a5236caa798",
+  "ledger_id": "rol_49f54e05ee0a3e17e3faa3e5e4bd5401853fb633722d4cd5e0246204d09bd6a9",
+  "closure_digest": "19b82cb79ece67e66e9ac1eb777fb9e5ba66ab0e2e25a03b6daf53dd096bc5d8",
   "status": "unknown",
   "coverage": {
    "status": "complete"
@@ -30,7 +30,7 @@
    "by_status": [
     {
      "key": "unowned",
-     "count": 9
+     "count": 8
     },
     {
      "key": "characterized",
@@ -38,7 +38,7 @@
     },
     {
      "key": "implemented",
-     "count": 155
+     "count": 156
     },
     {
      "key": "verified",
@@ -130,7 +130,6 @@
     "obl_daed3482f28b1338c4b24af0b06e20c92b35ba464be5880f30abae626a409a4c",
     "obl_eb6068f82f03f0bf97a17534949fb7994d4b7b0e51ee834c4509b460b0e4ad34",
     "typora.beh.files.quicklook",
-    "typora.ctx.media",
     "typora.images.ipic",
     "typora.menu.edit.emoji",
     "typora.menu.edit.speech",
@@ -151,7 +150,6 @@
     "typora.beh.clip.rtf-paste",
     "typora.beh.files.asset-scope",
     "typora.beh.files.title-dirty",
-    "typora.ctx.emoji",
     "typora.ctx.text",
     "typora.export.pdf",
     "typora.menu.app.about",
@@ -400,6 +398,11 @@
     "obligation_id": "typora.ctx.framework",
     "module_path": "src/app/ctxmenu/targets.ts",
     "symbol": "export function contextTarget"
+   },
+   {
+    "obligation_id": "typora.ctx.media",
+    "module_path": "src/app/ctxmenu/targets.ts",
+    "symbol": "closest?.('video')"
    },
    {
     "obligation_id": "typora.beh.files.snapshot-undo",
@@ -3795,7 +3798,7 @@
      "owner": {
       "module_path": "src/app/ctxmenu/items.ts",
       "symbol": "block('para:insertBefore', 'Insert Paragraph Before')",
-      "owner_sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
+      "owner_sha256": "a21158ebb028c6f9311b9730e68711e71eb0459cbc78a0d4d856218e4b6e3423"
      },
      "parser_type": null,
      "original_cases": [
@@ -3854,7 +3857,7 @@
    {
     "obligation_id": "typora.ctx.emoji",
     "obligation_version": 1,
-    "title": "Emoji/inline-math context entries (copy emoji, copy inline math)",
+    "title": "Emoji/inline-math context entries (copy emoji, copy inline math, copy as image)",
     "origin": "reviewed",
     "application_layer": "application",
     "family": "ctx.emoji",
@@ -3862,21 +3865,21 @@
      "artifact_sha256": null,
      "application_node_id": null,
      "semantic_node_id": null,
-     "location": "Emoji/inline-math context entries (copy emoji, copy inline math)"
+     "location": "Emoji/inline-math context entries (copy emoji, copy inline math, copy as image)"
     },
     "authority_references": [
      {
-      "evidence_id": "ev_df4f5480f4a90274b4e671edb7c9b27feeb5d50b392911d4892fac5827c1a140",
+      "evidence_id": "ev_2dcfdda5e64014a5fbf45717baa72124a923220a54ed60b65b332207313f588c",
       "authority": "analyst-inference",
       "state": "reviewed",
-      "location": "/evidence/ev_df4f5480f4a90274b4e671edb7c9b27feeb5d50b392911d4892fac5827c1a140"
+      "location": "/evidence/ev_2dcfdda5e64014a5fbf45717baa72124a923220a54ed60b65b332207313f588c"
      }
     ],
     "source_state": "reviewed",
     "observed_cases": [
      {
       "kind": "positive",
-      "evidence_id": "ev_df4f5480f4a90274b4e671edb7c9b27feeb5d50b392911d4892fac5827c1a140",
+      "evidence_id": "ev_2dcfdda5e64014a5fbf45717baa72124a923220a54ed60b65b332207313f588c",
       "location": "clipboard-contextmenu §6.1"
      }
     ],
@@ -3892,44 +3895,66 @@
     "residual_unknown_ids": [],
     "unavailable_authority": [],
     "required_next_evidence": [
-     "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules.",
-     "Implement: inline math Copy Math ▸ Tex/MathML; Margin renders no :emoji: shortcodes, inline Copy as Image disabled"
+     "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules."
     ],
     "binding": {
      "obligation_id": "typora.ctx.emoji",
      "owner": {
       "module_path": "src/app/ctxmenu/items.ts",
       "symbol": "function copyMath",
-      "owner_sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
+      "owner_sha256": "a21158ebb028c6f9311b9730e68711e71eb0459cbc78a0d4d856218e4b6e3423"
      },
      "parser_type": null,
      "original_cases": [
       {
        "kind": "positive",
-       "evidence_id": "ev_df4f5480f4a90274b4e671edb7c9b27feeb5d50b392911d4892fac5827c1a140",
+       "evidence_id": "ev_2dcfdda5e64014a5fbf45717baa72124a923220a54ed60b65b332207313f588c",
        "location": "clipboard-contextmenu §6.1"
       }
      ],
-     "fixtures": [],
-     "verifier": null
+     "fixtures": [
+      {
+       "fixture_id": "ctx.emoji.positive",
+       "case_kind": "positive",
+       "authority": "renderer",
+       "evidence_ids": [
+        "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       ]
+      }
+     ],
+     "verifier": {
+      "verifier_id": "margin.playwright.ctx.emoji",
+      "claim_id": "claim.ctx.emoji",
+      "command": "npx playwright test tests/e2e/parity-ctx.spec.ts -g \"ctx.emoji:\"",
+      "authority": "renderer",
+      "status": "pass",
+      "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+      "enumerated_obligation_ids": [
+       "typora.ctx.emoji"
+      ],
+      "nondeterminism": {
+       "mode": "total-order",
+       "specification": "Single deterministic suite run; pass = suite exited 0 with the named test not skipped."
+      }
+     }
     },
     "status": "implemented",
     "diagnostics": [
-     {
-      "code": "missing-case",
-      "detail": "Required positive fixture is missing."
-     },
-     {
-      "code": "missing-verifier",
-      "detail": "No verifier claim is bound to this obligation."
-     },
      {
       "code": "static-only",
       "detail": "No static authority characterizes the original finite behavior."
      },
      {
+      "code": "weak-fixture-authority",
+      "detail": "positive fixture lacks renderer authority or authenticated Evidence."
+     },
+     {
       "code": "weak-original-case-authority",
       "detail": "Original positive behavior lacks static Evidence."
+     },
+     {
+      "code": "weak-verifier-authority",
+      "detail": "Verifier authority does not satisfy renderer."
      }
     ]
    },
@@ -4085,7 +4110,7 @@
      "owner": {
       "module_path": "src/app/ctxmenu/items.ts",
       "symbol": "label: 'Copy Link Address'",
-      "owner_sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
+      "owner_sha256": "a21158ebb028c6f9311b9730e68711e71eb0459cbc78a0d4d856218e4b6e3423"
      },
      "parser_type": null,
      "original_cases": [
@@ -4144,7 +4169,7 @@
    {
     "obligation_id": "typora.ctx.media",
     "obligation_version": 1,
-    "title": "Media context entries: play / pause / download video",
+    "title": "Video context entries: Save Video As… after the system items",
     "origin": "reviewed",
     "application_layer": "application",
     "family": "ctx.media",
@@ -4152,48 +4177,96 @@
      "artifact_sha256": null,
      "application_node_id": null,
      "semantic_node_id": null,
-     "location": "Media context entries: play / pause / download video"
+     "location": "Video context entries: Save Video As… after the system items"
     },
     "authority_references": [
      {
-      "evidence_id": "ev_43cbeb858316569ae8f19d45e01657b3791c4fe35633c693f5f4e495cf98c9ef",
+      "evidence_id": "ev_f55ba63d73378d6805d3d6f54d96454f4f4f0d74c1e79ebd932216334cb7330b",
       "authority": "analyst-inference",
       "state": "reviewed",
-      "location": "/evidence/ev_43cbeb858316569ae8f19d45e01657b3791c4fe35633c693f5f4e495cf98c9ef"
+      "location": "/evidence/ev_f55ba63d73378d6805d3d6f54d96454f4f4f0d74c1e79ebd932216334cb7330b"
      }
     ],
     "source_state": "reviewed",
-    "observed_cases": [],
+    "observed_cases": [
+     {
+      "kind": "positive",
+      "evidence_id": "ev_f55ba63d73378d6805d3d6f54d96454f4f4f0d74c1e79ebd932216334cb7330b",
+      "location": "fe-contextmenus-tools §1.2"
+     }
+    ],
     "required": true,
     "required_case_kinds": [
      "positive"
     ],
     "required_original_authority": "static",
-    "required_fixture_authority": "renderer",
-    "required_verifier_authority": "renderer",
+    "required_fixture_authority": "unit",
+    "required_verifier_authority": "unit",
     "requires_parser_type": false,
     "dependency_obligation_ids": [],
     "residual_unknown_ids": [],
     "unavailable_authority": [],
     "required_next_evidence": [
-     "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules.",
-     "Add an e2e verifier that enumerates this obligation.",
-     "Implement: Media context entries: play / pause / download video"
+     "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules."
     ],
-    "binding": null,
-    "status": "unowned",
+    "binding": {
+     "obligation_id": "typora.ctx.media",
+     "owner": {
+      "module_path": "src/app/ctxmenu/targets.ts",
+      "symbol": "closest?.('video')",
+      "owner_sha256": "43daadbadb25c0206fe4887ce668f1fd4d153eabf43e73d25f61bb3da46c00e4"
+     },
+     "parser_type": null,
+     "original_cases": [
+      {
+       "kind": "positive",
+       "evidence_id": "ev_f55ba63d73378d6805d3d6f54d96454f4f4f0d74c1e79ebd932216334cb7330b",
+       "location": "fe-contextmenus-tools §1.2"
+      }
+     ],
+     "fixtures": [
+      {
+       "fixture_id": "ctx.media.positive",
+       "case_kind": "positive",
+       "authority": "unit",
+       "evidence_ids": [
+        "ev_fbff234ec48d7a423769c9e2d3ea5de846700e84dbbc2837733666f3e2eee501"
+       ]
+      }
+     ],
+     "verifier": {
+      "verifier_id": "margin.vitest.ctx.media",
+      "claim_id": "claim.ctx.media",
+      "command": "npx vitest run src/app/__tests__/ctxmenu.test.ts -t \"video and emoji targets\"",
+      "authority": "unit",
+      "status": "pass",
+      "result_evidence_id": "ev_fbff234ec48d7a423769c9e2d3ea5de846700e84dbbc2837733666f3e2eee501",
+      "enumerated_obligation_ids": [
+       "typora.ctx.media"
+      ],
+      "nondeterminism": {
+       "mode": "total-order",
+       "specification": "Single deterministic suite run; pass = suite exited 0 with the named test not skipped."
+      }
+     }
+    },
+    "status": "implemented",
     "diagnostics": [
-     {
-      "code": "missing-original-case",
-      "detail": "Original positive behavior has not been observed."
-     },
-     {
-      "code": "missing-owner",
-      "detail": "No reconstruction manifest binding owns this obligation."
-     },
      {
       "code": "static-only",
       "detail": "No static authority characterizes the original finite behavior."
+     },
+     {
+      "code": "weak-fixture-authority",
+      "detail": "positive fixture lacks unit authority or authenticated Evidence."
+     },
+     {
+      "code": "weak-original-case-authority",
+      "detail": "Original positive behavior lacks static Evidence."
+     },
+     {
+      "code": "weak-verifier-authority",
+      "detail": "Verifier authority does not satisfy unit."
      }
     ]
    },
@@ -4246,7 +4319,7 @@
      "owner": {
       "module_path": "src/app/ctxmenu/items.ts",
       "symbol": "label: 'Copy / Paste As…'",
-      "owner_sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
+      "owner_sha256": "a21158ebb028c6f9311b9730e68711e71eb0459cbc78a0d4d856218e4b6e3423"
      },
      "parser_type": null,
      "original_cases": [
@@ -5921,7 +5994,7 @@
      "owner": {
       "module_path": "src/app/ctxmenu/items.ts",
       "symbol": "Open Image Location",
-      "owner_sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
+      "owner_sha256": "a21158ebb028c6f9311b9730e68711e71eb0459cbc78a0d4d856218e4b6e3423"
      },
      "parser_type": null,
      "original_cases": [
@@ -16492,7 +16565,7 @@
      "owner": {
       "module_path": "src/app/ctxmenu/items.ts",
       "symbol": "'Delete Code Block'",
-      "owner_sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
+      "owner_sha256": "a21158ebb028c6f9311b9730e68711e71eb0459cbc78a0d4d856218e4b6e3423"
      },
      "parser_type": null,
      "original_cases": [
@@ -18080,6 +18153,7 @@
    "ev_2bfd37b7ac78629a1a8303889452f5ff14da581c3e0147b6c135fd307638aa53",
    "ev_2c3a102fc016c63e88353f5e0f662201f2adcdd205e3e5eedaab2d4db3205990",
    "ev_2cdb84bedffe598ed99053f40660572101657f97e5934d9e5610e5b8212b3456",
+   "ev_2dcfdda5e64014a5fbf45717baa72124a923220a54ed60b65b332207313f588c",
    "ev_2de768edb2decbc991458518769db69fa3b3b66e456768f075966f32d0518035",
    "ev_314ef36ad3a63a5024f1777c4c38fd700c0fe2bc2930ebc1154171876a967597",
    "ev_31b4d097d5c79785186b28ead5846b1753552c19960daf83dbeebc7c6e9f0c54",
@@ -18100,7 +18174,6 @@
    "ev_3fb8b84cee7279d523a2c19c8441384de2e266aa5ed455b1a6a8c68889ae3be1",
    "ev_41a86ed70f7d352fd1fd4ee4c8fc8d5ed2b1ee32ef2fd8ceb10510601f0c962e",
    "ev_4341a61451354b6c0655830d4b36b6e65cf1f0ef15713d67825e30b7d9413a49",
-   "ev_43cbeb858316569ae8f19d45e01657b3791c4fe35633c693f5f4e495cf98c9ef",
    "ev_458ac6b997a37b852f60228dfea7c1aa22be6b22d999b4a80609d9d097c768ed",
    "ev_48cef36056f7d963046645e2256be9bd5ddb6f50a2d84c19aca934e0903f489a",
    "ev_4ac8f85846afce7299ee1995f6c9d771aa25470f2e3edce8a921a5a5631c0504",
@@ -18198,7 +18271,6 @@
    "ev_d8a65e114dd0a62d01ed1519a5bb1298a931c96600f0cafbfed9177771e74847",
    "ev_dacf0faf0df8a387b8d87a7c1eb81deef222213ebc89ea6a307d1cd986beb8c0",
    "ev_decd579e1e9bdbe5b174eda3e5d9f2b7ed739be69527caf274c4ef71c5494fb3",
-   "ev_df4f5480f4a90274b4e671edb7c9b27feeb5d50b392911d4892fac5827c1a140",
    "ev_e046fa3a88b3a8ab6966891891417352e94ef17025ff3ecbab2cd8eee6ec7730",
    "ev_e1210a485b4cceb4e2aab5aeceda17396238695557347cf0c0ed692fc2ef3593",
    "ev_e3541f91887a80c9fa7e848ff27b7846123160ed2e35712802f54c516e7b3ab4",
@@ -18210,6 +18282,7 @@
    "ev_ed434c97506d18f834b446e072875525dcee504ad371d8e184fd7217dbbf244c",
    "ev_f4157d50cf77f67ec4ec0148aa5fee7d38203171433309534b5eaeb149724f5d",
    "ev_f50c83ee06941fa3a6c18b39b820330dbb4967ec16e8cdfc6bc7de5255b66ace",
+   "ev_f55ba63d73378d6805d3d6f54d96454f4f4f0d74c1e79ebd932216334cb7330b",
    "ev_f72a1c6a65fe42351288b9ad61ee6cc16ee4dbcd560fc19cde83666d7e2256fd",
    "ev_f915a919a67e0bd6a4da0d9cc655ad5297aa4a298fed727761388011a0eaa30f",
    "ev_f9c10eff1055cd2246addd46f5478402628d14660e97906e1be0fb96718d6af3",
@@ -18269,6 +18342,7 @@
   "ev_2bfd37b7ac78629a1a8303889452f5ff14da581c3e0147b6c135fd307638aa53",
   "ev_2c3a102fc016c63e88353f5e0f662201f2adcdd205e3e5eedaab2d4db3205990",
   "ev_2cdb84bedffe598ed99053f40660572101657f97e5934d9e5610e5b8212b3456",
+  "ev_2dcfdda5e64014a5fbf45717baa72124a923220a54ed60b65b332207313f588c",
   "ev_2de768edb2decbc991458518769db69fa3b3b66e456768f075966f32d0518035",
   "ev_314ef36ad3a63a5024f1777c4c38fd700c0fe2bc2930ebc1154171876a967597",
   "ev_31b4d097d5c79785186b28ead5846b1753552c19960daf83dbeebc7c6e9f0c54",
@@ -18289,7 +18363,6 @@
   "ev_3fb8b84cee7279d523a2c19c8441384de2e266aa5ed455b1a6a8c68889ae3be1",
   "ev_41a86ed70f7d352fd1fd4ee4c8fc8d5ed2b1ee32ef2fd8ceb10510601f0c962e",
   "ev_4341a61451354b6c0655830d4b36b6e65cf1f0ef15713d67825e30b7d9413a49",
-  "ev_43cbeb858316569ae8f19d45e01657b3791c4fe35633c693f5f4e495cf98c9ef",
   "ev_458ac6b997a37b852f60228dfea7c1aa22be6b22d999b4a80609d9d097c768ed",
   "ev_48cef36056f7d963046645e2256be9bd5ddb6f50a2d84c19aca934e0903f489a",
   "ev_4ac8f85846afce7299ee1995f6c9d771aa25470f2e3edce8a921a5a5631c0504",
@@ -18387,7 +18460,6 @@
   "ev_d8a65e114dd0a62d01ed1519a5bb1298a931c96600f0cafbfed9177771e74847",
   "ev_dacf0faf0df8a387b8d87a7c1eb81deef222213ebc89ea6a307d1cd986beb8c0",
   "ev_decd579e1e9bdbe5b174eda3e5d9f2b7ed739be69527caf274c4ef71c5494fb3",
-  "ev_df4f5480f4a90274b4e671edb7c9b27feeb5d50b392911d4892fac5827c1a140",
   "ev_e046fa3a88b3a8ab6966891891417352e94ef17025ff3ecbab2cd8eee6ec7730",
   "ev_e1210a485b4cceb4e2aab5aeceda17396238695557347cf0c0ed692fc2ef3593",
   "ev_e3541f91887a80c9fa7e848ff27b7846123160ed2e35712802f54c516e7b3ab4",
@@ -18399,6 +18471,7 @@
   "ev_ed434c97506d18f834b446e072875525dcee504ad371d8e184fd7217dbbf244c",
   "ev_f4157d50cf77f67ec4ec0148aa5fee7d38203171433309534b5eaeb149724f5d",
   "ev_f50c83ee06941fa3a6c18b39b820330dbb4967ec16e8cdfc6bc7de5255b66ace",
+  "ev_f55ba63d73378d6805d3d6f54d96454f4f4f0d74c1e79ebd932216334cb7330b",
   "ev_f72a1c6a65fe42351288b9ad61ee6cc16ee4dbcd560fc19cde83666d7e2256fd",
   "ev_f915a919a67e0bd6a4da0d9cc655ad5297aa4a298fed727761388011a0eaa30f",
   "ev_f9c10eff1055cd2246addd46f5478402628d14660e97906e1be0fb96718d6af3",
