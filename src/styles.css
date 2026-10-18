@@ -619,6 +619,14 @@ button { cursor: default; }
 .list-ext { opacity: 0.5; font-weight: 400; }
 .list-summary { white-space: pre-line; }
 .outline-header[hidden] { display: none; }
+.outline-titlebar { display: flex; align-items: center; gap: 4px; padding: 4px 10px 6px; }
+.outline-title { font-size: 11px; font-weight: 600; color: var(--margin-fg-muted); text-transform: uppercase; letter-spacing: 0.04em; flex: 1; }
+.outline-pin { margin-left: auto; }
+.outline-pin svg { width: 13px; height: 13px; }
+.outline[data-pinned='false'] .outline-titlebar { border-bottom: 1px solid var(--margin-border); }
+.outline-dropdown { position: fixed; top: 40px; left: 8px; width: 260px; max-height: 60vh; display: flex; flex-direction: column; background: var(--margin-bg); border: 1px solid var(--margin-border); border-radius: 10px; box-shadow: 0 12px 32px color-mix(in srgb, #000 25%, transparent); z-index: 60; overflow: hidden; }
+.outline-dropdown .outline { flex: 1; overflow: auto; }
+.dialog-checkbox { display: flex; align-items: center; gap: 6px; margin: 8px 0 0; font-size: 12px; color: var(--margin-fg-muted); cursor: pointer; }
 .outline-item.flash { animation: flash 0.7s var(--ease) 3; }
 .outline-text mark { background: color-mix(in srgb, var(--margin-accent) 25%, transparent); color: inherit; border-radius: 2px; }
 .search-more { border: 0; background: none; color: var(--margin-accent); font-size: 11.5px; padding: 2px 18px; }

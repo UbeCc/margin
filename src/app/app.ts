@@ -86,6 +86,7 @@ export class App {
   private findbar!: FindBar;
   private status!: StatusBar;
   private tabs: Record<'files' | 'outline', HTMLButtonElement> = {} as never;
+  private outlineDropdown: HTMLElement | null = null;
 
   private unwatchFolder: (() => void) | null = null;
   /** Non-blocking "changed on disk" prompt (#82). */
@@ -302,10 +303,10 @@ export class App {
       ],
       cancelId: 'cancel',
     });
-    if (r !== 'create' && this.settings.recentFiles.includes(path)) {
+    if (r.id !== 'create' && this.settings.recentFiles.includes(path)) {
       this.updateSettings({ recentFiles: this.settings.recentFiles.filter((x) => x !== path) });
     }
-    return r === 'create';
+    return r.id === 'create';
   }
 
   /** Oversize documents open in source code mode (#94, Typora's "oversize" mode). */
@@ -406,6 +407,8 @@ export class App {
       openFolderDialog: () => void this.run('openFolder'),
       openFolder: (p) => void this.openFolder(p),
       recentFolders: () => this.settings.recentFolders,
+      moveConfirm: () => this.settings.confirmSidebarMove,
+      onMoveConfirmSuppressed: () => this.updateSettings({ confirmSidebarMove: false }),
     });
     this.tree = this.files.tree;
     this.outline = new OutlineView(
@@ -414,7 +417,12 @@ export class App {
         this.editor.scrollToHeading(id);
         this.outline.setActive(id);
       },
-      { collapsible: this.settings.outlineCollapsible, onCollapsibleChange: (on) => this.updateSettings({ outlineCollapsible: on }) },
+      {
+        collapsible: this.settings.outlineCollapsible,
+        onCollapsibleChange: (on) => this.updateSettings({ outlineCollapsible: on }),
+        pinned: this.settings.outlinePinned,
+        onPinnedChange: (on) => this.setOutlinePinned(on),
+      },
     );
 
     const tab = (id: 'files' | 'outline', label: string): HTMLButtonElement =>
@@ -527,8 +535,55 @@ export class App {
   }
 
   private showSidebarTab(id: 'files' | 'outline'): void {
+    this.closeOutlineDropdown();
     this.updateSettings({ sidebarTab: id, sidebarVisible: true });
     if (id === 'outline') this.refreshOutline();
+  }
+
+  /**
+   * Outline pin/unpin (#131, fe-sidebar §10): unpinning hides the sidebar and
+   * shows the outline as a floating drop-down; pinning restores the sidebar
+   * "Outline" tab. The drop-down closes on Escape / outside click and reopens
+   * from View ▸ Outline (or the status-bar toggle) while unpinned.
+   */
+  private setOutlinePinned(on: boolean): void {
+    if (on) {
+      this.closeOutlineDropdown();
+      this.updateSettings({ outlinePinned: true, sidebarTab: 'outline', sidebarVisible: true });
+      this.refreshOutline();
+    } else {
+      this.updateSettings({ outlinePinned: false, sidebarVisible: false });
+      this.openOutlineDropdown();
+    }
+  }
+
+  private openOutlineDropdown(): void {
+    if (!this.outlineDropdown) {
+      this.outlineDropdown = h('div.outline-dropdown', { 'aria-label': 'Outline' });
+      const onDocClick = (e: MouseEvent): void => {
+        if (this.outlineDropdown?.contains(e.target as Node)) return;
+        this.closeOutlineDropdown();
+      };
+      const onKey = (e: KeyboardEvent): void => {
+        if (e.key !== 'Escape') return;
+        e.stopPropagation();
+        this.closeOutlineDropdown();
+      };
+      document.addEventListener('mousedown', onDocClick, true);
+      document.addEventListener('keydown', onKey, true);
+    }
+    this.outlineDropdown.replaceChildren(this.outline.el);
+    this.root.appendChild(this.outlineDropdown);
+    this.refreshOutline();
+  }
+
+  private closeOutlineDropdown(): void {
+    const dd = this.outlineDropdown;
+    if (!dd) return;
+    this.outlineDropdown = null;
+    // Put the outline back into its sidebar panel (hidden while the sidebar is).
+    this.root.querySelector('.sidebar-panel[data-panel="outline"]')?.appendChild(this.outline.el);
+    dd.remove();
   }
 
   private refreshOutline(): void {
@@ -647,7 +702,7 @@ export class App {
         { id: 'save', label: 'Save', primary: true },
       ],
       cancelId: 'cancel',
-    });
+    }).then((r) => r.id);
   }
 
   private async askReloadDirty(name: string): Promise<boolean> {
@@ -660,7 +715,7 @@ export class App {
       ],
       cancelId: 'keep',
     });
-    return r === 'reload';
+    return r.id === 'reload';
   }
 
   /**
@@ -951,8 +1006,15 @@ export class App {
         this.updateSettings({ sidebarVisible: !this.settings.sidebarVisible });
         return true;
       case 'showFiles':
+      case 'showFiles':
       case 'showOutline': {
         const tab = id === 'showFiles' ? 'files' : 'outline';
+        if (tab === 'outline' && !this.settings.outlinePinned) {
+          // Unpinned: the drop-down outline replaces the sidebar tab (#131).
+          if (this.outlineDropdown) this.closeOutlineDropdown();
+          else this.openOutlineDropdown();
+          return true;
+        }
         if (this.settings.sidebarVisible && this.settings.sidebarTab === tab) this.updateSettings({ sidebarVisible: false });
         else this.showSidebarTab(tab);
         return true;

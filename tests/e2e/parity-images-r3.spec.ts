@@ -33,6 +33,8 @@ const setDoc = (page: Page, md: string) => page.evaluate((m) => (window as unkno
 const menu = (page: Page, a: string) => page.evaluate((x) => (window as unknown as Win).__MARGIN_WEB__.triggerMenu(x), a);
 
 test.beforeEach(async ({ page }) => {
+  // Fake CDN host: fail fast (see parity-images.spec.ts).
+  await page.route(/^(https?:\/\/cdn\.example\b.*)$/, (r) => r.fulfill({ status: 404, body: '' }));
   await boot(page);
   await putPng(page, '/pics/shot.png');
 });

@@ -1,7 +1,7 @@
 import type { DirEntry, Platform } from '../../contracts';
 import { h, clearChildren } from '../util/dom';
 import { basename, dirname, extname, relative, stripExt } from '../util/path';
-import { showContextMenu } from '../ui/contextmenu';
+import { showContextMenu, type MenuItem } from '../ui/contextmenu';
 import { extras } from '../platform-extras';
 import { compareBy, DEFAULT_SORT, type SortOrder } from './sort';
 import { collectDocs, dateLabel, LIST_LIMIT, summarize } from './walk';
@@ -10,6 +10,8 @@ import { makeDraggable } from './drag';
 export interface FileListHost {
   platform: Platform;
   openFile(path: string): void;
+  /** Items spliced before the first separator (the tree's "Undo %@", #131). */
+  leadingMenuItems?(): MenuItem[];
 }
 
 /**
@@ -137,12 +139,21 @@ export class FileList {
     row.addEventListener('contextmenu', (e) => {
       e.preventDefault();
       const p = extras(this.host.platform);
-      showContextMenu(e.clientX, e.clientY, [
+      const items: MenuItem[] = [
         { label: 'Open', run: () => this.host.openFile(d.path) },
+        // Quick Look after Open, like the tree (#131).
+        { label: 'Quick Look', run: () => void p.quickLook?.(d.path), disabled: !p.quickLook },
         { separator: true },
         { label: 'Copy Path', run: () => void navigator.clipboard?.writeText(d.path) },
         { label: 'Reveal in Finder', run: () => void p.revealInFolder?.(d.path), disabled: !p.revealInFolder },
-      ]);
+      ];
+      // The tree's undoable op also leads the Articles menu (fe-sidebar §6).
+      const lead = this.host.leadingMenuItems?.() ?? [];
+      if (lead.length) {
+        const i = items.findIndex((it) => 'separator' in it);
+        items.splice(i < 0 ? items.length : i, 0, ...lead);
+      }
+      showContextMenu(e.clientX, e.clientY, items);
     });
     this.rows.set(d.path, row);
     return row;
@@ -155,6 +166,7 @@ export class FileList {
     if (e.key === 'ArrowDown') rows[Math.min(rows.length - 1, i + 1)].focus();
     else if (e.key === 'ArrowUp') rows[Math.max(0, i - 1)].focus();
     else if (e.key === 'Enter' && i >= 0) rows[i].click();
+    else if (e.key === ' ' && i >= 0) void extras(this.host.platform).quickLook?.(rows[i].dataset.path ?? '');
     else return;
     e.preventDefault();
   }

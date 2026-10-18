@@ -18,6 +18,7 @@ mod pandoc_import;
 mod drop_macos;
 #[cfg(target_os = "macos")]
 mod pdf_macos;
+mod quicklook_macos;
 #[cfg(target_os = "macos")]
 mod pdf_post_macos;
 mod quick_open;
@@ -429,6 +430,7 @@ pub fn run() {
             clipboard_macos::clipboard_write_rich,
             clipboard_macos::clipboard_write_image,
             clipboard_read::clipboard_read,
+            quicklook_macos::quick_look_file,
         ])
         .setup(|app| {
             let handle = app.handle().clone();

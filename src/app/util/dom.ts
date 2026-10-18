@@ -72,6 +72,7 @@ export const ICONS = {
   caseSensitive: 'M2 12l2.5-7 2.5 7M2.8 10h3.4M10.5 8.5a1.7 1.7 0 1 1 0 3.4 1.7 1.7 0 0 1 0-3.4zM12.2 7.5v4.5',
   wholeWord: 'M1.5 12.5v1.5h13v-1.5M4 4l1.5 6 1.5-4 1.5 4L10 4M12 5.5h1.5',
   regex: 'M11 2.5v5M8.8 3.8l4.4 2.4M8.8 6.2l4.4-2.4M4 11.5h.01',
+  pin: 'M9.5 1.5L7.5 3.5 5 3l.5 2.5L3.5 7.5 1.5 5.5 1 6l4 6 .5 3 1.5-1.5L14 5l.5-.5z',
 } as const;
 
 export function clearChildren(el: Element): void {

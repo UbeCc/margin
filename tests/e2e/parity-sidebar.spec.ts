@@ -153,6 +153,7 @@ test('sidebar.drag: Drag files from sidebar into the editor / other apps; drop f
   await expect.poll(() => editorValue(page)).toContain('[Roadmap](Ideas/Roadmap.md)');
   // Onto a folder: move it there (open document path follows).
   await tree(page).locator(`.tree-row[data-path="${ROOT}/notes.txt"]`).dragTo(tree(page).locator(`.tree-row[data-path="${ROOT}/Journal"]`));
+  await page.locator('.modal-card button[data-id=move]').click(); // #131: move confirmation
   await expect(tree(page).locator(`.tree-row[data-path="${ROOT}/Journal/notes.txt"]`)).toBeVisible();
   await expect(tree(page).locator(`.tree-row[data-path="${ROOT}/notes.txt"]`)).toHaveCount(0);
   // Negative: dropping a folder into itself is refused.
