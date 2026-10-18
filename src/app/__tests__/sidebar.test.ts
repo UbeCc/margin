@@ -85,7 +85,7 @@ describe('sidebar search', () => {
 });
 
 describe('outline tree', () => {
-  const hs = [
+  const hs: { level: 1 | 2 | 3; text: string }[] = [
     { level: 1, text: 'Intro' },
     { level: 2, text: 'Setup' },
     { level: 3, text: 'Install' },
