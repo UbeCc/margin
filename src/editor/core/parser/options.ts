@@ -28,7 +28,17 @@ export function resetSyntaxOptions(): void {
 /** Options that change parse trees (block or inline). */
 export const PARSER_KEYS: ReadonlySet<keyof MarkdownOptions> = new Set<keyof MarkdownOptions>([
   'highlight', 'subscript', 'superscript', 'inlineMath', 'emoji', 'strict',
+  'remapPunctuation', 'smartPunctuation', 'smartQuote', 'smartDash',
 ]);
+
+/**
+ * Remap Unicode Punctuation on Parse (#133, fe-preferences §10): on when the box
+ * is checked, or forced by smart quotes/dashes in Convert-on-Input mode.
+ */
+export function remapOn(): boolean {
+  const o = syntaxOptions;
+  return o.remapPunctuation || (o.smartPunctuation === 'input' && (o.smartQuote || o.smartDash));
+}
 
 /** Common GitHub-style emoji shortcodes (rendered only; the `:code:` source stays). */
 export const EMOJI: Readonly<Record<string, string>> = {

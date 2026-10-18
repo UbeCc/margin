@@ -6,7 +6,7 @@
 
 export type WrapTag = 'em' | 'strong' | 'del' | 'mark' | 'code' | 'link' | 'fnref' | 'u' | 'sub' | 'sup';
 
-import { syntaxOptions as OPT, EMOJI } from './options';
+import { syntaxOptions as OPT, EMOJI, remapOn } from './options';
 
 export type INode =
   | { k: 'text'; v: string }
@@ -71,6 +71,8 @@ function matchBracket(s: string, i: number): number {
   return -1;
 }
 
+/** #133 remap: opening curly quote → its closing partner (link titles). */
+const CURLY_TITLE_CLOSE: Record<string, string> = { '‘': '’', '“': '”', '’': '’', '”': '”' };
 /** Parse `(dest "title")` at s[i] === '('. Returns end index (exclusive) or -1. */
 function parseDest(s: string, i: number): { end: number; href: string; title?: string } | null {
   let j = i + 1;
@@ -99,10 +101,11 @@ function parseDest(s: string, i: number): { end: number; href: string; title?: s
   skip();
   let title: string | undefined;
   const q = s[j];
-  if ((q === '"' || q === "'" || q === '(') && j > beforeTitle) {
-    const close = q === '(' ? ')' : q;
+  const close = q === '(' ? ')' : remapOn() ? CURLY_TITLE_CLOSE[q] : undefined;
+  if ((q === '"' || q === "'" || q === '(' || close) && j > beforeTitle) {
+    const end = close ?? q;
     let e = j + 1;
-    while (e < s.length && s[e] !== close) e += s[e] === '\\' ? 2 : 1;
+    while (e < s.length && s[e] !== end) e += s[e] === '\\' ? 2 : 1;
     if (e >= s.length) return null;
     title = s.slice(j + 1, e);
     j = e + 1;

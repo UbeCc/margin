@@ -84,6 +84,18 @@ export interface MarkdownOptions {
   codeLineWrap: boolean;
   /** Spaces per tab in code fences; 0 = Preserve tabs. */
   codeIndentSize: 0 | 2 | 3 | 4;
+  /** Smart Punctuation: 'input' converts while typing (saved curly), 'rendering' only displays (#133). */
+  smartPunctuation: 'input' | 'rendering';
+  smartQuote: boolean;
+  smartDash: boolean;
+  /** Remap Unicode Punctuation on Parse (also forced on by input-mode smart quotes/dashes). */
+  remapPunctuation: boolean;
+  /** Editor › Indent Size on Save: 0 Auto (treated as 2), 2–5 spaces, -1 Tab (#132). */
+  indentSize: -1 | 0 | 2 | 3 | 4 | 5;
+  /** Pad generated markers so text aligns to the indent width (`>   Quote`). */
+  prettyIndent: boolean;
+  /** Heading style for generated markdown: plain ATX, closing `#` run, or setext (levels 1–2). */
+  headingStyle: 'atx' | 'atxSuffix' | 'setext' | 'setextVar';
   /** Math: equation numbering, physics macros, "Apply Line Break at \\ and \newline" in display math. */
   mathNumbering: 'all' | 'ams' | 'none';
   mathPhysics: boolean;
@@ -113,6 +125,13 @@ export const DEFAULT_MARKDOWN_OPTIONS: Readonly<MarkdownOptions> = Object.freeze
   codeLineNumbers: false,
   codeLineWrap: true,
   codeIndentSize: 4,
+  smartPunctuation: 'input',
+  smartQuote: false,
+  smartDash: false,
+  remapPunctuation: false,
+  indentSize: 0,
+  prettyIndent: false,
+  headingStyle: 'atx',
   mathNumbering: 'ams',
   mathPhysics: false,
   mathLineBreaks: true,
