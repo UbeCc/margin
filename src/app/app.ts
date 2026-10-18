@@ -1,5 +1,5 @@
 import { ExternalChangeBanner } from './ui/extchange';
-import type { EditorHandle, EditorSettings, MenuAction, Platform } from '../contracts';
+import type { EditorHandle, EditorSettings, ImageMenuAction, MenuAction, Platform } from '../contracts';
 import type { Wiring } from './wiring';
 import { COMMANDS, commandForKey, commandSpec, isCommandId, type CommandId } from './commands';
 import { DocumentController, type DocState } from './document';
@@ -25,6 +25,7 @@ import { PANDOC_ACTIONS, type PandocFormat } from './export-pandoc';
 import { closeContextMenu } from './ui/contextmenu';
 import { EditorContextMenu } from './ctxmenu';
 import { ImageUploader } from './upload-actions';
+import { ImageFeature } from './images/feature';
 import { debounce, h } from './util/dom';
 import { fuzzyFilter, fuzzyMatch } from './util/fuzzy';
 import { formatShortcut, isMac } from './util/keymap';
@@ -56,6 +57,8 @@ export class App {
   private sidebar!: HTMLElement;
   private editorHost!: HTMLElement;
   private uploader!: ImageUploader;
+  private images!: ImageFeature;
+  private syncImagesSoon = debounce(() => this.images.sync(), 300);
   private scroller!: HTMLElement;
   private tree!: FileTree;
   private outline!: OutlineView;
@@ -120,8 +123,22 @@ export class App {
       editor: () => this.editor,
       baseDir: () => this.doc.dir,
       settings: () => this.settings,
-      notify: (m, k) => void toast(m, { kind: k }),
+      notify: (m, k, action) => void toast(m, { kind: k, ...(action ? { action } : {}) }),
     });
+    // #99: image rules, Format › Image, image context menu, typora-root-url.
+    this.images = new ImageFeature({
+      platform: extras(this.platform) as Platform & ReturnType<typeof extras>,
+      editor: () => this.editor,
+      editorRoot: () => this.editorHost,
+      docPath: () => this.doc.path,
+      settings: () => this.settings,
+      uploader: this.uploader,
+      notify: (m, k, action) => void toast(m, { kind: k, ...(action ? { action } : {}) }),
+      saveAs: () => void this.doc.saveAs(),
+      openImagePreferences: () => this.preferences('images'),
+      resolveAsset: (src) => this.resolveAsset(src),
+    });
+    this.images.attach(this.editorHost);
     // #97: editor context menus (text, link, image, table, code, math, diagram, atomic blocks).
     new EditorContextMenu(
       {
@@ -136,6 +153,7 @@ export class App {
       this.editorHost,
     ).attach();
     this.editor.onChange(() => {
+      this.syncImagesSoon();
       this.refreshFindSoon();
       this.refreshOutlineSoon();
       this.refreshStatsSoon();
@@ -454,7 +472,8 @@ export class App {
   private printSetup: PrintSetup = { ...DEFAULT_PRINT_SETUP };
 
   private resolveAsset(src: string): string {
-    const p = resolveDocPath(src, this.doc?.dir ?? null);
+    const rooted = this.images?.resolvePath(src);
+    const p = rooted !== undefined ? rooted : resolveDocPath(src, this.doc?.dir ?? null);
     if (!p) return src;
     if (this.exportDir && isAbsolute(src.trim())) return src; // absolute paths stay absolute
     if (this.exportDir) return encodeURI(relativeFrom(this.exportDir, p)).replace(/[?#]/g, encodeURIComponent);
@@ -468,21 +487,8 @@ export class App {
     return this.platform.assetUrl(p);
   }
 
-  private async storeImage(input: { bytes?: Uint8Array; mime?: string; path?: string; name?: string }): Promise<string | null> {
-    const rule = this.settings.imageRule;
-    try {
-      return await this.platform.storeImage(this.doc.path, rule, input);
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      if (!this.doc.path && rule.kind === 'relative') {
-        if (input.path) return input.path; // keep the original file until saved
-        toast('Save the document first so pasted images can be stored next to it.', {
-          kind: 'warning',
-          action: { label: 'Save As…', run: () => void this.doc.saveAs() },
-        });
-      } else toast(`Couldn't insert image: ${msg}`, { kind: 'error' });
-      return null;
-    }
+  private storeImage(input: { bytes?: Uint8Array; mime?: string; path?: string; name?: string }): Promise<string | null> {
+    return this.images.store(input);
   }
 
   private async openLink(href: string): Promise<void> {
@@ -596,6 +602,7 @@ export class App {
     if (id.startsWith('delete:')) return ed.exec({ kind: 'delete', scope: id.slice(7) as 'word' });
     if (id.startsWith('jump:')) return ed.exec({ kind: 'jump', to: id.slice(5) as 'top' });
     if (id === 'pastePlain') return this.pastePlain();
+    if (id.startsWith('image:')) return this.images.run(id.slice(6) as ImageMenuAction);
     if (id.startsWith('theme:')) {
       const name = id.slice(6);
       if (!(name in this.themes.themes)) return false;
@@ -742,7 +749,7 @@ export class App {
     return false;
   }
 
-  private preferences(section?: 'export' | 'files'): void {
+  private preferences(section?: 'export' | 'files' | 'images'): void {
     openPreferences({
       settings: () => this.settings,
       update: (p) => this.updateSettings(p),
@@ -760,6 +767,10 @@ export class App {
         } catch (e) {
           return e instanceof Error ? e.message : String(e);
         }
+      },
+      testUploader: (config) => {
+        const test = extras(this.platform).testUploader;
+        return test ? test.call(this.platform, config) : Promise.reject(new Error('Image upload is only available in the desktop app.'));
       },
     }, section);
   }

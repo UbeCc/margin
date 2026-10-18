@@ -294,6 +294,12 @@ export function execCommand(ed: EditorCore, cmd: EditorCommand): boolean {
       return copyAs(ed, cmd.format);
     case 'pastePlain':
       return pastePlain(ed);
+    case 'replaceRange': {
+      const n = ed.doc.text().length;
+      if (!(cmd.from >= 0 && cmd.from <= cmd.to && cmd.to <= n)) return false;
+      ed.replaceRange(cmd.from, cmd.to, cmd.text, null);
+      return true;
+    }
     case 'copyBlock':
       return copyBlock(ed, cmd.part);
     case 'insertTable':

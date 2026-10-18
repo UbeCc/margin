@@ -23,7 +23,10 @@ export interface EditorSettings {
   baseDir: string | null;
   /** Resolve a document-relative src to something the webview can load. */
   resolveAsset(src: string): string;
-  /** Called when the user pastes / drops image data or files. Returns the markdown src to insert. */
+  /**
+   * Called when the user pastes / drops image data or files. Returns the markdown src to insert,
+   * or (#99) a complete image snippet (`![alt](src)` / `<img …>`) that is inserted verbatim.
+   */
   storeImage?(input: { bytes?: Uint8Array; mime?: string; path?: string; name?: string }): Promise<string | null>;
   /** Open an external link. */
   openLink?(href: string): void;
@@ -70,6 +73,8 @@ export type EditorCommand =
   | { kind: 'jump'; to: 'top' | 'bottom' | 'selection' }
   | { kind: 'copyAs'; format: CopyAsFormat }
   | { kind: 'pastePlain' }
+  // #99 (additive): replace markdown offsets [from, to) of getMarkdown() with text, as one undo step.
+  | { kind: 'replaceRange'; from: number; to: number; text: string }
   // #97 (additive): copy the block at the caret — markdown source, or the inner text of a code / math fence
   | { kind: 'copyBlock'; part: 'source' | 'content' }
   // #98 (additive): block tools — Paragraph › Table / Code Tools / Math Tools
@@ -245,7 +250,17 @@ export type MenuAction =
   | 'table:insert'
   | `table:${TableOp}`
   | `code:${CodeOp}`
-  | `math:${MathOp}`;
+  | `math:${MathOp}`
+  // #99 (additive): Format › Image submenu
+  | `image:${ImageMenuAction}`;
+
+/** Format › Image entries (#99), in Typora's menu order; per-image ones act on the image at the caret. */
+export type ImageMenuAction =
+  | 'insert' | 'insertLocal' | 'openLocation' | 'copyContent'
+  | `zoom-${25 | 33 | 50 | 67 | 80 | 100 | 150 | 200}`
+  | 'syntaxMarkdown' | 'syntaxHtml' | 'deleteFile' | 'copyTo' | 'moveTo' | 'upload'
+  | 'copyAll' | 'moveAll' | 'uploadAll' | 'reloadAll'
+  | 'insertCopyToFolder' | 'insertUpload' | 'rootPath' | 'settings';
 
 /** PDF export options (#18 baseDir; #95 page geometry, header/footer, bookmarks, metadata). All optional. */
 export interface PdfExportOptions {

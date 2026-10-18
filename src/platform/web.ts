@@ -6,6 +6,7 @@ import {
   expandImageDir,
   extForImage,
   generatedImageName,
+  duplicateNames,
   joinPath,
   normalizePath,
   normalizeSettings,
@@ -132,7 +133,7 @@ export interface WebPlatformOptions {
   watchDelay?: number;
 }
 
-export type DialogHook = (kind: 'open' | 'openFolder' | 'save', opts?: unknown) => string | null | Promise<string | null>;
+export type DialogHook = (kind: 'open' | 'openFolder' | 'save' | 'openImages', opts?: unknown) => string | null | Promise<string | null>;
 
 export class WebPlatform implements Platform {
   readonly kind = 'web' as const;
@@ -354,11 +355,8 @@ export class WebPlatform implements Platform {
       const name = basename(input.path);
       dest = joinPath(targetDir, name);
       const existing = this.nodes.get(dest);
-      if (normalizePath(input.path) !== dest && existing && !(existing.kind === 'file' && existing.content === dataUrl)) {
-        const dot = name.lastIndexOf('.');
-        const [stem, ext] = dot > 0 ? [name.slice(0, dot), name.slice(dot)] : [name, ''];
-        for (let i = 1; this.nodes.has(dest); i++) dest = joinPath(targetDir, `${stem}-${i}${ext}`);
-      }
+      if (normalizePath(input.path) !== dest && existing && !(existing.kind === 'file' && existing.content === dataUrl))
+        dest = this.freeImageName(targetDir, name, dataUrl);
     } else {
       const ext = extForImage(input.mime, input.name);
       do dest = joinPath(targetDir, generatedImageName(ext));
@@ -370,6 +368,62 @@ export class WebPlatform implements Platform {
     if (input.bytes) await this.writeThroughBytes(dest, input.bytes);
     const rel = rule.kind === 'absolute' || !docPath ? dest : relativePath(dirname(docPath), dest);
     return toMarkdownSrc(rel);
+  }
+
+  /** Typora's duplicate rule; a same-named earlier duplicate with identical bytes is reused. */
+  private freeImageName(dir: string, name: string, content: string): string {
+    const dot = name.lastIndexOf('.');
+    const stem = (dot > 0 ? name.slice(0, dot) : name) + '-';
+    const ext = dot > 0 ? name.slice(dot) : '';
+    for (const [p, n] of this.nodes) {
+      const b = basename(p);
+      if (dirname(p) === dir && n.kind === 'file' && n.content === content && b.startsWith(stem) && b.endsWith(ext)) return p;
+    }
+    for (const cand of duplicateNames(name)) {
+      const d = joinPath(dir, cand);
+      const n = this.nodes.get(d);
+      if (!n || (n.kind === 'file' && n.content === content)) return d;
+    }
+    throw new Error('unreachable');
+  }
+
+  // ---- optional image tools (PlatformExtras, #99)
+
+  async copyImage(src: string, dir: string, opts?: { name?: string; move?: boolean }): Promise<string> {
+    const s = normalizePath(src);
+    const d = normalizePath(dir);
+    const node = this.nodes.get(s);
+    if (node?.kind !== 'file') throw new Error(`image not found: ${src}`);
+    if (this.nodes.get(d)?.kind === 'file') throw new Error(`${d} is a file, not a directory`);
+    let dest: string;
+    if (opts?.name) {
+      if (/[\\/]/.test(opts.name) || opts.name === '.' || opts.name === '..') throw new Error(`invalid file name: ${opts.name}`);
+      dest = joinPath(d, opts.name);
+      if (dest !== s && this.nodes.has(dest)) throw new Error(`${dest} already exists`);
+    } else if (dirname(s) === d) return s;
+    else dest = this.freeImageName(d, basename(s), node.content);
+    if (dest === s) return s;
+    const events: FsEvent[] = [];
+    if (!this.nodes.has(dest)) for (const c of this.putFile(dest, node.content, !!node.binary)) events.push({ kind: 'created', path: c });
+    if (opts?.move) {
+      this.nodes.delete(s);
+      events.push({ kind: 'removed', path: s });
+    }
+    this.persist();
+    this.emit(events);
+    return dest;
+  }
+
+  /** Scale overrides for tests (path → device pixels per point). */
+  imageScales = new Map<string, number>();
+  async imageScale(path: string): Promise<number> {
+    return this.imageScales.get(normalizePath(path)) ?? 1;
+  }
+
+  async openImagesDialog(): Promise<string[]> {
+    const hook = this.hook();
+    const ans = hook ? await hook('openImages') : globalThis.prompt?.('Insert local images (in-browser paths, comma separated):', '');
+    return ans ? ans.split(',').map((x) => normalizePath(x.trim())).filter(Boolean) : [];
   }
 
   assetUrl(path: string): string {

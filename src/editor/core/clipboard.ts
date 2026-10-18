@@ -102,7 +102,8 @@ async function storeFiles(ed: EditorCore, files: File[]): Promise<string[]> {
       const path = (f as File & { path?: string }).path;
       src = await ed.settings.storeImage({ bytes, mime: f.type, name: f.name, ...(path ? { path } : {}) });
     } else src = URL.createObjectURL(f);
-    if (src) out.push(`![${f.name.replace(/\.[^.]+$/, '').replace(/[[\]]/g, '')}](${src.replace(/ /g, '%20')})`);
+    if (src && /^(?:!\[|<img\b)/i.test(src)) out.push(src); // #99: complete snippet from the shell
+    else if (src) out.push(`![${f.name.replace(/\.[^.]+$/, '').replace(/[[\]]/g, '')}](${src.replace(/ /g, '%20')})`);
   }
   return out;
 }

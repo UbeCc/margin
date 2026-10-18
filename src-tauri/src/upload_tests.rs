@@ -37,10 +37,31 @@ fn extract_urls_from_tail() {
 }
 
 #[test]
+fn url_lines_follow_typora_rules() {
+    assert_eq!(url_of_line("ftp://h/a.png").as_deref(), Some("ftp://h/a.png"));
+    assert_eq!(url_of_line("file:///tmp/a.png").as_deref(), Some("file:///tmp/a.png"));
+    assert_eq!(url_of_line("i.imgur.com/abc.png").as_deref(), Some("http://i.imgur.com/abc.png"));
+    assert_eq!(url_of_line("cdn.example:8080/x").as_deref(), Some("http://cdn.example:8080/x"));
+    for bad in ["Done:", "uploading 1/2", "a.b", "no-dot/path", "x.1/y", "https://", "https://a b"] {
+        assert_eq!(url_of_line(bad), None, "{bad}");
+    }
+    // single image: the last URL wins even if the tail has more; a batch needs exactly n
+    let out = "log\nhttps://a.example/1\nhttps://a.example/2\n";
+    assert_eq!(extract_urls(out, 1).unwrap(), s(&["https://a.example/2"]));
+    assert_eq!(extract_urls(out, 2).unwrap().len(), 2);
+    assert!(extract_urls("https://a.example/0\nhttps://a.example/1\nhttps://a.example/2", 2).is_err());
+    assert_eq!(display_argv(&s(&["/opt/up loader", "-u", "it's"])), "'/opt/up loader' -u 'it'\\''s'");
+}
+
+#[test]
 fn timeout_scales_and_caps() {
     assert_eq!(batch_timeout(None, 1), Duration::from_secs(DEFAULT_PER_IMAGE_SECS));
+    assert_eq!(batch_timeout(None, 1), Duration::from_secs(20));
+    assert_eq!(batch_timeout(None, 2), Duration::from_secs(40));
+    assert_eq!(batch_timeout(None, 5), Duration::from_secs(60), "Typora caps a batch at 60 s");
     assert_eq!(batch_timeout(Some(10), 3), Duration::from_secs(30));
-    assert_eq!(batch_timeout(Some(100), 50), Duration::from_secs(MAX_TIMEOUT_SECS));
+    assert_eq!(batch_timeout(Some(100), 50), Duration::from_secs(100));
+    assert_eq!(batch_timeout(Some(1000), 2), Duration::from_secs(MAX_TIMEOUT_SECS));
     assert_eq!(batch_timeout(Some(0), 0), Duration::from_secs(1));
 }
 
@@ -86,6 +107,12 @@ mod unix {
         p
     }
 
+    /// Command-running tests share the global cancel generation: serialize them.
+    static RUN_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+    fn lock() -> std::sync::MutexGuard<'static, ()> {
+        RUN_LOCK.lock().unwrap_or_else(|e| e.into_inner())
+    }
+
     fn image(dir: &Path, name: &str) -> String {
         let p = dir.join(name);
         fs::write(&p, b"\x89PNG fake").unwrap();
@@ -94,6 +121,7 @@ mod unix {
 
     #[test]
     fn hostile_file_names_are_plain_argv() {
+        let _g = lock();
         let t = tempfile::tempdir().unwrap();
         let dir = t.path();
         // The fake uploader records its argv verbatim and prints one URL per arg.
@@ -101,7 +129,7 @@ mod unix {
         let up = script(
             dir,
             "fake up.sh",
-            &format!("for a in \"$@\"; do printf '%s\\n' \"$a\" >> '{}'; done\necho uploading\nfor a in \"$@\"; do echo \"https://cdn.example/$(basename \"$a\" | od -An -tx1 | tr -d ' \\n')\"; done", log.display()),
+            &format!("for a in \"$@\"; do printf '%s\\n' \"$a\" >> '{}'; done\necho uploading\nshift 2\nfor a in \"$@\"; do echo \"https://cdn.example/$(basename \"$a\" | od -An -tx1 | tr -d ' \\n')\"; done", log.display()),
         );
         let names = ["$(touch pwned).png", "with space.png", "q\"uote's.png", "`touch pwned2`.png", "semi;touch pwned3.png"];
         let paths: Vec<String> = names.iter().map(|n| image(dir, n)).collect();
@@ -123,6 +151,7 @@ mod unix {
 
     #[test]
     fn url_count_mismatch_is_an_error() {
+        let _g = lock();
         let t = tempfile::tempdir().unwrap();
         let up = script(t.path(), "one.sh", "echo https://cdn.example/only-one");
         let paths = vec![image(t.path(), "a.png"), image(t.path(), "b.png")];
@@ -132,6 +161,7 @@ mod unix {
 
     #[test]
     fn failing_uploader_reports_stderr() {
+        let _g = lock();
         let t = tempfile::tempdir().unwrap();
         let up = script(t.path(), "fail.sh", "echo 'token expired' >&2\nexit 3");
         let e = upload(&[image(t.path(), "a.png")], &UploadConfig::Command { command: up.display().to_string(), timeout_secs: Some(5) }).unwrap_err();
@@ -140,6 +170,7 @@ mod unix {
 
     #[test]
     fn missing_program_is_an_error() {
+        let _g = lock();
         let t = tempfile::tempdir().unwrap();
         let e = upload(&[image(t.path(), "a.png")], &UploadConfig::Command { command: "/no/such/uploader".into(), timeout_secs: Some(5) }).unwrap_err();
         assert!(e.contains("cannot start uploader"), "{e}");
@@ -147,6 +178,7 @@ mod unix {
 
     #[test]
     fn timeout_kills_child() {
+        let _g = lock();
         let t = tempfile::tempdir().unwrap();
         let marker = t.path().join("finished");
         // Not `exec`: the shell's own child (sleep) keeps the pipes open after the kill.
@@ -157,6 +189,38 @@ mod unix {
         assert!(start.elapsed() < Duration::from_secs(3), "took {:?}", start.elapsed());
         std::thread::sleep(Duration::from_secs(6));
         assert!(!marker.exists(), "child was not killed");
+    }
+
+    #[test]
+    fn test_upload_needs_exactly_two_urls_and_shows_argv() {
+        let _g = lock();
+        let t = tempfile::tempdir().unwrap();
+        let two = script(t.path(), "two.sh", "echo working\nshift\ni=0\nfor a in \"$@\"; do i=$((i+1)); echo \"https://cdn.example/$i.png\"; done");
+        let paths = vec![image(t.path(), "a.png"), image(t.path(), "b c.png")];
+        let r = test_upload(&UploadConfig::Command { command: format!("'{}' -u", two.display()), timeout_secs: Some(5) }, &paths);
+        assert!(r.ok, "{r:?}");
+        assert_eq!(r.urls, s(&["https://cdn.example/1.png", "https://cdn.example/2.png"]));
+        assert!(r.command.contains("-u") && r.command.contains("'"), "{}", r.command);
+        assert!(r.stdout.contains("working"));
+        let one = script(t.path(), "one.sh", "echo https://cdn.example/only");
+        let r = test_upload(&UploadConfig::Command { command: one.display().to_string(), timeout_secs: Some(5) }, &paths);
+        assert!(!r.ok && r.message.contains("1 URL(s) for 2"), "{r:?}");
+        assert_eq!(r.urls, s(&["https://cdn.example/only"]));
+    }
+
+    #[test]
+    fn cancel_kills_a_running_upload() {
+        let _g = lock();
+        let t = tempfile::tempdir().unwrap();
+        let slow = script(t.path(), "slow.sh", "sleep 5\necho https://late.example/x");
+        let img = image(t.path(), "a.png");
+        let start = Instant::now();
+        let h = std::thread::spawn(move || run_command(&[slow.display().to_string()], &[img], Duration::from_secs(20)));
+        std::thread::sleep(Duration::from_millis(200));
+        cancel_all();
+        let e = h.join().unwrap().unwrap_err();
+        assert_eq!(e, "upload cancelled");
+        assert!(start.elapsed() < Duration::from_secs(4), "took {:?}", start.elapsed());
     }
 }
 

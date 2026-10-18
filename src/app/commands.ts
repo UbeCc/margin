@@ -174,6 +174,29 @@ export const COMMANDS: CommandSpec[] = [
   { id: 'toggleLineEnding', label: 'Toggle Line Endings (LF / CRLF)', category: 'View' },
   { id: 'openThemesFolder', label: 'Open Themes Folder', category: 'Theme' },
   { id: 'uploadAllImages', label: 'Upload All Local Images', category: 'Format' },
+  // #99 Format › Image (per-image entries act on the image at the caret)
+  ...(
+    [
+      ['insert', 'Insert Image'],
+      ['insertLocal', 'Insert Local Images…'],
+      ['openLocation', 'Open Image Location…'],
+      ['copyContent', 'Copy Image Content'],
+      ['syntaxMarkdown', 'Switch Image Syntax: Markdown Style'],
+      ['syntaxHtml', 'Switch Image Syntax: HTML Style'],
+      ['deleteFile', 'Delete Image File'],
+      ['copyTo', 'Copy Image to…'],
+      ['moveTo', 'Rename or Move Image to…'],
+      ['upload', 'Upload Image'],
+      ['copyAll', 'Copy All Images to…'],
+      ['moveAll', 'Move All Images to…'],
+      ['reloadAll', 'Reload All Images'],
+      ['insertCopyToFolder', 'When Insert Local Image: Copy Image File to Folder…'],
+      ['insertUpload', 'When Insert Local Image: Upload Image'],
+      ['rootPath', 'Use Image Root Path'],
+      ['settings', 'Global Image Settings…'],
+    ] as const
+  ).map(([a, label]): CommandSpec => ({ id: `image:${a}`, label, category: 'Format', scope: a === 'settings' ? 'global' : 'editor' })),
+  ...([25, 33, 50, 67, 80, 100, 150, 200] as const).map((z): CommandSpec => ({ id: `image:zoom-${z}`, label: `Zoom Image to ${z}%`, category: 'Format', scope: 'editor' })),
 ];
 
 /** 'Mod+Shift+S' form of a native menu accelerator (src/platform/shortcuts.ts). */
@@ -209,5 +232,5 @@ export function commandForKey(e: KeyLike, mac = isMac): CommandSpec | null {
 
 /** Validate a string coming from native menus / IPC. */
 export function isCommandId(s: string): s is CommandId {
-  return BY_ID.has(s as CommandId) || s.startsWith('theme:') || /^heading:[0-6]$/.test(s);
+  return BY_ID.has(s as CommandId) || s.startsWith('theme:') || /^heading:[0-6]$/.test(s) || s === 'image:uploadAll';
 }
