@@ -129,7 +129,7 @@ export class FileList {
       h('div.list-summary', { text: this.summaries.get(d.path) ?? '' }),
     );
     if (d.path === this.active) row.classList.add('active');
-    makeDraggable(row, d.path);
+    makeDraggable(row, d.path, this.host.platform);
     row.addEventListener('click', () => {
       row.focus({ preventScroll: true });
       this.host.openFile(d.path);

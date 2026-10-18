@@ -28,6 +28,12 @@ mod drop_macos;
 mod pdf_macos;
 #[cfg(target_os = "macos")]
 mod pdf_post_macos;
+#[cfg(target_os = "macos")]
+mod start_drag_macos;
+#[cfg(target_os = "linux")]
+mod start_drag_linux;
+#[cfg(target_os = "windows")]
+mod start_drag_windows;
 mod quick_open;
 mod remote_images;
 #[doc(hidden)]
@@ -421,6 +427,7 @@ pub fn run() {
             commands::save_dialog,
             commands::export_html,
             commands::export_pdf,
+            commands::start_file_drag,
             pandoc::pandoc_detect,
             pandoc::pandoc_export,
             pandoc::pandoc_abort,

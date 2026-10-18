@@ -389,6 +389,30 @@ pub async fn print_window<Rt: Runtime>(window: WebviewWindow<Rt>) -> R<()> {
     window.print().map_err(err)
 }
 
+/// Begin a native drag of `paths` from the current mouse gesture (#129).
+#[tauri::command]
+#[allow(unused_variables)]
+pub fn start_file_drag<Rt: Runtime>(window: WebviewWindow<Rt>, paths: Vec<String>) -> R<bool> {
+    #[cfg(target_os = "macos")]
+    {
+        use objc2::MainThreadMarker;
+        if let Some(mtm) = MainThreadMarker::new() {
+            return Ok(crate::start_drag_macos::start_drag(mtm, &paths));
+        }
+        return Ok(false);
+    }
+    #[cfg(target_os = "linux")]
+    {
+        return Ok(crate::start_drag_linux::start_drag(&window, &paths));
+    }
+    #[cfg(target_os = "windows")]
+    {
+        return crate::start_drag_windows::start_drag(&paths);
+    }
+    #[allow(unreachable_code)]
+    Ok(false)
+}
+
 // ------------------------------------------------------------------ settings & themes
 
 pub fn settings_path<Rt: Runtime>(app: &AppHandle<Rt>) -> R<PathBuf> {

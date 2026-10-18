@@ -336,6 +336,11 @@ export class TauriPlatform implements Platform {
     return subscribe<FileDrop>(EV.fileDrop, cb);
   }
 
+  /** #129: begin a native drag of `paths` from the current mouse gesture (sidebar rows). */
+  startFileDrag(paths: string[]): void {
+    if (paths.length) void call('start_file_drag', { paths }).catch(() => {});
+  }
+
   onCloseRequested(cb: () => Promise<boolean>): () => void {
     this.closeHandlers.add(cb);
     if (!this.closeUnlisten) {

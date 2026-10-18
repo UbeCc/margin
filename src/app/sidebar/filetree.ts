@@ -252,7 +252,7 @@ export class FileTree {
       }
     }
     if (entry.path === this.active) row.classList.add('active');
-    makeDraggable(row, entry.path);
+    makeDraggable(row, entry.path, this.host.platform);
     if (entry.isDir) this.dropTarget(row, entry.path);
     row.addEventListener('click', (e) => {
       row.focus({ preventScroll: true });
