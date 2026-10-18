@@ -207,6 +207,7 @@ export function createEditor(host: HTMLElement, settings: EditorSettings): Edito
           // #116: every Copy-as variant copies the selected source text (fe-contextmenus §1.5)
           return copyAsInSourceMode(ed, s);
         if (cmd.kind === 'pastePlain') return pastePlainInSourceMode(ed, s);
+        if (cmd.kind === 'insertMarkdownAt') return source.inst.insertAt?.(cmd.markdown, cmd.x, cmd.y) ?? false;
         return false;
       }
       try {

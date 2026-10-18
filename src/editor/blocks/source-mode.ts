@@ -78,6 +78,8 @@ export interface SourceModeInstance {
   redo(): boolean;
   /** Replace the main selection with text (#116 Paste as Plain Text). */
   replaceSelection(text: string): void;
+  /** Insert markdown at a viewport point (drop), falling back to the caret (#129). */
+  insertAt(markdown: string, x?: number, y?: number): boolean;
   /** The CodeMirror view (escape hatch for advanced integrations). */
   readonly view: EditorView;
 }
@@ -200,6 +202,22 @@ export const createSourceMode: SourceModeFactory = (host, opts) => {
     undo: () => undo(view),
     redo: () => redo(view),
     replaceSelection: (text) => view.dispatch(view.state.replaceSelection(text)),
+    insertAt(markdown, x, y) {
+      let pos: number | null = null;
+      if (x !== undefined && y !== undefined && Number.isFinite(x) && Number.isFinite(y)) {
+        // posAtCoords takes viewport (client) coordinates, like the drop point;
+        // the fast approximate pass is enough — a drop lands on a line/char.
+        pos = view.posAtCoords({ x, y }, false);
+      }
+      if (pos === null) pos = view.state.selection.main.head;
+      view.dispatch({
+        changes: { from: pos, insert: markdown },
+        selection: { anchor: pos + markdown.length },
+        scrollIntoView: true,
+      });
+      view.focus();
+      return true;
+    },
   };
   return inst;
 };

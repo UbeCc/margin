@@ -54,20 +54,27 @@ export interface ConfirmButton<T extends string> {
   danger?: boolean;
 }
 
-/** Message box with N buttons. Resolves the clicked button id, or `cancelId` on Escape. */
+/**
+ * Message box with N buttons. Resolves the clicked button id (or `cancelId`
+ * on Escape) plus the final state of the optional suppression checkbox —
+ * Typora's `window.showDialog {message, buttons, checkbox}` shape.
+ */
 export function ask<T extends string>(opts: {
   title: string;
   message?: string;
   buttons: ConfirmButton<T>[];
   cancelId: T;
-}): Promise<T> {
+  /** Suppression checkbox under the message ("Do not ask again" pattern). */
+  checkbox?: { label: string; checked?: boolean };
+}): Promise<{ id: T; checked: boolean }> {
   return new Promise((resolve) => {
+    let checked = opts.checkbox?.checked ?? false;
     let done = false;
     const finish = (id: T): void => {
       if (done) return;
       done = true;
       modal.close();
-      resolve(id);
+      resolve({ id, checked });
     };
     const btns = opts.buttons.map((b) =>
       h('button.btn', {
@@ -78,11 +85,15 @@ export function ask<T extends string>(opts: {
         onclick: () => finish(b.id),
       }),
     );
+    const box = opts.checkbox
+      ? h('label.dialog-checkbox', null, h('input', { type: 'checkbox', checked: checked || null, onchange: (e: Event) => (checked = (e.target as HTMLInputElement).checked) }), h('span', { text: opts.checkbox.label }))
+      : null;
     const body = h(
       'div.dialog',
       null,
       h('h2.dialog-title', { text: opts.title }),
       opts.message ? h('p.dialog-message', { text: opts.message }) : null,
+      box,
       h('div.dialog-buttons', null, ...btns),
     );
     const modal = openModal(body, { className: 'dialog-card', onDismiss: () => finish(opts.cancelId), label: opts.title });
@@ -100,7 +111,7 @@ export async function confirmDialog(title: string, message?: string, okLabel = '
     ],
     cancelId: 'cancel',
   });
-  return r === 'ok';
+  return r.id === 'ok';
 }
 
 /** Single-line text prompt. `selectStem` selects the name without extension (for renames). */

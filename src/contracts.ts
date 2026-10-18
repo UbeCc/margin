@@ -442,6 +442,13 @@ export interface Platform {
    * paths and the drop point in viewport CSS px. Platforms without native drop paths omit it.
    */
   onFileDrop?(cb: (drop: FileDrop) => void): () => void;
+  /**
+   * Optional (#129, Typora `controller.startDrag`): begin a native drag of the given
+   * absolute paths from the current mouse position (sidebar rows dragged out of the
+   * window, or onto the editor / a folder row). Platforms without a native source omit it
+   * and the sidebar keeps in-page HTML5 drags.
+   */
+  startFileDrag?(paths: string[]): void;
   /** Return false from cb to cancel closing (e.g. unsaved changes). */
   onCloseRequested(cb: () => Promise<boolean>): () => void;
   /**

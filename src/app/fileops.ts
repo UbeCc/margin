@@ -267,7 +267,7 @@ export class FileOps {
           ],
           cancelId: 'cancel',
         });
-        if (r !== 'replace') return;
+        if (r.id !== 'replace') return;
       }
       t.editor.exec({ kind: 'replaceDocument', markdown: d.content });
     } else {

@@ -15,7 +15,14 @@ export const DRAG_MIME = 'application/x-margin-path';
  */
 let current: string | null = null;
 
-export function makeDraggable(row: HTMLElement, path: string): void {
+/** Minimal platform surface `makeDraggable` needs (both sidebar hosts pass their host). */
+export interface DragPlatform {
+  startFileDrag?(paths: string[]): void;
+}
+
+const DRAG_THRESHOLD_PX = 4;
+
+export function makeDraggable(row: HTMLElement, path: string, platform?: DragPlatform): void {
   row.draggable = true;
   row.addEventListener('dragend', () => (current = null));
   row.addEventListener('dragstart', (e) => {
@@ -26,6 +33,37 @@ export function makeDraggable(row: HTMLElement, path: string): void {
     dt.setData(DRAG_MIME, path);
     dt.setData('text/plain', path);
     dt.setData('text/uri-list', 'file://' + encodeURI(path));
+  });
+
+  // Native drag-out (#129, Typora `controller.startDrag`): HTML5 drags cannot
+  // leave the webview carrying a real file, so once a press on the row moves
+  // past a few pixels we hand the gesture to the platform (it starts a native
+  // drag from the live mouse event and the in-page dragstart never fires).
+  // Platforms without `startFileDrag` (browser) keep the HTML5 drag above.
+  if (!platform?.startFileDrag) return;
+  row.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return;
+    const sx = e.clientX;
+    const sy = e.clientY;
+    const move = (ev: PointerEvent) => {
+      if (Math.hypot(ev.clientX - sx, ev.clientY - sy) < DRAG_THRESHOLD_PX) return;
+      cleanup();
+      row.draggable = false; // suppress the HTML5 drag for this gesture
+      const restore = () => {
+        row.draggable = true;
+        row.removeEventListener('dragend', restore);
+        row.removeEventListener('pointerup', restore);
+      };
+      row.addEventListener('dragend', restore);
+      row.addEventListener('pointerup', restore);
+      platform.startFileDrag!([path]);
+    };
+    const cleanup = () => {
+      row.removeEventListener('pointermove', move);
+      row.removeEventListener('pointerup', cleanup);
+    };
+    row.addEventListener('pointermove', move);
+    row.addEventListener('pointerup', cleanup);
   });
 }
 
