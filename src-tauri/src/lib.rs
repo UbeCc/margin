@@ -5,6 +5,7 @@ mod commands;
 mod fsops;
 mod images;
 mod menu;
+mod pandoc;
 #[cfg(target_os = "macos")]
 mod pdf_macos;
 mod quick_open;
@@ -216,6 +217,8 @@ pub fn run() {
             commands::save_dialog,
             commands::export_html,
             commands::export_pdf,
+            pandoc::pandoc_detect,
+            pandoc::pandoc_export,
             commands::print_window,
             commands::load_settings,
             commands::save_settings,

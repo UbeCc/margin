@@ -33,6 +33,8 @@ const COMMANDS: &[&str] = &[
     "trash_path",
     "create_dir",
     "reveal_path",
+    "pandoc_detect",
+    "pandoc_export",
 ];
 
 fn main() {

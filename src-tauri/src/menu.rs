@@ -28,7 +28,13 @@ const FILE: &[Item] = &[
     ("saveAs", "Save As…", Some("CmdOrCtrl+Shift+S")),
     ("reloadFromDisk", "Revert to Saved", None),
 ];
-const EXPORT: &[Item] = &[("exportHtml", "HTML…", None), ("exportPdf", "PDF…", Some("CmdOrCtrl+Alt+E"))];
+const EXPORT: &[Item] = &[
+    ("exportHtml", "HTML…", None),
+    ("exportPdf", "PDF…", Some("CmdOrCtrl+Alt+E")),
+    ("exportDocx", "Word (.docx)…", None),
+    ("exportLatex", "LaTeX…", None),
+    ("exportEpub", "EPUB…", None),
+];
 const EDIT_TOP: &[Item] = &[("undo", "Undo", Some("CmdOrCtrl+Z")), ("redo", "Redo", Some("CmdOrCtrl+Shift+Z"))];
 const EDIT_FIND: &[Item] = &[("find", "Find…", Some("CmdOrCtrl+F")), ("replace", "Replace…", Some("CmdOrCtrl+Alt+F"))];
 const PARAGRAPH: &[Item] = &[
@@ -266,7 +272,8 @@ mod tests {
                 "new", "open", "openFolder", "save", "saveAs", "close", "exportHtml", "exportPdf", "print", "undo",
                 "redo", "find", "replace", "toggleSidebar", "toggleSource", "toggleFocus", "toggleTypewriter",
                 "quickOpen", "zoomIn", "zoomOut", "zoomReset", "preferences", "commandPalette", "showOutline",
-                "showFiles", "revealActiveFile", "reloadFromDisk", "toggleLineEnding",
+                "showFiles", "revealActiveFile", "reloadFromDisk", "toggleLineEnding", "exportDocx", "exportLatex",
+                "exportEpub",
             ]
             .contains(&a)
                 || a.starts_with("heading:")
