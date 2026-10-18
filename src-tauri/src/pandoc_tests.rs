@@ -35,6 +35,8 @@ fn args_are_argv_with_resource_path() {
         doc_dir: Some(Path::new("/docs/my notes")),
         title: Some("A \"title\" $(x)"),
         timeout: DEFAULT_TIMEOUT,
+        options: Default::default(),
+        cancel: None,
     };
     let a = export_args(&req).unwrap();
     assert_eq!(
@@ -50,6 +52,33 @@ fn args_are_argv_with_resource_path() {
     assert!(!a2.contains(&"--standalone".to_string()));
     let bad = ExportRequest { format: "html", ..req2 };
     assert!(export_args(&bad).unwrap_err().contains("Unsupported"));
+}
+
+#[test]
+fn option_args_follow_typora_order_and_expand_vars() {
+    let o = PandocOptions {
+        pdf_engine: "xelatex".into(),
+        css: "style.css".into(),
+        reference_doc: "${currentFolder}/ref.docx".into(),
+        template: " tpl.tex ".into(),
+        epub_chapter_level: 2,
+        toc: true,
+        extra_arguments: "--number-sections -V 'geometry:margin=1in' ${outputPath}".into(),
+    };
+    let vars = arg_vars(Path::new("/o/x y.pdf"), Some(Path::new("/d")), Some("T"));
+    assert_eq!(
+        option_args(&o, &vars).unwrap(),
+        vec![
+            "--pdf-engine=xelatex", "--css", "style.css", "--reference-doc", "/d/ref.docx", "--template", "tpl.tex",
+            "--epub-chapter-level=2", "--toc", "--number-sections", "-V", "geometry:margin=1in", "/o/x y.pdf",
+        ]
+    );
+    // A file name with shell syntax stays one argv element; nothing is executed.
+    let vars = arg_vars(Path::new("/o/a; rm -rf ~.docx"), None, None);
+    let a = option_args(&PandocOptions { extra_arguments: "--metadata=src:${outputPath}".into(), ..Default::default() }, &vars).unwrap();
+    assert_eq!(a, vec!["--metadata=src:/o/a; rm -rf ~.docx"]);
+    assert!(option_args(&PandocOptions::default(), &vars).unwrap().is_empty());
+    assert!(option_args(&PandocOptions { extra_arguments: "--x 'open".into(), ..Default::default() }, &vars).unwrap_err().contains("Extra arguments"));
 }
 
 #[test]
@@ -87,7 +116,7 @@ mod fake {
                         cat > \"$out\"\necho '[WARNING] something minor' >&2";
 
     fn req<'a>(md: &str, out: &'a Path, doc: &'a Path, t: Duration) -> ExportRequest<'a> {
-        ExportRequest { markdown: md.into(), out, format: "docx", doc_dir: Some(doc), title: None, timeout: t }
+        ExportRequest { markdown: md.into(), out, format: "docx", doc_dir: Some(doc), title: None, timeout: t, options: Default::default(), cancel: None }
     }
 
     #[test]
@@ -170,6 +199,42 @@ mod fake {
     }
 
     #[test]
+    fn abort_kills_running_export() {
+        let tmp = TempDir::new().unwrap();
+        let bin = script(tmp.path(), "3.0", "sleep 30", 0o755);
+        let out = tmp.path().join("o.docx");
+        let flag = register("t-abort");
+        std::thread::spawn(move || {
+            std::thread::sleep(Duration::from_millis(300));
+            assert!(abort("t-abort"));
+        });
+        let t0 = Instant::now();
+        let mut r = req("x", &out, tmp.path(), Duration::from_secs(20));
+        r.cancel = Some(flag);
+        let e = export(&bin, r).unwrap_err();
+        assert_eq!(e, ABORTED);
+        assert!(t0.elapsed() < Duration::from_secs(8), "took {:?}", t0.elapsed());
+        unregister("t-abort");
+        assert!(!abort("t-abort"), "finished exports are no longer abortable");
+    }
+
+    #[test]
+    fn options_reach_pandoc_argv() {
+        let tmp = TempDir::new().unwrap();
+        let bin = script(tmp.path(), "3.1", COPY, 0o755);
+        let out = tmp.path().join("my out.docx");
+        let mut r = req("x", &out, tmp.path(), Duration::from_secs(10));
+        r.options = PandocOptions { reference_doc: "ref.docx".into(), extra_arguments: "--toc -M \"lang=${title}\"".into(), ..Default::default() };
+        r.title = Some("T 1");
+        export(&bin, r).unwrap();
+        let argv = std::fs::read_to_string(tmp.path().join("argv.log")).unwrap();
+        let lines: Vec<&str> = argv.lines().collect();
+        let i = lines.iter().position(|l| *l == "--reference-doc").expect("flag");
+        assert_eq!(lines[i + 1], "ref.docx");
+        assert!(lines.ends_with(&["--toc", "-M", "lang=T 1"]), "{lines:?}");
+    }
+
+    #[test]
     fn not_executable_is_reported() {
         let tmp = TempDir::new().unwrap();
         let bin = script(tmp.path(), "3.0", COPY, 0o644);
@@ -207,6 +272,8 @@ mod fake {
                 doc_dir: Some(tmp.path()),
                 title: Some("Title"),
                 timeout: DEFAULT_TIMEOUT,
+                options: Default::default(),
+                cancel: None,
             };
             export(&bin, r).unwrap_or_else(|e| panic!("{fmt}: {e}"));
             assert!(std::fs::metadata(&out).unwrap().len() > 20, "{fmt}");
