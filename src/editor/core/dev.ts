@@ -45,6 +45,8 @@ declare global {
       outlineEvents: number;
       opened: string[];
       ready: boolean;
+      /** `?rich`: payloads sent to EditorSettings.writeClipboardRich (#79). */
+      rich: RichClipboardData[];
       /** `?clipread`: what EditorSettings.readClipboard (native pasteboard, #96) returns. */
       clip: ClipboardSnapshot | null;
       /** `?mathimg`: Copy Math ▸ Copy as Image calls seen by the stub rasterizer (#127). */
