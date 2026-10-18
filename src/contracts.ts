@@ -37,7 +37,67 @@ export interface EditorSettings {
   typewriterMode: boolean;
   /** "light" | "dark" — widgets (code highlight, mermaid) follow it. */
   colorScheme: 'light' | 'dark';
+  /** Optional (#100/#102): Markdown syntax / editing preferences. Missing keys = `DEFAULT_MARKDOWN_OPTIONS`. */
+  markdown?: Partial<MarkdownOptions>;
 }
+
+/** Preferences › Markdown / Editor options consumed by the editing core and widgets (#100, #102). */
+export interface MarkdownOptions {
+  /** Syntax Support: `==mark==`, `~sub~`, `^sup^`, `$inline math$`, `:emoji:` shortcodes. */
+  highlight: boolean;
+  subscript: boolean;
+  superscript: boolean;
+  inlineMath: boolean;
+  emoji: boolean;
+  /** Strict Mode (more strict to GFM spec): when false, `#Heading` without a space is a heading. */
+  strict: boolean;
+  /** Markers written by menu commands / hybrid view (existing source is never rewritten). */
+  ulStyle: '-' | '*' | '+';
+  olStyle: '.' | ')';
+  /** Whitespace and Line Breaks: false = "Ignore whitespace and single line break" (soft breaks render as spaces). */
+  preserveLineBreak: boolean;
+  /** Visible <br/>: show `<br>` tags / hard breaks as a visible marker. */
+  visibleBr: boolean;
+  indentFirstLine: boolean;
+  /** Apply Line Break at `\` + newline. */
+  backslashBreak: boolean;
+  /** Editor › Auto Pair. */
+  autoPairBrackets: boolean;
+  autoPairMarkdown: boolean;
+  /** Display source (e.g. `#`) of simple blocks such as headings when the caret is in them. */
+  expandSimpleBlock: boolean;
+  /** Code Fences. */
+  codeLineNumbers: boolean;
+  codeLineWrap: boolean;
+  /** Spaces per tab in code fences; 0 = Preserve tabs. */
+  codeIndentSize: 0 | 2 | 3 | 4;
+  /** Math Blocks: equation numbering and physics macros. */
+  mathNumbering: 'all' | 'ams' | 'none';
+  mathPhysics: boolean;
+}
+
+export const DEFAULT_MARKDOWN_OPTIONS: Readonly<MarkdownOptions> = Object.freeze({
+  highlight: true,
+  subscript: false,
+  superscript: false,
+  inlineMath: true,
+  emoji: false,
+  strict: true,
+  ulStyle: '-',
+  olStyle: '.',
+  preserveLineBreak: true,
+  visibleBr: false,
+  indentFirstLine: false,
+  backslashBreak: true,
+  autoPairBrackets: true,
+  autoPairMarkdown: false,
+  expandSimpleBlock: true,
+  codeLineNumbers: false,
+  codeLineWrap: true,
+  codeIndentSize: 4,
+  mathNumbering: 'ams',
+  mathPhysics: false,
+});
 
 /** Inline formats toggled by Format menu commands (`underline`/`sub`/`sup` = `<u>`/`<sub>`/`<sup>`, `math` = `$…$`, `comment` = `<!-- … -->`). */
 export type InlineMark = 'strong' | 'em' | 'code' | 'strike' | 'highlight' | 'link' | 'underline' | 'sub' | 'sup' | 'math' | 'comment';

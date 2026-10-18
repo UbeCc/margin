@@ -6,6 +6,8 @@
 
 export type WrapTag = 'em' | 'strong' | 'del' | 'mark' | 'code' | 'link' | 'fnref' | 'u' | 'sub' | 'sup';
 
+import { syntaxOptions as OPT, EMOJI } from './options';
+
 export type INode =
   | { k: 'text'; v: string }
   | { k: 'meta'; v: string }
@@ -132,7 +134,7 @@ export function parseInline(s: string, refs: RefMap = new Map()): INode[] {
     const c = s[i];
     const rest = s.slice(i);
     if (c === '\\') {
-      if (s[i + 1] === '\n') { put({ k: 'br', v: '\\' }); buf += '\n'; i += 2; continue; }
+      if (s[i + 1] === '\n' && OPT.backslashBreak) { put({ k: 'br', v: '\\' }); buf += '\n'; i += 2; continue; }
       if (i + 1 < s.length && ASCII_PUNCT.test(s[i + 1])) { put(meta('\\')); buf += s[i + 1]; i += 2; continue; }
     } else if (c === '`') {
       const run = /^`+/.exec(rest)![0];
@@ -150,7 +152,7 @@ export function parseInline(s: string, refs: RefMap = new Map()): INode[] {
         continue;
       }
       buf += run; i += run.length; continue;
-    } else if (c === '$' && s[i + 1] !== '$' && s[i - 1] !== '$') {
+    } else if (c === '$' && OPT.inlineMath && s[i + 1] !== '$' && s[i - 1] !== '$') {
       const m = /^\$([^\s$](?:[^$\\]|\\.)*?)\$(?!\d)/.exec(rest);
       if (m && !/\s$/.test(m[1])) {
         put({ k: 'math', raw: m[0], tex: m[1] });
@@ -214,10 +216,14 @@ export function parseInline(s: string, refs: RefMap = new Map()): INode[] {
     } else if (c === ' ' && /^ {2,}\n/.test(rest)) {
       const m = /^ {2,}/.exec(rest)![0];
       put({ k: 'br', v: m }); buf += '\n'; i += m.length + 1; continue;
-    } else if (c === '*' || c === '_' || c === '~' || c === '=') {
+    } else if (c === ':' && OPT.emoji && /^:[\w+-]+:/.test(rest)) {
+      const m = /^:([\w+-]+):/.exec(rest)!;
+      const ch = EMOJI[m[1]];
+      if (ch) { put({ k: 'entity', v: m[0], ch }); i += m[0].length; continue; }
+    } else if (c === '*' || c === '_' || c === '~' || (c === '=' && OPT.highlight) || (c === '^' && OPT.superscript)) {
       const run = new RegExp('^\\' + c + '+').exec(rest)![0];
       const n = run.length;
-      if ((c === '=' && n !== 2) || (c === '~' && n > 2)) { buf += run; i += n; continue; }
+      if ((c === '=' && n !== 2) || (c === '~' && n > 2) || (c === '^' && n !== 1)) { buf += run; i += n; continue; }
       const prev = i > 0 ? s[i - 1] : ' ';
       const next = i + n < s.length ? s[i + n] : ' ';
       const left = !WS.test(next) && (!PUNCT.test(next) || WS.test(prev) || PUNCT.test(prev));
@@ -251,14 +257,15 @@ function processEmphasis(items: Item[]): void {
       const o = items[oi];
       if (o.k !== 'delim' || o.ch !== c.ch || !o.canOpen || o.n === 0) continue;
       if ((c.ch === '*' || c.ch === '_') && (o.canClose || c.canOpen) && (o.orig + c.orig) % 3 === 0 && (o.orig % 3 !== 0 || c.orig % 3 !== 0)) continue;
-      if (c.ch === '~' && o.n !== c.n) continue;
+      if ((c.ch === '~' || c.ch === '^') && o.n !== c.n) continue;
       found = oi;
       break;
     }
     if (found < 0) continue;
     const o = items[found] as Delim;
-    const use = c.ch === '~' ? c.n : c.ch === '=' ? 2 : o.n >= 2 && c.n >= 2 ? 2 : 1;
-    const tag: WrapTag = c.ch === '~' ? 'del' : c.ch === '=' ? 'mark' : use === 2 ? 'strong' : 'em';
+    const use = c.ch === '~' || c.ch === '^' ? c.n : c.ch === '=' ? 2 : o.n >= 2 && c.n >= 2 ? 2 : 1;
+    const tag: WrapTag =
+      c.ch === '~' ? (use === 1 && OPT.subscript ? 'sub' : 'del') : c.ch === '^' ? 'sup' : c.ch === '=' ? 'mark' : use === 2 ? 'strong' : 'em';
     o.n -= use;
     c.n -= use;
     const mk = c.ch.repeat(use);

@@ -21,7 +21,7 @@ export function splitBlockMeta(leaf: Pick<Leaf, 'type' | 'setext'>, c: string): 
       const k = c.lastIndexOf('\n');
       return k < 0 ? ['', '', c] : ['', c.slice(0, k), c.slice(k)];
     }
-    const m = /^( {0,3}#{1,6})(?:[ \t]+|$)/.exec(c);
+    const m = /^( {0,3}#{1,6})(?:[ \t]+|$|(?=[^#\s]))/.exec(c);
     const pre = m ? m[0] : '';
     let body = c.slice(pre.length);
     const t = /(?:^|[ \t]+)#+[ \t]*$|[ \t]+$/.exec(body);
