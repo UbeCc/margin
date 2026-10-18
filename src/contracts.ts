@@ -27,6 +27,8 @@ export interface EditorSettings {
   storeImage?(input: { bytes?: Uint8Array; mime?: string; path?: string; name?: string }): Promise<string | null>;
   /** Open an external link. */
   openLink?(href: string): void;
+  /** Optional (#79): add native rich flavours (RTF) after a copy; see `RichClipboardData`. */
+  writeClipboardRich?(data: RichClipboardData): Promise<boolean>;
   spellcheck: boolean;
   /** Visual modes. */
   focusMode: boolean;
@@ -168,7 +170,7 @@ export type MenuAction =
   | 'undo' | 'redo' | 'find' | 'replace'
   | 'toggleSidebar' | 'toggleSource' | 'toggleFocus' | 'toggleTypewriter' | 'quickOpen'
   | 'zoomIn' | 'zoomOut' | 'zoomReset'
-  | 'commandPalette' | 'showOutline' | 'showFiles' | 'revealActiveFile' | 'reloadFromDisk' | 'toggleLineEnding'
+  | 'clearRecent' | 'commandPalette' | 'showOutline' | 'showFiles' | 'revealActiveFile' | 'reloadFromDisk' | 'toggleLineEnding'
   | `heading:${0 | 1 | 2 | 3 | 4 | 5 | 6}`
   | `mark:${'strong' | 'em' | 'code' | 'strike' | 'highlight' | 'link'}`
   | `block:${'quote' | 'ul' | 'ol' | 'task' | 'code' | 'math' | 'table' | 'hr' | 'toc'}`
@@ -217,4 +219,19 @@ export interface Platform {
   onOpenFiles(cb: (paths: string[]) => void): () => void;
   /** Return false from cb to cancel closing (e.g. unsaved changes). */
   onCloseRequested(cb: () => Promise<boolean>): () => void;
+  /** Optional (#79, macOS): add public.rtf to the pasteboard after WebKit wrote `marker`'s copy. */
+  writeClipboardRich?(data: RichClipboardData): Promise<boolean>;
+}
+
+/**
+ * Rich copy payload (#79). `marker` is a nonce embedded in `html`; native code
+ * appends RTF only once the pasteboard's HTML contains it (else writes all
+ * flavours itself). Resolves false when nothing was written.
+ */
+export interface RichClipboardData {
+  plain: string;
+  html: string;
+  rtf: string;
+  markdown: string;
+  marker: string;
 }

@@ -1,0 +1,59 @@
+{
+  "ok": true,
+  "total_seconds": 28,
+  "cache": [
+    "e2e port: 38495",
+    "node_modules: hit (lock 975215959a357a01)",
+    "cargo debug target: warm"
+  ],
+  "stages": [
+    {
+      "stage": "npm_ci",
+      "status": "pass",
+      "seconds": 0,
+      "notes": ""
+    },
+    {
+      "stage": "typecheck",
+      "status": "pass",
+      "seconds": 1,
+      "notes": ""
+    },
+    {
+      "stage": "vitest",
+      "status": "pass",
+      "seconds": 3,
+      "notes": "338/338 tests"
+    },
+    {
+      "stage": "e2e",
+      "status": "pass",
+      "seconds": 24,
+      "notes": "chromium 68/69, webkit 66/69"
+    },
+    {
+      "stage": "cargo_test",
+      "status": "pass",
+      "seconds": 9,
+      "notes": "88 passed, 0 failed / 0 passed, 0 failed / 0 passed, 0 failed"
+    },
+    {
+      "stage": "clippy",
+      "status": "pass",
+      "seconds": 1,
+      "notes": "clean"
+    },
+    {
+      "stage": "bundle",
+      "status": "skip",
+      "seconds": 0,
+      "notes": ""
+    },
+    {
+      "stage": "smoke",
+      "status": "skip",
+      "seconds": 0,
+      "notes": ""
+    }
+  ]
+}

@@ -1,16 +1,33 @@
 //! Margin native shell: commands backing `Platform` (src/contracts.ts), native
 //! menus, file-open events, close-request veto and window chrome.
 
+mod clipboard_macos;
 mod commands;
 mod fsops;
+#[cfg(unix)]
+mod fsops_unix;
 mod images;
 mod menu;
 mod pandoc;
 #[cfg(target_os = "macos")]
 mod pdf_macos;
 mod quick_open;
+mod remote_images;
+#[doc(hidden)]
+pub mod recent;
 mod settings;
 mod watch;
+mod watch_state;
+#[cfg(test)]
+mod watch_live_tests;
+#[cfg(test)]
+mod asset_scope_tests;
+#[cfg(test)]
+mod quick_open_tests;
+#[cfg(test)]
+mod images_tests;
+#[cfg(test)]
+mod settings_tests;
 
 use serde::Serialize;
 use std::collections::HashMap;
@@ -45,19 +62,42 @@ pub struct FsEventsPayload {
     pub events: Vec<watch::FsEvent>,
 }
 
+/// Directories that must never be granted recursively: filesystem roots, the home
+/// directory, and the directories that contain all users' homes.
+fn is_broad(dir: &Path, home: Option<&Path>) -> bool {
+    dir.parent().is_none()
+        || home == Some(dir)
+        || home.and_then(Path::parent) == Some(dir)
+        || [Path::new("/Users"), Path::new("/home"), Path::new("/Volumes"), Path::new("/private"), Path::new("/var")]
+            .contains(&dir)
+}
+
+/// What to put into the asset scope for `dir`: the lexically normalized path and the
+/// canonical one (symlinks, `/var` → `/private/var`). The "too broad" check runs on
+/// the *resolved* paths, so `~/notes/..` or a symlink to `/` can't widen the grant.
+pub fn asset_grants(dir: &Path, home: Option<&Path>, recursive: bool) -> Vec<(PathBuf, bool)> {
+    let lexical = images::normalize(dir);
+    let canon = std::fs::canonicalize(&lexical).ok();
+    let home_canon = home.and_then(|h| std::fs::canonicalize(h).ok());
+    let broad = |p: &Path| is_broad(p, home) || is_broad(p, home_canon.as_deref());
+    let any_broad = broad(&lexical) || canon.as_deref().is_some_and(broad);
+    let rec = recursive && !any_broad;
+    let mut out = vec![(lexical.clone(), rec)];
+    if let Some(c) = canon
+        && c != lexical
+    {
+        out.push((c, rec));
+    }
+    out
+}
+
 /// Grant the asset protocol read access for images next to a document/folder.
-/// Directories that are too broad (filesystem root, home itself) are only allowed
-/// non-recursively.
 pub fn allow_assets<R: Runtime>(app: &AppHandle<R>, dir: &Path, recursive: bool) {
     let home = app.path().home_dir().ok();
-    let broad = dir.parent().is_none() || home.as_deref() == Some(dir) || dir == Path::new("/Users") || dir == Path::new("/home");
     let scope = app.asset_protocol_scope();
-    let _ = scope.allow_directory(dir, recursive && !broad);
-    // FSEvents/realpath style paths (/private/var vs /var) may be requested too.
-    if let Ok(canon) = std::fs::canonicalize(dir)
-        && canon != dir {
-            let _ = scope.allow_directory(&canon, recursive && !broad);
-        }
+    for (p, rec) in asset_grants(dir, home.as_deref(), recursive) {
+        let _ = scope.allow_directory(&p, rec);
+    }
 }
 
 pub fn allow_assets_for_file<R: Runtime>(app: &AppHandle<R>, file: &Path) {
@@ -91,16 +131,20 @@ pub fn open_files<R: Runtime>(app: &AppHandle<R>, paths: Vec<PathBuf>) {
 }
 
 fn cli_paths() -> Vec<PathBuf> {
-    let cwd = std::env::current_dir().unwrap_or_default();
-    std::env::args_os()
-        .skip(1)
-        .filter(|a| !a.to_string_lossy().starts_with('-'))
-        .map(|a| {
-            let p = PathBuf::from(a);
-            if p.is_absolute() { p } else { cwd.join(p) }
-        })
-        .filter(|p| p.exists())
-        .collect()
+    let args: Vec<String> = std::env::args_os().map(|a| a.to_string_lossy().into_owned()).collect();
+    recent::paths_from_args(&args, &std::env::current_dir().unwrap_or_default(), true)
+}
+
+/// Another `margin …` was started (Linux file manager, Windows Explorer, CLI): it
+/// exits and hands us its arguments.
+fn on_second_instance<R: Runtime>(app: &AppHandle<R>, argv: Vec<String>, cwd: String) {
+    let paths = recent::paths_from_args(&argv, Path::new(&cwd), true);
+    if let Some(w) = app.get_webview_window(MAIN) {
+        let _ = w.unminimize();
+        let _ = w.show();
+        let _ = w.set_focus();
+    }
+    open_files(app, paths);
 }
 
 fn request_close<R: Runtime>(app: &AppHandle<R>) -> bool {
@@ -130,6 +174,15 @@ fn handle_menu<R: Runtime>(app: &AppHandle<R>, id: &str) {
             use tauri_plugin_opener::OpenerExt;
             if let Ok(dir) = commands::themes_dir_path(app) {
                 let _ = app.opener().open_path(fsops::path_str(&dir), None::<&str>);
+            }
+        }
+        recent::ID_CLEAR => {
+            let _ = recent::set_menu(app, &[], &[]);
+            let _ = app.emit_to(MAIN, EV_MENU, recent::ID_CLEAR);
+        }
+        other if other.starts_with(recent::ID_PREFIX) => {
+            if let Some(p) = recent::path_for(app, other) {
+                open_files(app, vec![PathBuf::from(p)]);
             }
         }
         other => {
@@ -200,9 +253,12 @@ fn e2e_driver<R: Runtime>(app: &AppHandle<R>) {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let app = tauri::Builder::default()
+        // must be the first plugin: a second instance exits before doing anything else
+        .plugin(tauri_plugin_single_instance::init(on_second_instance))
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .manage(AppState::default())
+        .manage(recent::RecentState::default())
         .invoke_handler(tauri::generate_handler![
             commands::read_text_file,
             commands::write_text_file,
@@ -232,15 +288,18 @@ pub fn run() {
             commands::take_pending_open_files,
             commands::allow_asset_dir,
             commands::set_theme_menu,
+            commands::relocate_images,
             commands::rename_path,
             commands::trash_path,
             commands::create_dir,
             commands::reveal_path,
+            clipboard_macos::clipboard_write_rich,
         ])
         .setup(|app| {
             let handle = app.handle().clone();
             // Menu: built-in themes + user themes, current one ticked.
-            let current = settings::typed(&settings::load(&commands::settings_path(&handle)?)).theme;
+            let saved = settings::typed(&settings::load(&commands::settings_path(&handle)?));
+            let current = saved.theme.clone();
             let mut themes: Vec<String> = menu::BUILTIN_THEMES.iter().map(|s| s.to_string()).collect();
             if let Ok(user) = commands::user_theme_names(&handle) {
                 for t in user {
@@ -249,7 +308,8 @@ pub fn run() {
                     }
                 }
             }
-            let m = menu::build(&handle, &themes, &current)?;
+            let recents = recent::prepare(&handle, &saved.recent_files, &saved.recent_folders);
+            let m = menu::build(&handle, &themes, &current, &recents)?;
             app.set_menu(m)?;
             app.on_menu_event(|app, event| handle_menu(app, event.id().as_ref()));
 

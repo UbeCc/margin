@@ -1,0 +1,6508 @@
+{
+ "generated_from": {
+  "spec": "typora-re/parity-spec.md",
+  "prose": "typora-re/sections/*.md",
+  "margin_head": "521d0414a631d40476e3ac57da3f6628890af04d"
+ },
+ "summary": {
+  "head": "521d0414a631d40476e3ac57da3f6628890af04d",
+  "artifact_sha256": "78708b3f6829d68d4fa93e431bb99b9294d61f02e6e96401a8a4cd5368e602be",
+  "inventory": {
+   "total": 171,
+   "owned": 64,
+   "partial": 25,
+   "missing": 74,
+   "oos": 8,
+   "verified_by_test": 51
+  },
+  "ledger": {
+   "ledger_id": "rol_e13d043bce1e3d61a0b50ed2ff1e838b2e1942006bedcd0b34c7bee08a94a39e",
+   "closure_digest": "ec9d88e2b98ad8a227149bd02fe7269758f1abd61c74b6e737044491d7c8373d",
+   "status": "unknown",
+   "summary": {
+    "total": 176,
+    "required": 168,
+    "verified": 0,
+    "required_open": 168,
+    "by_status": [
+     {
+      "key": "unowned",
+      "count": 74
+     },
+     {
+      "key": "characterized",
+      "count": 0
+     },
+     {
+      "key": "implemented",
+      "count": 89
+     },
+     {
+      "key": "verified",
+      "count": 0
+     },
+     {
+      "key": "contradicted",
+      "count": 0
+     },
+     {
+      "key": "blocked",
+      "count": 0
+     },
+     {
+      "key": "out-of-scope",
+      "count": 8
+     },
+     {
+      "key": "unknown",
+      "count": 5
+     }
+    ],
+    "by_application_layer": [
+     {
+      "key": "cli",
+      "count": 0
+     },
+     {
+      "key": "protocol",
+      "count": 0
+     },
+     {
+      "key": "electron",
+      "count": 0
+     },
+     {
+      "key": "persistence",
+      "count": 21
+     },
+     {
+      "key": "process",
+      "count": 15
+     },
+     {
+      "key": "runtime",
+      "count": 14
+     },
+     {
+      "key": "packaging",
+      "count": 0
+     },
+     {
+      "key": "native-abi",
+      "count": 0
+     },
+     {
+      "key": "application",
+      "count": 121
+     },
+     {
+      "key": "other",
+      "count": 5
+     }
+    ],
+    "by_evidence_authority": [
+     {
+      "key": "candidate",
+      "count": 0
+     },
+     {
+      "key": "observed",
+      "count": 5
+     },
+     {
+      "key": "reviewed",
+      "count": 171
+     },
+     {
+      "key": "unknown",
+      "count": 0
+     }
+    ]
+   },
+   "evidence_id": "ev_a1bfc81301b6fc05fe71bac1004183f0374e3248c474563bca14da4804be1b2d"
+  },
+  "coverage": {
+   "status": "unknown",
+   "reason_counts": {
+    "owner-missing": 74,
+    "package-proof-missing": 1,
+    "verifier-missing": 99,
+    "verifier-unknown": 13
+   },
+   "claims_total": 163,
+   "claims_qualified_by_controlled_replay": 51,
+   "evidence_ids_cited": 175
+  },
+  "verifier_runs": {
+   "build": {
+    "evidence_id": "ev_1fff77de0927975cf6c8e1ae1f4f756642727a508cab1ec65759d425f7ebbded",
+    "exit": 0,
+    "completed_at": "2026-10-18T00:53:00.964Z"
+   },
+   "cargo-test": {
+    "evidence_id": "ev_596bfb2769e00f4b6f205f52b992c1e362c9ef2c165dece497fc57ee841de193",
+    "exit": 101,
+    "completed_at": "2026-10-18T00:53:54.631Z"
+   },
+   "independence": {
+    "evidence_id": "ev_2942f8ee964e73c11f47052521654a6cd99141b30781901b1390588cbafdbff7",
+    "exit": 0,
+    "completed_at": "2026-10-18T00:56:28.244Z"
+   },
+   "playwright": {
+    "evidence_id": "ev_901ce221009c1e4879641445b9c1b8fa86c9167e86e30c018915c84e038d0e62",
+    "exit": 0,
+    "completed_at": "2026-10-18T00:52:53.213Z"
+   },
+   "vitest": {
+    "evidence_id": "ev_84b0827da798dfcefb6dbc4c21ff3c29f26e729d72a12852a50d4e92f3f1acf0",
+    "exit": 0,
+    "completed_at": "2026-10-18T00:51:50.459Z"
+   }
+  }
+ },
+ "obligations": [
+  {
+   "obligation_id": "typora.menu.app.about",
+   "id": "menu.app.about",
+   "title": "About dialog",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src-tauri/src/menu.rs",
+    "anchor": "About Margin",
+    "sha256": "1cc92c5f52bd308d4cc0b37323c641fa3c774f2f7972add833595952a19de97a"
+   },
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "About",
+     "About Typora",
+     "Credits"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.app.preferences",
+   "id": "menu.app.preferences",
+   "title": "Preferences window",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/app.ts",
+    "anchor": "case 'preferences'",
+    "sha256": "0d4e0275e6d2c34c3639696699e70c6535a1c28e25dabe478f0ab75cf59d98a9"
+   },
+   "verifier": {
+    "file": "tests/e2e/app-themes.spec.ts",
+    "test": "theme switching via preferences persists across reloads",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Preferences"
+    ],
+    "panel": [
+     "Preferences"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.menu.app.system",
+   "id": "menu.app.system",
+   "title": "Services / Hide / Hide Others / Show All / Quit",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src-tauri/src/menu.rs",
+    "anchor": "PredefinedMenuItem::hide_others",
+    "sha256": "1cc92c5f52bd308d4cc0b37323c641fa3c774f2f7972add833595952a19de97a"
+   },
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Services",
+     "Hide Typora",
+     "Hide Others",
+     "Show All",
+     "Quit Typora"
+    ],
+    "panel": [
+     "Quit"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.file.new",
+   "id": "menu.file.new",
+   "title": "File › New (untitled document)",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/app.ts",
+    "anchor": "case 'new'",
+    "sha256": "0d4e0275e6d2c34c3639696699e70c6535a1c28e25dabe478f0ab75cf59d98a9"
+   },
+   "verifier": {
+    "file": "tests/e2e/app-files.spec.ts",
+    "test": "new untitled document → Save As writes file",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "File",
+     "New",
+     "New File"
+    ],
+    "panel": [
+     "New File",
+     "Untitled"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.menu.file.new-window",
+   "id": "menu.file.new-window",
+   "title": "File › New Window / Open in New Window",
+   "status": "missing",
+   "priority": "P0",
+   "epic": "files",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "New Window",
+     "Open in New Window"
+    ],
+    "panel": [],
+    "bridge": [
+     "controller.openInNewWindow",
+     "window.open",
+     "window.focus",
+     "window.execForAll"
+    ],
+    "prose": [
+     "files-windows-settings §4.4",
+     "files-windows-settings §7"
+    ]
+   },
+   "note": "one document per window today (#16, #23)",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.file.tabs",
+   "id": "menu.file.tabs",
+   "title": "Tabs: New Tab, switch between opened documents, next/previous tab",
+   "status": "missing",
+   "priority": "P0",
+   "epic": "files",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "New Tab",
+     "Switch Between Opened Documents"
+    ],
+    "panel": [],
+    "bridge": [
+     "window.selectNextTab",
+     "window.selectPreviousTab",
+     "controller.switchDocumentTarget"
+    ],
+    "prose": []
+   },
+   "note": "#23",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.file.open",
+   "id": "menu.file.open",
+   "title": "File › Open… (file dialog)",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/app.ts",
+    "anchor": "case 'open'",
+    "sha256": "0d4e0275e6d2c34c3639696699e70c6535a1c28e25dabe478f0ab75cf59d98a9"
+   },
+   "verifier": {
+    "file": "tests/e2e/app-files.spec.ts",
+    "test": "file tree lazily expands folders and opens files",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Open"
+    ],
+    "panel": [
+     "Markdown File",
+     "Markdown file",
+     "All Files",
+     "All Supported Formats",
+     "Plain Text File",
+     "Open From...",
+     "Open in…"
+    ],
+    "bridge": [
+     "path.selectFolderOrFile",
+     "controller.openInTypora"
+    ],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.menu.file.open-folder",
+   "id": "menu.file.open-folder",
+   "title": "File › Open Folder…",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/app.ts",
+    "anchor": "case 'openFolder'",
+    "sha256": "0d4e0275e6d2c34c3639696699e70c6535a1c28e25dabe478f0ab75cf59d98a9"
+   },
+   "verifier": {
+    "file": "tests/e2e/app-files.spec.ts",
+    "test": "file tree lazily expands folders and opens files",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Open Folder"
+    ],
+    "panel": [
+     "Open Folder...",
+     "Select Container Folder",
+     "Cannot open folder {0}",
+     "No Folder is Opened."
+    ],
+    "bridge": [
+     "controller.openFolder",
+     "controller.selectFolder",
+     "controller.switchFolder",
+     "controller.shouldLoadFolder",
+     "controller.calcMountFolder"
+    ],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.menu.file.quick-open",
+   "id": "menu.file.quick-open",
+   "title": "File › Open Quickly (fuzzy file finder)",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/app.ts",
+    "anchor": "quickOpen(): void",
+    "sha256": "0d4e0275e6d2c34c3639696699e70c6535a1c28e25dabe478f0ab75cf59d98a9"
+   },
+   "verifier": {
+    "file": "tests/e2e/app-navigation.spec.ts",
+    "test": "quick open fuzzy-finds files with highlights",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Open Quickly"
+    ],
+    "panel": [
+     "Search by file name",
+     "Gathering more results",
+     "No Files Available"
+    ],
+    "bridge": [
+     "quickOpen.query",
+     "quickOpen.stopQuery",
+     "quickOpen.reindexFolderIfNeeded",
+     "quickOpen.cacheRecentFiles"
+    ],
+    "prose": [
+     "files-windows-settings §10"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.menu.file.recent",
+   "id": "menu.file.recent",
+   "title": "File › Open Recent (files + folders, clear)",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src-tauri/src/recent.rs",
+    "anchor": "No Recent Items",
+    "sha256": "360d9f0581bde6166846f14b575cdfa7573cde8ca1d4d8945959d27825af8081"
+   },
+   "verifier": {
+    "file": "src/app/__tests__/settings.test.ts",
+    "test": "dedupes and caps recent lists",
+    "kind": "unit"
+   },
+   "spec": {
+    "menu": [
+     "Open Recent",
+     "Recent Files",
+     "Recent Locations",
+     "No Recent Files",
+     "Clear Items"
+    ],
+    "panel": [
+     "Recent Documents",
+     "Clear Recent Documents"
+    ],
+    "bridge": [
+     "library.getRecentFolders"
+    ],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.menu.file.reopen-closed",
+   "id": "menu.file.reopen-closed",
+   "title": "File › Reopen Closed File",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "files",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Reopen Closed File"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": [
+     "files-windows-settings §4.5"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.file.save",
+   "id": "menu.file.save",
+   "title": "File › Save (dirty tracking, atomic write)",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/app.ts",
+    "anchor": "case 'save'",
+    "sha256": "0d4e0275e6d2c34c3639696699e70c6535a1c28e25dabe478f0ab75cf59d98a9"
+   },
+   "verifier": {
+    "file": "tests/e2e/app-files.spec.ts",
+    "test": "editing marks dirty, Cmd+S saves to disk",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Save"
+    ],
+    "panel": [
+     "Saved",
+     "Save File Failed!",
+     "The file is read-only, or you do not have right permissions to modify the file."
+    ],
+    "bridge": [
+     "document.updateChangeCount",
+     "document.updateChangeCountIfUnedited",
+     "document.getContent",
+     "document.syncChangeIfNeeded"
+    ],
+    "prose": [
+     "files-windows-settings §4.1",
+     "files-windows-settings §4.2"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.menu.file.save-as",
+   "id": "menu.file.save-as",
+   "title": "File › Save As…",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/app.ts",
+    "anchor": "case 'saveAs'",
+    "sha256": "0d4e0275e6d2c34c3639696699e70c6535a1c28e25dabe478f0ab75cf59d98a9"
+   },
+   "verifier": {
+    "file": "tests/e2e/app-files.spec.ts",
+    "test": "new untitled document → Save As writes file",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Save As",
+     "Save %@ As"
+    ],
+    "panel": [
+     "Select file path to save"
+    ],
+    "bridge": [
+     "path.showSaveDialog"
+    ],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.menu.file.save-all",
+   "id": "menu.file.save-all",
+   "title": "File › Save All",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "files",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Save All"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": []
+   },
+   "note": "needs multi-document (tabs/windows)",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.file.duplicate",
+   "id": "menu.file.duplicate",
+   "title": "File › Duplicate",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "files",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Duplicate"
+    ],
+    "panel": [],
+    "bridge": [
+     "library.duplicate"
+    ],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.file.rename-move",
+   "id": "menu.file.rename-move",
+   "title": "File › Rename… / Move To… for the current document",
+   "status": "partial",
+   "priority": "P1",
+   "epic": "files",
+   "owner": {
+    "path": "src/app/sidebar/filetree.ts",
+    "anchor": "'Rename…'",
+    "sha256": "8ab20612a0b51cf692745206c1294f41f1fc0cdbb1b292a48d0c207670892963"
+   },
+   "verifier": {
+    "file": "tests/e2e/app-files.spec.ts",
+    "test": "context menu: new file, rename (open doc follows)",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Rename",
+     "Move To"
+    ],
+    "panel": [
+     "Rename",
+     "Rename %@",
+     "Rename to \"{0}\" ?",
+     "Cannot rename from $1 to $2, please use \"File\" → \"Move To…\" from menubar instead.",
+     "Failed to rename file",
+     "Failed to rename from \"{0}\" to \"{1}\"",
+     "Move %@",
+     "Are you sure you want to move %@?",
+     "Should continue moving and overwrite existing file(s) ?",
+     "File/directory already exists at target path.",
+     "File with the same name already exists at target path"
+    ],
+    "bridge": [
+     "library.renameFile",
+     "library.moveFile",
+     "path.moveTo"
+    ],
+    "prose": []
+   },
+   "note": "sidebar rename exists; no File-menu Rename/Move To for the open document",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.file.revert-versions",
+   "id": "menu.file.revert-versions",
+   "title": "File › Revert To / Browse All Versions (version history)",
+   "status": "partial",
+   "priority": "P1",
+   "epic": "files",
+   "owner": {
+    "path": "src/app/app.ts",
+    "anchor": "case 'reloadFromDisk'",
+    "sha256": "0d4e0275e6d2c34c3639696699e70c6535a1c28e25dabe478f0ab75cf59d98a9"
+   },
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Revert To",
+     "Browse All Versions"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": [
+     "files-windows-settings §4.6"
+    ]
+   },
+   "note": "only \"Revert to Saved\"; no version browser",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.file.encoding",
+   "id": "menu.file.encoding",
+   "title": "File › Reopen with Encoding",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "files",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Reopen with Encoding"
+    ],
+    "panel": [
+     "(Auto Detect)"
+    ],
+    "bridge": [],
+    "prose": [
+     "files-windows-settings §11"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.file.line-endings",
+   "id": "menu.file.line-endings",
+   "title": "File › Line Endings (LF / CRLF), preserved on save",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/app.ts",
+    "anchor": "case 'toggleLineEnding'",
+    "sha256": "0d4e0275e6d2c34c3639696699e70c6535a1c28e25dabe478f0ab75cf59d98a9"
+   },
+   "verifier": {
+    "file": "src/app/__tests__/document.test.ts",
+    "test": "toggling EOL marks dirty and toggling back cleans",
+    "kind": "unit"
+   },
+   "spec": {
+    "menu": [
+     "Line Endings",
+     "Unix Line Endings (LF)",
+     "Windows Line Endings (CRLF)"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.menu.file.properties",
+   "id": "menu.file.properties",
+   "title": "File › Properties / Get Info (word count, size, dates)",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "files",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Properties",
+     "Get Info"
+    ],
+    "panel": [],
+    "bridge": [
+     "library.showProperty"
+    ],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.file.reveal",
+   "id": "menu.file.reveal",
+   "title": "File › Reveal in Finder / Open File Location / Copy File Path (current doc)",
+   "status": "partial",
+   "priority": "P1",
+   "epic": "files",
+   "owner": {
+    "path": "src/app/sidebar/filetree.ts",
+    "anchor": "'Reveal in Finder'",
+    "sha256": "8ab20612a0b51cf692745206c1294f41f1fc0cdbb1b292a48d0c207670892963"
+   },
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Reveal in Finder",
+     "Open File Location",
+     "Copy File Path",
+     "Reveal in Library"
+    ],
+    "panel": [
+     "Reveal in Finder",
+     "Reveal in File Explorer"
+    ],
+    "bridge": [
+     "path.showInFinder",
+     "path.openFolderInFinder"
+    ],
+    "prose": []
+   },
+   "note": "only from the sidebar context menu",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.file.page-setup",
+   "id": "menu.file.page-setup",
+   "title": "File › Page Setup (paper size for print/PDF)",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "export",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Page Setup"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": [
+     "export-print §11"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.file.print",
+   "id": "menu.file.print",
+   "title": "File › Print",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/app.ts",
+    "anchor": "case 'print'",
+    "sha256": "0d4e0275e6d2c34c3639696699e70c6535a1c28e25dabe478f0ab75cf59d98a9"
+   },
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Print"
+    ],
+    "panel": [
+     "Print with default theme"
+    ],
+    "bridge": [],
+    "prose": [
+     "export-print §4.2"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.file.close",
+   "id": "menu.file.close",
+   "title": "File › Close (asks to save dirty docs)",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/app.ts",
+    "anchor": "case 'close'",
+    "sha256": "0d4e0275e6d2c34c3639696699e70c6535a1c28e25dabe478f0ab75cf59d98a9"
+   },
+   "verifier": {
+    "file": "tests/e2e/app-files.spec.ts",
+    "test": "close request with unsaved changes can be cancelled",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Close"
+    ],
+    "panel": [
+     "Close",
+     "Discard",
+     "Discard Changes"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.menu.file.errors",
+   "id": "menu.file.errors",
+   "title": "Open/save error reporting (missing file, open failed, create prompt)",
+   "status": "partial",
+   "priority": "P1",
+   "epic": "files",
+   "owner": {
+    "path": "src/app/document.ts",
+    "anchor": "missing",
+    "sha256": "7463d20622ea1cb2a293bbb4c7bea87c7b8d8f12d1b0d8635e5f952e172835b5"
+   },
+   "verifier": {
+    "file": "src/app/__tests__/document.test.ts",
+    "test": "marks missing on delete and follows renames",
+    "kind": "unit"
+   },
+   "spec": {
+    "menu": [
+     "Open Failed",
+     "File or folder does not exist."
+    ],
+    "panel": [
+     "File does not exist",
+     "File does not exist at <em>{0}</em>",
+     "File does not exist at path %@, do you want to create one at that path?",
+     "File does not exist at path %@.",
+     "Failed to load file",
+     "Open Operation Failed",
+     "Operation Failed",
+     "Error",
+     "Something is Wrong…",
+     "Cannot Continue…",
+     "You are not supposed to edit or save this file.",
+     "The file is too large to render in Typora.",
+     "Document must be saved first"
+    ],
+    "bridge": [
+     "controller.showErrorDialog",
+     "document.enterOversize"
+    ],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.edit.undo-redo",
+   "id": "menu.edit.undo-redo",
+   "title": "Edit › Undo / Redo",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/app.ts",
+    "anchor": "case 'undo'",
+    "sha256": "0d4e0275e6d2c34c3639696699e70c6535a1c28e25dabe478f0ab75cf59d98a9"
+   },
+   "verifier": {
+    "file": "tests/e2e/core-cases.ts",
+    "test": "typing, Enter split, heading shortcut, undo/redo",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Edit",
+     "Undo",
+     "Redo"
+    ],
+    "panel": [
+     "Edit",
+     "Undo",
+     "Undo %@",
+     "You could undo this operation later via `Edit` → `Undo`."
+    ],
+    "bridge": [],
+    "prose": [
+     "editor-core §5.6"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.menu.edit.cut-copy-paste",
+   "id": "menu.edit.cut-copy-paste",
+   "title": "Edit › Cut / Copy / Paste (markdown + HTML round-trip)",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/editor/core/clipboard.ts",
+    "anchor": "export function onPaste",
+    "sha256": "bfa91a163900c57dbb623e7b4a9ee0338101333ddb50664c20ef25216056db94"
+   },
+   "verifier": {
+    "file": "tests/e2e/core-cases.ts",
+    "test": "paste HTML becomes markdown; copy gives markdown",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Cut",
+     "Copy",
+     "Paste"
+    ],
+    "panel": [],
+    "bridge": [
+     "clipboard.read",
+     "clipboard.write"
+    ],
+    "prose": [
+     "clipboard-contextmenu §5.1",
+     "clipboard-contextmenu §5.2",
+     "clipboard-contextmenu §4.4"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.menu.edit.delete-select-all",
+   "id": "menu.edit.delete-select-all",
+   "title": "Edit › Delete / Select All",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/editor/core/commands.ts",
+    "anchor": "case 'selectAll'",
+    "sha256": "6c289b924eee227e128339f05763386820db0c0bbe7fd8e54ce123efd0a574ca"
+   },
+   "verifier": {
+    "file": "tests/e2e/blocks-core.spec.ts",
+    "test": "Cmd/Ctrl+A in a table cell selects the cell",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Delete",
+     "Select All"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.menu.edit.find-replace",
+   "id": "menu.edit.find-replace",
+   "title": "Edit › Find / Find Next / Previous / Replace / Replace Next",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/findbar.ts",
+    "anchor": "caseSensitive",
+    "sha256": "54d79dcdc1a566f1e511c082614748282d18f8263370eca6b18b6341b0924bff"
+   },
+   "verifier": {
+    "file": "tests/e2e/app-navigation.spec.ts",
+    "test": "find keeps focus in the bar, counts and cycles matches",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Find",
+     "Find Next",
+     "Find Previous",
+     "Find and Replace",
+     "Replace",
+     "Replace Next"
+    ],
+    "panel": [
+     "Replace",
+     "replace with",
+     "search text",
+     "Search text not found in article",
+     "Case Sensitive",
+     "Too many matches",
+     "No result found."
+    ],
+    "bridge": [
+     "touchBar.updateFindReplaceMode"
+    ],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.menu.edit.find-options",
+   "id": "menu.edit.find-options",
+   "title": "Find options: whole word and regular expression",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "clipboard",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [
+     "Whole Word",
+     "Regular Expression",
+     "In Selection"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": "only Match Case exists",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.edit.copy-as",
+   "id": "menu.edit.copy-as",
+   "title": "Edit › Copy as Markdown / HTML Code / Plain Text / without Theme Styling / to MS Word",
+   "status": "missing",
+   "priority": "P0",
+   "epic": "clipboard",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Copy / Paste As",
+     "Copy as Markdown",
+     "Copy as HTML Code",
+     "Copy as Plain Text",
+     "Copy without Theme Styling",
+     "Copy to MS Word",
+     "More Options"
+    ],
+    "panel": [
+     "Default Copy Behavior",
+     "Copy Markdown source as plain text",
+     "When copy / export as HTML (without style)"
+    ],
+    "bridge": [
+     "clipboard.postCopy"
+    ],
+    "prose": [
+     "clipboard-contextmenu §3.4",
+     "clipboard-contextmenu §5.4",
+     "clipboard-contextmenu §9"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.edit.paste-plain",
+   "id": "menu.edit.paste-plain",
+   "title": "Edit › Paste as Plain Text",
+   "status": "missing",
+   "priority": "P0",
+   "epic": "clipboard",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Paste as Plain Text"
+    ],
+    "panel": [],
+    "bridge": [
+     "window.pasteAsPlainText"
+    ],
+    "prose": [
+     "clipboard-contextmenu §5.3"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.edit.select-scopes",
+   "id": "menu.edit.select-scopes",
+   "title": "Edit › Selection: Select Word / Line-Sentence / Paragraph-Block / Styled Scope",
+   "status": "missing",
+   "priority": "P0",
+   "epic": "clipboard",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Selection",
+     "Select Word",
+     "Select Line / Sentence",
+     "Select Paragraph / Block",
+     "Select Styled Scope"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.edit.delete-scopes",
+   "id": "menu.edit.delete-scopes",
+   "title": "Edit › Delete Word / Line-Sentence / Paragraph-Block / Styled Scope / Range",
+   "status": "missing",
+   "priority": "P0",
+   "epic": "clipboard",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Delete Word",
+     "Delete Line / Sentence",
+     "Delete Paragraph / Block",
+     "Delete Styled Scope",
+     "Delete Range"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.edit.jump",
+   "id": "menu.edit.jump",
+   "title": "Edit › Jump To: Top / Bottom / Selection",
+   "status": "partial",
+   "priority": "P1",
+   "epic": "clipboard",
+   "owner": {
+    "path": "src/editor/core/input.ts",
+    "anchor": "ArrowUp",
+    "sha256": "0fd48eacfd2fec5f40c3ff03aa862c61266b378d40a00c41272fa675885ce6f0"
+   },
+   "verifier": {
+    "file": "tests/e2e/core-nav-keys.spec.ts",
+    "test": "doc start lands after the heading marker",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Jump To",
+     "Jump to Top",
+     "Jump to Bottom",
+     "Jump to Selection"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": []
+   },
+   "note": "Cmd+↑/↓ work; no menu items, no Jump to Selection",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.edit.spelling",
+   "id": "menu.edit.spelling",
+   "title": "Edit › Spelling: check while typing, check now, learn/unlearn, grammar, autocorrect",
+   "status": "partial",
+   "priority": "P2",
+   "epic": "chrome",
+   "owner": {
+    "path": "src/app/preferences.ts",
+    "anchor": "'Check spelling while typing'",
+    "sha256": "cee6782eb5b0e16a457a535f41618a5dbb5bce3834c50402ef061e18752544a5"
+   },
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Spell Check",
+     "Spelling and Grammar",
+     "Check Spelling While Typing",
+     "Check Document Now",
+     "Check Grammar With Spelling",
+     "Correct Spelling Automatically",
+     "Learn Spelling",
+     "Unlearn Spelling"
+    ],
+    "panel": [
+     "Spell Check",
+     "Auto correct spelling",
+     "Select Spell Check Language",
+     "Disable Spell Check",
+     "(Default spell check option)",
+     "Spell Check (%@ downloading)",
+     "Spell Check (%@ unavailable)",
+     "Dictionary file is missing to enable spellcheck support for %@.",
+     "Download dictionary file for %@",
+     "Install dictionary file only for Typora",
+     "Failed to load spellcheck module",
+     "Install Language Support",
+     "System Language"
+    ],
+    "bridge": [
+     "word.getSpellSuggestionInContext"
+    ],
+    "prose": [
+     "editor-core §8.3"
+    ]
+   },
+   "note": "only the WebView spellcheck toggle",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.edit.substitutions",
+   "id": "menu.edit.substitutions",
+   "title": "Edit › Substitutions: smart quotes/dashes/punctuation, text replacement",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "chrome",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Substitutions",
+     "Smart Quotes",
+     "Smart Dashes",
+     "Smart Punctuation",
+     "Text Replacement"
+    ],
+    "panel": [
+     "Convert -- and --- to — (em dash)",
+     "Convert -- to – (en dash), and --- to — (em dash)"
+    ],
+    "bridge": [
+     "word.getTextReplacement"
+    ],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.edit.speech",
+   "id": "menu.edit.speech",
+   "title": "Edit › Speech: Start / Stop Speaking",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "chrome",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Speech",
+     "Start Speaking",
+     "Stop Speaking"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.edit.emoji",
+   "id": "menu.edit.emoji",
+   "title": "Edit › Emoji and Symbols (system picker) and :emoji: autocomplete",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "chrome",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Emoji and Symbols"
+    ],
+    "panel": [
+     "Emoji Autocomplete",
+     "Trigger Autocomplete without ESC key for",
+     "Trigger automatically",
+     "Trigger by ESC key",
+     "Unicode Characters"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.para.headings",
+   "id": "menu.para.headings",
+   "title": "Paragraph › Heading 1–6 / Paragraph",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/editor/core/commands.ts",
+    "anchor": "case 'heading'",
+    "sha256": "6c289b924eee227e128339f05763386820db0c0bbe7fd8e54ce123efd0a574ca"
+   },
+   "verifier": {
+    "file": "tests/e2e/app-navigation.spec.ts",
+    "test": "keyboard shortcuts drive editor commands",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Paragraph",
+     "Heading 1",
+     "Heading 2",
+     "Heading 3",
+     "Heading 4",
+     "Heading 5",
+     "Heading 6"
+    ],
+    "panel": [],
+    "bridge": [
+     "touchBar.setBlockStyle"
+    ],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.menu.para.heading-level",
+   "id": "menu.para.heading-level",
+   "title": "Paragraph › Increase / Decrease Heading Level",
+   "status": "missing",
+   "priority": "P0",
+   "epic": "core-cmds",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Increase Heading Level",
+     "Decrease Heading Level"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.para.table",
+   "id": "menu.para.table",
+   "title": "Paragraph › Table / Insert Table (with rows×columns dialog)",
+   "status": "partial",
+   "priority": "P1",
+   "epic": "tools",
+   "owner": {
+    "path": "src/editor/core/commands.ts",
+    "anchor": "case 'table'",
+    "sha256": "6c289b924eee227e128339f05763386820db0c0bbe7fd8e54ce123efd0a574ca"
+   },
+   "verifier": {
+    "file": "tests/e2e/core-cases.ts",
+    "test": "table shortcut mounts the table widget",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Table",
+     "Insert Table"
+    ],
+    "panel": [
+     "Insert Table",
+     "Rows",
+     "Columns"
+    ],
+    "bridge": [
+     "touchBar.showInsertTableTouchBar",
+     "touchBar.updateInsertTableTouchBar"
+    ],
+    "prose": [
+     "editor-core §7.4"
+    ]
+   },
+   "note": "inserts a fixed 2×2 table; no size dialog",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.para.math-block",
+   "id": "menu.para.math-block",
+   "title": "Paragraph › Math Block",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/editor/core/commands.ts",
+    "anchor": "case 'math'",
+    "sha256": "6c289b924eee227e128339f05763386820db0c0bbe7fd8e54ce123efd0a574ca"
+   },
+   "verifier": {
+    "file": "tests/e2e/blocks-widgets.spec.ts",
+    "test": "renders KaTeX, edits source, shows errors",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Math Block",
+     "Math"
+    ],
+    "panel": [
+     "Input Math TeX here",
+     "Math Blocks"
+    ],
+    "bridge": [],
+    "prose": [
+     "editor-core §7.2"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.menu.para.code-fence",
+   "id": "menu.para.code-fence",
+   "title": "Paragraph › Code Fences (with language box)",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/editor/core/commands.ts",
+    "anchor": "case 'code'",
+    "sha256": "6c289b924eee227e128339f05763386820db0c0bbe7fd8e54ce123efd0a574ca"
+   },
+   "verifier": {
+    "file": "tests/e2e/core-cases.ts",
+    "test": "``` + Enter mounts a code widget",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Code Fences"
+    ],
+    "panel": [
+     "code language",
+     "Code Fences"
+    ],
+    "bridge": [
+     "touchBar.setFencesOnSetLang"
+    ],
+    "prose": [
+     "editor-core §7.1"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.menu.para.html-block",
+   "id": "menu.para.html-block",
+   "title": "Paragraph › HTML Block (insert)",
+   "status": "partial",
+   "priority": "P1",
+   "epic": "core-cmds",
+   "owner": {
+    "path": "src/editor/blocks/html-block.ts",
+    "anchor": "createHtmlBlockWidget",
+    "sha256": "53b6451595ca031ec9ec8c7c3f820255bf0feac2674380510a034ff89c2d84c2"
+   },
+   "verifier": {
+    "file": "tests/e2e/blocks-widgets.spec.ts",
+    "test": "html block is sanitized and editable",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "HTML Block"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": [
+     "editor-core §7.5"
+    ]
+   },
+   "note": "renders/edits HTML blocks; no insert command",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.para.containers",
+   "id": "menu.para.containers",
+   "title": "Paragraph › Quote / Ordered List / Unordered List / Task List",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/editor/core/commands.ts",
+    "anchor": "case 'quote'",
+    "sha256": "6c289b924eee227e128339f05763386820db0c0bbe7fd8e54ce123efd0a574ca"
+   },
+   "verifier": {
+    "file": "tests/e2e/core-qa.spec.ts",
+    "test": "cut/paste list items, toggle list on two blocks",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Quote",
+     "Ordered List",
+     "Unordered List",
+     "Task List",
+     "List Styles / Remove Block"
+    ],
+    "panel": [
+     "Ordered List",
+     "Unordered List"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.menu.para.task-status",
+   "id": "menu.para.task-status",
+   "title": "Paragraph › Task Status: toggle / mark complete / incomplete",
+   "status": "partial",
+   "priority": "P1",
+   "epic": "core-cmds",
+   "owner": {
+    "path": "src/editor/core/input.ts",
+    "anchor": "task",
+    "sha256": "0fd48eacfd2fec5f40c3ff03aa862c61266b378d40a00c41272fa675885ce6f0"
+   },
+   "verifier": {
+    "file": "tests/e2e/core-cases.ts",
+    "test": "task checkbox toggles source",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Task Status",
+     "Toggle Task Status",
+     "Mark as Complete",
+     "Mark as Incomplete"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": []
+   },
+   "note": "checkbox click only; no command/shortcut",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.para.indent",
+   "id": "menu.para.indent",
+   "title": "Paragraph › List Indentation: Indent / Outdent",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/editor/core/input.ts",
+    "anchor": "Tab",
+    "sha256": "0fd48eacfd2fec5f40c3ff03aa862c61266b378d40a00c41272fa675885ce6f0"
+   },
+   "verifier": {
+    "file": "tests/e2e/core-qa.spec.ts",
+    "test": "Tab moves an item with its nested children",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "List Indentation",
+     "Indent",
+     "Outdent"
+    ],
+    "panel": [
+     "Indent"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.menu.para.insert-paragraph",
+   "id": "menu.para.insert-paragraph",
+   "title": "Paragraph › Insert Paragraph Before / After",
+   "status": "missing",
+   "priority": "P0",
+   "epic": "core-cmds",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Insert Paragraph Before",
+     "Insert Paragraph After",
+     "Paragraph (before)",
+     "Paragraph (after)",
+     "Insert"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.para.link-reference",
+   "id": "menu.para.link-reference",
+   "title": "Paragraph › Link Reference (insert [id]: url definition)",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "core-cmds",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Link Reference"
+    ],
+    "panel": [
+     "Please define image reference by [{0}]: http://example.png",
+     "Need to define the reference link <b>[{0}]</b> with syntax <b>[{1}]: www.example.com</b>"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.para.footnotes",
+   "id": "menu.para.footnotes",
+   "title": "Paragraph › Footnotes (insert, hover preview, jump)",
+   "status": "partial",
+   "priority": "P1",
+   "epic": "core-cmds",
+   "owner": {
+    "path": "src/editor/core/render-inline.ts",
+    "anchor": "footnote",
+    "sha256": "7cd6fb2eda9953f64e109a0a5010d745ce30aa40fa98b5a25486f601295fca11"
+   },
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Footnotes"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": [
+     "editor-core §7.5"
+    ]
+   },
+   "note": "footnote refs/defs parse and render; no insert command or navigation",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.para.hr",
+   "id": "menu.para.hr",
+   "title": "Paragraph › Horizontal Line",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/editor/core/commands.ts",
+    "anchor": "case 'hr'",
+    "sha256": "6c289b924eee227e128339f05763386820db0c0bbe7fd8e54ce123efd0a574ca"
+   },
+   "verifier": {
+    "file": "tests/e2e/core-cases.ts",
+    "test": "exec: heading, strong, block quote",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Horizontal Line"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.menu.para.toc",
+   "id": "menu.para.toc",
+   "title": "Paragraph › Table of Contents",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/editor/core/commands.ts",
+    "anchor": "case 'toc'",
+    "sha256": "6c289b924eee227e128339f05763386820db0c0bbe7fd8e54ce123efd0a574ca"
+   },
+   "verifier": {
+    "file": "tests/e2e/blocks-widgets.spec.ts",
+    "test": "toc lists headings and scrolls",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Table of Contents"
+    ],
+    "panel": [
+     "Table of Contents"
+    ],
+    "bridge": [],
+    "prose": [
+     "editor-core §7.5"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.menu.para.front-matter",
+   "id": "menu.para.front-matter",
+   "title": "Paragraph › YAML Front Matter",
+   "status": "partial",
+   "priority": "P1",
+   "epic": "core-cmds",
+   "owner": {
+    "path": "src/editor/core/commands.ts",
+    "anchor": "case 'front_matter'",
+    "sha256": "6c289b924eee227e128339f05763386820db0c0bbe7fd8e54ce123efd0a574ca"
+   },
+   "verifier": {
+    "file": "tests/e2e/blocks-widgets.spec.ts",
+    "test": "front matter collapsed box and yaml editing",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "YAML Front Matter"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": []
+   },
+   "note": "editor command exists; not exposed in menu/palette",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.format.basic",
+   "id": "menu.format.basic",
+   "title": "Format › Strong / Emphasis / Code / Strike / Highlight",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/editor/core/commands.ts",
+    "anchor": "case 'mark'",
+    "sha256": "6c289b924eee227e128339f05763386820db0c0bbe7fd8e54ce123efd0a574ca"
+   },
+   "verifier": {
+    "file": "tests/e2e/app-navigation.spec.ts",
+    "test": "keyboard shortcuts drive editor commands",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Format",
+     "Strong",
+     "Emphasis",
+     "Code",
+     "Strike",
+     "Highlight",
+     "Inline Styles",
+     "Block Styles"
+    ],
+    "panel": [],
+    "bridge": [
+     "touchBar.setInlineEnabled",
+     "touchBar.setInlineStates"
+    ],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.menu.format.underline",
+   "id": "menu.format.underline",
+   "title": "Format › Underline (<u>)",
+   "status": "missing",
+   "priority": "P0",
+   "epic": "core-cmds",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Underline"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.format.inline-math",
+   "id": "menu.format.inline-math",
+   "title": "Format › Inline Math (toggle $…$)",
+   "status": "partial",
+   "priority": "P0",
+   "epic": "core-cmds",
+   "owner": {
+    "path": "src/editor/blocks/inline-md.ts",
+    "anchor": "math",
+    "sha256": "82e1836e681451fb10641dc84176a42cb073dd8faf7b4d1c412f3cf67dd77670"
+   },
+   "verifier": {
+    "file": "tests/e2e/blocks-widgets.spec.ts",
+    "test": "inline math renders and shows errors",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Inline Math"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": []
+   },
+   "note": "renders; no format command",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.format.sub-sup",
+   "id": "menu.format.sub-sup",
+   "title": "Format › Superscript / Subscript",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "core-cmds",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Superscript",
+     "Subscript"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.format.comment",
+   "id": "menu.format.comment",
+   "title": "Format › Comment (<!-- -->)",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "core-cmds",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Comment"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.format.hyperlink",
+   "id": "menu.format.hyperlink",
+   "title": "Format › Hyperlink",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/editor/core/commands.ts",
+    "anchor": "case 'mark'",
+    "sha256": "6c289b924eee227e128339f05763386820db0c0bbe7fd8e54ce123efd0a574ca"
+   },
+   "verifier": {
+    "file": "tests/e2e/core-cases.ts",
+    "test": "Cmd+click opens links",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Hyperlink"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.menu.format.clear",
+   "id": "menu.format.clear",
+   "title": "Format › Clear Format",
+   "status": "missing",
+   "priority": "P0",
+   "epic": "core-cmds",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Clear Format"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.format.image",
+   "id": "menu.format.image",
+   "title": "Format › Image › Insert Image / Insert Local Images…",
+   "status": "partial",
+   "priority": "P0",
+   "epic": "images",
+   "owner": {
+    "path": "src/editor/core/commands.ts",
+    "anchor": "case 'insertImage'",
+    "sha256": "6c289b924eee227e128339f05763386820db0c0bbe7fd8e54ce123efd0a574ca"
+   },
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Image",
+     "Insert Image",
+     "Insert Local Images"
+    ],
+    "panel": [
+     "Select image from local file",
+     "input image URL"
+    ],
+    "bridge": [
+     "images.insertLocalImage"
+    ],
+    "prose": [
+     "images §4.1"
+    ]
+   },
+   "note": "insertImage command + paste/drop; no menu/dialog",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.view.source-mode",
+   "id": "menu.view.source-mode",
+   "title": "View › Source Code Mode",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/app.ts",
+    "anchor": "case 'toggleSource'",
+    "sha256": "0d4e0275e6d2c34c3639696699e70c6535a1c28e25dabe478f0ab75cf59d98a9"
+   },
+   "verifier": {
+    "file": "tests/e2e/core-cases.ts",
+    "test": "source mode round-trip",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "View",
+     "Source Code Mode",
+     "Toggle Source Code Mode",
+     "Exit Source Code Mode"
+    ],
+    "panel": [
+     "Toggle Source Code Mode",
+     "Exit Source Code Mode"
+    ],
+    "bridge": [
+     "window.updateUIAfterExitSourceMode"
+    ],
+    "prose": [
+     "editor-core §8.1"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.menu.view.focus-typewriter",
+   "id": "menu.view.focus-typewriter",
+   "title": "View › Focus Mode / Typewriter Mode",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/app.ts",
+    "anchor": "case 'toggleFocus'",
+    "sha256": "0d4e0275e6d2c34c3639696699e70c6535a1c28e25dabe478f0ab75cf59d98a9"
+   },
+   "verifier": {
+    "file": "tests/e2e/app-navigation.spec.ts",
+    "test": "native menu actions route through one dispatcher",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Focus Mode",
+     "Typewriter Mode"
+    ],
+    "panel": [
+     "Typewriter Mode",
+     "Turn off Typewriter / Focus Mode",
+     "Typewriter / Focus Mode have been turned off.",
+     "Always keep caret in middle of screen when typewriter mode is enabled"
+    ],
+    "bridge": [],
+    "prose": [
+     "editor-core §8.2"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.menu.view.sidebar",
+   "id": "menu.view.sidebar",
+   "title": "View › Toggle Sidebar / Outline / File Tree",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/app.ts",
+    "anchor": "case 'toggleSidebar'",
+    "sha256": "0d4e0275e6d2c34c3639696699e70c6535a1c28e25dabe478f0ab75cf59d98a9"
+   },
+   "verifier": {
+    "file": "tests/e2e/app-navigation.spec.ts",
+    "test": "outline lists headings and jumps on click",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Toggle Sidebar",
+     "Outline",
+     "File Tree",
+     "File Tree (Tree View)"
+    ],
+    "panel": [
+     "Toggle Sidebar",
+     "Close sidebar",
+     "Close Sidebar Menu",
+     "Outline",
+     "Switch to Outline view",
+     "Switch to File Tree view"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.menu.view.status-bar",
+   "id": "menu.view.status-bar",
+   "title": "View › Show Status Bar (word count, toggle)",
+   "status": "partial",
+   "priority": "P2",
+   "epic": "chrome",
+   "owner": {
+    "path": "src/app/statusbar.ts",
+    "anchor": "cycle()",
+    "sha256": "316d146a08fc9d1b45721f89749a5d98a71dd214b5913827e031db2ae59c1ccc"
+   },
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Show Status Bar"
+    ],
+    "panel": [
+     "Show status bar",
+     "Status Bar",
+     "Word Count",
+     "Always Show Word Count",
+     "Words",
+     "Word",
+     "Characters",
+     "Character",
+     "Lines",
+     "Line",
+     "Minute",
+     "Minutes",
+     "Reading Speed",
+     "words / min",
+     "120 words/minute (Slow)",
+     "240 words/minute (Medium)",
+     "382 words/minute (Fast)",
+     "Total",
+     "Word count only support OS X later than 10.10."
+    ],
+    "bridge": [
+     "word.updateWordCount"
+    ],
+    "prose": [
+     "editor-core §8.3"
+    ]
+   },
+   "note": "status bar always shown; no reading time / word-count popover",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.view.zoom",
+   "id": "menu.view.zoom",
+   "title": "View › Actual Size / Zoom In / Zoom Out",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/app.ts",
+    "anchor": "case 'zoomIn'",
+    "sha256": "0d4e0275e6d2c34c3639696699e70c6535a1c28e25dabe478f0ab75cf59d98a9"
+   },
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Actual Size",
+     "Zoom In",
+     "Zoom Out",
+     "Zoom"
+    ],
+    "panel": [],
+    "bridge": [
+     "window.zoomIn",
+     "window.zoomOut",
+     "window.resetZoom"
+    ],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.view.fullscreen",
+   "id": "menu.view.fullscreen",
+   "title": "View › Toggle Fullscreen",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src-tauri/src/menu.rs",
+    "anchor": "PredefinedMenuItem::fullscreen",
+    "sha256": "1cc92c5f52bd308d4cc0b37323c641fa3c774f2f7972add833595952a19de97a"
+   },
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Full Screen",
+     "Toggle Fullscreen"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.view.always-on-top",
+   "id": "menu.view.always-on-top",
+   "title": "View › Always on Top",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "chrome",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Always on Top"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.view.devtools",
+   "id": "menu.view.devtools",
+   "title": "View › Toggle DevTools / Inspect Element (debug builds)",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "chrome",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Toggle DevTools",
+     "Inspect Element"
+    ],
+    "panel": [
+     "Developer",
+     "Enable Debug"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.view.magnification",
+   "id": "menu.view.magnification",
+   "title": "View › Allow Magnification (trackpad pinch zoom)",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "chrome",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Allow Magnification"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.themes",
+   "id": "menu.themes",
+   "title": "Themes menu: built-in + user themes, check mark on current",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src-tauri/src/menu.rs",
+    "anchor": "THEMES_SUBMENU_ID",
+    "sha256": "1cc92c5f52bd308d4cc0b37323c641fa3c774f2f7972add833595952a19de97a"
+   },
+   "verifier": {
+    "file": "tests/e2e/app-themes.spec.ts",
+    "test": "command palette theme entry and custom CSS",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Themes"
+    ],
+    "panel": [
+     "Themes",
+     "Theme",
+     "Current Theme"
+    ],
+    "bridge": [],
+    "prose": [
+     "files-windows-settings §9"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.menu.themes.folder",
+   "id": "menu.themes.folder",
+   "title": "Themes › Open Theme Folder",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/app.ts",
+    "anchor": "case 'openThemesFolder'",
+    "sha256": "0d4e0275e6d2c34c3639696699e70c6535a1c28e25dabe478f0ab75cf59d98a9"
+   },
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [
+     "Open Theme Folder"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.themes.gallery",
+   "id": "menu.themes.gallery",
+   "title": "Themes › Get Themes (theme gallery website)",
+   "status": "oos",
+   "priority": null,
+   "epic": null,
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [
+     "Get Themes"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": "Links to the vendor-hosted theme gallery; Margin documents user themes instead.",
+   "rea_ledger_status": "out-of-scope",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "out-of-scope",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.state-sync",
+   "id": "menu.state-sync",
+   "title": "Native menu state sync (enabled/checked items follow editor state)",
+   "status": "partial",
+   "priority": "P2",
+   "epic": "chrome",
+   "owner": {
+    "path": "src-tauri/src/commands.rs",
+    "anchor": "set_theme_menu",
+    "sha256": "78fe24d99859e2ace3cd6e9f70cf945f73bb26e203f831b515765f7a0940b1a3"
+   },
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [],
+    "bridge": [
+     "menu.updateMenu"
+    ],
+    "prose": []
+   },
+   "note": "only the Themes check marks are synced",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.window",
+   "id": "menu.window",
+   "title": "Window › Minimize / Zoom / Bring All to Front",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src-tauri/src/menu.rs",
+    "anchor": "PredefinedMenuItem::minimize",
+    "sha256": "1cc92c5f52bd308d4cc0b37323c641fa3c774f2f7972add833595952a19de97a"
+   },
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Window",
+     "Minimize",
+     "Bring All to Front"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.help.reference",
+   "id": "menu.help.reference",
+   "title": "Help › Markdown reference",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src-tauri/src/menu.rs",
+    "anchor": "ID_HELP_MARKDOWN",
+    "sha256": "1cc92c5f52bd308d4cc0b37323c641fa3c774f2f7972add833595952a19de97a"
+   },
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Help"
+    ],
+    "panel": [
+     "Support Document",
+     "Support Documentation",
+     "Learn More",
+     "Learn More…"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.menu.help.vendor-links",
+   "id": "menu.help.vendor-links",
+   "title": "Help › Website / Feedback / Change Log / Contact (vendor URLs)",
+   "status": "oos",
+   "priority": null,
+   "epic": null,
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Website",
+     "Feedback",
+     "Change Log",
+     "Learn More"
+    ],
+    "panel": [
+     "Contact"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": "Vendor-specific web destinations; Margin points at its own repo.",
+   "rea_ledger_status": "out-of-scope",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "out-of-scope",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.ctx.framework",
+   "id": "ctx.framework",
+   "title": "Context-menu framework: target-aware item lists for the editor",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "ctx",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [],
+    "bridge": [
+     "contextMenu.setItems"
+    ],
+    "prose": [
+     "clipboard-contextmenu §6.1",
+     "clipboard-contextmenu §6.3",
+     "clipboard-contextmenu §9"
+    ]
+   },
+   "note": "only the sidebar has a context menu (src/app/ui/contextmenu.ts)",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.ctx.text",
+   "id": "ctx.text",
+   "title": "Text context menu: cut/copy/paste, copy-as, insert, format, paragraph submenus, search with…",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "ctx",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "More Actions",
+     "Search With…",
+     "Search with Google",
+     "Copy '%@'"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": [
+     "clipboard-contextmenu §6.5"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.ctx.link",
+   "id": "ctx.link",
+   "title": "Link context menu: Open Link / Copy Link Address / Hyperlink Actions",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "ctx",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Open Link",
+     "Copy Link Address",
+     "Hyperlink Actions"
+    ],
+    "panel": [],
+    "bridge": [
+     "path.openURL"
+    ],
+    "prose": [
+     "clipboard-contextmenu §6.1"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.ctx.block-generic",
+   "id": "ctx.block-generic",
+   "title": "Block context menu: Insert Paragraph Before/After, Delete (atomic blocks)",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "ctx",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Delete Selected"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": [
+     "clipboard-contextmenu §6.1"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.ctx.emoji",
+   "id": "ctx.emoji",
+   "title": "Emoji/inline-math context entries (copy emoji, copy inline math)",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "ctx",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [],
+    "bridge": [],
+    "prose": [
+     "clipboard-contextmenu §6.1"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.ctx.media",
+   "id": "ctx.media",
+   "title": "Media context entries: play / pause / download video",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "ctx",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Play",
+     "Pause"
+    ],
+    "panel": [
+     "Download",
+     "Download %@",
+     "Downloading…",
+     "Download failed"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.tools.table.rows-cols",
+   "id": "tools.table.rows-cols",
+   "title": "Table: add row above/below, column before/after, delete row/column",
+   "status": "partial",
+   "priority": "P1",
+   "epic": "tools",
+   "owner": {
+    "path": "src/editor/blocks/table.ts",
+    "anchor": "Table tools",
+    "sha256": "fb22eaff30b843984169a1c140884b2e7aa516bc6da14988c83f1e25b23ef15a"
+   },
+   "verifier": {
+    "file": "tests/e2e/blocks-widgets.spec.ts",
+    "test": "Tab at last cell adds a row; Enter moves down; toolbar ops",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Add Row Above",
+     "Add Row Below",
+     "Add Column Before",
+     "Add Column After",
+     "Delete Row",
+     "Delete Column"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": [
+     "editor-core §7.4"
+    ]
+   },
+   "note": "toolbar ops exist; no menu/context entries",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.tools.table.move",
+   "id": "tools.table.move",
+   "title": "Table: Move Row Up/Down, Move Column Left/Right",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "tools",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Move Row Up",
+     "Move Row Down",
+     "Move Column Left",
+     "Move Column Right"
+    ],
+    "panel": [
+     "Move Up",
+     "Move Down"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.tools.table.align-resize",
+   "id": "tools.table.align-resize",
+   "title": "Table: column alignment and Resize Table dialog",
+   "status": "partial",
+   "priority": "P1",
+   "epic": "tools",
+   "owner": {
+    "path": "src/editor/blocks/table.ts",
+    "anchor": "Table tools",
+    "sha256": "fb22eaff30b843984169a1c140884b2e7aa516bc6da14988c83f1e25b23ef15a"
+   },
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [
+     "Align Left",
+     "Align Center",
+     "Align Right",
+     "Resize Table",
+     "Width",
+     "Width x Height"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": "alignment via toolbar; no resize dialog",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.tools.table.copy-delete",
+   "id": "tools.table.copy-delete",
+   "title": "Table: Copy Table / Delete Table",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "tools",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Copy Table",
+     "Delete Table"
+    ],
+    "panel": [
+     "Delete Table"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.tools.table.cells",
+   "id": "tools.table.cells",
+   "title": "Table cell editing, Tab/Enter navigation, TSV paste, IME",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/editor/blocks/table.ts",
+    "anchor": "Table tools",
+    "sha256": "fb22eaff30b843984169a1c140884b2e7aa516bc6da14988c83f1e25b23ef15a"
+   },
+   "verifier": {
+    "file": "tests/e2e/blocks-core.spec.ts",
+    "test": "pasting TSV / CSV fills and grows the grid",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [],
+    "panel": [],
+    "bridge": [],
+    "prose": [
+     "editor-core §7.4"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.tools.code.language",
+   "id": "tools.code.language",
+   "title": "Code fence language box + syntax highlight + copy button",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/editor/blocks/code-fence.ts",
+    "anchor": "mount",
+    "sha256": "0019da5ea1dd298f25e2abb95bdbb5b85602b49d3e5a794875b6a331c93481ec"
+   },
+   "verifier": {
+    "file": "tests/e2e/blocks-widgets.spec.ts",
+    "test": "language box edits info string, copy button works",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Code Tools",
+     "Copy Code Content"
+    ],
+    "panel": [
+     "Auto Detect Language",
+     "Copy Content"
+    ],
+    "bridge": [],
+    "prose": [
+     "editor-core §7.1"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.tools.code.indent-prettify",
+   "id": "tools.code.indent-prettify",
+   "title": "Code tools: Auto Indent Selected/Whole Code, Prettify Source Code",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "tools",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Auto Indent Selected Code",
+     "Auto Indent Whole Code",
+     "Prettify Source Code"
+    ],
+    "panel": [
+     "Use Shift+Tab key to auto indent selected code"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.tools.code.delete",
+   "id": "tools.code.delete",
+   "title": "Code tools: Delete Code Block",
+   "status": "partial",
+   "priority": "P2",
+   "epic": "ctx",
+   "owner": {
+    "path": "src/editor/blocks/code-fence.ts",
+    "anchor": "onRemove",
+    "sha256": "0019da5ea1dd298f25e2abb95bdbb5b85602b49d3e5a794875b6a331c93481ec"
+   },
+   "verifier": {
+    "file": "tests/e2e/blocks-widgets.spec.ts",
+    "test": "arrow keys exit at edges; backspace in empty removes",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Delete Code Block"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": []
+   },
+   "note": "backspace in empty fence only",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.tools.code.line-numbers",
+   "id": "tools.code.line-numbers",
+   "title": "Code fences: line numbers, line wrap, indent size",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "prefs",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [
+     "Display line numbers for code fences",
+     "Auto wrap long lines",
+     "Line Wrap",
+     "Indent Size for Code",
+     "2 spaces per tab",
+     "3 spaces per tab",
+     "4 spaces per tab",
+     "Preserve tabs"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.tools.math.render",
+   "id": "tools.math.render",
+   "title": "Math blocks/inline: KaTeX render, errors, \\tag/\\eqref",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/editor/blocks/math.ts",
+    "anchor": "createMathBlockWidget",
+    "sha256": "04123007f7184954e415940f368283fd48a54bec62be5b040d7329f841b502e4"
+   },
+   "verifier": {
+    "file": "tests/e2e/blocks-core.spec.ts",
+    "test": "follows the referenced",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [],
+    "panel": [],
+    "bridge": [],
+    "prose": [
+     "editor-core §7.2"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.tools.math.copy",
+   "id": "tools.math.copy",
+   "title": "Math tools: Copy Math / Copy as TeX / Copy as MathML / Delete Math",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "tools",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Math Tools",
+     "Copy Math",
+     "Copy as Tex",
+     "Copy as MathML"
+    ],
+    "panel": [
+     "Delete Math",
+     "Use LaTeX Source",
+     "Use Rendered SVG"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.tools.math.refresh",
+   "id": "tools.math.refresh",
+   "title": "Math tools: Refresh All Math Expressions",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "tools",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Refresh All Math Expressions"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.tools.math.numbering",
+   "id": "tools.math.numbering",
+   "title": "Math numbering options (auto-number, AMS rules, physics package)",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "syntax",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [
+     "Auto Numbering Math Equations",
+     "Auto Numbering for All Math Equations",
+     "No Automatic Equation Numbering",
+     "Use AMS Numbering Rules",
+     "Enable physics package",
+     "Physics package will redefine some latex macros, such as \\\\div, \\\\Re, etc."
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.tools.diagram",
+   "id": "tools.diagram",
+   "title": "Diagrams: mermaid / sequence / flowchart render + theme",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/editor/blocks/diagram.ts",
+    "anchor": "createDiagramWidget",
+    "sha256": "64398a07886a9592416a8eaf0d0f4af960b30949fc7ded6df4158148cfb5761b"
+   },
+   "verifier": {
+    "file": "tests/e2e/blocks-widgets.spec.ts",
+    "test": "mermaid renders SVG, errors are shown, sequence syntax translated",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [],
+    "panel": [
+     "Diagrams",
+     "(Sequence, Flowchart and Mermaid)",
+     "Empty Diagram"
+    ],
+    "bridge": [],
+    "prose": [
+     "editor-core §7.3"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.tools.diagram.copy-image",
+   "id": "tools.diagram.copy-image",
+   "title": "Diagram/math: Copy as Image, Save as PNG",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "tools",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Copy as Image"
+    ],
+    "panel": [],
+    "bridge": [
+     "images.savePNG",
+     "clipboard.writeImage"
+    ],
+    "prose": [
+     "images §4.7"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.images.paste-drop",
+   "id": "images.paste-drop",
+   "title": "Paste/drop images: copy into target folder by rule, unique names",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/app.ts",
+    "anchor": "private async storeImage(",
+    "sha256": "0d4e0275e6d2c34c3639696699e70c6535a1c28e25dabe478f0ab75cf59d98a9"
+   },
+   "verifier": {
+    "file": "src/platform/web.test.ts",
+    "test": "copies (never moves) an existing image and dedupes names",
+    "kind": "unit"
+   },
+   "spec": {
+    "menu": [
+     "Convert on Input",
+     "When Insert Local Image"
+    ],
+    "panel": [
+     "Images Insert",
+     "When Insert",
+     "Copy image to current folder (./)",
+     "Copy image to ./assets",
+     "Copy image to ./${filename}.assets",
+     "Copy image to custom folder",
+     "No special action",
+     "Failed to Copy Image to Target Folder."
+    ],
+    "bridge": [
+     "images.copyImage",
+     "clipboard.readImage"
+    ],
+    "prose": [
+     "images §3",
+     "images §4.2",
+     "images §4.3",
+     "images §9"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.images.rules-scope",
+   "id": "images.rules-scope",
+   "title": "Image rule options: apply to local/online images, relative path, ./ prefix, escape URL, YAML override",
+   "status": "partial",
+   "priority": "P1",
+   "epic": "images",
+   "owner": {
+    "path": "src/app/settings.ts",
+    "anchor": "migrateImageRule",
+    "sha256": "ec0edbd2eb22c111a23ce755214ef0f0c0034a3bcda4c2f19a3d6bfc30e27d45"
+   },
+   "verifier": {
+    "file": "src/app/__tests__/settings.test.ts",
+    "test": "image rule forms",
+    "kind": "unit"
+   },
+   "spec": {
+    "menu": [
+     "Global Image Settings",
+     "Convert on Rendering"
+    ],
+    "panel": [
+     "Apply above rules to local images",
+     "Apply above rules to online images",
+     "Use relative path if possible",
+     "Add ./ for relative path",
+     "Auto escape image URL when insert",
+     "Preferred Image Syntax",
+     "Select custom folder",
+     "Open custom folder",
+     "Custom location",
+     "Same folder with current file"
+    ],
+    "bridge": [],
+    "prose": [
+     "images §3.1",
+     "images §3.3"
+    ]
+   },
+   "note": "rule kinds exist; YAML typora-copy-images-to and per-scope toggles missing",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.images.root-path",
+   "id": "images.root-path",
+   "title": "Image root path (typora-root-url)",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "images",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Use Image Root Path"
+    ],
+    "panel": [
+     "Cannot use root path."
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.images.remote-download",
+   "id": "images.remote-download",
+   "title": "Download remote images into the target folder",
+   "status": "partial",
+   "priority": "P1",
+   "epic": "images",
+   "owner": {
+    "path": "src-tauri/src/remote_images.rs",
+    "anchor": "fn ",
+    "sha256": "6eb1cb2aaf18eaa39ac9d4234547ceb98952771927fa27a552deda660104c55d"
+   },
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [],
+    "bridge": [],
+    "prose": [
+     "images §4.5"
+    ]
+   },
+   "note": "#17",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.images.copy-move-all",
+   "id": "images.copy-move-all",
+   "title": "Image Tools: Copy / Move All Images to… (and per-image copy/move/rename)",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "images",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Image Tools",
+     "Copy All Images to",
+     "Move All Images to",
+     "Copy Image to",
+     "Copy Image File to Folder",
+     "Rename or Move Image to",
+     "Copy to %@",
+     "Move to %@"
+    ],
+    "panel": [
+     "Copy Images To…",
+     "Images copied to %@.",
+     "Images moved to %@.",
+     "No local images found.",
+     "Copy %@"
+    ],
+    "bridge": [
+     "images.startCopyAllImages",
+     "images.prepImageMove"
+    ],
+    "prose": [
+     "images §5"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.images.delete",
+   "id": "images.delete",
+   "title": "Image context: Delete Image / Delete Image File (undoable)",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "images",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Delete Image",
+     "Delete Image File",
+     "Delete %@"
+    ],
+    "panel": [
+     "Delete %@",
+     "Are you sure you want to delete %@?",
+     "Delete",
+     "Delete Permanently",
+     "You can restore from the Trash."
+    ],
+    "bridge": [
+     "path.removeFiles"
+    ],
+    "prose": [
+     "images §9"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.images.reveal-open",
+   "id": "images.reveal-open",
+   "title": "Image context: Open Image Location / Open in Browser / Copy Image Content",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "images",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Open Image Location",
+     "Open Image in Browser",
+     "Copy Image Content"
+    ],
+    "panel": [],
+    "bridge": [
+     "clipboard.writeImage",
+     "path.openFile"
+    ],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.images.zoom",
+   "id": "images.zoom",
+   "title": "Image zoom (Zoom Image to N%) and switch Markdown/HTML image syntax",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "images",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Zoom Image",
+     "Zoom Image to %@",
+     "Switch Image Syntax",
+     "Markdown Style",
+     "HTML Style"
+    ],
+    "panel": [],
+    "bridge": [
+     "images.getScale"
+    ],
+    "prose": [
+     "images §4.6",
+     "images §9"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.images.reload",
+   "id": "images.reload",
+   "title": "Image Tools: Reload All Images",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "images",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Reload All Images"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.images.upload",
+   "id": "images.upload",
+   "title": "Image upload: custom command (argv) / PicGo; upload one / all local images; test uploader",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "images",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Upload Image",
+     "Upload All Local Images"
+    ],
+    "panel": [
+     "Image Uploader",
+     "Image Upload Setting",
+     "Upload image",
+     "Uploading in progress",
+     "Uploading in progress…",
+     "Test Uploader",
+     "Testing image uploading using command:",
+     "Validating Image Uploader",
+     "Validation Failed",
+     "Validation Succeed",
+     "Successfully get uploaded image url.",
+     "Successfully uploaded {0} images.",
+     "Successfully uploaded {0} images, {1} failed.",
+     "%d Images Failed to Upload.",
+     "%d Succeeded,",
+     "Failed to upload image. Error Message:",
+     "Failed to upload images:",
+     "Failed to fetch uploaded image from command output.",
+     "Please set an image uploader in Preferences panel before using this function.",
+     "Allow upload images automatically based on YAML settings",
+     "The option `%@` must be enabled first to automatically upload images.",
+     "Custom Command",
+     "Command",
+     "PicGo Path",
+     "Path of PicGo binary",
+     "Failed to get installed version of PicGo-Core (command line)",
+     "You have the latest PicGo-Core (CLI)",
+     "Download or Upgrade",
+     "Running… Waiting for results."
+    ],
+    "bridge": [
+     "images.upload"
+    ],
+    "prose": [
+     "images §6"
+    ]
+   },
+   "note": "#80; use argv, never shell-concatenate (prose §6.3 risk)",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.images.ipic",
+   "id": "images.ipic",
+   "title": "iPic uploader (third-party macOS app, private pasteboard protocol)",
+   "status": "oos",
+   "priority": null,
+   "epic": null,
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Upload Local Images via iPic"
+    ],
+    "panel": [
+     "Get iPic",
+     "This function requires latest version of iPic to be installed."
+    ],
+    "bridge": [
+     "images.iPicValidateBeforeUpload"
+    ],
+    "prose": [
+     "images §6.5"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": "Proprietary third-party integration with an undocumented pasteboard protocol; command/PicGo uploaders cover the use case.",
+   "rea_ledger_status": "out-of-scope",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "out-of-scope",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.pref.storage",
+   "id": "pref.storage",
+   "title": "Settings storage: defaults, validation, migration, unknown keys kept",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/settings.ts",
+    "anchor": "DEFAULT_SETTINGS",
+    "sha256": "ec0edbd2eb22c111a23ce755214ef0f0c0034a3bcda4c2f19a3d6bfc30e27d45"
+   },
+   "verifier": {
+    "file": "src/app/__tests__/settings.test.ts",
+    "test": "keeps unknown keys for forward compatibility",
+    "kind": "unit"
+   },
+   "spec": {
+    "menu": [],
+    "panel": [
+     "Reset to Default",
+     "Restore to previous setting",
+     "Panel",
+     "Menu"
+    ],
+    "bridge": [
+     "setting.put"
+    ],
+    "prose": [
+     "files-windows-settings §8.1"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.pref.advanced",
+   "id": "pref.advanced",
+   "title": "Advanced settings: open/reset config file, reset dialog warnings",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "prefs",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [
+     "Advanced Settings",
+     "Open Advanced Settings",
+     "Reset Advanced Settings",
+     "Open Config File",
+     "Revert advanced setting file to default one ?",
+     "Reset All Dialog Warnings",
+     "Dialog warnings have been reset.",
+     "Dialogs",
+     "Do not show this again",
+     "Do not show this message again",
+     "(Following preferences will be applied after restart.)",
+     "(Some options will be applied after restart.)",
+     "(applied after restart)"
+    ],
+    "bridge": [
+     "setting.showAndHighlight"
+    ],
+    "prose": []
+   },
+   "note": "#63 corrupt settings handling",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.pref.general.launch",
+   "id": "pref.general.launch",
+   "title": "General: On Launch (restore files/folders, open new file, default folder)",
+   "status": "partial",
+   "priority": "P1",
+   "epic": "prefs",
+   "owner": {
+    "path": "src/app/preferences.ts",
+    "anchor": "'restoreLastFolder'",
+    "sha256": "cee6782eb5b0e16a457a535f41618a5dbb5bce3834c50402ef061e18752544a5"
+   },
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [
+     "General",
+     "On Launch",
+     "Restore last closed files and folders",
+     "Restore last closed folders",
+     "Open new file",
+     "Open custom folder",
+     "Choose Default Folder",
+     "Quit Typora when last window is closed"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": "only \"Reopen last folder\"",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.pref.general.save",
+   "id": "pref.general.save",
+   "title": "General: Auto Save, save-on-switch, recover unsaved drafts",
+   "status": "partial",
+   "priority": "P0",
+   "epic": "files",
+   "owner": {
+    "path": "src/app/document.ts",
+    "anchor": "autoSave",
+    "sha256": "7463d20622ea1cb2a293bbb4c7bea87c7b8d8f12d1b0d8635e5f952e172835b5"
+   },
+   "verifier": {
+    "file": "src/app/__tests__/document.test.ts",
+    "test": "auto-saves after the delay when enabled",
+    "kind": "unit"
+   },
+   "spec": {
+    "menu": [],
+    "panel": [
+     "Auto Save",
+     "Save without asking when switch files on side panel",
+     "Recover Unsaved Drafts",
+     "Learn Data Recovery",
+     "Other Options for Data Recovery",
+     "Try Recovery",
+     "Save & Recover",
+     "Continue",
+     "Abort"
+    ],
+    "bridge": [],
+    "prose": [
+     "files-windows-settings §4.1",
+     "files-windows-settings §4.6"
+    ]
+   },
+   "note": "auto-save exists; draft recovery missing",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.pref.general.language",
+   "id": "pref.general.language",
+   "title": "General: UI language",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "prefs",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [
+     "Language"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.pref.appearance.theme",
+   "id": "pref.appearance.theme",
+   "title": "Appearance: theme, separate dark theme, follow system",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/preferences.ts",
+    "anchor": "'darkTheme'",
+    "sha256": "cee6782eb5b0e16a457a535f41618a5dbb5bce3834c50402ef061e18752544a5"
+   },
+   "verifier": {
+    "file": "tests/e2e/app-themes.spec.ts",
+    "test": "preferences: Theme lists light themes, Dark theme lists dark ones",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [],
+    "panel": [
+     "Appearance",
+     "Light Theme",
+     "Dark Theme",
+     "Use separate theme in dark mode",
+     "Dark theme is not supported.",
+     "Dark Theme not support",
+     "System",
+     "Auto (based on current OS)"
+    ],
+    "bridge": [
+     "window.setIsSchemeAwareness",
+     "window.setBackground"
+    ],
+    "prose": [
+     "files-windows-settings §9"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.pref.appearance.font",
+   "id": "pref.appearance.font",
+   "title": "Appearance: font size, custom CSS",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/preferences.ts",
+    "anchor": "'Font size'",
+    "sha256": "cee6782eb5b0e16a457a535f41618a5dbb5bce3834c50402ef061e18752544a5"
+   },
+   "verifier": {
+    "file": "tests/e2e/app-themes.spec.ts",
+    "test": "command palette theme entry and custom CSS",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [],
+    "panel": [
+     "Font Size",
+     "Use custom font size",
+     "Custom CSS"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.pref.appearance.window",
+   "id": "pref.appearance.window",
+   "title": "Appearance: window style (seamless/unibody/native), text column width, outline panel",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "prefs",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [
+     "Window Style",
+     "Seamless",
+     "Unibody",
+     "System Native",
+     "<strong>Unibody</strong> style has been turned on.",
+     "<strong>%@</strong> has been turned on.",
+     "Seamless window only support OS X later than 10.10.",
+     "Text Column Width",
+     "Show Outline Panel by Default",
+     "Collapsible Outline on Left Panel",
+     "Left Panel",
+     "You can right click titlebar to popup application menu."
+    ],
+    "bridge": [
+     "window.setTitlebarTextMarginLeft"
+    ],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.pref.editor.general",
+   "id": "pref.editor.general",
+   "title": "Editor: auto pair brackets/markdown, display source on focus, heading style, indent",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "prefs",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [
+     "Editor",
+     "Auto Pair",
+     "Auto pair brackets and quotes",
+     "Auto pair common Markdown syntax",
+     "Display source for simple blocks (including headings, etc.) on focus",
+     "Live Rendering",
+     "Heading Style",
+     "Pretty indentation",
+     "When Writing",
+     "Indent Size on Save"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.pref.editor.shortcuts",
+   "id": "pref.editor.shortcuts",
+   "title": "Custom shortcut keys",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "prefs",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [
+     "Custom Shortcut Keys",
+     "Shortcut Keys"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.pref.files.defaults",
+   "id": "pref.files.defaults",
+   "title": "Files: default line ending, default folder, file extensions",
+   "status": "partial",
+   "priority": "P1",
+   "epic": "prefs",
+   "owner": {
+    "path": "src/app/preferences.ts",
+    "anchor": "'autoSave'",
+    "sha256": "cee6782eb5b0e16a457a535f41618a5dbb5bce3834c50402ef061e18752544a5"
+   },
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [
+     "Files",
+     "Default Line Ending",
+     "Line ending for new file",
+     "Auto ( Recommended )",
+     "Auto",
+     "Default",
+     "Customized",
+     "Custom"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": "LF/CRLF per file only",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.pref.privacy",
+   "id": "pref.privacy",
+   "title": "Privacy/security toggles (no telemetry; local-only network)",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/settings.ts",
+    "anchor": "DEFAULT_SETTINGS",
+    "sha256": "ec0edbd2eb22c111a23ce755214ef0f0c0034a3bcda4c2f19a3d6bfc30e27d45"
+   },
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [
+     "Security"
+    ],
+    "bridge": [],
+    "prose": [
+     "network-updates-privacy §5"
+    ]
+   },
+   "note": "Margin sends no telemetry by construction",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.sidebar.tree",
+   "id": "sidebar.tree",
+   "title": "File tree: lazy folders, open, watch, new/rename/trash/reveal/copy path",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/sidebar/filetree.ts",
+    "anchor": "'New File…'",
+    "sha256": "8ab20612a0b51cf692745206c1294f41f1fc0cdbb1b292a48d0c207670892963"
+   },
+   "verifier": {
+    "file": "tests/e2e/app-files.spec.ts",
+    "test": "context menu: new file, rename (open doc follows), new folder, trash",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "New Folder",
+     "Reveal in File Tree",
+     "Reveal in Sidebar"
+    ],
+    "panel": [
+     "Create File",
+     "Create Folder",
+     "Failed to create file",
+     "Failed to create folder",
+     "Refresh Folder",
+     "Failed to move target file or folder to trash",
+     "Copy Content",
+     "Create Folder and Continue"
+    ],
+    "bridge": [
+     "library.listDocsUnder",
+     "library.newFile",
+     "library.newFileUnder",
+     "library.newFolder",
+     "library.trashItem",
+     "library.updateListItem",
+     "library.updateListItemIfIsOpen",
+     "controller.bindFolderMonitor",
+     "path.isDirectory"
+    ],
+    "prose": [
+     "files-windows-settings §6.1",
+     "files-windows-settings §6.2",
+     "files-windows-settings §6.4"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.sidebar.list-view",
+   "id": "sidebar.list-view",
+   "title": "Articles list view (summaries, ≤400 items) and tree/list switch",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "sidebar",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Articles",
+     "Articles (List View)"
+    ],
+    "panel": [
+     "Articles",
+     "Switch File List/Tree View",
+     "Switch to File List view",
+     "Group By Folder"
+    ],
+    "bridge": [
+     "library.fetchAllDocs"
+    ],
+    "prose": [
+     "files-windows-settings §6.3",
+     "files-windows-settings §11"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.sidebar.search",
+   "id": "sidebar.search",
+   "title": "Sidebar full-text search across the folder",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "sidebar",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Search",
+     "File Results"
+    ],
+    "panel": [
+     "Search",
+     "Searching",
+     "No Results",
+     "Gathering more results"
+    ],
+    "bridge": [
+     "library.search"
+    ],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.sidebar.sort",
+   "id": "sidebar.sort",
+   "title": "File tree sorting (name/natural/created/modified, asc/desc)",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "sidebar",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [
+     "Sort",
+     "Sort by Name (Ascending)",
+     "Sort by Name (Descending)",
+     "Sort Naturally (Ascending)",
+     "Sort Naturally (Descending)",
+     "Sort by Creation Date (Ascending)",
+     "Sort by Creation Date (Descending)",
+     "Sort by Modification Date (Ascending)",
+     "Sort by Modification Date (Descending)"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.sidebar.outline",
+   "id": "sidebar.outline",
+   "title": "Outline: headings, jump, highlight current header",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/sidebar/outline.ts",
+    "anchor": "activeId",
+    "sha256": "fff6ed5bc7cbefc92423af061c993fca53fd9c6b7c3a5e5c87e69c8e933366c9"
+   },
+   "verifier": {
+    "file": "tests/e2e/app-navigation.spec.ts",
+    "test": "outline lists headings and jumps on click",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Highlight Current Header"
+    ],
+    "panel": [
+     "Outline is Empty."
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.sidebar.outline-collapse",
+   "id": "sidebar.outline-collapse",
+   "title": "Outline: collapsible/flat outline, expand/collapse all, filter, unpin",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "sidebar",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Collapsible Outline",
+     "Flat Outline",
+     "Expand All",
+     "Collapse All",
+     "Filter"
+    ],
+    "panel": [
+     "Filter",
+     "Unpin Outline Panel"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.sidebar.drag",
+   "id": "sidebar.drag",
+   "title": "Drag files from sidebar into the editor / other apps; drop files to open",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "sidebar",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [],
+    "bridge": [
+     "controller.startDrag"
+    ],
+    "prose": []
+   },
+   "note": "#23",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.export.html",
+   "id": "export.html",
+   "title": "Export › HTML (theme inlined, local images relative)",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/app.ts",
+    "anchor": "private async export(",
+    "sha256": "0d4e0275e6d2c34c3639696699e70c6535a1c28e25dabe478f0ab75cf59d98a9"
+   },
+   "verifier": {
+    "file": "tests/e2e/app-themes.spec.ts",
+    "test": "export HTML inlines the theme",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [
+     "Export"
+    ],
+    "panel": [
+     "Export As...",
+     "Export to...",
+     "Exporting...",
+     "Exporting in progress...",
+     "Export Failed",
+     "Failed to export file to <em>{0}</em>",
+     "Export operation finished successfully."
+    ],
+    "bridge": [],
+    "prose": [
+     "export-print §5"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.export.html-plain",
+   "id": "export.html-plain",
+   "title": "Export › HTML (without Styles)",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "export",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "HTML (without Styles)"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.export.pdf",
+   "id": "export.pdf",
+   "title": "Export › PDF",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src-tauri/src/pdf_macos.rs",
+    "anchor": "pub async fn export_pdf",
+    "sha256": "d972dddbfe9ccdca49ceee602bfdac3c2bb0882c46b787497e1580ac689f410f"
+   },
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [
+     "Export to PDF",
+     "Export to PDF successfully."
+    ],
+    "bridge": [],
+    "prose": [
+     "export-print §4.1",
+     "export-print §4.2"
+    ]
+   },
+   "note": "macOS native; #14 for Windows/Linux",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.export.pdf-options",
+   "id": "export.pdf-options",
+   "title": "PDF options: paper size/margins, header/footer, page breaks, bookmarks, internal links",
+   "status": "missing",
+   "priority": "P0",
+   "epic": "export",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [
+     "Paper Size",
+     "US Letter",
+     "US Legal",
+     "Tabloid",
+     "Margin",
+     "Margin Top",
+     "Margin Bottom",
+     "Margin Left",
+     "Margin Right",
+     "Header",
+     "Footer",
+     "Page Break",
+     "Page Break Between Top Headings",
+     "[Warning] Failed to attach bookmark for PDF file."
+    ],
+    "bridge": [],
+    "prose": [
+     "export-print §4.4",
+     "export-print §9",
+     "export-print §10"
+    ]
+   },
+   "note": "#15",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.export.image",
+   "id": "export.image",
+   "title": "Export › Image (PNG/JPEG of the whole document)",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "export",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [
+     "Image Format",
+     "Image Quality",
+     "Best",
+     "High",
+     "Medium",
+     "Generated Image too Large",
+     "Use theme font size"
+    ],
+    "bridge": [
+     "controller.screenshotHTML"
+    ],
+    "prose": [
+     "export-print §6"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.export.pandoc",
+   "id": "export.pandoc",
+   "title": "Export via Pandoc: docx/odt/rtf/epub/latex/mediawiki/rst/textile/opml",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "export",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [
+     "More Formats",
+     "Pandoc Path",
+     "Set Pandoc Path",
+     "Require Pandoc to Continue...",
+     "Pandoc is needed for importing these file formats",
+     "Import function and several export formats requires Pandoc (≥%@) to be installed.",
+     "Follow instructions to install Pandoc",
+     "Check help->Install and use Pandoc from menubar for detail",
+     "Converting file using Pandoc. This may take some time.",
+     "Converting file with Pandoc. This may take some time.",
+     "Exporting file using Pandoc. This may take some time.",
+     "LaTeX Engine",
+     "PDF Engine",
+     "Template",
+     "Style Reference",
+     "Chapter Level",
+     "Extra Arguments",
+     "Markdown Variants",
+     "CommonMark with many pandoc extensions",
+     "Original Unextended Markdown",
+     "Hard line wrap",
+     "Use only ASCII characters in output",
+     "Use reference-style links rather than inline links",
+     "Footnotes and References Location",
+     "End of current (top-level) block",
+     "End of current section",
+     "End of document",
+     "Convert TeX formulas to web images",
+     "Target Format",
+     "Raw Type",
+     "TextBundle file",
+     "Images saved to TextBundle"
+    ],
+    "bridge": [],
+    "prose": [
+     "export-print §7"
+    ]
+   },
+   "note": "#81; feed pandoc JSON/native AST from the editor model, argv only",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.export.custom",
+   "id": "export.custom",
+   "title": "Custom export commands and \"run command after export\"",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "export",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [
+     "Add",
+     "Add From a Template",
+     "Delete this export option ?",
+     "Executable",
+     "Arguments",
+     "Command Arguments:",
+     "File Extensions for Export",
+     "Target File Extensions (separate by whitespace)",
+     "e.g: .text .asciidoc or leave this empty",
+     "Show command output",
+     "Output from the console:",
+     "Error from the console:",
+     "Run command",
+     "Run command after export failed",
+     "Show Save File Dialog",
+     "Do not popup save file dialog",
+     "Export operation succeeded with warnings."
+    ],
+    "bridge": [
+     "controller.runCommand"
+    ],
+    "prose": [
+     "export-print §8"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.export.settings",
+   "id": "export.settings",
+   "title": "Export settings pane: per-format options, theme, default folder, after-export action, YAML overrides",
+   "status": "missing",
+   "priority": "P0",
+   "epic": "export",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Export Setting"
+    ],
+    "panel": [
+     "Export / Print",
+     "Default Folder for Exported File",
+     "auto detect based on target file path",
+     "After Export",
+     "Open exported file",
+     "Open exported file location",
+     "Change this option to specify a separated theme for export.",
+     "Read and overwrite export settings from YAML front matters",
+     "Append Extra Content (HTML)",
+     "Append in <head />",
+     "Append in <body />",
+     "Include Outline Sidebar",
+     "Author",
+     "File Name",
+     "File Format:",
+     "Path",
+     "Location",
+     "Please input a folder path.",
+     "Folder does not exist at %@",
+     "Folder not exist at %@, please input another path.",
+     "%@ is a file, not a directory",
+     "Select folder path to save"
+    ],
+    "bridge": [],
+    "prose": [
+     "export-print §9"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.export.previous",
+   "id": "export.previous",
+   "title": "Export with Previous / Export and Overwrite with Previous",
+   "status": "missing",
+   "priority": "P0",
+   "epic": "export",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Export with Previous",
+     "Export and Overwrite with Previous"
+    ],
+    "panel": [
+     "\"Export and Overwrite with Previous\" will overwrite file at %@, would you continue?",
+     "Overwrite",
+     "Continue & Overwrite",
+     "Keep Both",
+     "Apply to All",
+     "Ignore"
+    ],
+    "bridge": [],
+    "prose": [
+     "export-print §9"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.export.import",
+   "id": "export.import",
+   "title": "File › Import (docx/html/… via Pandoc)",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "export",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Import"
+    ],
+    "panel": [
+     "Import...",
+     "Importing...",
+     "Importing in progress...",
+     "Import Failed",
+     "Failed to import file from <em>{0}</em>",
+     "Unzipping…"
+    ],
+    "bridge": [
+     "document.getDataFromFile"
+    ],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.syntax.extensions",
+   "id": "syntax.extensions",
+   "title": "Syntax support toggles: highlight, sub/sup, inline math, emoji shortcodes",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "syntax",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [
+     "Markdown",
+     "Syntax Support",
+     "Syntax Preference",
+     "Highlight (e.g: ==key==)",
+     "Subscript ( e.g: H~2~O )",
+     "Superscript ( e.g: X^2^ )",
+     "Inline Math ( e.g: $\\LaTeX$ )",
+     "Emoji (e.g. :smile:)"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": "highlight/inline math always on; sub/sup/emoji not parsed",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.syntax.strict",
+   "id": "syntax.strict",
+   "title": "Strict Mode (closer to GFM) and list/quote style preferences",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "syntax",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [
+     "Strict Mode",
+     "(more strict to GFM spec)",
+     "(only applies to styles created from menubar or hybrid view)",
+     "only apply to quotes and lists created from menu bar or hybrid view",
+     "Classic",
+     "e.g: %@"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.syntax.whitespace",
+   "id": "syntax.whitespace",
+   "title": "Whitespace & line breaks: preserve single line break, visible <br/>, first-line indent, \\\\ line break",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "syntax",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Whitespace and Line Breaks",
+     "Preserve single line break",
+     "Visible <br/>",
+     "Indent first line of paragraphs"
+    ],
+    "panel": [
+     "Whitespace / Line Break",
+     "Ignore whitespace and single line break",
+     "Preserve whitespace and single line break",
+     "Apply Line Break at \\\\ and &#92;newline",
+     "These options can also be changed under \"Edit→Whitespace and Line Breaks\" menu"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.syntax.save-normalize",
+   "id": "syntax.save-normalize",
+   "title": "On save: insert final newline, remap Unicode punctuation on parse",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "syntax",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Insert Final New Line On Save",
+     "Remap Unicode Punctuation on Parse"
+    ],
+    "panel": [],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.beh.core.lossless",
+   "id": "beh.core.lossless",
+   "title": "Lossless block model: serialize(parse(x)) === x, raw markers preserved",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/editor/core/model.ts",
+    "anchor": "export class",
+    "sha256": "73df466426ffa62732f00764e38aa993d6f445dd8caf1974151830761a34ac98"
+   },
+   "verifier": {
+    "file": "tests/e2e/core-cases.ts",
+    "test": "lossless load, markers hidden until caret enters",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [],
+    "panel": [],
+    "bridge": [],
+    "prose": [
+     "editor-core §3.3",
+     "editor-core §6"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.beh.core.md-expand",
+   "id": "beh.core.md-expand",
+   "title": "Hidden syntax markers revealed when caret enters (md-meta / md-expand)",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/editor/core/view.ts",
+    "anchor": "expandAt",
+    "sha256": "c659f7ca690924f1d37b1bf6f7d86be1b287837205e0255a0542edebb4ced991"
+   },
+   "verifier": {
+    "file": "tests/e2e/core-cases.ts",
+    "test": "lossless load, markers hidden until caret enters",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [],
+    "panel": [
+     "Display source for simple blocks (including headings, etc.) on focus"
+    ],
+    "bridge": [],
+    "prose": [
+     "editor-core §5.2"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.beh.core.incremental",
+   "id": "beh.core.incremental",
+   "title": "Incremental dirty-block reparse; per-keystroke cost independent of doc size",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/editor/core/edit.ts",
+    "anchor": "export function",
+    "sha256": "e3447f232e9e8b38ce3ac12027dba4176d4e44f9006da86b1bff9a1a0c72cc8e"
+   },
+   "verifier": {
+    "file": "tests/e2e/core-qa.spec.ts",
+    "test": "typing in a 5k-line document stays fast",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [],
+    "panel": [],
+    "bridge": [],
+    "prose": [
+     "editor-core §5.3",
+     "editor-core §10"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.beh.core.input-rules",
+   "id": "beh.core.input-rules",
+   "title": "Typing transforms: # heading, lists, ``` fences, tables, Enter/Backspace split/merge",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/editor/core/input.ts",
+    "anchor": "beforeinput",
+    "sha256": "0fd48eacfd2fec5f40c3ff03aa862c61266b378d40a00c41272fa675885ce6f0"
+   },
+   "verifier": {
+    "file": "tests/e2e/core-qa.spec.ts",
+    "test": "type a whole document from empty",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [],
+    "panel": [],
+    "bridge": [],
+    "prose": [
+     "editor-core §5.4"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.beh.core.ime",
+   "id": "beh.core.ime",
+   "title": "IME composition commits once (CJK), also inside table cells",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/editor/core/input.ts",
+    "anchor": "compositionend",
+    "sha256": "0fd48eacfd2fec5f40c3ff03aa862c61266b378d40a00c41272fa675885ce6f0"
+   },
+   "verifier": {
+    "file": "tests/e2e/core-cases.ts",
+    "test": "IME composition (Chinese) commits once",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [],
+    "panel": [],
+    "bridge": [],
+    "prose": [
+     "editor-core §5.5"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.beh.core.undo",
+   "id": "beh.core.undo",
+   "title": "Undo stack drives dirty state; typing coalesces; widget edits share history",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/editor/core/history.ts",
+    "anchor": "export class",
+    "sha256": "d89edb60cac31f5be63bdf256aad76083b3b9d25be419956ae8d6362e3501dc7"
+   },
+   "verifier": {
+    "file": "tests/e2e/core-qa.spec.ts",
+    "test": "undo/redo shortcuts work while focus is inside a widget",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [],
+    "panel": [],
+    "bridge": [],
+    "prose": [
+     "editor-core §5.6",
+     "files-windows-settings §4.2"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.beh.core.widgets-nav",
+   "id": "beh.core.widgets-nav",
+   "title": "Caret enter/exit across atomic widgets with arrows; doc start/end keys",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/editor/core/view.ts",
+    "anchor": "widget",
+    "sha256": "c659f7ca690924f1d37b1bf6f7d86be1b287837205e0255a0542edebb4ced991"
+   },
+   "verifier": {
+    "file": "tests/e2e/core-nav-keys.spec.ts",
+    "test": "doc start lands after the heading marker",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [],
+    "panel": [],
+    "bridge": [],
+    "prose": [
+     "editor-core §7"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.beh.core.find-in-widgets",
+   "id": "beh.core.find-in-widgets",
+   "title": "Find/replace reaches inside code, tables, math; replace-all is one undo step",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/editor/core/find.ts",
+    "anchor": "export function",
+    "sha256": "af012085c36cc333d7ccaa6a01a450bb1542ecaf35cc3d818c960efd0bf05bff"
+   },
+   "verifier": {
+    "file": "tests/e2e/core-widget-find.spec.ts",
+    "test": "replace-all across widgets is lossless and one undo step",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [],
+    "panel": [],
+    "bridge": [],
+    "prose": [
+     "editor-core §8.1"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.beh.core.html-sanitize",
+   "id": "beh.core.html-sanitize",
+   "title": "Raw HTML blocks/inline sanitized in preview, copy and export",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/editor/blocks/sanitize.ts",
+    "anchor": "export function",
+    "sha256": "69c680982eacbac8723f86816c5cd38ec93ce0421cd52cdd6c80eda0a3bb3fb7"
+   },
+   "verifier": {
+    "file": "tests/e2e/core-qa.spec.ts",
+    "test": "export sanitizes inline HTML",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [],
+    "panel": [],
+    "bridge": [],
+    "prose": [
+     "network-updates-privacy §5"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.beh.core.large-file",
+   "id": "beh.core.large-file",
+   "title": "Oversize documents: degrade gracefully (warn / source mode)",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "files",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [],
+    "bridge": [],
+    "prose": [
+     "files-windows-settings §4.3"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.beh.files.external-change",
+   "id": "beh.files.external-change",
+   "title": "External change: silent reload when clean, prompt when dirty, ignore own save echo",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/document.ts",
+    "anchor": "external",
+    "sha256": "7463d20622ea1cb2a293bbb4c7bea87c7b8d8f12d1b0d8635e5f952e172835b5"
+   },
+   "verifier": {
+    "file": "tests/e2e/app-files.spec.ts",
+    "test": "external change reloads silently when clean and prompts when dirty",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [],
+    "panel": [
+     "File content is changed by external applications. Reload content from disk ?"
+    ],
+    "bridge": [
+     "document.refreshContentFromDisk"
+    ],
+    "prose": [
+     "files-windows-settings §5",
+     "files-windows-settings §11"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.beh.files.external-merge",
+   "id": "beh.files.external-merge",
+   "title": "External change prompt offers Keep mine / Load disk / Show diff",
+   "status": "missing",
+   "priority": "P1",
+   "epic": "files",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [],
+    "bridge": [],
+    "prose": []
+   },
+   "note": "#82",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.beh.files.folder-watch",
+   "id": "beh.files.folder-watch",
+   "title": "Folder watcher: incremental tree updates, rename pairing, hidden/unsupported filtered",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src-tauri/src/watch.rs",
+    "anchor": "fn ",
+    "sha256": "8f25087e18a1002848973e5820333e758e24cd40101ede186cc9713bbd6e4064"
+   },
+   "verifier": {
+    "file": "src/platform/web.test.ts",
+    "test": "suppresses own modifications but reports creations and external changes",
+    "kind": "unit"
+   },
+   "spec": {
+    "menu": [],
+    "panel": [
+     "Auto refresh on Files Panel cannot be enabled."
+    ],
+    "bridge": [],
+    "prose": [
+     "files-windows-settings §6.2"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.beh.files.title-dirty",
+   "id": "beh.files.title-dirty",
+   "title": "Window title shows document name and edited state",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/app.ts",
+    "anchor": "setDocumentEdited",
+    "sha256": "0d4e0275e6d2c34c3639696699e70c6535a1c28e25dabe478f0ab75cf59d98a9"
+   },
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [],
+    "bridge": [],
+    "prose": [
+     "files-windows-settings §7"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.beh.files.single-instance",
+   "id": "beh.files.single-instance",
+   "title": "Single instance: opening files from Finder reuses the running app",
+   "status": "partial",
+   "priority": "P1",
+   "epic": "files",
+   "owner": {
+    "path": "src-tauri/src/lib.rs",
+    "anchor": "on_second_instance",
+    "sha256": "dc1429495edd25809836044733886ed5445a48bed8a084969688053a901e6af4"
+   },
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [],
+    "bridge": [],
+    "prose": [
+     "files-windows-settings §2.1"
+    ]
+   },
+   "note": "#29 Linux",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.beh.files.snapshot-undo",
+   "id": "beh.files.snapshot-undo",
+   "title": "Reopen keeps undo history and caret (per-document snapshot)",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "files",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [],
+    "bridge": [
+     "document.needsUpdateSnap",
+     "document.requestBuildSnap",
+     "controller.syncFullContent",
+     "window.refreshFullContentState"
+    ],
+    "prose": [
+     "files-windows-settings §4.4",
+     "files-windows-settings §11"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.beh.files.quicklook",
+   "id": "beh.files.quicklook",
+   "title": "Quick Look / preview of a file from the sidebar",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "sidebar",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [
+     "Quick Look",
+     "Preview"
+    ],
+    "bridge": [
+     "window.previewFile"
+    ],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.beh.files.asset-scope",
+   "id": "beh.files.asset-scope",
+   "title": "Asset access scoped to doc/folder (no whole-disk file:// access)",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src-tauri/src/commands.rs",
+    "anchor": "allow_asset_dir",
+    "sha256": "78fe24d99859e2ace3cd6e9f70cf945f73bb26e203f831b515765f7a0940b1a3"
+   },
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [],
+    "bridge": [],
+    "prose": [
+     "files-windows-settings §3.1",
+     "files-windows-settings §11",
+     "network-updates-privacy §5"
+    ]
+   },
+   "note": "prose flags Typora granting \"/\" read access; Margin scopes per folder (#48 open)",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.beh.settings.inject",
+   "id": "beh.settings.inject",
+   "title": "Settings available to the editor before first paint; theme background avoids white flash",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/app.ts",
+    "anchor": "applyAppearance",
+    "sha256": "0d4e0275e6d2c34c3639696699e70c6535a1c28e25dabe478f0ab75cf59d98a9"
+   },
+   "verifier": {
+    "file": "tests/e2e/app-themes.spec.ts",
+    "test": "system color scheme is followed",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [],
+    "panel": [],
+    "bridge": [],
+    "prose": [
+     "files-windows-settings §8.2",
+     "files-windows-settings §11"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.beh.clip.paste-priority",
+   "id": "beh.clip.paste-priority",
+   "title": "Paste priority: private lossless > HTML > files > image > text; HTML→markdown; markdown heuristic",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/editor/core/paste.ts",
+    "anchor": "export function htmlToMarkdown",
+    "sha256": "f5583d5ead2ccd3ae324b1dd7ec4441d4c743fd709c26ecba621b5c0919a3dec"
+   },
+   "verifier": {
+    "file": "tests/e2e/core-qa.spec.ts",
+    "test": "paste Google Docs HTML and markdown blocks mid-paragraph",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [],
+    "panel": [],
+    "bridge": [],
+    "prose": [
+     "clipboard-contextmenu §4.4",
+     "clipboard-contextmenu §9"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
+   ],
+   "coverage_claim_qualified": true
+  },
+  {
+   "obligation_id": "typora.beh.clip.rich-copy",
+   "id": "beh.clip.rich-copy",
+   "title": "Rich copy writes plain + HTML + RTF + private format",
+   "status": "partial",
+   "priority": "P0",
+   "epic": "clipboard",
+   "owner": {
+    "path": "src/editor/core/clipboard.ts",
+    "anchor": "MARGIN_HTML_ATTR",
+    "sha256": "bfa91a163900c57dbb623e7b4a9ee0338101333ddb50664c20ef25216056db94"
+   },
+   "verifier": {
+    "file": "tests/e2e/core-cases.ts",
+    "test": "paste HTML becomes markdown; copy gives markdown",
+    "kind": "e2e"
+   },
+   "spec": {
+    "menu": [],
+    "panel": [],
+    "bridge": [],
+    "prose": [
+     "clipboard-contextmenu §3.3",
+     "clipboard-contextmenu §3.4",
+     "clipboard-contextmenu §9"
+    ]
+   },
+   "note": "#79: no RTF/RTFD flavors",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.beh.clip.rtf-paste",
+   "id": "beh.clip.rtf-paste",
+   "title": "Paste RTF/RTFD from rich apps (attachments materialized)",
+   "status": "missing",
+   "priority": "P2",
+   "epic": "clipboard",
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [],
+    "bridge": [],
+    "prose": [
+     "clipboard-contextmenu §3.2",
+     "clipboard-contextmenu §9"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "unowned",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.oos.license",
+   "id": "oos.license",
+   "title": "Licensing / registration / trial",
+   "status": "oos",
+   "priority": null,
+   "epic": null,
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [
+     "UNREGISTERED",
+     "This dev version of Typora is expired, please download and install a newer version."
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": "Commercial licensing is not a product feature; Margin is free.",
+   "rea_ledger_status": "out-of-scope",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "out-of-scope",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.oos.updates",
+   "id": "oos.updates",
+   "title": "Auto-update (Sparkle) and version checks",
+   "status": "oos",
+   "priority": null,
+   "epic": null,
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [
+     "New version available.",
+     "Newer version is available",
+     "Latest version is $1, your version is $2",
+     "You're up to date!",
+     "Skip This Version",
+     "Remind Me Later",
+     "Quit and Install",
+     "Download and Reinstall",
+     "Agree and Download",
+     "Checking",
+     "You can reinstall the stable version and then disable this.",
+     "Typora Server",
+     "Use Typora Server in China"
+    ],
+    "bridge": [],
+    "prose": [
+     "network-updates-privacy §2"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": "Distribution concern, not editor behavior; Margin ships via its own release channel.",
+   "rea_ledger_status": "out-of-scope",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "out-of-scope",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.oos.telemetry",
+   "id": "oos.telemetry",
+   "title": "Telemetry (Sentry, usage analytics)",
+   "status": "oos",
+   "priority": null,
+   "epic": null,
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [
+     "Send Anonymous Usage Info"
+    ],
+    "bridge": [
+     "setting.fetchAnalytics",
+     "logger.debug",
+     "logger.info"
+    ],
+    "prose": [
+     "network-updates-privacy §4"
+    ]
+   },
+   "note": null,
+   "out_of_scope_rationale": "Privacy: Margin collects nothing; logging is local only.",
+   "rea_ledger_status": "out-of-scope",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "out-of-scope",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.oos.touchbar",
+   "id": "oos.touchbar",
+   "title": "Touch Bar integration",
+   "status": "oos",
+   "priority": null,
+   "epic": null,
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [],
+    "bridge": [
+     "touchBar.showDialogTouchBar",
+     "touchBar.showFindReplaceTouchBar"
+    ],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": "Touch Bar hardware is discontinued and Tauri exposes no NSTouchBar API.",
+   "rea_ledger_status": "out-of-scope",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "out-of-scope",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.oos.platform-notes",
+   "id": "oos.platform-notes",
+   "title": "Platform-specific notices (Snap packaging, old macOS versions)",
+   "status": "oos",
+   "priority": null,
+   "epic": null,
+   "owner": null,
+   "verifier": null,
+   "spec": {
+    "menu": [],
+    "panel": [
+     "You are using the Snap version, it may have limited access to your local executables.",
+     "This feature require macOS >= 10.11",
+     "Supported on macOS ≥ 10.15 or Windows 10 ≥ 1903"
+    ],
+    "bridge": [],
+    "prose": []
+   },
+   "note": null,
+   "out_of_scope_rationale": "Version gates for platforms Margin does not target.",
+   "rea_ledger_status": "out-of-scope",
+   "rea_diagnostics": [
+    "missing-original-case",
+    "missing-owner",
+    "out-of-scope",
+    "static-only"
+   ],
+   "coverage_claim_qualified": false
+  },
+  {
+   "obligation_id": "typora.ui.generic",
+   "id": "ui.generic",
+   "title": "Generic dialog vocabulary (OK/Cancel/Yes/…, notices)",
+   "status": "owned",
+   "priority": null,
+   "epic": null,
+   "owner": {
+    "path": "src/app/ui/modal.ts",
+    "anchor": "export function",
+    "sha256": "e4112f8834e21de5a3d9df0824ca342443c188d81c200ad3f58e95ccb464967c"
+   },
+   "verifier": null,
+   "spec": {
+    "menu": [
+     "Auto",
+     "Click",
+     "Learn More"
+    ],
+    "panel": [
+     "Cancel",
+     "Confirm",
+     "Yes",
+     "Dismiss",
+     "Notice",
+     "Detail",
+     "Instructions",
+     "Action",
+     "Back",
+     "back to document",
+     "Finished",
+     "Finish Editing",
+     "Loading",
+     "Select",
+     "Stop",
+     "Empty",
+     "None",
+     "All",
+     "One More Step",
+     "Global Setting…",
+     "You could turn it off from `View` menu.",
+     "Enable this feature on preferences panel"
+    ],
+    "bridge": [
+     "window.showDialog"
+    ],
+    "prose": []
+   },
+   "note": "strings attached to features elsewhere where meaningful",
+   "out_of_scope_rationale": null,
+   "rea_ledger_status": "implemented",
+   "rea_diagnostics": [
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
+   ],
+   "coverage_claim_qualified": false
+  }
+ ]
+}

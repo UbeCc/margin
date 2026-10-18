@@ -87,6 +87,7 @@ export const COMMANDS: CommandSpec[] = [
   { id: 'toggleTypewriter', label: 'Typewriter Mode', category: 'View', keys: ['F9'] },
   { id: 'zoomIn', label: 'Zoom In', category: 'View', keys: ['Mod+=', 'Mod+Shift+='] },
   { id: 'zoomOut', label: 'Zoom Out', category: 'View', keys: ['Mod+-', 'Mod+Shift+-'] },
+  { id: 'clearRecent', label: 'Clear Recent Files', category: 'File' },
   { id: 'zoomReset', label: 'Actual Size', category: 'View', keys: ['Mod+Shift+0'] },
   { id: 'toggleLineEnding', label: 'Toggle Line Endings (LF / CRLF)', category: 'View' },
   { id: 'openThemesFolder', label: 'Open Themes Folder', category: 'Theme' },
