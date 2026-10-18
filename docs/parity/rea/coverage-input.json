@@ -6,7 +6,7 @@
    {
     "artifact_id": "margin-src",
     "artifact_sha256": "a8818df6ac7d968d669d275a99c2d2e8653fa388a8b4e20f9da559553e79bdbb",
-    "version": "950546ad4c5c986207aea8ccfc050da9653da74c",
+    "version": "e2015b1bd685484d704588517e3a27ea99e3635a",
     "environment_sha256": "20aa30e081a969eaed6bd1d8c33d9e966312a547a57b9f2a8a471dd04b5549ae",
     "evidence_ids": [
      "ev_1fff77de0927975cf6c8e1ae1f4f756642727a508cab1ec65759d425f7ebbded"
@@ -1728,6 +1728,18 @@
     "dependency_surface_ids": [],
     "evidence_ids": [
      "ev_1c92d513ea60222776d3e090b1adfd71ac7a2d2369cc16083e4e49094c1c84b2"
+    ]
+   },
+   {
+    "surface_id": "syntax.toc",
+    "family": "syntax.toc",
+    "artifact_id": "margin-src",
+    "occurrence_id": null,
+    "location": "TOC writings: [toc], 【toc】, {:toc}, [[_TOC_]] all parse to the TOC widget",
+    "authority": "inferred",
+    "dependency_surface_ids": [],
+    "evidence_ids": [
+     "ev_3da74c48da398f9c3c2627b4e2ff057102d092cb833471f6b02161f3e8b4968a"
     ]
    },
    {
@@ -3751,7 +3763,7 @@
      "disposition": "implemented",
      "owner_path": "src/editor/core/parser/starts.ts",
      "owner_export": "outside Strict Mode",
-     "owner_sha256": "9b50a5bcdd527cc2928b132d6b3353bf316343a496b6e21360c536b170d00434",
+     "owner_sha256": "adc265d0dd3c4a8da9e5563c0906f8c22a1f2dd9e94046c0cc516de7adccf81f",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -3776,6 +3788,18 @@
      "owner_path": "src/app/document.ts",
      "owner_export": "Insert Final New Line On Save",
      "owner_sha256": "8bcb316b4b34e7821352e34015cd90b267a3feb446bb2c2e8872ee3c63d14648",
+     "path_state": "present",
+     "package_state": "distributed",
+     "authority_route": "none"
+    }
+   },
+   {
+    "surface_id": "syntax.toc",
+    "ownership": {
+     "disposition": "implemented",
+     "owner_path": "src/editor/core/parser/starts.ts",
+     "owner_export": "isToc",
+     "owner_sha256": "adc265d0dd3c4a8da9e5563c0906f8c22a1f2dd9e94046c0cc516de7adccf81f",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -5780,6 +5804,18 @@
     "kind": "behavior",
     "surface_ids": [
      "syntax.save-normalize"
+    ],
+    "required_dimensions": [
+     "behavior"
+    ],
+    "required_authority": "controlled-replay"
+   },
+   {
+    "claim_id": "claim.syntax.toc",
+    "title": "TOC writings: [toc], 【toc】, {:toc}, [[_TOC_]] all parse to the TOC widget",
+    "kind": "behavior",
+    "surface_ids": [
+     "syntax.toc"
     ],
     "required_dimensions": [
      "behavior"
@@ -8025,6 +8061,21 @@
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "normalization_removes_dimensions": false,
     "contract_sha256": "99be39cfc71b2d4d2782761bf569355ed819a418506f4f69020e7f5d2c0a2fc8"
+   },
+   {
+    "verifier_id": "margin.playwright.syntax.toc",
+    "claim_ids": [
+     "claim.syntax.toc"
+    ],
+    "dimensions": [
+     "behavior"
+    ],
+    "authority": "controlled-replay",
+    "max_age_ms": 2592000000,
+    "minimum_repeats": 1,
+    "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
+    "normalization_removes_dimensions": false,
+    "contract_sha256": "233537037c8540fe9871df9da08d52952a7ac9a5cd55dbcfb3aed9e15b2bf3d8"
    },
    {
     "verifier_id": "margin.playwright.beh.core.lossless",
@@ -11279,7 +11330,7 @@
      "a8818df6ac7d968d669d275a99c2d2e8653fa388a8b4e20f9da559553e79bdbb"
     ],
     "owner_sha256s": [
-     "9b50a5bcdd527cc2928b132d6b3353bf316343a496b6e21360c536b170d00434"
+     "adc265d0dd3c4a8da9e5563c0906f8c22a1f2dd9e94046c0cc516de7adccf81f"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -11326,6 +11377,29 @@
     ],
     "owner_sha256s": [
      "8bcb316b4b34e7821352e34015cd90b267a3feb446bb2c2e8872ee3c63d14648"
+    ],
+    "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
+    "repeats": 1,
+    "evidence_ids": [
+     "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+    ]
+   },
+   {
+    "verifier_id": "margin.playwright.syntax.toc",
+    "contract_sha256": "233537037c8540fe9871df9da08d52952a7ac9a5cd55dbcfb3aed9e15b2bf3d8",
+    "observed_at": "2026-10-18T06:42:19.907Z",
+    "status": "pass",
+    "covered_claim_ids": [
+     "claim.syntax.toc"
+    ],
+    "covered_dimensions": [
+     "behavior"
+    ],
+    "artifact_sha256s": [
+     "a8818df6ac7d968d669d275a99c2d2e8653fa388a8b4e20f9da559553e79bdbb"
+    ],
+    "owner_sha256s": [
+     "adc265d0dd3c4a8da9e5563c0906f8c22a1f2dd9e94046c0cc516de7adccf81f"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -11991,6 +12065,7 @@
      "syntax.strict",
      "syntax.whitespace",
      "syntax.save-normalize",
+     "syntax.toc",
      "beh.core.lossless",
      "beh.core.md-expand",
      "beh.core.incremental",
@@ -12162,6 +12237,7 @@
      "claim.syntax.strict",
      "claim.syntax.whitespace",
      "claim.syntax.save-normalize",
+     "claim.syntax.toc",
      "claim.beh.core.lossless",
      "claim.beh.core.md-expand",
      "claim.beh.core.incremental",

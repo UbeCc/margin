@@ -1,5 +1,5 @@
 {
- "evidence_id": "ev_39475fb3ebbf5f5e62484183dff845b5269206d4b49cd252beef8ceed33a4171",
+ "evidence_id": "ev_61e612c9df83ac3104580821ba4763eafb648e4040378f8905adfe6758e2cb53",
  "subject": null,
  "provider": {
   "id": "rea-javascript-application-workflows",
@@ -10,23 +10,23 @@
  "predicate_type": "rea.reconstruction-obligation-ledger",
  "operation": "build_reconstruction_obligation_ledger",
  "parameters": {
-  "ledger_id": "rol_0971bf7b466f6a8c468c6ef5675d428e8c0ce8aeb15915bc5c72ea34ffb59f06",
-  "closure_digest": "107281c90c19cbe165d82d4408fd6708c4d37f57bd479d655030d3542b01e5d3"
+  "ledger_id": "rol_d90bac8fd979387db4eacdb89824cb101dfe0a322637ea618d18de61a9d09edb",
+  "closure_digest": "15d401e22c3a285675ba1cbd298998eb4297c63cb67bbc3f66c67a86961e249f"
  },
  "raw_result": null,
  "normalized_result": {
   "schema": "ReconstructionObligationLedger",
-  "ledger_id": "rol_0971bf7b466f6a8c468c6ef5675d428e8c0ce8aeb15915bc5c72ea34ffb59f06",
-  "closure_digest": "107281c90c19cbe165d82d4408fd6708c4d37f57bd479d655030d3542b01e5d3",
+  "ledger_id": "rol_d90bac8fd979387db4eacdb89824cb101dfe0a322637ea618d18de61a9d09edb",
+  "closure_digest": "15d401e22c3a285675ba1cbd298998eb4297c63cb67bbc3f66c67a86961e249f",
   "status": "unknown",
   "coverage": {
    "status": "complete"
   },
   "summary": {
-   "total": 177,
-   "required": 169,
+   "total": 178,
+   "required": 170,
    "verified": 0,
-   "required_open": 169,
+   "required_open": 170,
    "by_status": [
     {
      "key": "unowned",
@@ -38,7 +38,7 @@
     },
     {
      "key": "implemented",
-     "count": 164
+     "count": 165
     },
     {
      "key": "verified",
@@ -96,7 +96,7 @@
     },
     {
      "key": "application",
-     "count": 121
+     "count": 122
     },
     {
      "key": "other",
@@ -114,7 +114,7 @@
     },
     {
      "key": "reviewed",
-     "count": 172
+     "count": 173
     },
     {
      "key": "unknown",
@@ -945,6 +945,11 @@
     "obligation_id": "typora.syntax.strict",
     "module_path": "src/editor/core/parser/starts.ts",
     "symbol": "outside Strict Mode"
+   },
+   {
+    "obligation_id": "typora.syntax.toc",
+    "module_path": "src/editor/core/parser/starts.ts",
+    "symbol": "isToc"
    },
    {
     "obligation_id": "typora.beh.clip.paste-priority",
@@ -16827,7 +16832,7 @@
      "owner": {
       "module_path": "src/editor/core/parser/starts.ts",
       "symbol": "outside Strict Mode",
-      "owner_sha256": "9b50a5bcdd527cc2928b132d6b3353bf316343a496b6e21360c536b170d00434"
+      "owner_sha256": "adc265d0dd3c4a8da9e5563c0906f8c22a1f2dd9e94046c0cc516de7adccf81f"
      },
      "parser_type": null,
      "original_cases": [
@@ -16856,6 +16861,110 @@
       "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
       "enumerated_obligation_ids": [
        "typora.syntax.strict"
+      ],
+      "nondeterminism": {
+       "mode": "total-order",
+       "specification": "Single deterministic suite run; pass = suite exited 0 with the named test not skipped."
+      }
+     }
+    },
+    "status": "implemented",
+    "diagnostics": [
+     {
+      "code": "static-only",
+      "detail": "No static authority characterizes the original finite behavior."
+     },
+     {
+      "code": "weak-fixture-authority",
+      "detail": "positive fixture lacks renderer authority or authenticated Evidence."
+     },
+     {
+      "code": "weak-original-case-authority",
+      "detail": "Original positive behavior lacks static Evidence."
+     },
+     {
+      "code": "weak-verifier-authority",
+      "detail": "Verifier authority does not satisfy renderer."
+     }
+    ]
+   },
+   {
+    "obligation_id": "typora.syntax.toc",
+    "obligation_version": 1,
+    "title": "TOC writings: [toc], 【toc】, {:toc}, [[_TOC_]] all parse to the TOC widget",
+    "origin": "reviewed",
+    "application_layer": "application",
+    "family": "syntax.toc",
+    "target": {
+     "artifact_sha256": null,
+     "application_node_id": null,
+     "semantic_node_id": null,
+     "location": "TOC writings: [toc], 【toc】, {:toc}, [[_TOC_]] all parse to the TOC widget"
+    },
+    "authority_references": [
+     {
+      "evidence_id": "ev_3da74c48da398f9c3c2627b4e2ff057102d092cb833471f6b02161f3e8b4968a",
+      "authority": "analyst-inference",
+      "state": "reviewed",
+      "location": "/evidence/ev_3da74c48da398f9c3c2627b4e2ff057102d092cb833471f6b02161f3e8b4968a"
+     }
+    ],
+    "source_state": "reviewed",
+    "observed_cases": [
+     {
+      "kind": "positive",
+      "evidence_id": "ev_3da74c48da398f9c3c2627b4e2ff057102d092cb833471f6b02161f3e8b4968a",
+      "location": "editor-core §4.1"
+     }
+    ],
+    "required": true,
+    "required_case_kinds": [
+     "positive"
+    ],
+    "required_original_authority": "static",
+    "required_fixture_authority": "renderer",
+    "required_verifier_authority": "renderer",
+    "requires_parser_type": false,
+    "dependency_obligation_ids": [],
+    "residual_unknown_ids": [],
+    "unavailable_authority": [],
+    "required_next_evidence": [
+     "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules."
+    ],
+    "binding": {
+     "obligation_id": "typora.syntax.toc",
+     "owner": {
+      "module_path": "src/editor/core/parser/starts.ts",
+      "symbol": "isToc",
+      "owner_sha256": "adc265d0dd3c4a8da9e5563c0906f8c22a1f2dd9e94046c0cc516de7adccf81f"
+     },
+     "parser_type": null,
+     "original_cases": [
+      {
+       "kind": "positive",
+       "evidence_id": "ev_3da74c48da398f9c3c2627b4e2ff057102d092cb833471f6b02161f3e8b4968a",
+       "location": "editor-core §4.1"
+      }
+     ],
+     "fixtures": [
+      {
+       "fixture_id": "syntax.toc.positive",
+       "case_kind": "positive",
+       "authority": "renderer",
+       "evidence_ids": [
+        "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       ]
+      }
+     ],
+     "verifier": {
+      "verifier_id": "margin.playwright.syntax.toc",
+      "claim_id": "claim.syntax.toc",
+      "command": "npx playwright test tests/e2e/parity-syntax.spec.ts -g \"syntax.toc: toc writings [toc] 【toc】 {:toc} [[_TOC_]] all render the TOC widget (#151)\"",
+      "authority": "renderer",
+      "status": "pass",
+      "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+      "enumerated_obligation_ids": [
+       "typora.syntax.toc"
       ],
       "nondeterminism": {
        "mode": "total-order",
@@ -18683,6 +18792,7 @@
    "ev_391cc84ed55b4e709a481b8ea9fa2d41219c67af1bc7f85c1e9072919493911c",
    "ev_398b968a3f776bc01454b68dc33300c429913875739918ac9909f514d425f10f",
    "ev_3c0855fd39565d4264201a1d588a02aa4c4d16f198e296ca90f373834f471390",
+   "ev_3da74c48da398f9c3c2627b4e2ff057102d092cb833471f6b02161f3e8b4968a",
    "ev_3f6cecf0497ef114e31557e49d950d4a6eb65c9c2d74b0aed4ab4dc6e73fc2d6",
    "ev_3fb8b84cee7279d523a2c19c8441384de2e266aa5ed455b1a6a8c68889ae3be1",
    "ev_41a86ed70f7d352fd1fd4ee4c8fc8d5ed2b1ee32ef2fd8ceb10510601f0c962e",
@@ -18872,6 +18982,7 @@
   "ev_391cc84ed55b4e709a481b8ea9fa2d41219c67af1bc7f85c1e9072919493911c",
   "ev_398b968a3f776bc01454b68dc33300c429913875739918ac9909f514d425f10f",
   "ev_3c0855fd39565d4264201a1d588a02aa4c4d16f198e296ca90f373834f471390",
+  "ev_3da74c48da398f9c3c2627b4e2ff057102d092cb833471f6b02161f3e8b4968a",
   "ev_3f6cecf0497ef114e31557e49d950d4a6eb65c9c2d74b0aed4ab4dc6e73fc2d6",
   "ev_3fb8b84cee7279d523a2c19c8441384de2e266aa5ed455b1a6a8c68889ae3be1",
   "ev_41a86ed70f7d352fd1fd4ee4c8fc8d5ed2b1ee32ef2fd8ceb10510601f0c962e",

@@ -93,7 +93,9 @@ export function htmlEnds(kind: number, s: string): boolean {
   }
 }
 
-export const isToc = (s: string) => /^ {0,3}(?:\[toc\]|【toc】)[ \t]*$/i.test(s); // 【toc】 always on (typora-re editor-core §289)
+// #151 (editor-core §4.1 keys D/B/L/I/W + §7.5): the four TOC writings — [toc] (case-insensitive),
+// 【toc】, {:toc} and [[_TOC_]]. `$$toc$$` is NOT one (the `$$` key opens a math block).
+export const isToc = (s: string) => /^ {0,3}(?:\[toc\]|【toc】|\{:toc\}|\[\[_TOC_\]\])[ \t]*$/i.test(s);
 export const isFootnoteDef = (s: string) => /^ {0,3}\[\^[^\]\s]+\]:/.test(s);
 export const isLinkDef = (s: string) => /^ {0,3}\[(?!\^)(?:[^\]\\]|\\.)+\]:[ \t]*\S/.test(s);
 

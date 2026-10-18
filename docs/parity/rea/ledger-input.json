@@ -4443,6 +4443,37 @@
    ]
   },
   {
+   "obligation_id": "typora.syntax.toc",
+   "obligation_version": 1,
+   "title": "TOC writings: [toc], 【toc】, {:toc}, [[_TOC_]] all parse to the TOC widget",
+   "application_layer": "application",
+   "family": "syntax.toc",
+   "target": {
+    "artifact_sha256": null,
+    "application_node_id": null,
+    "semantic_node_id": null,
+    "location": "TOC writings: [toc], 【toc】, {:toc}, [[_TOC_]] all parse to the TOC widget"
+   },
+   "required": true,
+   "required_case_kinds": [
+    "positive"
+   ],
+   "required_original_authority": "static",
+   "required_fixture_authority": "renderer",
+   "required_verifier_authority": "renderer",
+   "requires_parser_type": false,
+   "dependency_obligation_ids": [],
+   "residual_unknown_ids": [],
+   "unavailable_authority": [],
+   "required_next_evidence": [
+    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules."
+   ],
+   "disposition": "active",
+   "review_evidence_ids": [
+    "ev_3da74c48da398f9c3c2627b4e2ff057102d092cb833471f6b02161f3e8b4968a"
+   ]
+  },
+  {
    "obligation_id": "typora.beh.core.lossless",
    "obligation_version": 1,
    "title": "Lossless block model: serialize(parse(x)) === x, raw markers preserved",
@@ -10660,7 +10691,7 @@
     "owner": {
      "module_path": "src/editor/core/parser/starts.ts",
      "symbol": "outside Strict Mode",
-     "owner_sha256": "9b50a5bcdd527cc2928b132d6b3353bf316343a496b6e21360c536b170d00434"
+     "owner_sha256": "adc265d0dd3c4a8da9e5563c0906f8c22a1f2dd9e94046c0cc516de7adccf81f"
     },
     "parser_type": null,
     "original_cases": [
@@ -10754,6 +10785,47 @@
     ],
     "fixtures": [],
     "verifier": null
+   },
+   {
+    "obligation_id": "typora.syntax.toc",
+    "owner": {
+     "module_path": "src/editor/core/parser/starts.ts",
+     "symbol": "isToc",
+     "owner_sha256": "adc265d0dd3c4a8da9e5563c0906f8c22a1f2dd9e94046c0cc516de7adccf81f"
+    },
+    "parser_type": null,
+    "original_cases": [
+     {
+      "kind": "positive",
+      "evidence_id": "ev_3da74c48da398f9c3c2627b4e2ff057102d092cb833471f6b02161f3e8b4968a",
+      "location": "editor-core §4.1"
+     }
+    ],
+    "fixtures": [
+     {
+      "fixture_id": "syntax.toc.positive",
+      "case_kind": "positive",
+      "authority": "renderer",
+      "evidence_ids": [
+       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+      ]
+     }
+    ],
+    "verifier": {
+     "verifier_id": "margin.playwright.syntax.toc",
+     "claim_id": "claim.syntax.toc",
+     "command": "npx playwright test tests/e2e/parity-syntax.spec.ts -g \"syntax.toc: toc writings [toc] 【toc】 {:toc} [[_TOC_]] all render the TOC widget (#151)\"",
+     "authority": "renderer",
+     "status": "pass",
+     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "enumerated_obligation_ids": [
+      "typora.syntax.toc"
+     ],
+     "nondeterminism": {
+      "mode": "total-order",
+      "specification": "Single deterministic suite run; pass = suite exited 0 with the named test not skipped."
+     }
+    }
    },
    {
     "obligation_id": "typora.beh.core.lossless",

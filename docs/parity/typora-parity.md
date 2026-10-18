@@ -8,15 +8,15 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 
 | | surfaces |
 |---|---|
-| total | 172 |
-| owned (implemented) | 160 (with a named passing test: 147) |
+| total | 173 |
+| owned (implemented) | 161 (with a named passing test: 148) |
 | partial | 4 |
 | missing | 0 |
 | out of scope | 8 |
 
-REA ledger `rol_0971bf7b466f6a8c468c6ef5675d428e8c0ce8aeb15915bc5c72ea34ffb59f06` (closure `107281c90c19cbe1…`): status **unknown**; implemented 164, out-of-scope 8, unknown 5.
+REA ledger `rol_d90bac8fd979387db4eacdb89824cb101dfe0a322637ea618d18de61a9d09edb` (closure `15d401e22c3a2856…`): status **unknown**; implemented 165, out-of-scope 8, unknown 5.
 
-REA coverage boundary `margin.typora-parity`: status **unknown**; 147/164 claims qualified by controlled-replay verifier Evidence. Reasons: package-proof-missing 1, verifier-missing 13, verifier-unknown 4.
+REA coverage boundary `margin.typora-parity`: status **unknown**; 148/165 claims qualified by controlled-replay verifier Evidence. Reasons: package-proof-missing 1, verifier-missing 13, verifier-unknown 4.
 
 Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): build exit 0, cargo-test exit 0, independence exit 0, playwright exit 0, vitest exit 0. See `rea/summary.json`.
 
@@ -286,6 +286,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `syntax.strict` | Strict Mode (closer to GFM) and list/quote style preferences — non-strict: `#Heading` without space; list markers for menu-created lists | owned |  | `src/editor/core/parser/starts.ts` `outside Strict Mode` | `tests/e2e/parity-syntax.spec.ts` › syntax.strict: Strict Mode (closer to GFM) and list/quote style preferences | 6 |
 | `syntax.whitespace` | Whitespace & line breaks: preserve single line break, visible <br/>, first-line indent, \\ line break — preserve/ignore single line break, Visible <br/> (default on), first-line indent; Apply Line Break at \\ is the Math option (display math). Deliberate fix: one source of truth for the Preserve check state | owned |  | `src/editor/core/editor.ts` `md-ignore-linebreak` | `tests/e2e/parity-syntax.spec.ts` › syntax.whitespace: Whitespace & line breaks: preserve single line break | 9 |
 | `syntax.save-normalize` | On save: insert final newline, remap Unicode punctuation on parse — Insert Final New Line On Save is per document (follows the opened file; palette command); Remap Unicode Punctuation persisted only, parser remap pending (gap issue) | **partial** | P2 | `src/app/document.ts` `Insert Final New Line On Save` | `tests/e2e/parity-syntax.spec.ts` › syntax.save-normalize: On save: insert final newline, remap Unicode punctuation on parse | 2 |
+| `syntax.toc` | TOC writings: [toc], 【toc】, {:toc}, [[_TOC_]] all parse to the TOC widget — #151: exactly four writings (block-start keys D/B/L/I/W); case-insensitive [toc]; $$toc$$ is a math block, not a TOC | owned |  | `src/editor/core/parser/starts.ts` `isToc` | `tests/e2e/parity-syntax.spec.ts` › syntax.toc: toc writings [toc] 【toc】 {:toc} [[_TOC_]] all render the TOC widget (#151) | 0 |
 
 ## Behaviors — editor core
 

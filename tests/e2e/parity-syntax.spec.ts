@@ -99,6 +99,20 @@ test('syntax.strict: Strict Mode (closer to GFM) and list/quote style preference
   expect(await editorValue(page)).toBe('- a\n1. b\n');
 });
 
+test('syntax.toc: toc writings [toc] 【toc】 {:toc} [[_TOC_]] all render the TOC widget (#151)', async ({ page }) => {
+  // each writing parses to the same TOC widget and round-trips losslessly
+  for (const w of ['[toc]', '[TOC]', '【toc】', '{:toc}', '[[_TOC_]]']) {
+    await setDoc(page, `${w}\n\n# Heading One\n## Sub\n`);
+    await expect(ed(page).locator('.md-toc .md-toc-content')).toHaveCount(1);
+    await expect(ed(page).locator('.md-toc-item')).toHaveCount(2);
+    expect(await editorValue(page)).toBe(`${w}\n\n# Heading One\n## Sub\n`);
+  }
+  // `$$` opens a math block instead — $$toc$$ is not a TOC writing
+  await setDoc(page, '$$toc$$\n');
+  await expect(ed(page).locator('.md-toc')).toHaveCount(0);
+  await expect(ed(page).locator('.mb-math-block')).toHaveCount(1);
+});
+
 test('syntax.whitespace: Whitespace & line breaks: preserve single line break, visible <br/>, first-line indent, \\\\ line break', async ({ page }) => {
   const src = 'one\ntwo<br/>three\\\nfour\n\nnext\n';
   await setDoc(page, src);

@@ -27,6 +27,9 @@ const SAMPLES = [
   '<div>\n<p>hi</p>\n</div>\n\npara',
   '<!-- c\nstill -->\n',
   '[toc]\n\n# A\n## B\n',
+  // #151: the four TOC writings, each rendering the same TOC widget
+  '[TOC]\n{:toc}\n[[_TOC_]]\n【toc】\n\n# A\n',
+  '$$toc$$\n', // `$$` opens a math block — not a TOC writing
   'Text[^1]\n\n[^1]: Note.\n[ref]: http://x "t"\n',
   '    indented code\n    more\n\npara',
   '\t- tab list\n\t\tdeep\n',
@@ -92,6 +95,10 @@ describe('block structure', () => {
     expect(types('---\na: 1\n---\n```\nx\n```\n$$\ny\n$$\n|a|\n|-|\n<div>\n</div>\n\n[toc]\n***\n')).toEqual([
       'front_matter', 'code_fence', 'math_block', 'table', 'html_block', 'toc', 'hr',
     ]);
+  });
+  it('toc writings (#151): all four parse as toc; $$toc$$ is a math block', () => {
+    expect(types('[toc]\n[TOC]\n{:toc}\n[[_TOC_]]\n【toc】\n')).toEqual(Array(5).fill('toc'));
+    expect(types('$$toc$$\n')).toEqual(['math_block']);
   });
   it('fence inside list item', () => {
     const l = parseBlocks('- ```\n  x\n  ```\n- y');
