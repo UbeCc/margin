@@ -1,23 +1,23 @@
 {
- "head": "950546ad4c5c986207aea8ccfc050da9653da74c",
- "artifact_sha256": "a8818df6ac7d968d669d275a99c2d2e8653fa388a8b4e20f9da559553e79bdbb",
+ "head": "4f7c16690302fd29ae5a2cdedbaa0faec907b428",
+ "artifact_sha256": "b95890a613e8cb8b48b04db96896882b005bf74a4b4126f178202bc587a72f31",
  "inventory": {
-  "total": 172,
-  "owned": 160,
+  "total": 173,
+  "owned": 161,
   "partial": 4,
   "missing": 0,
   "oos": 8,
-  "verified_by_test": 147
+  "verified_by_test": 148
  },
  "ledger": {
-  "ledger_id": "rol_0971bf7b466f6a8c468c6ef5675d428e8c0ce8aeb15915bc5c72ea34ffb59f06",
-  "closure_digest": "107281c90c19cbe165d82d4408fd6708c4d37f57bd479d655030d3542b01e5d3",
+  "ledger_id": "rol_af21c3eafa8afd61b2ccf2062359162a9b8d20d69d0e271a0bb41689799a817b",
+  "closure_digest": "7a8a0880c278deddfaed7d29fc5c1ed0a59ae9288aeeaab2861d037c0b70487c",
   "status": "unknown",
   "summary": {
-   "total": 177,
-   "required": 169,
+   "total": 178,
+   "required": 170,
    "verified": 0,
-   "required_open": 169,
+   "required_open": 170,
    "by_status": [
     {
      "key": "unowned",
@@ -29,7 +29,7 @@
     },
     {
      "key": "implemented",
-     "count": 164
+     "count": 165
     },
     {
      "key": "verified",
@@ -75,7 +75,7 @@
     },
     {
      "key": "runtime",
-     "count": 14
+     "count": 15
     },
     {
      "key": "packaging",
@@ -105,7 +105,7 @@
     },
     {
      "key": "reviewed",
-     "count": 172
+     "count": 173
     },
     {
      "key": "unknown",
@@ -113,7 +113,7 @@
     }
    ]
   },
-  "evidence_id": "ev_39475fb3ebbf5f5e62484183dff845b5269206d4b49cd252beef8ceed33a4171"
+  "evidence_id": "ev_2be528c2c1efe10883b2348841f2d6ccef118d4831224234e38f320a95806855"
  },
  "coverage": {
   "status": "unknown",
@@ -122,9 +122,9 @@
    "verifier-missing": 13,
    "verifier-unknown": 4
   },
-  "claims_total": 164,
-  "claims_qualified_by_controlled_replay": 147,
-  "evidence_ids_cited": 176
+  "claims_total": 165,
+  "claims_qualified_by_controlled_replay": 148,
+  "evidence_ids_cited": 177
  },
  "verifier_runs": {
   "build": {
