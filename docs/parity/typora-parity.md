@@ -9,14 +9,14 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 | | surfaces |
 |---|---|
 | total | 171 |
-| owned (implemented) | 82 (with a named passing test: 69) |
-| partial | 20 |
-| missing | 61 |
+| owned (implemented) | 92 (with a named passing test: 79) |
+| partial | 17 |
+| missing | 54 |
 | out of scope | 8 |
 
-REA ledger `rol_fe89516b35388868f919ee54f7f71e883a6cfbd1b4db2d1a650f71b935f88403` (closure `aa012a43129121c1…`): status **unknown**; unowned 61, implemented 102, out-of-scope 8, unknown 5.
+REA ledger `rol_3133d85a17627dad1197caa023e37947be4281c65c67c5c927aa0e6a2304451f` (closure `a53699370ee58443…`): status **unknown**; unowned 54, implemented 109, out-of-scope 8, unknown 5.
 
-REA coverage boundary `margin.typora-parity`: status **unknown**; 69/163 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 61, package-proof-missing 1, verifier-missing 85, verifier-unknown 9.
+REA coverage boundary `margin.typora-parity`: status **unknown**; 79/163 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 54, package-proof-missing 1, verifier-missing 76, verifier-unknown 8.
 
 Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): build exit 0, cargo-test exit 101, independence exit 0, playwright exit 0, vitest exit 0. See `rea/summary.json`.
 
@@ -38,7 +38,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `clipboard` Clipboard & selection: copy-as / paste-as, selection & delete scopes, jump-to | P0 | 2 |
 | `ctx` Editor & sidebar context menus (text, link, table, image, code, math, diagram, outline, files) | P1 | 7 |
 | `tools` Table, code-fence and math tools | P1 | 9 |
-| `images` Image pipeline: insert-local, copy/move/upload, zoom, syntax switch, image root path | P1 | 10 |
+| `images` Image pipeline: insert-local, copy/move/upload, zoom, syntax switch, image root path | P1 | 0 |
 | `prefs` Preferences completeness (General, Editor, Image, Markdown, Export, Appearance panes) | P1 | 8 |
 | `sidebar` Sidebar & outline: list view, file search, sort, collapsible outline, filter | P1 | 6 |
 | `syntax` Markdown syntax options & whitespace/line-break settings | P2 | 5 |
@@ -129,7 +129,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `menu.format.comment` | Format › Comment (<!-- -->) | owned |  | `src/editor/core/commands.ts` `comment: ['<!-- ', ' -->']` | `tests/e2e/parity-core-cmds.spec.ts` › menu.format.comment: | 1 |
 | `menu.format.hyperlink` | Format › Hyperlink | owned |  | `src/editor/core/commands.ts` `case 'mark'` | `tests/e2e/core-cases.ts` › Cmd+click opens links | 1 |
 | `menu.format.clear` | Format › Clear Format | owned |  | `src/editor/core/para-cmds.ts` `export function clearFormat` | `tests/e2e/parity-core-cmds.spec.ts` › menu.format.clear: | 1 |
-| `menu.format.image` | Format › Image › Insert Image / Insert Local Images… — insertImage command + paste/drop; no menu/dialog | **partial** | P0 | `src/editor/core/commands.ts` `case 'insertImage'` | none | 6 |
+| `menu.format.image` | Format › Image › Insert Image / Insert Local Images… — full Format › Image submenu in Typora order (native menu + palette); per-image entries act on the image at the caret | owned |  | `src/app/images/tools.ts` `async insertLocal()` | `tests/e2e/parity-images.spec.ts` › menu.format.image: Format › Image › Insert Image / Insert Local Images… | 6 |
 
 ## View menu
 
@@ -222,16 +222,16 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
-| `images.paste-drop` | Paste/drop images: copy into target folder by rule, unique names | owned |  | `src/app/app.ts` `private async storeImage(` | `src/platform/web.test.ts` › copies (never moves) an existing image and dedupes names | 12 |
-| `images.rules-scope` | Image rule options: apply to local/online images, relative path, ./ prefix, escape URL, YAML override — rule kinds exist; YAML typora-copy-images-to and per-scope toggles missing | **partial** | P1 | `src/app/settings.ts` `migrateImageRule` | `src/app/__tests__/settings.test.ts` › image rule forms | 12 |
-| `images.root-path` | Image root path (typora-root-url) | **missing** | P1 | — | none | 2 |
-| `images.remote-download` | Download remote images into the target folder — #17 | **partial** | P1 | `src-tauri/src/remote_images.rs` `fn ` | none | 0 |
-| `images.copy-move-all` | Image Tools: Copy / Move All Images to… (and per-image copy/move/rename) | **missing** | P1 | — | none | 15 |
-| `images.delete` | Image context: Delete Image / Delete Image File (undoable) | **missing** | P1 | — | none | 9 |
-| `images.reveal-open` | Image context: Open Image Location / Open in Browser / Copy Image Content | **missing** | P1 | — | none | 5 |
-| `images.zoom` | Image zoom (Zoom Image to N%) and switch Markdown/HTML image syntax | **missing** | P1 | — | none | 6 |
-| `images.reload` | Image Tools: Reload All Images | **missing** | P2 | — | none | 1 |
-| `images.upload` | Image upload: custom command (argv) / PicGo; upload one / all local images; test uploader — #80; use argv, never shell-concatenate (prose §6.3 risk) | **missing** | P1 | — | none | 32 |
+| `images.paste-drop` | Paste/drop images: copy into target folder by rule, unique names | owned |  | `src/app/images/insert.ts` `export async function insertImage(` | `src/platform/web.test.ts` › copies (never moves) an existing image and dedupes names | 12 |
+| `images.rules-scope` | Image rule options: apply to local/online images, relative path, ./ prefix, escape URL, YAML override — front matter typora-copy-images-to (${filename}; upload/ipic gated by Allow upload…) overrides Preferences; scope toggles, relative / ./, escape, Preferred Image Syntax | owned |  | `src/app/images/rules.ts` `export function imageTarget` | `tests/e2e/parity-images.spec.ts` › images.rules-scope: Image rule options: apply to local/online images, relative path, ./ prefix, escape URL, YAML override | 12 |
+| `images.root-path` | Image root path (typora-root-url) — Use Image Root Path toggles typora-root-url (written relative to the document); srcs written site-root style and rendered from the root | owned |  | `src/app/images/rules.ts` `export function rootDirOf` | `tests/e2e/parity-images.spec.ts` › images.root-path: Image root path (typora-root-url) | 2 |
+| `images.remote-download` | Download remote images into the target folder — downloaded natively (curl, with timeout) only when Apply above rules to online images is on (Typora default off) | owned |  | `src/app/images/insert.ts` `shouldApplyRule(input.path, opts)` | `tests/e2e/parity-images.spec.ts` › images.remote-download: Download remote images into the target folder | 0 |
+| `images.copy-move-all` | Image Tools: Copy / Move All Images to… (and per-image copy/move/rename) — duplicate names get Typora stem-<last 7 digits of unix seconds>.ext; Margin deviation: identical bytes reuse the existing copy and explicit names never clobber | owned |  | `src/app/images/tools.ts` `async copyAll(move: boolean` | `tests/e2e/parity-images.spec.ts` › images.copy-move-all: Image Tools: Copy / Move All Images to… (and per-image copy/move/rename) | 15 |
+| `images.delete` | Image context: Delete Image / Delete Image File (undoable) — Delete Image File moves the file to the Trash after confirmation; removing the reference is one undo step | owned |  | `src/app/images/tools.ts` `async deleteImageFile(` | `tests/e2e/parity-images.spec.ts` › images.delete: Image context: Delete Image / Delete Image File (undoable) | 9 |
+| `images.reveal-open` | Image context: Open Image Location / Open in Browser / Copy Image Content — Open Image in Browser only for remote images (desktop openExternal allows http(s) only) | owned |  | `src/app/images/context-menu.ts` `Open Image Location` | `tests/e2e/parity-images.spec.ts` › images.reveal-open: Image context: Open Image Location / Open in Browser / Copy Image Content | 5 |
+| `images.zoom` | Image zoom (Zoom Image to N%) and switch Markdown/HTML image syntax — Typora presets 25-200% plus 1/scale (PNG pHYs / JPEG JFIF density); inline <img> renders as an image | owned |  | `src/app/images/syntax.ts` `export function setZoom` | `tests/e2e/parity-images.spec.ts` › images.zoom: Image zoom (Zoom Image to N%) and switch Markdown/HTML image syntax | 6 |
+| `images.reload` | Image Tools: Reload All Images | owned |  | `src/app/images/tools.ts` `reloadAll(root: HTMLElement)` | `tests/e2e/parity-images.spec.ts` › images.reload: Image Tools: Reload All Images | 1 |
+| `images.upload` | Image upload: custom command (argv) / PicGo; upload one / all local images; test uploader — DELIBERATE DEVIATION (security): the command is tokenized to argv and run without a shell (Typora runs bash -c with only backslash and double quote escaped, so $() or backticks in file names execute); success also needs exit status 0. Same as Typora: 20 s per image, 60 s batch cap (child killed), URL lines http(s)/ftp/file/host.tld scanned from the tail, last URL for one image, exactly n for a batch, Test Uploader needs exactly 2 URLs; upload-on-insert keeps the local image on failure; Cancel kills the run | owned |  | `src-tauri/src/upload.rs` `pub fn test_upload(` | `tests/e2e/parity-images.spec.ts` › images.upload: Image upload: custom command (argv) / PicGo; upload one / all local images; test uploader | 32 |
 | `images.ipic` | iPic uploader (third-party macOS app, private pasteboard protocol) — Proprietary third-party integration with an undocumented pasteboard protocol; command/PicGo uploaders cover the use case. | out-of-scope |  | — | none | 4 |
 
 ## Preferences
