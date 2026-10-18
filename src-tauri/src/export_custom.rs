@@ -106,10 +106,8 @@ pub async fn run_export_command(
         let timeout = timeout_ms.map(Duration::from_millis).unwrap_or(Duration::from_secs(120)).clamp(Duration::from_secs(1), Duration::from_secs(1800));
         let cwd = cwd.map(PathBuf::from).filter(|p| p.is_absolute());
         let res = run_command(&command, &vars, stdin, cwd.as_deref(), timeout);
-        if res.is_ok() {
-            if let Some(out) = vars.get("outputPath").map(PathBuf::from).filter(|p| p.is_absolute() && p.exists()) {
-                crate::export_cmds::record_export(&out);
-            }
+        if let (Ok(_), Some(out)) = (&res, vars.get("outputPath").map(PathBuf::from).filter(|p| p.is_absolute() && p.exists())) {
+            crate::export_cmds::record_export(&out);
         }
         res
     })
