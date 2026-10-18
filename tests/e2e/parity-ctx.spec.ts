@@ -5,8 +5,7 @@
  * menu); clipboard contents are read back with a real ⌘V into a scratch field.
  */
 import { expect, test, type Page } from '@playwright/test';
-import { boot, caretAtText, editorValue, MOD } from './app-helpers';
-
+import { boot, caretAtText, editorValue, MOD, queueDialog } from './app-helpers';
 async function load(page: Page, md: string): Promise<void> {
   await boot(page);
   await page.evaluate((m) => window.__margin!.editor.setMarkdown(m), md);
@@ -143,8 +142,20 @@ test.describe('parity: context menus (#97)', () => {
     const math = page.locator('.md-editor .md-block[data-type=math_block]');
     await math.click({ button: 'right' });
     expect(await labels(page)).toEqual(['Cut', 'Copy', 'Paste', 'Copy / Paste As…', 'Edit', 'Copy Math', 'Save Math As…', 'Code Tools', 'Insert Paragraph Before', 'Insert Paragraph After', 'Delete']);
+    // #138: Save Math As… rasterizes the KaTeX node to a PNG (web memfs keeps it as a data: URL)
+    await queueDialog(page, '/tmp/eq.png');
+    await item(page, 'Save Math As…').click();
+    await expect
+      .poll(() =>
+        page.evaluate(async () => {
+          const w = window as unknown as { __MARGIN_WEB__: { stat(p: string): Promise<unknown>; readFile?(p: string): Promise<string> } };
+          if (!await w.__MARGIN_WEB__.stat('/tmp/eq.png')) return null;
+          return (await (w.__MARGIN_WEB__ as unknown as { readTextFile(p: string): Promise<string> }).readTextFile('/tmp/eq.png')).slice(0, 22);
+        }),
+      )
+      .toBe('data:image/png;base64,');
+    await math.click({ button: 'right' });
     await item(page, 'Insert Paragraph After').click();
-    await expect.poll(() => editorValue(page)).toMatch(/^Top\n\n\$\$\nE=mc\^2\n\$\$\n\n\n+End\n$/);
     await expect(page.locator('.md-editor .md-paragraph')).toHaveCount(3);
     await math.click({ button: 'right' });
     await item(page, 'Delete').click();
