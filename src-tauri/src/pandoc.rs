@@ -138,7 +138,20 @@ pub fn run(bin: &Path, args: &[String], input: Option<String>, cwd: Option<&Path
     if let Some(d) = cwd {
         cmd.current_dir(d);
     }
-    let mut child = cmd.spawn().map_err(|e| match e.kind() {
+    // ETXTBSY: a just-written executable can still have a writable fd open in a child
+    // that another thread forked but hasn't exec'd yet (fd inherited until CLOEXEC fires).
+    // It clears within milliseconds, so retry briefly instead of failing the export.
+    let mut spawned = cmd.spawn();
+    for _ in 0..20 {
+        match &spawned {
+            Err(e) if e.raw_os_error() == Some(26) => {
+                std::thread::sleep(Duration::from_millis(25));
+                spawned = cmd.spawn();
+            }
+            _ => break,
+        }
+    }
+    let mut child = spawned.map_err(|e| match e.kind() {
         std::io::ErrorKind::PermissionDenied => format!("Pandoc at {} is not executable: {e}", bin.display()),
         std::io::ErrorKind::NotFound => format!("Cannot run {}: {e}", bin.display()),
         _ => format!("Failed to start {}: {e}", bin.display()),
