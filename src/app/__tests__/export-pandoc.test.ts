@@ -171,3 +171,50 @@ describe('pandoc wiring', () => {
     expect(migrateSettings({ pandocPath: 42 }).pandocPath).toBe('');
   });
 });
+
+describe('pandoc Abort + options (#90)', () => {
+  it('Abort stops the export by id and ends silently', async () => {
+    let abortBtn: (() => void) | undefined;
+    let reject: (e: Error) => void = () => {};
+    const pandocAbort = vi.fn(async (_id: string) => {
+      reject(new Error('Export aborted'));
+      return true;
+    });
+    const onAborted = vi.fn();
+    const t = setup({
+      onAborted,
+      progress: (_m, abort) => {
+        abortBtn = abort;
+        return () => {};
+      },
+    });
+    t.deps.platform.pandocAbort = pandocAbort;
+    t.pandocExport.mockImplementationOnce(() => new Promise<string>((_, r) => (reject = r)));
+    const p = exportWithPandoc('docx', t.deps);
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(abortBtn).toBeTypeOf('function');
+    abortBtn!();
+    expect(await p).toBe(false);
+    const id = (t.pandocExport.mock.calls[0][2] as { exportId: string }).exportId;
+    expect(id).toMatch(/^pandoc-/);
+    expect(pandocAbort).toHaveBeenCalledWith(id);
+    expect(onAborted).toHaveBeenCalledOnce();
+    expect(t.notices).toEqual([]);
+  });
+
+  it('no Abort button without platform support', async () => {
+    let got: unknown = 'unset';
+    const t = setup({ progress: (_m, abort) => ((got = abort), () => {}) });
+    await exportWithPandoc('docx', t.deps);
+    expect(got).toBeUndefined();
+    expect((t.pandocExport.mock.calls[0][2] as { exportId?: string }).exportId).toBeUndefined();
+  });
+
+  it('per-format options are passed through', async () => {
+    const options = { referenceDoc: 'ref.docx', template: '', css: '', epubChapterLevel: 0, extraArguments: '--toc' };
+    const t = setup({ options });
+    await exportWithPandoc('docx', t.deps);
+    expect((t.pandocExport.mock.calls[0][2] as { options: unknown }).options).toEqual(options);
+  });
+});

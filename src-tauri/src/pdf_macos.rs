@@ -104,7 +104,13 @@ async fn wait_blocking<T: Send + 'static>(rx: mpsc::Receiver<T>, timeout: Durati
         .flatten()
 }
 
-pub async fn export_pdf<R: Runtime>(app: &AppHandle<R>, html: String, base_dir: PathBuf, out: PathBuf) -> Result<(), String> {
+pub async fn export_pdf<R: Runtime>(
+    app: &AppHandle<R>,
+    html: String,
+    base_dir: PathBuf,
+    out: PathBuf,
+    options: crate::export_cmds::PdfOptions,
+) -> Result<(), String> {
     static COUNTER: AtomicU32 = AtomicU32::new(0);
     let label = format!("pdf-export-{}", COUNTER.fetch_add(1, Ordering::Relaxed));
     let base = asset_base_url(&base_dir);
@@ -119,12 +125,26 @@ pub async fn export_pdf<R: Runtime>(app: &AppHandle<R>, html: String, base_dir: 
         .build()
         .map_err(|e| e.to_string())?;
 
-    let result = run(&win, html, base, out.clone()).await;
+    let paper = options.checked_paper();
+    let result = run(&win, html, base, out.clone(), paper).await;
     let _ = win.destroy();
-    result
+    result?;
+    if options.needs_post_processing() {
+        let out2 = out.clone();
+        tauri::async_runtime::spawn_blocking(move || crate::pdf_post_macos::post_process(&out2, &options))
+            .await
+            .map_err(|e| e.to_string())??;
+    }
+    Ok(())
 }
 
-async fn run<R: Runtime>(win: &WebviewWindow<R>, html: String, base: String, out: PathBuf) -> Result<(), String> {
+async fn run<R: Runtime>(
+    win: &WebviewWindow<R>,
+    html: String,
+    base: String,
+    out: PathBuf,
+    paper: Option<crate::export_cmds::Paper>,
+) -> Result<(), String> {
     on_main(win, move |wk, _| unsafe {
         // Print CSS backgrounds (code blocks, tables, themes). macOS 13.3+.
         let prefs = wk.configuration().preferences();
@@ -152,7 +172,7 @@ async fn run<R: Runtime>(win: &WebviewWindow<R>, html: String, base: String, out
     tokio_sleep(Duration::from_millis(400)).await;
 
     let _ = std::fs::remove_file(&out);
-    if print_paginated(win, &out).await.is_ok() && file_nonempty(&out) {
+    if print_paginated(win, &out, paper).await.is_ok() && file_nonempty(&out) {
         return Ok(());
     }
     log::warn!("paginated PDF export failed; falling back to createPDF (single page)");
@@ -167,7 +187,11 @@ async fn tokio_sleep(d: Duration) {
     let _ = tauri::async_runtime::spawn_blocking(move || std::thread::sleep(d)).await;
 }
 
-async fn print_paginated<R: Runtime>(win: &WebviewWindow<R>, out: &Path) -> Result<(), String> {
+async fn print_paginated<R: Runtime>(
+    win: &WebviewWindow<R>,
+    out: &Path,
+    paper: Option<crate::export_cmds::Paper>,
+) -> Result<(), String> {
     let (tx, rx) = mpsc::channel::<bool>();
     let out_str = out.to_string_lossy().into_owned();
     on_main(win, move |wk, ns_window| unsafe {
@@ -182,8 +206,20 @@ async fn print_paginated<R: Runtime>(win: &WebviewWindow<R>, out: &Path) -> Resu
         info.setVerticalPagination(NSPrintingPaginationMode::Automatic);
         info.setHorizontallyCentered(false);
         info.setVerticallyCentered(false);
-        for set in [NSPrintInfo::setTopMargin, NSPrintInfo::setBottomMargin, NSPrintInfo::setLeftMargin, NSPrintInfo::setRightMargin] {
-            set(&info, 36.0);
+        match &paper {
+            // Page Setup / PDF settings (#95): paper size + margins in points.
+            Some(p) => {
+                info.setPaperSize(NSSize::new(p.width, p.height));
+                info.setTopMargin(p.margins.top);
+                info.setBottomMargin(p.margins.bottom);
+                info.setLeftMargin(p.margins.left);
+                info.setRightMargin(p.margins.right);
+            }
+            None => {
+                for set in [NSPrintInfo::setTopMargin, NSPrintInfo::setBottomMargin, NSPrintInfo::setLeftMargin, NSPrintInfo::setRightMargin] {
+                    set(&info, 36.0);
+                }
+            }
         }
         let op = wk.printOperationWithPrintInfo(&info);
         op.setShowsPrintPanel(false);

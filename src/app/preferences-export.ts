@@ -1,0 +1,299 @@
+/**
+ * Preferences › Export (#95, `typora.export.settings`): general export behaviour
+ * plus per-format options (PDF, HTML, HTML without styles, Image).
+ */
+import { themeLabel } from '../themes';
+import {
+  CUSTOM_EXPORT_TEMPLATES,
+  FOOTER_PRESETS,
+  HEADER_PRESETS,
+  migrateExportSettings,
+  pandocArgsPreview,
+  PANDOC_FORMAT_FIELDS,
+  PANDOC_FORMAT_IDS,
+  type CustomExport,
+  type ExportSettings,
+  type PandocFormatId,
+  type PandocFormatOptions,
+} from './export-settings';
+import { confirmDialog } from './ui/modal';
+import { pdfPaperFields } from './export-ui';
+import { h, debounce } from './util/dom';
+
+export interface ExportPrefsHost {
+  get(): ExportSettings;
+  set(next: ExportSettings): void;
+  themeNames(): string[];
+  pickFolder(): Promise<string | null>;
+  pickFile?(name: string, extensions: string[]): Promise<string | null>;
+}
+
+type Fmt = 'general' | 'pdf' | 'html' | 'htmlPlain' | 'image';
+
+export function exportPrefsSection(host: ExportPrefsHost): HTMLElement {
+  // Every control patches one path of the settings object and saves the whole thing.
+  const patch = (fmt: Fmt, key: string, value: unknown): void => {
+    const cur = host.get();
+    host.set(migrateExportSettings({ ...cur, [fmt]: { ...cur[fmt], [key]: value } }));
+  };
+  const row = (label: string, control: HTMLElement, hint?: string): HTMLElement =>
+    h('label.pref-row', null, h('span.pref-label', null, label, hint ? h('span.pref-hint', { text: hint }) : null), h('span.pref-control', null, control));
+  const sel = (fmt: Fmt, key: string, options: [string, string][]): HTMLSelectElement => {
+    const el = h('select.select', { 'data-export': `${fmt}.${key}` }, ...options.map(([v, l]) => h('option', { value: v, text: l })));
+    el.value = String((host.get()[fmt] as unknown as Record<string, unknown>)[key]);
+    el.addEventListener('change', () => patch(fmt, key, el.value));
+    return el;
+  };
+  const check = (fmt: Fmt, key: string): HTMLInputElement => {
+    const el = h('input.switch', { type: 'checkbox', role: 'switch', 'data-export': `${fmt}.${key}` });
+    el.checked = Boolean((host.get()[fmt] as unknown as Record<string, unknown>)[key]);
+    el.addEventListener('change', () => patch(fmt, key, el.checked));
+    return el;
+  };
+  const text = (fmt: Fmt, key: string, placeholder = '', multiline = false): HTMLElement => {
+    const el = multiline
+      ? h('textarea.css-input', { rows: '3', spellcheck: 'false', placeholder, 'data-export': `${fmt}.${key}` })
+      : h('input.text-input', { type: 'text', spellcheck: 'false', placeholder, 'data-export': `${fmt}.${key}` });
+    el.value = String((host.get()[fmt] as unknown as Record<string, unknown>)[key] ?? '');
+    const save = debounce(() => patch(fmt, key, el.value), 300);
+    el.addEventListener('input', save);
+    el.addEventListener('change', () => save.flush());
+    el.addEventListener('blur', () => save.flush());
+    return el;
+  };
+  const num = (fmt: Fmt, key: string, min: number, max: number, unit: string): HTMLElement => {
+    const el = h('input.number', { type: 'number', min: String(min), max: String(max), step: '1', 'data-export': `${fmt}.${key}` });
+    el.value = String((host.get()[fmt] as unknown as Record<string, unknown>)[key]);
+    el.addEventListener('change', () => {
+      const v = Number(el.value);
+      if (v >= min && v <= max) patch(fmt, key, v);
+    });
+    return h('span.inline', null, el, h('span.unit', { text: unit }));
+  };
+  const themes: [string, string][] = [['', 'Current theme'], ...host.themeNames().map((n): [string, string] => [n, themeLabel(n)])];
+  const heading = (t: string): HTMLElement => h('h3.pref-subhead', { text: t });
+
+  const customFolder = text('general', 'customFolder', '/path/to/exports');
+  const browse = h('button.btn.btn-small', {
+    type: 'button',
+    text: 'Choose…',
+    onclick: async () => {
+      const p = await host.pickFolder();
+      if (!p) return;
+      (customFolder as HTMLInputElement).value = p;
+      const cur = host.get();
+      host.set(migrateExportSettings({ ...cur, general: { ...cur.general, customFolder: p, folder: 'custom' } }));
+      folder.value = 'custom';
+    },
+  });
+  const folder = sel('general', 'folder', [
+    ['last', 'Auto'],
+    ['same', 'Same folder with current file'],
+    ['custom', 'Custom location'],
+  ]);
+
+  const vars = 'Variables: ${title} ${author} ${today} ${currentFileName} ${pageNo} ${totalPages}';
+  // Header / Footer: free text with Typora's preset list; empty shows "None".
+  const preset = (key: 'header' | 'footer', presets: string[]): HTMLElement => {
+    const el = text('pdf', key, 'None') as HTMLInputElement;
+    const id = `export-pdf-${key}-presets`;
+    el.setAttribute('list', id);
+    return h('span.inline', null, el, h('datalist', { id }, ...presets.map((p) => h('option', { value: p }))));
+  };
+  const pageBreak = (): HTMLInputElement => {
+    const el = h('input.switch', { type: 'checkbox', role: 'switch', 'data-export': 'pdf.pageBreaks' });
+    el.checked = host.get().pdf.pageBreaks !== 'none';
+    el.addEventListener('change', () => patch('pdf', 'pageBreaks', el.checked ? 'h1' : 'none'));
+    return el;
+  };
+  return h(
+    'section.pref-section',
+    { 'data-section': 'export' },
+    heading('General'),
+    row('Default Folder for Exported File', folder),
+    row('Custom folder', h('span.inline', null, customFolder, browse)),
+    row('After Export', sel('general', 'afterExport', [['none', 'Do nothing'], ['open', 'Open exported file'], ['reveal', 'Open exported file location']])),
+    row('Read and overwrite export settings from YAML front matters', check('general', 'allowYamlOverrides'), 'title, author, subject, keywords, header, footer'),
+    row('Do not warn before “Export and Overwrite with Previous”', check('general', 'noOverwriteWarning')),
+    row('Run command after export', text('general', 'runAfterExport', 'open -R ${outputPath}'), 'Executable and arguments; no shell. ${outputPath} ${outputFolder} ${currentPath} …'),
+    heading('PDF'),
+    pdfPaperFields(host.get().pdf.page, (page) => patch('pdf', 'page', page)),
+    row('Theme', sel('pdf', 'theme', themes)),
+    row('Page Break Between Top Headings', pageBreak()),
+    row('Header', preset('header', HEADER_PRESETS), vars),
+    row('Footer', preset('footer', FOOTER_PRESETS)),
+    row('Bookmarks (outline from headings)', check('pdf', 'outline')),
+    row('Author', text('pdf', 'author')),
+    row('Append Extra Content (HTML)', text('pdf', 'appendBody', '', true)),
+    heading('HTML'),
+    row('Theme', sel('html', 'theme', themes)),
+    row('Append in <head>', text('html', 'appendHead', '<meta name="robots" content="noindex">', true)),
+    row('Append in <body>', text('html', 'appendBody', '', true)),
+    heading('HTML (without Styles)'),
+    row('Append in <head>', text('htmlPlain', 'appendHead', '<link rel="stylesheet" href="style.css">', true)),
+    row('Append in <body>', text('htmlPlain', 'appendBody', '', true)),
+    heading('Image'),
+    row('Image Format', sel('image', 'format', [['png', 'PNG'], ['jpeg', 'JPEG']])),
+    row('Image Quality', sel('image', 'quality', [['medium', 'Medium'], ['high', 'High'], ['best', 'Best (2×)']])),
+    row('Image Width', num('image', 'width', 200, 4000, 'px')),
+    row('Font Size', num('image', 'fontSize', 8, 48, 'px')),
+    row('Theme', sel('image', 'theme', themes)),
+    heading('Pandoc'),
+    pandocOptionsEditor(host),
+    heading('Custom Export Commands'),
+    customExportsEditor(host),
+  );
+}
+
+/** Menu labels of the Pandoc exports (File › Export). */
+const PANDOC_LABELS: Record<PandocFormatId, string> = {
+  docx: 'Word (.docx)',
+  odt: 'OpenOffice',
+  rtf: 'RTF',
+  epub: 'Epub',
+  latex: 'LaTeX',
+  mediawiki: 'Media Wiki',
+  rst: 'reStructuredText',
+  textile: 'Textile',
+  opml: 'OPML',
+};
+
+/** Typora's labels; file fields carry the picker filter (typora-re#9). */
+const FIELD_LABELS: Record<keyof PandocFormatOptions, [string, string, string[]?]> = {
+  referenceDoc: ['Style Reference', 'reference.docx', ['docx']],
+  template: ['Template', 'template.opendocument', ['opendocument']],
+  css: ['Custom CSS', 'epub.css', ['css']],
+  epubChapterLevel: ['Chapter Level', ''],
+  extraArguments: ['Extra Arguments', '--toc --number-sections'],
+};
+
+/** Per-format Pandoc options (#90) with a read-only preview of the resulting arguments. */
+function pandocOptionsEditor(host: ExportPrefsHost): HTMLElement {
+  const box = h('div.pandoc-options', { 'data-export': 'pandoc' });
+  for (const f of PANDOC_FORMAT_IDS) {
+    const cur = (): PandocFormatOptions => host.get().pandoc[f];
+    const preview = h('input.text-input.args-preview', { type: 'text', readonly: 'true', disabled: 'true', 'data-export': `pandoc.${f}.args` }) as HTMLInputElement;
+    const refresh = (): void => {
+      preview.value = pandocArgsPreview(f, cur());
+    };
+    const save = (key: keyof PandocFormatOptions, value: string | number): void => {
+      const all = host.get();
+      host.set(migrateExportSettings({ ...all, pandoc: { ...all.pandoc, [f]: { ...all.pandoc[f], [key]: value } } }));
+      refresh();
+    };
+    const fields = PANDOC_FORMAT_FIELDS[f].map((key) => {
+      const [label, placeholder] = FIELD_LABELS[key];
+      let el: HTMLInputElement | HTMLSelectElement;
+      if (key === 'epubChapterLevel') {
+        // 1–4, no preset: the empty choice passes no --epub-chapter-level.
+        el = h('select.select', { 'data-export': `pandoc.${f}.${key}` }, h('option', { value: '0', text: '' }), ...[1, 2, 3, 4].map((n) => h('option', { value: String(n), text: String(n) })));
+        el.value = String(cur()[key]);
+        el.addEventListener('change', () => save(key, Number(el.value)));
+      } else {
+        el = h('input.text-input', { type: 'text', spellcheck: 'false', placeholder, 'data-export': `pandoc.${f}.${key}` }) as HTMLInputElement;
+        el.value = String(cur()[key]);
+        const input = el;
+        const commit = debounce(() => save(key, input.value), 300);
+        el.addEventListener('input', () => {
+          commit();
+          preview.value = pandocArgsPreview(f, { ...cur(), [key]: input.value });
+        });
+        el.addEventListener('change', () => commit.flush());
+        el.addEventListener('blur', () => commit.flush());
+      }
+      const hint = key === 'extraArguments' ? 'Quoted like a shell; ${outputPath} ${outputFolder} ${currentFolder} ${title}' : undefined;
+      const exts = FIELD_LABELS[key][2];
+      const pick =
+        exts && host.pickFile
+          ? h('button.btn.btn-small', {
+              type: 'button',
+              text: 'Choose…',
+              'data-export': `pandoc.${f}.${key}.choose`,
+              onclick: async () => {
+                const p = await host.pickFile!(label, exts);
+                if (!p) return;
+                (el as HTMLInputElement).value = p;
+                save(key, p);
+              },
+            })
+          : null;
+      return h('label.pref-row', null, h('span.pref-label', null, label, hint ? h('span.pref-hint', { text: hint }) : null), h('span.pref-control', null, pick ? h('span.inline', null, el, pick) : el));
+    });
+    refresh();
+    box.appendChild(
+      h(
+        'div.pandoc-format',
+        { 'data-format': f },
+        h('h4.pref-subsubhead', { text: PANDOC_LABELS[f] }),
+        // Typora's order: read-only Arguments, Extra Arguments, then the format's own fields.
+        h('label.pref-row', null, h('span.pref-label', null, 'Arguments'), h('span.pref-control', null, preview)),
+        ...fields,
+      ),
+    );
+  }
+  return box;
+}
+
+/** Add / edit / delete custom export commands (File › Export › Custom…). */
+function customExportsEditor(host: ExportPrefsHost): HTMLElement {
+  const list = h('div.custom-exports');
+  const save = (next: CustomExport[]): void => {
+    host.set(migrateExportSettings({ ...host.get(), custom: next }));
+    render();
+  };
+  const update = (id: string, patch: Partial<CustomExport>): void => {
+    host.set(migrateExportSettings({ ...host.get(), custom: host.get().custom.map((c) => (c.id === id ? { ...c, ...patch } : c)) }));
+  };
+  const add = (tpl: Omit<CustomExport, 'id'>): void => save([...host.get().custom, { ...tpl, id: `c${Date.now().toString(36)}` }]);
+  const render = (): void => {
+    list.replaceChildren(
+      ...host.get().custom.map((c) => {
+        const field = (key: 'name' | 'command' | 'extension', ph: string): HTMLInputElement => {
+          const el = h('input.text-input', { type: 'text', spellcheck: 'false', placeholder: ph, value: c[key], 'data-custom': key });
+          el.addEventListener('change', () => update(c.id, { [key]: el.value } as Partial<CustomExport>));
+          return el;
+        };
+        const input = h('select.select', { 'data-custom': 'input' }, h('option', { value: 'markdown', text: 'Markdown on stdin' }), h('option', { value: 'html', text: 'HTML on stdin' }));
+        input.value = c.input;
+        input.addEventListener('change', () => update(c.id, { input: input.value as CustomExport['input'] }));
+        const dlg = h('input', { type: 'checkbox', 'data-custom': 'saveDialog' });
+        dlg.checked = c.saveDialog;
+        dlg.addEventListener('change', () => update(c.id, { saveDialog: dlg.checked }));
+        const del = h('button.btn.btn-small.btn-danger', {
+          type: 'button',
+          text: 'Delete',
+          'data-custom': 'delete',
+          onclick: async () => {
+            if (await confirmDialog('Delete this export option?', c.name, 'Delete', true)) save(host.get().custom.filter((x) => x.id !== c.id));
+          },
+        });
+        return h(
+          'div.custom-export',
+          { 'data-id': c.id },
+          h('div.inline', null, field('name', 'Name'), field('extension', 'ext'), del),
+          field('command', 'Executable and arguments, e.g. pandoc -o ${outputPath}'),
+          h('div.inline', null, input, h('label.inline', null, dlg, h('span', { text: 'Ask for output file' }))),
+        );
+      }),
+    );
+  };
+  const tpl = h('select.select', { 'data-custom': 'template' }, h('option', { value: '', text: 'Add From a Template…' }), ...CUSTOM_EXPORT_TEMPLATES.map((t, i) => h('option', { value: String(i), text: t.name })));
+  tpl.addEventListener('change', () => {
+    const t = CUSTOM_EXPORT_TEMPLATES[Number(tpl.value)];
+    tpl.value = '';
+    if (t) add(t);
+  });
+  render();
+  return h(
+    'div.pref-block',
+    null,
+    list,
+    h(
+      'div.pref-actions',
+      null,
+      h('button.btn', { type: 'button', text: 'Add', 'data-custom': 'add', onclick: () => add({ name: 'New export', command: '', extension: 'txt', input: 'markdown', saveDialog: true }) }),
+      tpl,
+    ),
+    h('p.pref-note', { text: 'Commands run without a shell: the line is split into arguments first, then ${outputPath}, ${outputFolder}, ${currentPath}, ${currentFolder}, ${title}, ${today}… are filled into each argument.' }),
+  );
+}
