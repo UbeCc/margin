@@ -94,8 +94,14 @@ fn quick_open_bench() {
             })
             .collect();
         let hits = spot_t[0].1;
-        let spot = median(spot_t.into_iter().map(|x| x.0).collect());
-        println!("q={q:<16} walker+rank {:>10}   spotlight+filter+rank {:>10} ({hits} hits)", ms(median(walk_t)), ms(spot));
+        let spot = median(spot_t.iter().map(|x| x.0).collect());
+        println!(
+            "q={q:<16} walker+rank {:>10} (all: {:?})   spotlight+filter+rank {:>10} (all: {:?}, {hits} hits)",
+            ms(median(walk_t.clone())),
+            walk_t.iter().map(|x| x.as_millis()).collect::<Vec<_>>(),
+            ms(spot),
+            spot_t.iter().map(|x| x.0.as_millis()).collect::<Vec<_>>()
+        );
     }
 
     // End-to-end cold search through QuickOpen (fresh instance each time).
