@@ -6,7 +6,7 @@ const selectedText = (page: import('@playwright/test').Page) => page.evaluate(()
 test.beforeEach(async ({ page }) => boot(page));
 
 test('quick open fuzzy-finds files with highlights', async ({ page }) => {
-  await page.keyboard.press(`${MOD}+p`);
+  await page.keyboard.press(`${MOD}+Shift+o`);
   const palette = page.locator('.palette.quick-open');
   await expect(palette).toBeVisible();
   await page.keyboard.type('rdlst');
