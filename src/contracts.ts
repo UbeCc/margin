@@ -23,7 +23,10 @@ export interface EditorSettings {
   baseDir: string | null;
   /** Resolve a document-relative src to something the webview can load. */
   resolveAsset(src: string): string;
-  /** Called when the user pastes / drops image data or files. Returns the markdown src to insert. */
+  /**
+   * Called when the user pastes / drops image data or files. Returns the markdown src to insert,
+   * or (#99) a complete image snippet (`![alt](src)` / `<img …>`) that is inserted verbatim.
+   */
   storeImage?(input: { bytes?: Uint8Array; mime?: string; path?: string; name?: string }): Promise<string | null>;
   /** Open an external link. */
   openLink?(href: string): void;
@@ -69,7 +72,9 @@ export type EditorCommand =
   | { kind: 'delete'; scope: 'word' | 'line' | 'block' | 'styled' | 'range' }
   | { kind: 'jump'; to: 'top' | 'bottom' | 'selection' }
   | { kind: 'copyAs'; format: CopyAsFormat }
-  | { kind: 'pastePlain' };
+  | { kind: 'pastePlain' }
+  // #99 (additive): replace markdown offsets [from, to) of getMarkdown() with text, as one undo step.
+  | { kind: 'replaceRange'; from: number; to: number; text: string };
 
 /**
  * Edit › Copy as (#96). markdown = source only; html = the rendered HTML *source*
@@ -214,7 +219,12 @@ export type MenuAction =
   | 'pastePlain'
   | `select:${'word' | 'line' | 'block' | 'styled'}`
   | `delete:${'word' | 'line' | 'block' | 'styled' | 'range'}`
-  | `jump:${'top' | 'bottom' | 'selection'}`;
+  | `jump:${'top' | 'bottom' | 'selection'}`
+  // #99 (additive): Format › Image submenu
+  | `image:${ImageMenuAction}`;
+
+/** Format › Image entries (#99). */
+export type ImageMenuAction = 'insert' | 'insertLocal' | 'uploadAll' | 'rootPath' | 'copyAll' | 'moveAll' | 'reloadAll' | 'settings';
 
 export interface Platform {
   readonly kind: 'tauri' | 'web';
