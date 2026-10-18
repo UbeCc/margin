@@ -6,7 +6,7 @@
    {
     "artifact_id": "margin-src",
     "artifact_sha256": "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e",
-    "version": "3c9dfdfc0c0e98779c5cda6c4ae322949c8c2694",
+    "version": "d3798c2def83ca69684b919d9833b109f16c3210",
     "environment_sha256": "20aa30e081a969eaed6bd1d8c33d9e966312a547a57b9f2a8a471dd04b5549ae",
     "evidence_ids": [
      "ev_1fff77de0927975cf6c8e1ae1f4f756642727a508cab1ec65759d425f7ebbded"
@@ -275,7 +275,7 @@
     "authority": "inferred",
     "dependency_surface_ids": [],
     "evidence_ids": [
-     "ev_9990fb790a9e32a73b9dad7f88024ed2b136c7839aa93e958e882267907407cc"
+     "ev_d1f17de163f986bfe6a970f3e13c403c94264e4e7e9598910dfd95f003aa1e8f"
     ]
    },
    {
@@ -1583,7 +1583,7 @@
     "authority": "inferred",
     "dependency_surface_ids": [],
     "evidence_ids": [
-     "ev_8da29279072301e931cbb4d929f58ca7e12fa459a0b7a27d91d6828d97fd40a7"
+     "ev_9949c2545d506e24d01a06822e483aab48be38ed5c5d4d7151783ad6a9de951e"
     ]
    },
    {
@@ -1607,7 +1607,7 @@
     "authority": "inferred",
     "dependency_surface_ids": [],
     "evidence_ids": [
-     "ev_aba54062efc760ab8ad5854cd80f2799a22894a7c857336955ad83306ff1cc5a"
+     "ev_8512aa131b9800654327c8f95922cc8a50bb807f083966c795f64cf353553095"
     ]
    },
    {
@@ -1619,7 +1619,7 @@
     "authority": "inferred",
     "dependency_surface_ids": [],
     "evidence_ids": [
-     "ev_f42b737eced29aa4fd968eef79eeccb6ac0df42503b5029f549880a0a842f172"
+     "ev_9978957139b62790328ce143f76f1bc27e60267da374644b4a4f1c811e0e1800"
     ]
    },
    {
@@ -1631,7 +1631,7 @@
     "authority": "inferred",
     "dependency_surface_ids": [],
     "evidence_ids": [
-     "ev_3e25944b9a7347293992d75e4d4b743294b4af36e5d2b03324da011810779920"
+     "ev_91b5e0b93b24925f0286dc64a13fbddb801a94bb81ef79620ba096e353339609"
     ]
    },
    {
@@ -1643,7 +1643,7 @@
     "authority": "inferred",
     "dependency_surface_ids": [],
     "evidence_ids": [
-     "ev_9d67164deb564f20c23f604b0fb5aaf5b58dd1c2c8277fa6572cc0479ec92a0e"
+     "ev_c96959e07acab5d4688aac45beb395972c54a7041ecd41eb092b158fde2a6680"
     ]
    },
    {
@@ -1655,7 +1655,7 @@
     "authority": "inferred",
     "dependency_surface_ids": [],
     "evidence_ids": [
-     "ev_dc285c146f7d8d13a45118d7979426832a68326baf6915ba854c14b1601d1890"
+     "ev_391cc84ed55b4e709a481b8ea9fa2d41219c67af1bc7f85c1e9072919493911c"
     ]
    },
    {
@@ -1667,7 +1667,7 @@
     "authority": "inferred",
     "dependency_surface_ids": [],
     "evidence_ids": [
-     "ev_f44bfff05edef5515438f3d0d1908f2c928d08c1b39ccb6df5cd274f113804cb"
+     "ev_a37b3e9a49fc39976bfba8eb2d2fa1f753037de1693f5f2980c57534f225a1c5"
     ]
    },
    {
@@ -1679,7 +1679,7 @@
     "authority": "inferred",
     "dependency_surface_ids": [],
     "evidence_ids": [
-     "ev_be267631b065b146e9aaea94bd9d658b9985bae8408ca71e81f3813183e29593"
+     "ev_b20611cf4ada7071507dbdcac0ad0c8a7800a8b31ba76fd010a9d70f51130a24"
     ]
    },
    {
@@ -2074,7 +2074,7 @@
      "disposition": "implemented",
      "owner_path": "src-tauri/src/menu.rs",
      "owner_export": "About Margin",
-     "owner_sha256": "ccd7b0c7de21aa97c1bbfa43967f48b693ba3e2445446ea8d311f1a9bfd9081d",
+     "owner_sha256": "ce2b74bbd74a7a76718f68d27cb85c3def84a836f70feb9146ed024085b1e006",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2086,7 +2086,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/app.ts",
      "owner_export": "case 'preferences'",
-     "owner_sha256": "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9",
+     "owner_sha256": "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2098,7 +2098,7 @@
      "disposition": "implemented",
      "owner_path": "src-tauri/src/menu.rs",
      "owner_export": "PredefinedMenuItem::hide_others",
-     "owner_sha256": "ccd7b0c7de21aa97c1bbfa43967f48b693ba3e2445446ea8d311f1a9bfd9081d",
+     "owner_sha256": "ce2b74bbd74a7a76718f68d27cb85c3def84a836f70feb9146ed024085b1e006",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2110,7 +2110,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/app.ts",
      "owner_export": "case 'new'",
-     "owner_sha256": "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9",
+     "owner_sha256": "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2122,7 +2122,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/app.ts",
      "owner_export": "case 'open'",
-     "owner_sha256": "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9",
+     "owner_sha256": "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2134,7 +2134,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/app.ts",
      "owner_export": "case 'openFolder'",
-     "owner_sha256": "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9",
+     "owner_sha256": "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2146,7 +2146,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/app.ts",
      "owner_export": "quickOpen(): void",
-     "owner_sha256": "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9",
+     "owner_sha256": "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2170,7 +2170,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/app.ts",
      "owner_export": "case 'save'",
-     "owner_sha256": "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9",
+     "owner_sha256": "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2182,7 +2182,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/app.ts",
      "owner_export": "case 'saveAs'",
-     "owner_sha256": "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9",
+     "owner_sha256": "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2206,7 +2206,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/app.ts",
      "owner_export": "case 'reloadFromDisk'",
-     "owner_sha256": "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9",
+     "owner_sha256": "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2218,7 +2218,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/app.ts",
      "owner_export": "case 'toggleLineEnding'",
-     "owner_sha256": "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9",
+     "owner_sha256": "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2237,12 +2237,24 @@
     }
    },
    {
+    "surface_id": "menu.file.page-setup",
+    "ownership": {
+     "disposition": "implemented",
+     "owner_path": "src/app/export-ui.ts",
+     "owner_export": "export function openPageSetup",
+     "owner_sha256": "e07b825f505e11339e0126d8999d4d76df25b954ae31bd199f7a62d62acfaa7d",
+     "path_state": "present",
+     "package_state": "distributed",
+     "authority_route": "none"
+    }
+   },
+   {
     "surface_id": "menu.file.print",
     "ownership": {
      "disposition": "implemented",
      "owner_path": "src/app/app.ts",
      "owner_export": "case 'print'",
-     "owner_sha256": "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9",
+     "owner_sha256": "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2254,7 +2266,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/app.ts",
      "owner_export": "case 'close'",
-     "owner_sha256": "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9",
+     "owner_sha256": "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2266,7 +2278,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/document.ts",
      "owner_export": "missing",
-     "owner_sha256": "58b3d037b25102c5c34fcda8881de97d4a01c2dca73b6ff302f02308ec84d842",
+     "owner_sha256": "038aae913cfc898f4c89a01d4bd59c9dc3fdd4cefe3e2cc06d4b11707176405c",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2278,7 +2290,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/app.ts",
      "owner_export": "case 'undo'",
-     "owner_sha256": "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9",
+     "owner_sha256": "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2686,7 +2698,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/app.ts",
      "owner_export": "case 'toggleSource'",
-     "owner_sha256": "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9",
+     "owner_sha256": "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2698,7 +2710,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/app.ts",
      "owner_export": "case 'toggleFocus'",
-     "owner_sha256": "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9",
+     "owner_sha256": "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2710,7 +2722,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/app.ts",
      "owner_export": "case 'toggleSidebar'",
-     "owner_sha256": "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9",
+     "owner_sha256": "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2734,7 +2746,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/app.ts",
      "owner_export": "case 'zoomIn'",
-     "owner_sha256": "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9",
+     "owner_sha256": "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2746,7 +2758,7 @@
      "disposition": "implemented",
      "owner_path": "src-tauri/src/menu.rs",
      "owner_export": "PredefinedMenuItem::fullscreen",
-     "owner_sha256": "ccd7b0c7de21aa97c1bbfa43967f48b693ba3e2445446ea8d311f1a9bfd9081d",
+     "owner_sha256": "ce2b74bbd74a7a76718f68d27cb85c3def84a836f70feb9146ed024085b1e006",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2758,7 +2770,7 @@
      "disposition": "implemented",
      "owner_path": "src-tauri/src/menu.rs",
      "owner_export": "THEMES_SUBMENU_ID",
-     "owner_sha256": "ccd7b0c7de21aa97c1bbfa43967f48b693ba3e2445446ea8d311f1a9bfd9081d",
+     "owner_sha256": "ce2b74bbd74a7a76718f68d27cb85c3def84a836f70feb9146ed024085b1e006",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2770,7 +2782,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/app.ts",
      "owner_export": "case 'openThemesFolder'",
-     "owner_sha256": "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9",
+     "owner_sha256": "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2789,7 +2801,7 @@
      "disposition": "implemented",
      "owner_path": "src-tauri/src/commands.rs",
      "owner_export": "set_theme_menu",
-     "owner_sha256": "78fe24d99859e2ace3cd6e9f70cf945f73bb26e203f831b515765f7a0940b1a3",
+     "owner_sha256": "8ff08cf646b8051e911f417a554b05f274ab91645253685c18bcc30891d546f5",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2801,7 +2813,7 @@
      "disposition": "implemented",
      "owner_path": "src-tauri/src/menu.rs",
      "owner_export": "PredefinedMenuItem::minimize",
-     "owner_sha256": "ccd7b0c7de21aa97c1bbfa43967f48b693ba3e2445446ea8d311f1a9bfd9081d",
+     "owner_sha256": "ce2b74bbd74a7a76718f68d27cb85c3def84a836f70feb9146ed024085b1e006",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2813,7 +2825,7 @@
      "disposition": "implemented",
      "owner_path": "src-tauri/src/menu.rs",
      "owner_export": "ID_HELP_MARKDOWN",
-     "owner_sha256": "ccd7b0c7de21aa97c1bbfa43967f48b693ba3e2445446ea8d311f1a9bfd9081d",
+     "owner_sha256": "ce2b74bbd74a7a76718f68d27cb85c3def84a836f70feb9146ed024085b1e006",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2940,7 +2952,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/app.ts",
      "owner_export": "private async storeImage(",
-     "owner_sha256": "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9",
+     "owner_sha256": "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2952,7 +2964,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/settings.ts",
      "owner_export": "migrateImageRule",
-     "owner_sha256": "f3c20ffaf01318b34862f703e643ef401168688bd197cc79026cffa71be50be5",
+     "owner_sha256": "5d7a026672e5a47d73a2d10d12b4cf71d68502709e5c4f741bfb4065a460e1ed",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2983,7 +2995,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/settings.ts",
      "owner_export": "DEFAULT_SETTINGS",
-     "owner_sha256": "f3c20ffaf01318b34862f703e643ef401168688bd197cc79026cffa71be50be5",
+     "owner_sha256": "5d7a026672e5a47d73a2d10d12b4cf71d68502709e5c4f741bfb4065a460e1ed",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -3007,7 +3019,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/settings.ts",
      "owner_export": "export function launchPlan",
-     "owner_sha256": "f3c20ffaf01318b34862f703e643ef401168688bd197cc79026cffa71be50be5",
+     "owner_sha256": "5d7a026672e5a47d73a2d10d12b4cf71d68502709e5c4f741bfb4065a460e1ed",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -3019,7 +3031,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/document.ts",
      "owner_export": "autoSave",
-     "owner_sha256": "58b3d037b25102c5c34fcda8881de97d4a01c2dca73b6ff302f02308ec84d842",
+     "owner_sha256": "038aae913cfc898f4c89a01d4bd59c9dc3fdd4cefe3e2cc06d4b11707176405c",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -3043,7 +3055,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/preferences.ts",
      "owner_export": "'darkTheme'",
-     "owner_sha256": "1c0825c6a2ee01030bba6407a03e243c3371261e94e5697aa4d30bac336f9e6f",
+     "owner_sha256": "aeb51a90d669f49e58e68b3bb4804d447c9f42c9dff3d8e262c00b905efcc5e1",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -3055,7 +3067,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/preferences.ts",
      "owner_export": "'Font size'",
-     "owner_sha256": "1c0825c6a2ee01030bba6407a03e243c3371261e94e5697aa4d30bac336f9e6f",
+     "owner_sha256": "aeb51a90d669f49e58e68b3bb4804d447c9f42c9dff3d8e262c00b905efcc5e1",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -3067,7 +3079,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/settings.ts",
      "owner_export": "textColumnWidth",
-     "owner_sha256": "f3c20ffaf01318b34862f703e643ef401168688bd197cc79026cffa71be50be5",
+     "owner_sha256": "5d7a026672e5a47d73a2d10d12b4cf71d68502709e5c4f741bfb4065a460e1ed",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -3091,7 +3103,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/commands.ts",
      "owner_export": "export function setCustomKeys",
-     "owner_sha256": "62e669eba6e488203f7ab02fc4d1a2a49328c2c89ca7d7f39aa3a3d4fec94d84",
+     "owner_sha256": "0bb46df6a9d5b07423e009581e62ba7bb694e840a579b0d5361b7851ae6964a5",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -3103,7 +3115,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/settings.ts",
      "owner_export": "export function newFileEol",
-     "owner_sha256": "f3c20ffaf01318b34862f703e643ef401168688bd197cc79026cffa71be50be5",
+     "owner_sha256": "5d7a026672e5a47d73a2d10d12b4cf71d68502709e5c4f741bfb4065a460e1ed",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -3115,7 +3127,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/settings.ts",
      "owner_export": "DEFAULT_SETTINGS",
-     "owner_sha256": "f3c20ffaf01318b34862f703e643ef401168688bd197cc79026cffa71be50be5",
+     "owner_sha256": "5d7a026672e5a47d73a2d10d12b4cf71d68502709e5c4f741bfb4065a460e1ed",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -3150,8 +3162,20 @@
     "ownership": {
      "disposition": "implemented",
      "owner_path": "src/app/app.ts",
-     "owner_export": "private async export(",
-     "owner_sha256": "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9",
+     "owner_export": "private createExports(",
+     "owner_sha256": "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df",
+     "path_state": "present",
+     "package_state": "distributed",
+     "authority_route": "none"
+    }
+   },
+   {
+    "surface_id": "export.html-plain",
+    "ownership": {
+     "disposition": "implemented",
+     "owner_path": "src/app/export.ts",
+     "owner_export": "export function buildPlainHtml",
+     "owner_sha256": "487615e159b90bf3d82a20871278b6509831997a847111f535ef33601072c84a",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -3163,7 +3187,91 @@
      "disposition": "implemented",
      "owner_path": "src-tauri/src/pdf_macos.rs",
      "owner_export": "pub async fn export_pdf",
-     "owner_sha256": "d972dddbfe9ccdca49ceee602bfdac3c2bb0882c46b787497e1580ac689f410f",
+     "owner_sha256": "2a3f28038f70c9e7e75088291c1c2e9797f5da0215cab024364c942d8c65cbcf",
+     "path_state": "present",
+     "package_state": "distributed",
+     "authority_route": "none"
+    }
+   },
+   {
+    "surface_id": "export.pdf-options",
+    "ownership": {
+     "disposition": "implemented",
+     "owner_path": "src-tauri/src/pdf_post_macos.rs",
+     "owner_export": "pub fn post_process",
+     "owner_sha256": "edcf6c12f952517a3b3b585403feb483bb344963c8202147409fcc365637bf59",
+     "path_state": "present",
+     "package_state": "distributed",
+     "authority_route": "none"
+    }
+   },
+   {
+    "surface_id": "export.image",
+    "ownership": {
+     "disposition": "implemented",
+     "owner_path": "src/app/export-image.ts",
+     "owner_export": "export async function rasterizeHtml",
+     "owner_sha256": "ac2b70e353d49b663e85a4b755d2d5ed6b549883e21b9d58dd14e00b98e4adc6",
+     "path_state": "present",
+     "package_state": "distributed",
+     "authority_route": "none"
+    }
+   },
+   {
+    "surface_id": "export.pandoc",
+    "ownership": {
+     "disposition": "implemented",
+     "owner_path": "src/app/export-pandoc.ts",
+     "owner_export": "export async function exportWithPandoc",
+     "owner_sha256": "96e77e6cf2cae76059f9d6f7afb6c48c57301fc0e5038f0eb36dfa57505ea2c2",
+     "path_state": "present",
+     "package_state": "distributed",
+     "authority_route": "none"
+    }
+   },
+   {
+    "surface_id": "export.custom",
+    "ownership": {
+     "disposition": "implemented",
+     "owner_path": "src-tauri/src/export_custom.rs",
+     "owner_export": "pub fn run_command",
+     "owner_sha256": "02c9634413374d5d8d96eb615576c32ff8c0ed4036eb76082d05d5a549a008d0",
+     "path_state": "present",
+     "package_state": "distributed",
+     "authority_route": "none"
+    }
+   },
+   {
+    "surface_id": "export.settings",
+    "ownership": {
+     "disposition": "implemented",
+     "owner_path": "src/app/preferences-export.ts",
+     "owner_export": "export function exportPrefsSection",
+     "owner_sha256": "f739073051c34b96ba7d26fc6281f98c48766813ca591d522d67e44afe0fb283",
+     "path_state": "present",
+     "package_state": "distributed",
+     "authority_route": "none"
+    }
+   },
+   {
+    "surface_id": "export.previous",
+    "ownership": {
+     "disposition": "implemented",
+     "owner_path": "src/app/export-actions.ts",
+     "owner_export": "async export(kind",
+     "owner_sha256": "b68611b8eb304b321374c1cbe7916daaf909cbb16f7cbf0e53a3afeee5e99afc",
+     "path_state": "present",
+     "package_state": "distributed",
+     "authority_route": "none"
+    }
+   },
+   {
+    "surface_id": "export.import",
+    "ownership": {
+     "disposition": "implemented",
+     "owner_path": "src/app/import.ts",
+     "owner_export": "export async function runImport",
+     "owner_sha256": "0f621b8875564d44d0f6e796d20e262937a851551ee6014e5f7785692ccdcd0a",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -3211,7 +3319,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/document.ts",
      "owner_export": "Insert Final New Line On Save",
-     "owner_sha256": "58b3d037b25102c5c34fcda8881de97d4a01c2dca73b6ff302f02308ec84d842",
+     "owner_sha256": "038aae913cfc898f4c89a01d4bd59c9dc3fdd4cefe3e2cc06d4b11707176405c",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -3331,7 +3439,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/document.ts",
      "owner_export": "external",
-     "owner_sha256": "58b3d037b25102c5c34fcda8881de97d4a01c2dca73b6ff302f02308ec84d842",
+     "owner_sha256": "038aae913cfc898f4c89a01d4bd59c9dc3fdd4cefe3e2cc06d4b11707176405c",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -3355,7 +3463,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/app.ts",
      "owner_export": "setDocumentEdited",
-     "owner_sha256": "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9",
+     "owner_sha256": "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -3367,7 +3475,7 @@
      "disposition": "implemented",
      "owner_path": "src-tauri/src/lib.rs",
      "owner_export": "on_second_instance",
-     "owner_sha256": "5a6217a262aa913b4ae39673666bf390ffb83819b89721adb20f91fbed857b96",
+     "owner_sha256": "aa9a3aedbafab7e4ed4189b7ad53c49ce8bb7bd305c69a33f8f0d10c123abd30",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -3379,7 +3487,7 @@
      "disposition": "implemented",
      "owner_path": "src-tauri/src/commands.rs",
      "owner_export": "allow_asset_dir",
-     "owner_sha256": "78fe24d99859e2ace3cd6e9f70cf945f73bb26e203f831b515765f7a0940b1a3",
+     "owner_sha256": "8ff08cf646b8051e911f417a554b05f274ab91645253685c18bcc30891d546f5",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -3391,7 +3499,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/app.ts",
      "owner_export": "applyAppearance",
-     "owner_sha256": "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9",
+     "owner_sha256": "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -3474,7 +3582,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/ui/modal.ts",
      "owner_export": "export function",
-     "owner_sha256": "e4112f8834e21de5a3d9df0824ca342443c188d81c200ad3f58e95ccb464967c",
+     "owner_sha256": "529c19cd6027e4066cea0f8084ca0989b652ba36b67cff5c1ac7295b5923f116",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -5591,6 +5699,21 @@
     "contract_sha256": "a94ff136d527cee0ffd7e06363094c52a95b9658a8a67f3a477aa463cf7248d5"
    },
    {
+    "verifier_id": "margin.playwright.menu.file.page-setup",
+    "claim_ids": [
+     "claim.menu.file.page-setup"
+    ],
+    "dimensions": [
+     "behavior"
+    ],
+    "authority": "controlled-replay",
+    "max_age_ms": 2592000000,
+    "minimum_repeats": 1,
+    "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
+    "normalization_removes_dimensions": false,
+    "contract_sha256": "100024fde22aef3805a1a6326708bdd0828b1bc643079e3680e8fa3179c5a174"
+   },
+   {
     "verifier_id": "margin.playwright.menu.file.close",
     "claim_ids": [
      "claim.menu.file.close"
@@ -6521,6 +6644,126 @@
     "contract_sha256": "fcb9b3e07054377355e3d65d47102a9c52825ffba709b69bed3530ca45c8b399"
    },
    {
+    "verifier_id": "margin.playwright.export.html-plain",
+    "claim_ids": [
+     "claim.export.html-plain"
+    ],
+    "dimensions": [
+     "behavior"
+    ],
+    "authority": "controlled-replay",
+    "max_age_ms": 2592000000,
+    "minimum_repeats": 1,
+    "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
+    "normalization_removes_dimensions": false,
+    "contract_sha256": "ec22b3193433c1289038d18c44fa3db97feb7aabd5e954aa6a51412d74502675"
+   },
+   {
+    "verifier_id": "margin.playwright.export.pdf-options",
+    "claim_ids": [
+     "claim.export.pdf-options"
+    ],
+    "dimensions": [
+     "behavior"
+    ],
+    "authority": "controlled-replay",
+    "max_age_ms": 2592000000,
+    "minimum_repeats": 1,
+    "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
+    "normalization_removes_dimensions": false,
+    "contract_sha256": "d91dce143502d180a4b386518275ca05333d68efd70e79f1814e06338258c824"
+   },
+   {
+    "verifier_id": "margin.playwright.export.image",
+    "claim_ids": [
+     "claim.export.image"
+    ],
+    "dimensions": [
+     "behavior"
+    ],
+    "authority": "controlled-replay",
+    "max_age_ms": 2592000000,
+    "minimum_repeats": 1,
+    "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
+    "normalization_removes_dimensions": false,
+    "contract_sha256": "7eb40f5f4eabdcd9db1426a24fe05c9ac131922e44539335fd639c159cf1dfec"
+   },
+   {
+    "verifier_id": "margin.playwright.export.pandoc",
+    "claim_ids": [
+     "claim.export.pandoc"
+    ],
+    "dimensions": [
+     "behavior"
+    ],
+    "authority": "controlled-replay",
+    "max_age_ms": 2592000000,
+    "minimum_repeats": 1,
+    "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
+    "normalization_removes_dimensions": false,
+    "contract_sha256": "002f4986c15f673c8d2a4577a380dc261c385bc975394b7569636ead44ebb113"
+   },
+   {
+    "verifier_id": "margin.playwright.export.custom",
+    "claim_ids": [
+     "claim.export.custom"
+    ],
+    "dimensions": [
+     "behavior"
+    ],
+    "authority": "controlled-replay",
+    "max_age_ms": 2592000000,
+    "minimum_repeats": 1,
+    "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
+    "normalization_removes_dimensions": false,
+    "contract_sha256": "444819b83e605fb3d90174d0ef0b7e5370996796451cd6d6be30ac4b45f68cc2"
+   },
+   {
+    "verifier_id": "margin.playwright.export.settings",
+    "claim_ids": [
+     "claim.export.settings"
+    ],
+    "dimensions": [
+     "behavior"
+    ],
+    "authority": "controlled-replay",
+    "max_age_ms": 2592000000,
+    "minimum_repeats": 1,
+    "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
+    "normalization_removes_dimensions": false,
+    "contract_sha256": "61f36a30000febb3c0d0ebf95674e3ca8ff81700957b94287314e4bf3ec8c3e2"
+   },
+   {
+    "verifier_id": "margin.playwright.export.previous",
+    "claim_ids": [
+     "claim.export.previous"
+    ],
+    "dimensions": [
+     "behavior"
+    ],
+    "authority": "controlled-replay",
+    "max_age_ms": 2592000000,
+    "minimum_repeats": 1,
+    "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
+    "normalization_removes_dimensions": false,
+    "contract_sha256": "63e2b0bc1727896cc1f7ee0a8d9dba2848968b5e05f4e403523532d316708b7a"
+   },
+   {
+    "verifier_id": "margin.playwright.export.import",
+    "claim_ids": [
+     "claim.export.import"
+    ],
+    "dimensions": [
+     "behavior"
+    ],
+    "authority": "controlled-replay",
+    "max_age_ms": 2592000000,
+    "minimum_repeats": 1,
+    "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
+    "normalization_removes_dimensions": false,
+    "contract_sha256": "e5b8a29d77cced4b048222a21ace2ba746f21b77fd11635ec509b1b5d40cea31"
+   },
+   {
     "verifier_id": "margin.playwright.syntax.extensions",
     "claim_ids": [
      "claim.syntax.extensions"
@@ -6822,7 +7065,7 @@
      "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
     ],
     "owner_sha256s": [
-     "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9"
+     "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -6845,7 +7088,7 @@
      "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
     ],
     "owner_sha256s": [
-     "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9"
+     "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -6868,7 +7111,7 @@
      "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
     ],
     "owner_sha256s": [
-     "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9"
+     "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -6891,7 +7134,7 @@
      "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
     ],
     "owner_sha256s": [
-     "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9"
+     "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -6914,7 +7157,7 @@
      "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
     ],
     "owner_sha256s": [
-     "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9"
+     "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -6960,7 +7203,7 @@
      "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
     ],
     "owner_sha256s": [
-     "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9"
+     "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -6983,7 +7226,7 @@
      "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
     ],
     "owner_sha256s": [
-     "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9"
+     "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -7029,12 +7272,35 @@
      "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
     ],
     "owner_sha256s": [
-     "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9"
+     "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
     "evidence_ids": [
      "ev_84b0827da798dfcefb6dbc4c21ff3c29f26e729d72a12852a50d4e92f3f1acf0"
+    ]
+   },
+   {
+    "verifier_id": "margin.playwright.menu.file.page-setup",
+    "contract_sha256": "100024fde22aef3805a1a6326708bdd0828b1bc643079e3680e8fa3179c5a174",
+    "observed_at": "2026-10-18T00:52:53.213Z",
+    "status": "pass",
+    "covered_claim_ids": [
+     "claim.menu.file.page-setup"
+    ],
+    "covered_dimensions": [
+     "behavior"
+    ],
+    "artifact_sha256s": [
+     "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
+    ],
+    "owner_sha256s": [
+     "e07b825f505e11339e0126d8999d4d76df25b954ae31bd199f7a62d62acfaa7d"
+    ],
+    "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
+    "repeats": 1,
+    "evidence_ids": [
+     "ev_901ce221009c1e4879641445b9c1b8fa86c9167e86e30c018915c84e038d0e62"
     ]
    },
    {
@@ -7052,7 +7318,7 @@
      "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
     ],
     "owner_sha256s": [
-     "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9"
+     "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -7075,7 +7341,7 @@
      "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
     ],
     "owner_sha256s": [
-     "58b3d037b25102c5c34fcda8881de97d4a01c2dca73b6ff302f02308ec84d842"
+     "038aae913cfc898f4c89a01d4bd59c9dc3fdd4cefe3e2cc06d4b11707176405c"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -7098,7 +7364,7 @@
      "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
     ],
     "owner_sha256s": [
-     "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9"
+     "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -7834,7 +8100,7 @@
      "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
     ],
     "owner_sha256s": [
-     "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9"
+     "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -7857,7 +8123,7 @@
      "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
     ],
     "owner_sha256s": [
-     "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9"
+     "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -7880,7 +8146,7 @@
      "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
     ],
     "owner_sha256s": [
-     "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9"
+     "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -7903,7 +8169,7 @@
      "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
     ],
     "owner_sha256s": [
-     "ccd7b0c7de21aa97c1bbfa43967f48b693ba3e2445446ea8d311f1a9bfd9081d"
+     "ce2b74bbd74a7a76718f68d27cb85c3def84a836f70feb9146ed024085b1e006"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -8110,7 +8376,7 @@
      "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
     ],
     "owner_sha256s": [
-     "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9"
+     "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -8133,7 +8399,7 @@
      "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
     ],
     "owner_sha256s": [
-     "f3c20ffaf01318b34862f703e643ef401168688bd197cc79026cffa71be50be5"
+     "5d7a026672e5a47d73a2d10d12b4cf71d68502709e5c4f741bfb4065a460e1ed"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -8156,7 +8422,7 @@
      "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
     ],
     "owner_sha256s": [
-     "f3c20ffaf01318b34862f703e643ef401168688bd197cc79026cffa71be50be5"
+     "5d7a026672e5a47d73a2d10d12b4cf71d68502709e5c4f741bfb4065a460e1ed"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -8202,7 +8468,7 @@
      "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
     ],
     "owner_sha256s": [
-     "f3c20ffaf01318b34862f703e643ef401168688bd197cc79026cffa71be50be5"
+     "5d7a026672e5a47d73a2d10d12b4cf71d68502709e5c4f741bfb4065a460e1ed"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -8225,7 +8491,7 @@
      "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
     ],
     "owner_sha256s": [
-     "58b3d037b25102c5c34fcda8881de97d4a01c2dca73b6ff302f02308ec84d842"
+     "038aae913cfc898f4c89a01d4bd59c9dc3fdd4cefe3e2cc06d4b11707176405c"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -8271,7 +8537,7 @@
      "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
     ],
     "owner_sha256s": [
-     "1c0825c6a2ee01030bba6407a03e243c3371261e94e5697aa4d30bac336f9e6f"
+     "aeb51a90d669f49e58e68b3bb4804d447c9f42c9dff3d8e262c00b905efcc5e1"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -8294,7 +8560,7 @@
      "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
     ],
     "owner_sha256s": [
-     "1c0825c6a2ee01030bba6407a03e243c3371261e94e5697aa4d30bac336f9e6f"
+     "aeb51a90d669f49e58e68b3bb4804d447c9f42c9dff3d8e262c00b905efcc5e1"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -8317,7 +8583,7 @@
      "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
     ],
     "owner_sha256s": [
-     "f3c20ffaf01318b34862f703e643ef401168688bd197cc79026cffa71be50be5"
+     "5d7a026672e5a47d73a2d10d12b4cf71d68502709e5c4f741bfb4065a460e1ed"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -8363,7 +8629,7 @@
      "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
     ],
     "owner_sha256s": [
-     "62e669eba6e488203f7ab02fc4d1a2a49328c2c89ca7d7f39aa3a3d4fec94d84"
+     "0bb46df6a9d5b07423e009581e62ba7bb694e840a579b0d5361b7851ae6964a5"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -8386,7 +8652,7 @@
      "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
     ],
     "owner_sha256s": [
-     "f3c20ffaf01318b34862f703e643ef401168688bd197cc79026cffa71be50be5"
+     "5d7a026672e5a47d73a2d10d12b4cf71d68502709e5c4f741bfb4065a460e1ed"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -8455,7 +8721,191 @@
      "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
     ],
     "owner_sha256s": [
-     "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9"
+     "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df"
+    ],
+    "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
+    "repeats": 1,
+    "evidence_ids": [
+     "ev_901ce221009c1e4879641445b9c1b8fa86c9167e86e30c018915c84e038d0e62"
+    ]
+   },
+   {
+    "verifier_id": "margin.playwright.export.html-plain",
+    "contract_sha256": "ec22b3193433c1289038d18c44fa3db97feb7aabd5e954aa6a51412d74502675",
+    "observed_at": "2026-10-18T00:52:53.213Z",
+    "status": "pass",
+    "covered_claim_ids": [
+     "claim.export.html-plain"
+    ],
+    "covered_dimensions": [
+     "behavior"
+    ],
+    "artifact_sha256s": [
+     "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
+    ],
+    "owner_sha256s": [
+     "487615e159b90bf3d82a20871278b6509831997a847111f535ef33601072c84a"
+    ],
+    "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
+    "repeats": 1,
+    "evidence_ids": [
+     "ev_901ce221009c1e4879641445b9c1b8fa86c9167e86e30c018915c84e038d0e62"
+    ]
+   },
+   {
+    "verifier_id": "margin.playwright.export.pdf-options",
+    "contract_sha256": "d91dce143502d180a4b386518275ca05333d68efd70e79f1814e06338258c824",
+    "observed_at": "2026-10-18T00:52:53.213Z",
+    "status": "pass",
+    "covered_claim_ids": [
+     "claim.export.pdf-options"
+    ],
+    "covered_dimensions": [
+     "behavior"
+    ],
+    "artifact_sha256s": [
+     "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
+    ],
+    "owner_sha256s": [
+     "edcf6c12f952517a3b3b585403feb483bb344963c8202147409fcc365637bf59"
+    ],
+    "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
+    "repeats": 1,
+    "evidence_ids": [
+     "ev_901ce221009c1e4879641445b9c1b8fa86c9167e86e30c018915c84e038d0e62"
+    ]
+   },
+   {
+    "verifier_id": "margin.playwright.export.image",
+    "contract_sha256": "7eb40f5f4eabdcd9db1426a24fe05c9ac131922e44539335fd639c159cf1dfec",
+    "observed_at": "2026-10-18T00:52:53.213Z",
+    "status": "pass",
+    "covered_claim_ids": [
+     "claim.export.image"
+    ],
+    "covered_dimensions": [
+     "behavior"
+    ],
+    "artifact_sha256s": [
+     "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
+    ],
+    "owner_sha256s": [
+     "ac2b70e353d49b663e85a4b755d2d5ed6b549883e21b9d58dd14e00b98e4adc6"
+    ],
+    "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
+    "repeats": 1,
+    "evidence_ids": [
+     "ev_901ce221009c1e4879641445b9c1b8fa86c9167e86e30c018915c84e038d0e62"
+    ]
+   },
+   {
+    "verifier_id": "margin.playwright.export.pandoc",
+    "contract_sha256": "002f4986c15f673c8d2a4577a380dc261c385bc975394b7569636ead44ebb113",
+    "observed_at": "2026-10-18T00:52:53.213Z",
+    "status": "pass",
+    "covered_claim_ids": [
+     "claim.export.pandoc"
+    ],
+    "covered_dimensions": [
+     "behavior"
+    ],
+    "artifact_sha256s": [
+     "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
+    ],
+    "owner_sha256s": [
+     "96e77e6cf2cae76059f9d6f7afb6c48c57301fc0e5038f0eb36dfa57505ea2c2"
+    ],
+    "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
+    "repeats": 1,
+    "evidence_ids": [
+     "ev_901ce221009c1e4879641445b9c1b8fa86c9167e86e30c018915c84e038d0e62"
+    ]
+   },
+   {
+    "verifier_id": "margin.playwright.export.custom",
+    "contract_sha256": "444819b83e605fb3d90174d0ef0b7e5370996796451cd6d6be30ac4b45f68cc2",
+    "observed_at": "2026-10-18T00:52:53.213Z",
+    "status": "pass",
+    "covered_claim_ids": [
+     "claim.export.custom"
+    ],
+    "covered_dimensions": [
+     "behavior"
+    ],
+    "artifact_sha256s": [
+     "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
+    ],
+    "owner_sha256s": [
+     "02c9634413374d5d8d96eb615576c32ff8c0ed4036eb76082d05d5a549a008d0"
+    ],
+    "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
+    "repeats": 1,
+    "evidence_ids": [
+     "ev_901ce221009c1e4879641445b9c1b8fa86c9167e86e30c018915c84e038d0e62"
+    ]
+   },
+   {
+    "verifier_id": "margin.playwright.export.settings",
+    "contract_sha256": "61f36a30000febb3c0d0ebf95674e3ca8ff81700957b94287314e4bf3ec8c3e2",
+    "observed_at": "2026-10-18T00:52:53.213Z",
+    "status": "pass",
+    "covered_claim_ids": [
+     "claim.export.settings"
+    ],
+    "covered_dimensions": [
+     "behavior"
+    ],
+    "artifact_sha256s": [
+     "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
+    ],
+    "owner_sha256s": [
+     "f739073051c34b96ba7d26fc6281f98c48766813ca591d522d67e44afe0fb283"
+    ],
+    "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
+    "repeats": 1,
+    "evidence_ids": [
+     "ev_901ce221009c1e4879641445b9c1b8fa86c9167e86e30c018915c84e038d0e62"
+    ]
+   },
+   {
+    "verifier_id": "margin.playwright.export.previous",
+    "contract_sha256": "63e2b0bc1727896cc1f7ee0a8d9dba2848968b5e05f4e403523532d316708b7a",
+    "observed_at": "2026-10-18T00:52:53.213Z",
+    "status": "pass",
+    "covered_claim_ids": [
+     "claim.export.previous"
+    ],
+    "covered_dimensions": [
+     "behavior"
+    ],
+    "artifact_sha256s": [
+     "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
+    ],
+    "owner_sha256s": [
+     "b68611b8eb304b321374c1cbe7916daaf909cbb16f7cbf0e53a3afeee5e99afc"
+    ],
+    "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
+    "repeats": 1,
+    "evidence_ids": [
+     "ev_901ce221009c1e4879641445b9c1b8fa86c9167e86e30c018915c84e038d0e62"
+    ]
+   },
+   {
+    "verifier_id": "margin.playwright.export.import",
+    "contract_sha256": "e5b8a29d77cced4b048222a21ace2ba746f21b77fd11635ec509b1b5d40cea31",
+    "observed_at": "2026-10-18T00:52:53.213Z",
+    "status": "pass",
+    "covered_claim_ids": [
+     "claim.export.import"
+    ],
+    "covered_dimensions": [
+     "behavior"
+    ],
+    "artifact_sha256s": [
+     "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
+    ],
+    "owner_sha256s": [
+     "0f621b8875564d44d0f6e796d20e262937a851551ee6014e5f7785692ccdcd0a"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -8547,7 +8997,7 @@
      "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
     ],
     "owner_sha256s": [
-     "58b3d037b25102c5c34fcda8881de97d4a01c2dca73b6ff302f02308ec84d842"
+     "038aae913cfc898f4c89a01d4bd59c9dc3fdd4cefe3e2cc06d4b11707176405c"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -8777,7 +9227,7 @@
      "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
     ],
     "owner_sha256s": [
-     "58b3d037b25102c5c34fcda8881de97d4a01c2dca73b6ff302f02308ec84d842"
+     "038aae913cfc898f4c89a01d4bd59c9dc3fdd4cefe3e2cc06d4b11707176405c"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -8823,7 +9273,7 @@
      "a2de59aac5b939579ecb87021a031f4a9a55e444fc72f8f7c959d03551681b2e"
     ],
     "owner_sha256s": [
-     "c6b1dec31c678cf178c7127530ea60c439d66c3c2453c16875f1d492ac4547e9"
+     "2f6bf70b2b39eef9fdfd35c3a1622e7cd3cbfae568dd776ce098c7d19d9858df"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,

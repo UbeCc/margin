@@ -232,9 +232,16 @@ export class DocumentController {
     return true;
   }
 
-  async newDocument(): Promise<boolean> {
+  /** New untitled document; `content` (e.g. File › Import) starts it modified. */
+  async newDocument(content = ''): Promise<boolean> {
     if (!(await this.confirmLeave('before creating a new document'))) return false;
     this.load(null, '');
+    if (content) {
+      this.host.editor.setMarkdown(normalizeEol(content));
+      this.dirty = this.isModified();
+      void this.host.platform.setDocumentEdited(this.dirty);
+      this.emit();
+    }
     await this.rewatch();
     this.host.editor.focus();
     return true;

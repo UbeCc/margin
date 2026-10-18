@@ -3,6 +3,7 @@ import { themeLabel } from '../themes';
 import { IMAGE_RULE_PRESETS, imageRulePresetId, type MarginSettings } from './settings';
 import { h, debounce } from './util/dom';
 import { confirmDialog, openModal } from './ui/modal';
+import { exportPrefsSection } from './preferences-export';
 import { uploadPrefsSection } from './upload-prefs';
 import { prefKit } from './prefs/kit';
 import { generalPane } from './prefs/general';
@@ -15,6 +16,8 @@ export interface PreferencesHost {
   isDarkTheme(name: string): boolean;
   openThemesFolder(): void;
   pickFolder(): Promise<string | null>;
+  /** File picker limited to `extensions` (Pandoc Style Reference / Template / Custom CSS). */
+  pickFile?(name: string, extensions: string[]): Promise<string | null>;
   /** Locate pandoc for the given path ('' = auto); resolves to a status line, never rejects. */
   detectPandoc?(path: string): Promise<string>;
 }
@@ -133,7 +136,7 @@ export function openPreferences(host: PreferencesHost, initial: Section = 'gener
     : null;
   const exportPane = h(
     'section.pref-section',
-    { 'data-section': 'export' },
+    { 'data-section': 'export-pandoc' },
     row('Pandoc Path', h('span.inline', null, pandocPath, pandocDetect), 'Used for Word, LaTeX and EPUB export'),
     h('div.pref-block', null, pandocStatus),
   );
@@ -210,7 +213,22 @@ export function openPreferences(host: PreferencesHost, initial: Section = 'gener
     editor: ['Editor', editorPane(kit)],
     images: ['Image', images],
     markdown: ['Markdown', markdownPane(kit)],
-    export: ['Export', exportPane],
+    // Export: Pandoc Path (#81) + the export settings pane (#110/#118/#128)
+    export: [
+      'Export',
+      h(
+        'div.pref-export-wrap',
+        null,
+        exportPane,
+        exportPrefsSection({
+          get: () => host.settings().export,
+          set: (next) => set({ export: next }),
+          themeNames: () => host.themeNames(),
+          pickFolder: () => host.pickFolder(),
+          pickFile: host.pickFile ? (n, e) => host.pickFile!(n, e) : undefined,
+        }),
+      ),
+    ],
   };
   const nav = h('nav.pref-nav', { role: 'tablist' });
   const panel = h('div.pref-panel');
