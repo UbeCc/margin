@@ -128,7 +128,6 @@ export class App {
       notify: (m, k, action) => void toast(m, { kind: k, ...(action ? { action } : {}) }),
       saveAs: () => void this.doc.saveAs(),
       openImagePreferences: () => this.preferences('images'),
-      refreshAssets: () => this.editor.updateSettings({ resolveAsset: (src) => this.resolveAsset(src) }),
       resolveAsset: (src) => this.resolveAsset(src),
     });
     this.images.attach(this.editorHost);

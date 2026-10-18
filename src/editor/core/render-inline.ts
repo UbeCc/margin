@@ -93,9 +93,27 @@ function node(parent: Node, n: INode, ctx: InlineCtx, s: number): number {
     case 'br':
       parent.appendChild(meta(n.v, 'md-br'));
       return s + n.v.length;
-    case 'html':
+    case 'html': {
+      // #99: an inline `<img …>` (Typora's HTML image syntax, e.g. after "Zoom Image") renders as an image.
+      const im = htmlImage(n.v);
+      if (im) {
+        const w = wrap('image', s, s + n.v.length);
+        w.classList.add('md-html-image');
+        w.append(meta(n.v, 'md-src'));
+        const img = ns('img', 'md-img') as HTMLImageElement;
+        img.alt = im.alt;
+        if (im.title) img.title = im.title;
+        for (const k of ['width', 'height'] as const) if (im[k]) img.setAttribute(k, im[k]!);
+        if (im.style) img.setAttribute('style', im.style);
+        img.src = ctx.resolveAsset(im.src);
+        img.draggable = false;
+        w.append(img);
+        parent.appendChild(w);
+        return s + n.v.length;
+      }
       parent.appendChild(el('span', n.v.startsWith('<!--') ? 'md-html md-comment' : 'md-html', n.v));
       return s + n.v.length;
+    }
     case 'entity': {
       const w = wrap('entity', s, s + n.v.length);
       w.append(meta(n.v), ns('span', 'md-entity-char', n.ch));
@@ -161,4 +179,22 @@ export function expandAt(host: HTMLElement, off: number | null): void {
     const on = off !== null && +w.dataset.s! <= off && off <= +w.dataset.e!;
     w.classList.toggle('md-expand', on);
   });
+}
+
+/** Attributes of a lone `<img …>` tag (safe subset), or null. */
+function htmlImage(tag: string): { src: string; alt: string; title?: string; width?: string; height?: string; style?: string } | null {
+  const m = /^<img\b([^>]*?)\/?>$/i.exec(tag);
+  if (!m) return null;
+  const attrs: Record<string, string> = {};
+  for (const a of m[1].matchAll(/([^\s=/>]+)(?:\s*=\s*("[^"]*"|'[^']*'|[^\s>]+))?/g)) {
+    let v = a[2] ?? '';
+    if (/^["']/.test(v)) v = v.slice(1, -1);
+    attrs[a[1].toLowerCase()] = v.replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+  }
+  if (attrs.src === undefined || /^\s*javascript:/i.test(attrs.src)) return null;
+  const style = (attrs.style ?? '')
+    .split(';')
+    .filter((d) => /^\s*(zoom|width|height|max-width|max-height)\s*:\s*[\w.%\s-]+$/i.test(d))
+    .join(';');
+  return { src: attrs.src, alt: attrs.alt ?? '', title: attrs.title, width: attrs.width, height: attrs.height, style: style || undefined };
 }
