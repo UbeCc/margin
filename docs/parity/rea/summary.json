@@ -1,23 +1,23 @@
 {
- "head": "82a8195ed53816ea94330bd4e77858e89dea35f8",
- "artifact_sha256": "178c6feb1b0987b2c276f52754e7de3141c539e3a34c8a9bfed863dd9d52815d",
+ "head": "fb68680222820b152d91829cd6e09e177355bac2",
+ "artifact_sha256": "1245af66be2a8fb388562f7576d05863ff63d46d28876df08c27098564e0d0b6",
  "inventory": {
-  "total": 172,
-  "owned": 162,
+  "total": 174,
+  "owned": 164,
   "partial": 2,
   "missing": 0,
   "oos": 8,
-  "verified_by_test": 149
+  "verified_by_test": 151
  },
  "ledger": {
-  "ledger_id": "rol_a327194a73a1ee2daec3f110fdac8e0bcb877896d763796cfdaf4299973e73d8",
-  "closure_digest": "5ef96cd36c7877e739d17c0db9b2096c4dd541f00104fae2ba9adedc396d6300",
+  "ledger_id": "rol_1cc39528e3a14003cb6e9358f71d5a6ac32e0af1de6064efed74c518cccac397",
+  "closure_digest": "54efde8504d54eced91497ff5bd5e000164856a1a07bd7e36322b25e158e1340",
   "status": "unknown",
   "summary": {
-   "total": 177,
-   "required": 169,
+   "total": 179,
+   "required": 171,
    "verified": 0,
-   "required_open": 169,
+   "required_open": 171,
    "by_status": [
     {
      "key": "unowned",
@@ -29,7 +29,7 @@
     },
     {
      "key": "implemented",
-     "count": 164
+     "count": 166
     },
     {
      "key": "verified",
@@ -75,7 +75,7 @@
     },
     {
      "key": "runtime",
-     "count": 14
+     "count": 15
     },
     {
      "key": "packaging",
@@ -87,7 +87,7 @@
     },
     {
      "key": "application",
-     "count": 121
+     "count": 122
     },
     {
      "key": "other",
@@ -105,7 +105,7 @@
     },
     {
      "key": "reviewed",
-     "count": 172
+     "count": 174
     },
     {
      "key": "unknown",
@@ -113,7 +113,7 @@
     }
    ]
   },
-  "evidence_id": "ev_d7eb078b2827dec493d82b0fd96075574beb988dc9bb34752f133199a4840cee"
+  "evidence_id": "ev_3165a7019930473dfe9b7d8754eb4ca4b1f8fa1cbf3cf5a2e41601fbdb912d6d"
  },
  "coverage": {
   "status": "unknown",
@@ -122,9 +122,9 @@
    "verifier-missing": 13,
    "verifier-unknown": 2
   },
-  "claims_total": 164,
-  "claims_qualified_by_controlled_replay": 149,
-  "evidence_ids_cited": 176
+  "claims_total": 166,
+  "claims_qualified_by_controlled_replay": 151,
+  "evidence_ids_cited": 178
  },
  "verifier_runs": {
   "build": {

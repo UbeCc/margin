@@ -36,7 +36,17 @@ const setDoc = (page: Page, md: string) => page.evaluate((m) => (window as unkno
 const menu = (page: Page, a: string) => page.evaluate((x) => (window as unknown as Win).__MARGIN_WEB__.triggerMenu(x), a);
 const settings = (page: Page, p: object) => page.evaluate((x) => (window as unknown as Win).__margin.updateSettings(x), p);
 const exists = (page: Page, p: string) => page.evaluate(async (x) => !!(await (window as unknown as Win).__MARGIN_WEB__.stat(x)), p);
-const rightClickImage = (page: Page, i = 0) => page.locator('.md-editor .md-image img.md-img, .md-editor .mb-html-block img').nth(i).click({ button: 'right' });
+/**
+ * Right-click the i-th rendered image. Bounded to 10s (#152): when an image's
+ * hit box degenerates (a failed-load image before #141's 24×24 placeholder box),
+ * Linux WebKit never delivers the point to the img and Playwright retries
+ * "<div class=\"md-content\"> intercepts pointer events" until the whole 30s
+ * test budget — both attempts — is spent. A 10s bound keeps the click fully
+ * real but turns any recurrence into a fast, explicit failure. (1×1 images are
+ * legitimately clickable; no size threshold.)
+ */
+const rightClickImage = (page: Page, i = 0) =>
+  page.locator('.md-editor .md-image img.md-img, .md-editor .mb-html-block img').nth(i).click({ button: 'right', timeout: 10_000 });
 const ctxItem = (page: Page, label: string | RegExp) => page.locator('.context-item', { hasText: label });
 
 test.beforeEach(async ({ page }) => {

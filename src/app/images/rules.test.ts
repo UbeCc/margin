@@ -52,20 +52,33 @@ describe('imageTarget (front matter > preferences)', () => {
     expect(t.warning).toContain('must be enabled first');
   });
 
+  it('a textbundle document fixes the target to assets/, above YAML and prefs (images §3.1)', () => {
+    const md = '---\ntypora-copy-images-to: ./pics\n---\n';
+    const bundle = imageTarget({ markdown: md, globalRule: { kind: 'none' }, options: O(), docPath: '/notes/journal.textbundle' });
+    expect(bundle).toEqual({ kind: 'copy', rule: { kind: 'relative', dir: 'assets' }, source: 'textbundle' });
+    // Only the bundle's own path counts, not a sibling folder.
+    expect(imageTarget({ markdown: md, globalRule: assets, options: O(), docPath: '/notes/journal.md' })).toMatchObject({ source: 'yaml' });
+    expect(imageTarget({ markdown: md, globalRule: assets, options: O(), docPath: '/Notes.TEXTBUNDLE' })).toMatchObject({ source: 'textbundle' });
+  });
+
+
   it('source mode ignores front matter; none = keep; upload preference', () => {
     const md = '---\ntypora-copy-images-to: ./pics\n---\n';
     expect(imageTarget({ markdown: md, globalRule: { kind: 'none' }, options: O(), sourceMode: true })).toEqual({ kind: 'keep' });
     expect(imageTarget({ markdown: '', globalRule: assets, options: O({ imageUploadOnInsert: true }) })).toEqual({ kind: 'upload', source: 'settings' });
   });
 
-  it('scope toggles: local on, online off by default, data: never', () => {
+  it('scope toggles: local on, online off by default, data: never; a textbundle always copies (§3.2)', () => {
     expect(shouldApplyRule(undefined, O())).toBe(true);
     expect(shouldApplyRule('/a.png', O())).toBe(true);
     expect(shouldApplyRule('/a.png', O({ imageApplyLocal: false }))).toBe(false);
     expect(shouldApplyRule('https://x/a.png', O())).toBe(false);
     expect(shouldApplyRule('ftp://x/a.png', O({ imageApplyOnline: true }))).toBe(true);
     expect(shouldApplyRule('data:image/png;base64,AA', O({ imageApplyOnline: true }))).toBe(false);
+    expect(shouldApplyRule('https://x/a.png', O(), true)).toBe(true);
+    expect(shouldApplyRule('/a.png', O({ imageApplyLocal: false }), true)).toBe(true);
   });
+
 });
 
 describe('formatImageSrc (resolveImagePath)', () => {

@@ -1,7 +1,8 @@
 import type { EditorHandle, ImageRule } from '../../contracts';
 import { confirmDialog } from '../ui/modal';
 import { findImageRefs, withSrc, type ImageRef } from '../upload';
-import { basename, dirname, isUrlLike, relative } from '../util/path';
+import { basename, isUrlLike, relative } from '../util/path';
+import { docBaseDir } from '../textbundle';
 import type { FullPlatform } from '../platform-extras';
 import { absOfSrc, insertImage, type InsertHost } from './insert';
 import { formatImageSrc, imageOptionsOf, imageTarget, REMOTE_RE, rootDirOf, setFrontMatterValue } from './rules';
@@ -41,7 +42,7 @@ export class ImageTools {
 
   private docDir(): string | null {
     const d = this.host.docPath();
-    return d ? dirname(d) : null;
+    return d ? docBaseDir(d) : null;
   }
 
   /** Write `newAbs` the way a newly inserted image would be written (relative / root url / escape). */
@@ -231,7 +232,7 @@ export class ImageTools {
   targetFolder(): string | null {
     const docDir = this.docDir();
     if (!docDir) return null;
-    const t = imageTarget({ markdown: this.host.markdown(), globalRule: this.host.settings().imageRule as ImageRule, options: imageOptionsOf(this.host.settings()) });
+    const t = imageTarget({ markdown: this.host.markdown(), globalRule: this.host.settings().imageRule as ImageRule, options: imageOptionsOf(this.host.settings()), docPath: this.host.docPath() });
     if (t.kind !== 'copy' || t.rule.kind === 'none') return null;
     const stem = basename(this.host.docPath()!).replace(/\.[^.]+$/, '');
     const dir = t.rule.dir.replace(/\$\{filename\}/g, stem);

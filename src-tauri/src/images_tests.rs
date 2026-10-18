@@ -166,3 +166,19 @@ fn relocate_parked_images_on_first_save() {
     }
     assert!(relocate_fallback(&doc, &ImageRule::None, &srcs, &fb, None).is_empty());
 }
+
+#[test]
+fn textbundle_docs_store_into_the_bundle_root() {
+    let dir = tempfile::tempdir().unwrap();
+    let bundle = dir.path().join("journal.textbundle");
+    fs::create_dir_all(bundle.join("assets")).unwrap();
+    fs::write(bundle.join("markdown.md"), "# j\n").unwrap();
+    // The `assets` rule resolves against the bundle itself, not its parent dir.
+    let r = store_image(Some(&bundle), &rel("assets"), ImageInput::Bytes { data: b"GIF89a", mime: None, name: None }, dir.path(), None).unwrap();
+    assert!(r.src.starts_with("assets/"), "{}", r.src);
+    assert_eq!(bundle.join(decode(&r.src)), r.abs);
+    // ${filename} expands to the bundle stem, still resolved from the bundle root.
+    let r2 = store_image(Some(&bundle), &rel("${filename}.assets"), ImageInput::Bytes { data: b"GIF89a", mime: None, name: None }, dir.path(), None).unwrap();
+    assert!(r2.src.starts_with("journal.assets/"), "{}", r2.src);
+    assert_eq!(bundle.join(decode(&r2.src)), r2.abs);
+}

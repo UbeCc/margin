@@ -275,7 +275,11 @@ pub fn store_image(
     fallback_dir: &Path,
     home: Option<&Path>,
 ) -> std::io::Result<Stored> {
-    let doc_dir = doc_path.and_then(|p| p.parent()).map(normalize);
+    // A TextBundle document resolves relative rules from (and writes srcs against)
+    // the bundle root, so `assets/` lands inside it (#157).
+    let doc_dir = doc_path
+        .map(|p| if crate::textbundle::is_textbundle(p) { normalize(p) } else { p.parent().map(normalize).unwrap_or_default() })
+        .filter(|d| !d.as_os_str().is_empty());
     let (target_dir, relative_to): (PathBuf, Option<PathBuf>) = match (rule, &doc_dir) {
         (ImageRule::None, _) => {
             if let ImageInput::File(p) = input {

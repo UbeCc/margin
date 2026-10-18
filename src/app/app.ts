@@ -4,6 +4,7 @@ import type { EditorHandle, EditorSettings, ImageMenuAction, MenuAction, Platfor
 import type { Wiring } from './wiring';
 import { COMMANDS, commandForKey, commandSpec, isCommandId, setCustomKeys, type CommandId } from './commands';
 import { DocumentController, type DocState } from './document';
+import { docBaseDir, isTextBundlePath } from './textbundle';
 import { DocTabs, type DocTab, type DocHostCallbacks } from './doctabs';
 import { TabBar } from './tabs';
 import { FileOps } from './fileops';
@@ -290,7 +291,7 @@ export class App {
       notify: (m, k) => void toast(m, { kind: k }),
       autoSave: () => ({ enabled: this.settings.autoSave, delay: this.settings.autoSaveDelay }),
       imageRule: () => this.settings.imageRule,
-      willLoad: (p) => tab.editor.updateSettings({ baseDir: p ? dirname(p) : null, docUrl: fileUrl(p) }),
+      willLoad: (p) => tab.editor.updateSettings({ baseDir: p ? docBaseDir(p) : null, docUrl: fileUrl(p && isTextBundlePath(p) ? p + '/' : p) }),
       onState: (s) => {
         if (this.docs.active === tab) this.onDocState(s);
         this.renderTabs();
@@ -497,7 +498,7 @@ export class App {
       }
     });
     installSidebarDrop(this.scroller, {
-      docDir: () => (this.doc.path ? dirname(this.doc.path) : null),
+      docDir: () => (this.doc.path ? docBaseDir(this.doc.path) : null),
       editor: () => this.editor,
     });
     const main = h('main.main', null, this.tabBar.el, this.findbar.el, this.extBanner.el, this.scroller);
@@ -797,7 +798,8 @@ export class App {
     let opened = false;
     for (const p of paths) {
       const st = await this.platform.stat(p).catch(() => null);
-      if (st?.isDir) await this.openFolder(p);
+      // A `.textbundle` folder opens as one document (fe-sidebar §11).
+      if (st?.isDir && !isTextBundlePath(p)) await this.openFolder(p);
       else if (st) opened = (await this.docs.openPath(p, 'tab')) || opened;
     }
   }

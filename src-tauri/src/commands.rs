@@ -3,6 +3,7 @@
 //! frontend should fall back from.
 
 use crate::images::{self, ImageInput, ImageRule};
+use crate::textbundle;
 use crate::{AppState, EV_FS, FsEventsPayload, allow_assets, allow_assets_for_file, fsops, menu, settings, watch};
 use serde::Deserialize;
 use serde_json::Value;
@@ -34,11 +35,21 @@ pub async fn read_text_file<Rt: Runtime>(app: AppHandle<Rt>, path: String) -> R<
     let p = abs(&path)?;
     let text = blocking({
         let p = p.clone();
-        move || fsops::read_text(&p)
+        move || {
+            // A `.textbundle` folder is one document (#157): read its content file.
+            if p.is_dir() && textbundle::is_textbundle(&p) {
+                return textbundle::read_bundle(&p);
+            }
+            fsops::read_text(&p)
+        }
     })
     .await?
     .map_err(|e| format!("{path}: {e}"))?;
-    allow_assets_for_file(&app, &p);
+    if p.is_dir() {
+        allow_assets(&app, &p, true); // images live inside the bundle
+    } else {
+        allow_assets_for_file(&app, &p);
+    }
     Ok(text)
 }
 
@@ -54,6 +65,14 @@ pub async fn write_text_file<Rt: Runtime>(
     blocking({
         let p = p.clone();
         move || -> std::io::Result<()> {
+            if textbundle::is_textbundle(&p) && (!p.exists() || p.is_dir()) {
+                let content_file = textbundle::ensure_bundle(&p)?;
+                let existed = content_file.exists();
+                own.record(&content_file, existed);
+                fsops::atomic_write(&content_file, content.as_bytes())?;
+                own.record(&content_file, existed);
+                return Ok(());
+            }
             let existed = p.exists();
             // record before the rename so the watcher can never see it first
             own.record(&p, existed);
@@ -64,7 +83,11 @@ pub async fn write_text_file<Rt: Runtime>(
     })
     .await?
     .map_err(|e| format!("{path}: {e}"))?;
-    allow_assets_for_file(&app, &p);
+    if p.is_dir() {
+        allow_assets(&app, &p, true);
+    } else {
+        allow_assets_for_file(&app, &p);
+    }
     Ok(())
 }
 

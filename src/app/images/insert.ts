@@ -1,5 +1,6 @@
 import type { ImageRule } from '../../contracts';
-import { basename, dirname, isAbsolute, isUrlLike, join, normalize, stripExt } from '../util/path';
+import { basename, isAbsolute, isUrlLike, join, normalize, stripExt } from '../util/path';
+import { docBaseDir, isTextBundlePath } from '../textbundle';
 import {
   decodeSrcPath,
   formatImageSrc,
@@ -51,8 +52,8 @@ export async function insertImage(host: InsertHost, input: ImageInput): Promise<
   const opts: ImageOptions = imageOptionsOf(host.settings());
   const md = host.markdown();
   const docPath = host.docPath();
-  const docDir = docPath ? dirname(docPath) : null;
-  const target = imageTarget({ markdown: md, globalRule: host.settings().imageRule, options: opts, sourceMode: host.sourceMode() });
+  const docDir = docPath ? docBaseDir(docPath) : null;
+  const target = imageTarget({ markdown: md, globalRule: host.settings().imageRule, options: opts, sourceMode: host.sourceMode(), docPath });
   if (target.warning) host.notify(target.warning, 'warning');
   const ctx = { docDir, rootDir: host.sourceMode() ? null : rootDirOf(md, docDir), options: opts };
   const alt = altFor(input);
@@ -65,9 +66,8 @@ export async function insertImage(host: InsertHost, input: ImageInput): Promise<
   const store = (rule: ImageRule) => host.platform.storeImage(docPath, rule, input);
 
   try {
-    // Out of scope (e.g. online image with "Apply above rules to online images" off): reference as is.
-    if (!input.bytes && input.path && !shouldApplyRule(input.path, opts)) return write(local ?? input.path);
-    if (input.bytes && local && !opts.imageApplyLocal) return write(local);
+    if (!input.bytes && input.path && !shouldApplyRule(input.path, opts, isTextBundlePath(docPath))) return write(local ?? input.path);
+    if (input.bytes && local && !opts.imageApplyLocal && !isTextBundlePath(docPath)) return write(local);
 
     if (target.kind === 'keep') return write(await store({ kind: 'none' }));
 

@@ -7,7 +7,7 @@ import type { Container, ItemContainer, Line, ParsedLeaf } from '../types';
 import { splitLines, isBlank, indentCols, consumeCols, columnOf, RawLine } from './lines';
 import {
   atxLevel, fenceOpen, isFenceClose, mathOpen, isMathClose, isThematic, setextLevel,
-  htmlStart, htmlEnds, isToc, isFootnoteDef, isLinkDef, quoteStart, listStart, isTableStart, FenceOpen,
+  htmlStart, htmlEnds, isToc, isFootnoteDef, isLinkDef, quoteStart, listStart, isTableStart, isDashFence, FenceOpen,
 } from './starts';
 
 type Kind = 'para' | 'fence' | 'math' | 'html' | 'indented' | 'table';
@@ -53,9 +53,10 @@ export function parseBlocks(src: string, keyBase = 0): ParsedLeaf[] {
     leaf.n = leaf.lines.length;
   };
 
-  // Front matter: `---` on the very first line, closed by `---` or `...`.
-  if (raw.length > 1 && /^---[ \t]*$/.test(raw[0].text)) {
-    const end = raw.findIndex((l, i) => i > 0 && /^(?:---|\.\.\.)[ \t]*$/.test(l.text));
+  // Front matter: `---` on the very first line, closed by `---` or `...`. #133 remap:
+  // the `---`-line checks take the dash family (`—`, `–-`, `-–` via –→-- / —→--- equality).
+  if (raw.length > 1 && isDashFence(raw[0].text)) {
+    const end = raw.findIndex((l, i) => i > 0 && (isDashFence(l.text) || /^\.\.\.[ \t]*$/.test(l.text)));
     if (end > 0) {
       const lines = raw.slice(0, end + 1).map((l) => ({ prefix: '', text: l.text, eol: l.eol }));
       add({ type: 'front_matter', lines, n: lines.length, chain: [], openFrom: 0 });

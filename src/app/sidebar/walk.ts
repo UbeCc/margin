@@ -1,4 +1,5 @@
 import type { DirEntry, Platform } from '../../contracts';
+import { isTextBundlePath } from '../textbundle';
 import { extname } from '../util/path';
 
 /**
@@ -52,7 +53,11 @@ export async function collectDocs(platform: Platform, root: string, opts: WalkOp
     }
     for (const e of entries) {
       if (e.isDir) {
-        if (!shouldSkipDir(e.name)) queue.push(e.path);
+        // A `.textbundle` is one document (fe-sidebar §1), not a folder to walk into.
+        if (isTextBundlePath(e.path) && !shouldSkipDir(e.name)) {
+          if (docs.length >= limit) return { docs, oversize: true };
+          docs.push(e);
+        } else if (!isTextBundlePath(e.path) && !shouldSkipDir(e.name)) queue.push(e.path);
       } else if (isListedDoc(e.name) && (opts.maxBytes === undefined || e.size <= opts.maxBytes)) {
         if (docs.length >= limit) return { docs, oversize: true };
         docs.push(e);

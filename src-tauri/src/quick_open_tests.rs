@@ -146,3 +146,25 @@ fn huge_tree_is_capped_and_markdown_survives_the_cap() {
     assert!(took < std::time::Duration::from_secs(10), "walk took {took:?}");
     eprintln!("walk of {} files: {took:?}", MAX_INDEX + 2 * per);
 }
+
+#[test]
+fn walk_lists_textbundles_as_single_files() {
+    let root = tempfile::tempdir().unwrap();
+    fs::write(root.path().join("a.md"), "").unwrap();
+    let bundle = root.path().join("note.textbundle");
+    fs::create_dir_all(bundle.join("assets")).unwrap();
+    fs::write(bundle.join("markdown.md"), "").unwrap();
+    fs::write(bundle.join("text.json"), "{}").unwrap();
+    let files = walk(root.path());
+    assert!(files.contains(&"note.textbundle".to_string()), "{files:?}");
+    assert!(!files.iter().any(|f| f.contains("markdown.md") || f.contains("text.json")), "{files:?}");
+    assert!(files.contains(&"a.md".to_string()));
+    // Watcher-created bundles index like files; their children never do.
+    let qo = QuickOpen::default();
+    qo.on_created(&bundle, true);
+    let hits = qo.search(root.path(), "note", 10, true);
+    assert_eq!(hits, vec![bundle.to_string_lossy().into_owned()]);
+    qo.on_created(&bundle.join("assets/x.png"), false);
+    let none: Vec<String> = qo.search(root.path(), "x.png", 10, true);
+    assert!(none.is_empty());
+}
