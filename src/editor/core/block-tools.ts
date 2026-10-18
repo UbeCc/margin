@@ -7,7 +7,7 @@
 import type { CodeOp, MathOp, TableOp, WidgetBlockType, WidgetInstance } from '../../contracts';
 import type { EditorCore } from './editor';
 import type { Leaf } from './types';
-import { leafContent, widgetRaw } from './model';
+import { widgetRaw } from './model';
 import { isTextLeaf, widgetToParagraph } from './edit';
 import { copyAs, lastCopyAs, writePayload } from './copy-as';
 
@@ -82,39 +82,13 @@ export function codeTool(ed: EditorCore, op: CodeOp): boolean {
   return hit?.inst?.command?.(op) ?? false;
 }
 
-/** Inline `$…$` range (content offsets) around the caret in text block `i`. */
-function inlineMathRange(ed: EditorCore): { i: number; from: number; to: number } | null {
-  const s = ed.readSel() ?? ed.lastSel;
-  if (!s) return null;
-  const { i, off } = ed.doc.locate(s.focus);
-  const l = ed.doc.leaves[i];
-  if (!l || !isTextLeaf(l)) return null;
-  const c = leafContent(l);
-  const re = /(?<![\\$])\$(?!\$)((?:\\.|[^$\\\n])+?)\$(?!\$)/g;
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(c))) if (off >= m.index && off <= m.index + m[0].length) return { i, from: m.index, to: m.index + m[0].length };
-  return null;
-}
-
 export function mathTool(ed: EditorCore, op: MathOp): boolean {
   if (op === 'copyTex' || op === 'copyMathML') return copyAs(ed, op === 'copyTex' ? 'tex' : 'mathml');
   if (op === 'refresh') return refreshMath(ed);
-  // delete: the math block with the caret, else the inline $…$ around the caret
+  // delete: the math block with the caret (Typora has no Delete Math for inline $…$, typora-re#4)
   const hit = widgetAtCaret(ed, ['math_block']);
-  if (hit) {
-    removeBlock(ed, hit.leaf.id);
-    return true;
-  }
-  const r = inlineMathRange(ed);
-  if (!r) return false;
-  const from = ed.doc.docPos(r.i, r.from);
-  const to = ed.doc.docPos(r.i, r.to);
-  ed.hist.break();
-  ed.change(() => {
-    ed.doc.replace(from, to, '');
-    return { pos: from };
-  });
-  ed.hist.break();
+  if (!hit) return false;
+  removeBlock(ed, hit.leaf.id);
   return true;
 }
 

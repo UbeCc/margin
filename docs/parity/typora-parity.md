@@ -14,7 +14,7 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 | missing | 56 |
 | out of scope | 8 |
 
-REA ledger `rol_932b7d720a8c511a97cf96d80b28e7f76ff2692d986e04d9f98dd6bcc2f8401e` (closure `e83e5c741b224ecb…`): status **unknown**; unowned 56, implemented 107, out-of-scope 8, unknown 5.
+REA ledger `rol_1baba9def850f27eb87a7e6be411b816abef99159d7e7c9f468b2fc40a547cda` (closure `4a0c232bb9bdde73…`): status **unknown**; unowned 56, implemented 107, out-of-scope 8, unknown 5.
 
 REA coverage boundary `margin.typora-parity`: status **unknown**; 77/163 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 56, package-proof-missing 1, verifier-missing 79, verifier-unknown 7.
 
@@ -104,7 +104,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 |---|---|---|---|---|---|---|
 | `menu.para.headings` | Paragraph › Heading 1–6 / Paragraph | owned |  | `src/editor/core/commands.ts` `case 'heading'` | `tests/e2e/app-navigation.spec.ts` › keyboard shortcuts drive editor commands | 8 |
 | `menu.para.heading-level` | Paragraph › Increase / Decrease Heading Level | owned |  | `src/editor/core/commands.ts` `case 'headingLevel'` | `tests/e2e/parity-core-cmds.spec.ts` › menu.para.heading-level: | 2 |
-| `menu.para.table` | Paragraph › Table / Insert Table (with rows×columns dialog) — default 3 columns × 3 rows incl. header (typora-re#4); no Touch Bar | owned |  | `src/app/ui/table-dialog.ts` `export function insertTableDialog` | `tests/e2e/parity-tools.spec.ts` › menu.para.table: | 7 |
+| `menu.para.table` | Paragraph › Table / Insert Table (with rows×columns dialog) — 3 columns × 4 rows incl. header, remembers the last size, 1–40 cols / 1–99 rows (typora-re#4); inserts after the caret block instead of splitting the paragraph; no Touch Bar | owned |  | `src/app/ui/table-dialog.ts` `export function insertTableDialog` | `tests/e2e/parity-tools.spec.ts` › menu.para.table: | 7 |
 | `menu.para.math-block` | Paragraph › Math Block | owned |  | `src/editor/core/commands.ts` `case 'math'` | `tests/e2e/blocks-widgets.spec.ts` › renders KaTeX, edits source, shows errors | 4 |
 | `menu.para.code-fence` | Paragraph › Code Fences (with language box) | owned |  | `src/editor/core/commands.ts` `case 'code'` | `tests/e2e/core-cases.ts` › ``` + Enter mounts a code widget | 4 |
 | `menu.para.html-block` | Paragraph › HTML Block (insert) | owned |  | `src/editor/core/commands.ts` `case 'html'` | `tests/e2e/parity-core-cmds.spec.ts` › menu.para.html-block: | 1 |
@@ -207,7 +207,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
 | `tools.math.render` | Math blocks/inline: KaTeX render, errors, \tag/\eqref | owned |  | `src/editor/blocks/math.ts` `createMathBlockWidget` | `tests/e2e/blocks-core.spec.ts` › follows the referenced | 0 |
-| `tools.math.copy` | Math tools: Copy Math / Copy as TeX / Copy as MathML / Delete Math — block + inline; Copy as Image and the Use LaTeX Source / Use Rendered SVG options are not implemented | owned |  | `src/editor/core/block-tools.ts` `export function mathTool` | `tests/e2e/parity-tools.spec.ts` › tools.math.copy: | 7 |
+| `tools.math.copy` | Math tools: Copy Math / Copy as TeX / Copy as MathML / Delete Math — copy: block + inline; Delete Math: blocks only (typora-re#4); Copy as Image and Use LaTeX Source / Use Rendered SVG → #127 | owned |  | `src/editor/core/block-tools.ts` `export function mathTool` | `tests/e2e/parity-tools.spec.ts` › tools.math.copy: | 7 |
 | `tools.math.refresh` | Math tools: Refresh All Math Expressions | owned |  | `src/editor/core/block-tools.ts` `export function refreshMath` | `tests/e2e/parity-tools.spec.ts` › tools.math.refresh: | 1 |
 | `tools.math.numbering` | Math numbering options (auto-number, AMS rules, physics package) | **missing** | P2 | — | none | 6 |
 

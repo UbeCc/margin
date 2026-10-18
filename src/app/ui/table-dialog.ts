@@ -1,27 +1,29 @@
 import { h } from '../util/dom';
 import { openModal } from './modal';
 
-/** Default size of Paragraph › Table › Insert Table… (rows include the header row). */
-export const TABLE_DEFAULT = { cols: 3, rows: 3 };
-const MAX = 200;
+/** Initial size of Paragraph › Table › Insert Table… (rows include the header row); later opens reuse the last size. */
+export const TABLE_DEFAULT = { cols: 3, rows: 4 };
+export const TABLE_MAX = { cols: 40, rows: 99 };
+let last = { ...TABLE_DEFAULT };
 
 /** Insert Table dialog (#98): Columns × Rows. Resolves null on Cancel / Escape. */
-export function insertTableDialog(init = TABLE_DEFAULT): Promise<{ rows: number; cols: number } | null> {
+export function insertTableDialog(init = last): Promise<{ rows: number; cols: number } | null> {
   return new Promise((resolve) => {
     let done = false;
-    const num = (name: string, v: number) =>
-      h('input.text-input.table-dim', { type: 'number', min: '1', max: String(MAX), value: String(v), name, 'aria-label': name }) as HTMLInputElement;
-    const cols = num('Columns', init.cols);
-    const rows = num('Rows', init.rows);
+    const num = (name: string, v: number, max: number) =>
+      h('input.text-input.table-dim', { type: 'number', min: '1', max: String(max), value: String(v), name, 'aria-label': name }) as HTMLInputElement;
+    const cols = num('Columns', init.cols, TABLE_MAX.cols);
+    const rows = num('Rows', init.rows, TABLE_MAX.rows);
     const err = h('div.dialog-error');
     const finish = (ok: boolean): void => {
       if (done) return;
       const c = Math.floor(+cols.value);
       const r = Math.floor(+rows.value);
-      if (ok && !(c >= 1 && c <= MAX && r >= 1 && r <= MAX)) {
-        err.textContent = `Enter numbers between 1 and ${MAX}`;
+      if (ok && !(c >= 1 && c <= TABLE_MAX.cols && r >= 1 && r <= TABLE_MAX.rows)) {
+        err.textContent = `Columns must be between 1 and ${TABLE_MAX.cols}, rows between 1 and ${TABLE_MAX.rows}`;
         return;
       }
+      if (ok) last = { rows: r, cols: c };
       done = true;
       modal.close();
       resolve(ok ? { rows: r, cols: c } : null);

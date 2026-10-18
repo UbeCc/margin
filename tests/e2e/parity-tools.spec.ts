@@ -64,7 +64,7 @@ test.describe('parity: table, code and math tools (#98)', () => {
     await expect(dlg).toBeVisible();
     await expect(dlg.locator('h2')).toHaveText('Insert Table');
     await expect(dlg.locator('input[name=Columns]')).toHaveValue('3');
-    await expect(dlg.locator('input[name=Rows]')).toHaveValue('3');
+    await expect(dlg.locator('input[name=Rows]')).toHaveValue('4');
     // negative: Escape cancels without touching the document
     await page.keyboard.press('Escape');
     await expect(dlg).toHaveCount(0);
@@ -77,11 +77,13 @@ test.describe('parity: table, code and math tools (#98)', () => {
     await expect(dlg).toHaveCount(0);
     await expect.poll(() => editorValue(page)).toContain('|   |   |   |   |\n| --- | --- | --- | --- |\n|   |   |   |   |');
     expect(await page.locator('.mb-table tr').count()).toBe(2);
-    // invalid size is refused in the dialog
+    // the dialog remembers the last size; out-of-range sizes (cols 1..40, rows 1..99) are refused
     void page.evaluate(() => window.__margin!.run('table:insert'));
-    await dlg.locator('input[name=Rows]').fill('0');
+    await expect(dlg.locator('input[name=Columns]')).toHaveValue('4');
+    await expect(dlg.locator('input[name=Rows]')).toHaveValue('2');
+    await dlg.locator('input[name=Columns]').fill('41');
     await page.keyboard.press('Enter');
-    await expect(dlg.locator('.dialog-error')).toContainText('between 1 and');
+    await expect(dlg.locator('.dialog-error')).toContainText('between 1 and 40');
     await page.keyboard.press('Escape');
   });
 
@@ -197,11 +199,10 @@ test.describe('parity: table, code and math tools (#98)', () => {
     expect(await run(page, { kind: 'math', op: 'delete' })).toBe(true);
     await expect(page.locator('.mb-math-block')).toHaveCount(0);
     expect(await md(page)).not.toContain('frac');
-    // inline: Delete Math removes the whole $…$ span
+    // negative: inline math has no Delete Math (block-only, as in Typora); no math at the caret
     await caret(page, 0, 9);
-    expect(await run(page, { kind: 'math', op: 'delete' })).toBe(true);
-    expect(await md(page)).toMatch(/^Inline {2}here\./);
-    // negative: no math at the caret
+    expect(await run(page, { kind: 'math', op: 'delete' })).toBe(false);
+    expect(await md(page)).toContain('$a^2$');
     await caret(page, 0, 2);
     expect(await run(page, { kind: 'math', op: 'delete' })).toBe(false);
     expect(await run(page, { kind: 'math', op: 'copyTex' })).toBe(false);

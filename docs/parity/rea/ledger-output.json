@@ -1,5 +1,5 @@
 {
- "evidence_id": "ev_d2a1350ce9fa64cab9b1a0326c655f643d00bb38e7917975dcea5fe7ce17e6a5",
+ "evidence_id": "ev_e75d378c075093b0c0447611190663ce4331a667312e75b3babe17b9171fa4b8",
  "subject": null,
  "provider": {
   "id": "rea-javascript-application-workflows",
@@ -10,14 +10,14 @@
  "predicate_type": "rea.reconstruction-obligation-ledger",
  "operation": "build_reconstruction_obligation_ledger",
  "parameters": {
-  "ledger_id": "rol_932b7d720a8c511a97cf96d80b28e7f76ff2692d986e04d9f98dd6bcc2f8401e",
-  "closure_digest": "e83e5c741b224ecb839fd7cd53dbda28634b890926e4af6229228352fb82b9f8"
+  "ledger_id": "rol_1baba9def850f27eb87a7e6be411b816abef99159d7e7c9f468b2fc40a547cda",
+  "closure_digest": "4a0c232bb9bdde73dad1dd306ba208fe87911cbad4e7d9825fbb21b552100f34"
  },
  "raw_result": null,
  "normalized_result": {
   "schema": "ReconstructionObligationLedger",
-  "ledger_id": "rol_932b7d720a8c511a97cf96d80b28e7f76ff2692d986e04d9f98dd6bcc2f8401e",
-  "closure_digest": "e83e5c741b224ecb839fd7cd53dbda28634b890926e4af6229228352fb82b9f8",
+  "ledger_id": "rol_1baba9def850f27eb87a7e6be411b816abef99159d7e7c9f468b2fc40a547cda",
+  "closure_digest": "4a0c232bb9bdde73dad1dd306ba208fe87911cbad4e7d9825fbb21b552100f34",
   "status": "unknown",
   "coverage": {
    "status": "complete"
@@ -10577,7 +10577,7 @@
      "owner": {
       "module_path": "src/app/ui/table-dialog.ts",
       "symbol": "export function insertTableDialog",
-      "owner_sha256": "ef07dcce07be9e70c9dfd7432b9ef414d8d2f3917b3668c71cc92cde07022922"
+      "owner_sha256": "0e3e7f5d0f5fe0c5859b1bfb50093822685432691ebe631bee84cb0a12b202ce"
      },
      "parser_type": null,
      "original_cases": [
@@ -14443,7 +14443,7 @@
      "owner": {
       "module_path": "src/editor/core/block-tools.ts",
       "symbol": "export function mathTool",
-      "owner_sha256": "cadc9b1101b69324d397efb7cdd3179ca51f159888e01eb4f136bdb3f94f0c6c"
+      "owner_sha256": "638cef6c084a0e484cc9e3bb9aca3ea1d0aadecdccf57a80e1facb4cdf39bae9"
      },
      "parser_type": null,
      "original_cases": [
@@ -14603,7 +14603,7 @@
      "owner": {
       "module_path": "src/editor/core/block-tools.ts",
       "symbol": "export function refreshMath",
-      "owner_sha256": "cadc9b1101b69324d397efb7cdd3179ca51f159888e01eb4f136bdb3f94f0c6c"
+      "owner_sha256": "638cef6c084a0e484cc9e3bb9aca3ea1d0aadecdccf57a80e1facb4cdf39bae9"
      },
      "parser_type": null,
      "original_cases": [
@@ -15019,7 +15019,7 @@
      "owner": {
       "module_path": "src/editor/core/block-tools.ts",
       "symbol": "export function copyTable",
-      "owner_sha256": "cadc9b1101b69324d397efb7cdd3179ca51f159888e01eb4f136bdb3f94f0c6c"
+      "owner_sha256": "638cef6c084a0e484cc9e3bb9aca3ea1d0aadecdccf57a80e1facb4cdf39bae9"
      },
      "parser_type": null,
      "original_cases": [
