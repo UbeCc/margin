@@ -1,32 +1,35 @@
 import { S, T, O } from './dsl.mjs';
 
 const ec = 'editor-core';
+// Paragraph & Format command verifiers (epic #93): one test per surface, titled with its id.
+const V = (id) => 'tests/e2e/parity-core-cmds.spec.ts::' + id + ':';
+const PC = 'src/editor/core/para-cmds.ts#';
 export default [
   // ── Paragraph ─────────────────────────────────────────────────────
   S('menu.para.headings', 'Paragraph › Heading 1–6 / Paragraph', 'owned', O.cmd + "case 'heading'", T.nav + 'keyboard shortcuts drive editor commands', { A: ['Paragraph', 'Heading 1', 'Heading 2', 'Heading 3', 'Heading 4', 'Heading 5', 'Heading 6'], C: ['touchBar.setBlockStyle'] }),
-  S('menu.para.heading-level', 'Paragraph › Increase / Decrease Heading Level', 'missing', null, null, { p: 0, e: 'core-cmds', A: ['Increase Heading Level', 'Decrease Heading Level'] }),
+  S('menu.para.heading-level', 'Paragraph › Increase / Decrease Heading Level', 'owned', O.cmd + "case 'headingLevel'", V('menu.para.heading-level'), { A: ['Increase Heading Level', 'Decrease Heading Level'] }),
   S('menu.para.table', 'Paragraph › Table / Insert Table (with rows×columns dialog)', 'partial', O.cmd + "case 'table'", T.core + 'table shortcut mounts the table widget', { p: 1, e: 'tools', A: ['Table', 'Insert Table'], B: ['Insert Table', 'Rows', 'Columns'], C: ['touchBar.showInsertTableTouchBar', 'touchBar.updateInsertTableTouchBar'], sec: [ec + ' §7.4'], note: 'inserts a fixed 2×2 table; no size dialog' }),
   S('menu.para.math-block', 'Paragraph › Math Block', 'owned', O.cmd + "case 'math'", T.bw + 'renders KaTeX, edits source, shows errors', { A: ['Math Block', 'Math'], B: ['Input Math TeX here', 'Math Blocks'], sec: [ec + ' §7.2'] }),
   S('menu.para.code-fence', 'Paragraph › Code Fences (with language box)', 'owned', O.cmd + "case 'code'", T.core + '``` + Enter mounts a code widget', { A: ['Code Fences'], B: ['code language', 'Code Fences'], C: ['touchBar.setFencesOnSetLang'], sec: [ec + ' §7.1'] }),
-  S('menu.para.html-block', 'Paragraph › HTML Block (insert)', 'partial', 'src/editor/blocks/html-block.ts#createHtmlBlockWidget', T.bw + 'html block is sanitized and editable', { p: 1, e: 'core-cmds', A: ['HTML Block'], sec: [ec + ' §7.5'], note: 'renders/edits HTML blocks; no insert command' }),
+  S('menu.para.html-block', 'Paragraph › HTML Block (insert)', 'owned', O.cmd + "case 'html'", V('menu.para.html-block'), { A: ['HTML Block'], sec: [ec + ' §7.5'] }),
   S('menu.para.containers', 'Paragraph › Quote / Ordered List / Unordered List / Task List', 'owned', O.cmd + "case 'quote'", T.qa + 'cut/paste list items, toggle list on two blocks', { A: ['Quote', 'Ordered List', 'Unordered List', 'Task List', 'List Styles / Remove Block'], B: ['Ordered List', 'Unordered List'] }),
-  S('menu.para.task-status', 'Paragraph › Task Status: toggle / mark complete / incomplete', 'partial', 'src/editor/core/input.ts#task', T.core + 'task checkbox toggles source', { p: 1, e: 'core-cmds', A: ['Task Status', 'Toggle Task Status', 'Mark as Complete', 'Mark as Incomplete'], note: 'checkbox click only; no command/shortcut' }),
+  S('menu.para.task-status', 'Paragraph › Task Status: toggle / mark complete / incomplete', 'owned', PC + 'export function taskStatus', V('menu.para.task-status'), { A: ['Task Status', 'Toggle Task Status', 'Mark as Complete', 'Mark as Incomplete'] }),
   S('menu.para.indent', 'Paragraph › List Indentation: Indent / Outdent', 'owned', 'src/editor/core/input.ts#Tab', T.qa + 'Tab moves an item with its nested children', { A: ['List Indentation', 'Indent', 'Outdent'], B: ['Indent'] }),
-  S('menu.para.insert-paragraph', 'Paragraph › Insert Paragraph Before / After', 'missing', null, null, { p: 0, e: 'core-cmds', A: ['Insert Paragraph Before', 'Insert Paragraph After', 'Paragraph (before)', 'Paragraph (after)', 'Insert'] }),
-  S('menu.para.link-reference', 'Paragraph › Link Reference (insert [id]: url definition)', 'missing', null, null, { p: 1, e: 'core-cmds', A: ['Link Reference'], B: ['Please define image reference by [{0}]: http://example.png', 'Need to define the reference link <b>[{0}]</b> with syntax <b>[{1}]: www.example.com</b>'] }),
-  S('menu.para.footnotes', 'Paragraph › Footnotes (insert, hover preview, jump)', 'partial', 'src/editor/core/render-inline.ts#footnote', null, { p: 1, e: 'core-cmds', A: ['Footnotes'], sec: [ec + ' §7.5'], note: 'footnote refs/defs parse and render; no insert command or navigation' }),
+  S('menu.para.insert-paragraph', 'Paragraph › Insert Paragraph Before / After', 'owned', PC + 'export function insertParagraph', V('menu.para.insert-paragraph'), { A: ['Insert Paragraph Before', 'Insert Paragraph After', 'Paragraph (before)', 'Paragraph (after)', 'Insert'] }),
+  S('menu.para.link-reference', 'Paragraph › Link Reference (insert [id]: url definition)', 'owned', O.cmd + "case 'linkRef'", V('menu.para.link-reference'), { A: ['Link Reference'], note: 'inserts a [id]: url definition; no hover hint on undefined references yet', B: ['Please define image reference by [{0}]: http://example.png', 'Need to define the reference link <b>[{0}]</b> with syntax <b>[{1}]: www.example.com</b>'] }),
+  S('menu.para.footnotes', 'Paragraph › Footnotes (insert, hover preview, jump)', 'owned', PC + 'export function insertFootnote', V('menu.para.footnotes'), { A: ['Footnotes'], sec: [ec + ' §7.5'] }),
   S('menu.para.hr', 'Paragraph › Horizontal Line', 'owned', O.cmd + "case 'hr'", T.core + 'exec: heading, strong, block quote', { A: ['Horizontal Line'] }),
   S('menu.para.toc', 'Paragraph › Table of Contents', 'owned', O.cmd + "case 'toc'", T.bw + 'toc lists headings and scrolls', { A: ['Table of Contents'], B: ['Table of Contents'], sec: [ec + ' §7.5'] }),
-  S('menu.para.front-matter', 'Paragraph › YAML Front Matter', 'partial', O.cmd + "case 'front_matter'", T.bw + 'front matter collapsed box and yaml editing', { p: 1, e: 'core-cmds', A: ['YAML Front Matter'], note: 'editor command exists; not exposed in menu/palette' }),
+  S('menu.para.front-matter', 'Paragraph › YAML Front Matter', 'owned', O.cmd + "case 'front_matter'", V('menu.para.front-matter'), { A: ['YAML Front Matter'] }),
 
   // ── Format ────────────────────────────────────────────────────────
   S('menu.format.basic', 'Format › Strong / Emphasis / Code / Strike / Highlight', 'owned', O.cmd + "case 'mark'", T.nav + 'keyboard shortcuts drive editor commands', { A: ['Format', 'Strong', 'Emphasis', 'Code', 'Strike', 'Highlight', 'Inline Styles', 'Block Styles'], C: ['touchBar.setInlineEnabled', 'touchBar.setInlineStates'] }),
-  S('menu.format.underline', 'Format › Underline (<u>)', 'missing', null, null, { p: 0, e: 'core-cmds', A: ['Underline'] }),
-  S('menu.format.inline-math', 'Format › Inline Math (toggle $…$)', 'partial', 'src/editor/blocks/inline-md.ts#math', T.bw + 'inline math renders and shows errors', { p: 0, e: 'core-cmds', A: ['Inline Math'], note: 'renders; no format command' }),
-  S('menu.format.sub-sup', 'Format › Superscript / Subscript', 'missing', null, null, { p: 1, e: 'core-cmds', A: ['Superscript', 'Subscript'] }),
-  S('menu.format.comment', 'Format › Comment (<!-- -->)', 'missing', null, null, { p: 2, e: 'core-cmds', A: ['Comment'] }),
+  S('menu.format.underline', 'Format › Underline (<u>)', 'owned', O.cmd + "underline: ['<u>', '</u>']", V('menu.format.underline'), { A: ['Underline'] }),
+  S('menu.format.inline-math', 'Format › Inline Math (toggle $…$)', 'owned', O.cmd + "math: ['$', '$']", V('menu.format.inline-math'), { A: ['Inline Math'] }),
+  S('menu.format.sub-sup', 'Format › Superscript / Subscript', 'owned', O.cmd + "sub: ['<sub>', '</sub>']", V('menu.format.sub-sup'), { A: ['Superscript', 'Subscript'] }),
+  S('menu.format.comment', 'Format › Comment (<!-- -->)', 'owned', O.cmd + "comment: ['<!-- ', ' -->']", V('menu.format.comment'), { A: ['Comment'] }),
   S('menu.format.hyperlink', 'Format › Hyperlink', 'owned', O.cmd + "case 'mark'", T.core + 'Cmd+click opens links', { A: ['Hyperlink'] }),
-  S('menu.format.clear', 'Format › Clear Format', 'missing', null, null, { p: 0, e: 'core-cmds', A: ['Clear Format'] }),
+  S('menu.format.clear', 'Format › Clear Format', 'owned', PC + 'export function clearFormat', V('menu.format.clear'), { A: ['Clear Format'] }),
   S('menu.format.image', 'Format › Image › Insert Image / Insert Local Images…', 'partial', O.cmd + "case 'insertImage'", null, { p: 0, e: 'images', A: ['Image', 'Insert Image', 'Insert Local Images'], B: ['Select image from local file', 'input image URL'], C: ['images.insertLocalImage'], sec: ['images §4.1'], note: 'insertImage command + paste/drop; no menu/dialog' }),
 
   // ── View ──────────────────────────────────────────────────────────

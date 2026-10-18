@@ -9,14 +9,14 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 | | surfaces |
 |---|---|
 | total | 171 |
-| owned (implemented) | 64 (with a named passing test: 51) |
-| partial | 25 |
-| missing | 74 |
+| owned (implemented) | 76 (with a named passing test: 63) |
+| partial | 20 |
+| missing | 67 |
 | out of scope | 8 |
 
-REA ledger `rol_e13d043bce1e3d61a0b50ed2ff1e838b2e1942006bedcd0b34c7bee08a94a39e` (closure `ec9d88e2b98ad8a2…`): status **unknown**; unowned 74, implemented 89, out-of-scope 8, unknown 5.
+REA ledger `rol_86bb7cb54671f1e3cfd1837584592d209e758c4b8a59218e2aab4eea5b2a3659` (closure `ff2645d71581a751…`): status **unknown**; unowned 67, implemented 96, out-of-scope 8, unknown 5.
 
-REA coverage boundary `margin.typora-parity`: status **unknown**; 51/163 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 74, package-proof-missing 1, verifier-missing 99, verifier-unknown 13.
+REA coverage boundary `margin.typora-parity`: status **unknown**; 63/163 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 67, package-proof-missing 1, verifier-missing 91, verifier-unknown 9.
 
 Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): build exit 0, cargo-test exit 101, independence exit 0, playwright exit 0, vitest exit 0. See `rea/summary.json`.
 
@@ -32,7 +32,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 
 | epic | priority | open surfaces |
 |---|---|---|
-| `core-cmds` Paragraph & Format menu commands (headings, inline styles, insert/convert blocks) | P0 | 12 |
+| `core-cmds` Paragraph & Format menu commands (headings, inline styles, insert/convert blocks) | P0 | 0 |
 | `files` File lifecycle: tabs/windows, recent, duplicate/move/rename, encoding, versions, recovery | P0 | 16 |
 | `export` Export, import & print: image/Pandoc/custom formats, export settings, export-with-previous | P0 | 9 |
 | `clipboard` Clipboard & selection: copy-as / paste-as, selection & delete scopes, jump-to | P0 | 8 |
@@ -103,32 +103,32 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
 | `menu.para.headings` | Paragraph › Heading 1–6 / Paragraph | owned |  | `src/editor/core/commands.ts` `case 'heading'` | `tests/e2e/app-navigation.spec.ts` › keyboard shortcuts drive editor commands | 8 |
-| `menu.para.heading-level` | Paragraph › Increase / Decrease Heading Level | **missing** | P0 | — | none | 2 |
+| `menu.para.heading-level` | Paragraph › Increase / Decrease Heading Level | owned |  | `src/editor/core/commands.ts` `case 'headingLevel'` | `tests/e2e/parity-core-cmds.spec.ts` › menu.para.heading-level: | 2 |
 | `menu.para.table` | Paragraph › Table / Insert Table (with rows×columns dialog) — inserts a fixed 2×2 table; no size dialog | **partial** | P1 | `src/editor/core/commands.ts` `case 'table'` | `tests/e2e/core-cases.ts` › table shortcut mounts the table widget | 7 |
 | `menu.para.math-block` | Paragraph › Math Block | owned |  | `src/editor/core/commands.ts` `case 'math'` | `tests/e2e/blocks-widgets.spec.ts` › renders KaTeX, edits source, shows errors | 4 |
 | `menu.para.code-fence` | Paragraph › Code Fences (with language box) | owned |  | `src/editor/core/commands.ts` `case 'code'` | `tests/e2e/core-cases.ts` › ``` + Enter mounts a code widget | 4 |
-| `menu.para.html-block` | Paragraph › HTML Block (insert) — renders/edits HTML blocks; no insert command | **partial** | P1 | `src/editor/blocks/html-block.ts` `createHtmlBlockWidget` | `tests/e2e/blocks-widgets.spec.ts` › html block is sanitized and editable | 1 |
+| `menu.para.html-block` | Paragraph › HTML Block (insert) | owned |  | `src/editor/core/commands.ts` `case 'html'` | `tests/e2e/parity-core-cmds.spec.ts` › menu.para.html-block: | 1 |
 | `menu.para.containers` | Paragraph › Quote / Ordered List / Unordered List / Task List | owned |  | `src/editor/core/commands.ts` `case 'quote'` | `tests/e2e/core-qa.spec.ts` › cut/paste list items, toggle list on two blocks | 7 |
-| `menu.para.task-status` | Paragraph › Task Status: toggle / mark complete / incomplete — checkbox click only; no command/shortcut | **partial** | P1 | `src/editor/core/input.ts` `task` | `tests/e2e/core-cases.ts` › task checkbox toggles source | 4 |
+| `menu.para.task-status` | Paragraph › Task Status: toggle / mark complete / incomplete | owned |  | `src/editor/core/para-cmds.ts` `export function taskStatus` | `tests/e2e/parity-core-cmds.spec.ts` › menu.para.task-status: | 4 |
 | `menu.para.indent` | Paragraph › List Indentation: Indent / Outdent | owned |  | `src/editor/core/input.ts` `Tab` | `tests/e2e/core-qa.spec.ts` › Tab moves an item with its nested children | 4 |
-| `menu.para.insert-paragraph` | Paragraph › Insert Paragraph Before / After | **missing** | P0 | — | none | 5 |
-| `menu.para.link-reference` | Paragraph › Link Reference (insert [id]: url definition) | **missing** | P1 | — | none | 3 |
-| `menu.para.footnotes` | Paragraph › Footnotes (insert, hover preview, jump) — footnote refs/defs parse and render; no insert command or navigation | **partial** | P1 | `src/editor/core/render-inline.ts` `footnote` | none | 1 |
+| `menu.para.insert-paragraph` | Paragraph › Insert Paragraph Before / After | owned |  | `src/editor/core/para-cmds.ts` `export function insertParagraph` | `tests/e2e/parity-core-cmds.spec.ts` › menu.para.insert-paragraph: | 5 |
+| `menu.para.link-reference` | Paragraph › Link Reference (insert [id]: url definition) — inserts a [id]: url definition; no hover hint on undefined references yet | owned |  | `src/editor/core/commands.ts` `case 'linkRef'` | `tests/e2e/parity-core-cmds.spec.ts` › menu.para.link-reference: | 3 |
+| `menu.para.footnotes` | Paragraph › Footnotes (insert, hover preview, jump) | owned |  | `src/editor/core/para-cmds.ts` `export function insertFootnote` | `tests/e2e/parity-core-cmds.spec.ts` › menu.para.footnotes: | 1 |
 | `menu.para.hr` | Paragraph › Horizontal Line | owned |  | `src/editor/core/commands.ts` `case 'hr'` | `tests/e2e/core-cases.ts` › exec: heading, strong, block quote | 1 |
 | `menu.para.toc` | Paragraph › Table of Contents | owned |  | `src/editor/core/commands.ts` `case 'toc'` | `tests/e2e/blocks-widgets.spec.ts` › toc lists headings and scrolls | 2 |
-| `menu.para.front-matter` | Paragraph › YAML Front Matter — editor command exists; not exposed in menu/palette | **partial** | P1 | `src/editor/core/commands.ts` `case 'front_matter'` | `tests/e2e/blocks-widgets.spec.ts` › front matter collapsed box and yaml editing | 1 |
+| `menu.para.front-matter` | Paragraph › YAML Front Matter | owned |  | `src/editor/core/commands.ts` `case 'front_matter'` | `tests/e2e/parity-core-cmds.spec.ts` › menu.para.front-matter: | 1 |
 
 ## Format menu
 
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
 | `menu.format.basic` | Format › Strong / Emphasis / Code / Strike / Highlight | owned |  | `src/editor/core/commands.ts` `case 'mark'` | `tests/e2e/app-navigation.spec.ts` › keyboard shortcuts drive editor commands | 10 |
-| `menu.format.underline` | Format › Underline (<u>) | **missing** | P0 | — | none | 1 |
-| `menu.format.inline-math` | Format › Inline Math (toggle $…$) — renders; no format command | **partial** | P0 | `src/editor/blocks/inline-md.ts` `math` | `tests/e2e/blocks-widgets.spec.ts` › inline math renders and shows errors | 1 |
-| `menu.format.sub-sup` | Format › Superscript / Subscript | **missing** | P1 | — | none | 2 |
-| `menu.format.comment` | Format › Comment (<!-- -->) | **missing** | P2 | — | none | 1 |
+| `menu.format.underline` | Format › Underline (<u>) | owned |  | `src/editor/core/commands.ts` `underline: ['<u>', '</u>']` | `tests/e2e/parity-core-cmds.spec.ts` › menu.format.underline: | 1 |
+| `menu.format.inline-math` | Format › Inline Math (toggle $…$) | owned |  | `src/editor/core/commands.ts` `math: ['$', '$']` | `tests/e2e/parity-core-cmds.spec.ts` › menu.format.inline-math: | 1 |
+| `menu.format.sub-sup` | Format › Superscript / Subscript | owned |  | `src/editor/core/commands.ts` `sub: ['<sub>', '</sub>']` | `tests/e2e/parity-core-cmds.spec.ts` › menu.format.sub-sup: | 2 |
+| `menu.format.comment` | Format › Comment (<!-- -->) | owned |  | `src/editor/core/commands.ts` `comment: ['<!-- ', ' -->']` | `tests/e2e/parity-core-cmds.spec.ts` › menu.format.comment: | 1 |
 | `menu.format.hyperlink` | Format › Hyperlink | owned |  | `src/editor/core/commands.ts` `case 'mark'` | `tests/e2e/core-cases.ts` › Cmd+click opens links | 1 |
-| `menu.format.clear` | Format › Clear Format | **missing** | P0 | — | none | 1 |
+| `menu.format.clear` | Format › Clear Format | owned |  | `src/editor/core/para-cmds.ts` `export function clearFormat` | `tests/e2e/parity-core-cmds.spec.ts` › menu.format.clear: | 1 |
 | `menu.format.image` | Format › Image › Insert Image / Insert Local Images… — insertImage command + paste/drop; no menu/dialog | **partial** | P0 | `src/editor/core/commands.ts` `case 'insertImage'` | none | 6 |
 
 ## View menu
