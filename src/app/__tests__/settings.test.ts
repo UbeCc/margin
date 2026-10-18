@@ -109,6 +109,34 @@ describe('preferences completeness (#100, #102)', () => {
     expect(m.strict).toBe(true);
   });
 
+  it('#127 math copy format and Shift+Tab auto-indent defaults and validation', () => {
+    const d = migrateSettings({}).markdown;
+    expect(d.mathCopyFormat).toBe('svg');
+    expect(d.shiftTabAutoIndent).toBe(false);
+    const m = migrateSettings({ markdown: { mathCopyFormat: 'latex', shiftTabAutoIndent: true } }).markdown;
+    expect(m.mathCopyFormat).toBe('latex');
+    expect(m.shiftTabAutoIndent).toBe(true);
+    const bad = migrateSettings({ markdown: { mathCopyFormat: 'png', shiftTabAutoIndent: 'yes' } }).markdown;
+    expect(bad.mathCopyFormat).toBe('svg');
+    expect(bad.shiftTabAutoIndent).toBe(false);
+    // Typora's key was `mathFormatOnCopy` ('svg'/'latex') — carried over when Margin's is unset.
+    expect(migrateSettings({ markdown: { mathFormatOnCopy: 'latex' } }).markdown.mathCopyFormat).toBe('latex');
+    expect(migrateSettings({ markdown: { mathFormatOnCopy: 'svg', mathCopyFormat: 'latex' } }).markdown.mathCopyFormat).toBe('latex');
+  });
+
+  it('#133: top-level remapPunctuation migrates into markdown; new keys validate', () => {
+    expect(migrateSettings({ remapPunctuation: true }).markdown.remapPunctuation).toBe(true);
+    // an explicit markdown value wins over the legacy top-level key
+    expect(migrateSettings({ remapPunctuation: true, markdown: { remapPunctuation: false } }).markdown.remapPunctuation).toBe(false);
+    expect(migrateSettings({ markdown: { smartPunctuation: 'rendering', smartQuote: true, smartDash: true, indentSize: 4, prettyIndent: true, headingStyle: 'setext' } }).markdown).toMatchObject({
+      smartPunctuation: 'rendering', smartQuote: true, smartDash: true, indentSize: 4, prettyIndent: true, headingStyle: 'setext',
+    });
+    const bad = migrateSettings({ markdown: { smartPunctuation: 'both', indentSize: 7, headingStyle: 'wow' } }).markdown;
+    expect(bad.smartPunctuation).toBe('input');
+    expect(bad.indentSize).toBe(0);
+    expect(bad.headingStyle).toBe('atx');
+  });
+
   it('text column width is 0 (theme default) or 400–3000', () => {
     expect(migrateSettings({ textColumnWidth: 120 }).textColumnWidth).toBe(0);
     expect(migrateSettings({ textColumnWidth: 900 }).textColumnWidth).toBe(900);

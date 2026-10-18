@@ -7,7 +7,7 @@
  *   unless `hidePreviewWhileEditing`). Leaving focus, Escape or arrow keys at the
  *   edges stop editing.
  */
-import type { BlockWidget, EditorSettings, WidgetBlockType, WidgetContext, WidgetInstance } from '../../contracts';
+import { DEFAULT_MARKDOWN_OPTIONS, type BlockWidget, type EditorSettings, type WidgetBlockType, type WidgetContext, type WidgetInstance } from '../../contracts';
 import { createCodeEditor, CodeEditor } from './cm/setup';
 import { indentRange } from '@codemirror/language';
 import { indentSelection } from '@codemirror/commands';
@@ -136,7 +136,7 @@ class RawPreviewInstance<P extends Parsed> implements WidgetInstance {
       doc: this.parsed.body,
       dark: this.settings.colorScheme === 'dark',
       lineWrapping: this.spec.lineWrapping ?? true,
-      placeholder: this.spec.placeholder,
+      shiftTabAutoIndent: { ...DEFAULT_MARKDOWN_OPTIONS, ...this.settings.markdown }.shiftTabAutoIndent,
       ariaLabel: `${this.spec.type} source`,
       exit: {
         onExit: (d) => this.ctx.onExit(d),
@@ -234,8 +234,9 @@ class RawPreviewInstance<P extends Parsed> implements WidgetInstance {
     const schemeChanged = settings.colorScheme !== this.root.dataset.scheme || key !== this.settingsSig;
     this.settingsSig = key;
     this.settings = settings;
-    this.applyScheme();
+    this.editor?.setShiftTabAutoIndent({ ...DEFAULT_MARKDOWN_OPTIONS, ...settings.markdown }.shiftTabAutoIndent);
     if (schemeChanged) {
+      this.applyScheme();
       this.editor?.setDark(settings.colorScheme === 'dark');
       this.renderPreview();
     }

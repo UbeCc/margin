@@ -13,7 +13,7 @@ import { confirmDialog } from '../ui/modal';
 import { closeContextMenu, showContextMenu } from '../ui/contextmenu';
 import { localImages } from '../upload';
 import { basename } from '../util/path';
-import { buildItems, type CtxActions, type TableAction } from './items';
+import { buildItems, type CtxActions } from './items';
 import { contextTarget, type CtxTarget } from './targets';
 import { copySvgAsPng, svgSource } from './svg';
 
@@ -27,15 +27,7 @@ export interface CtxHost {
   notify(msg: string, kind?: 'info' | 'success' | 'error'): void;
 }
 
-const TABLE_BUTTONS: Record<TableAction, string> = {
-  rowAbove: '.mb-row-above',
-  rowBelow: '.mb-row-below',
-  colBefore: '.mb-col-left',
-  colAfter: '.mb-col-right',
-  deleteRow: '.mb-row-del',
-  deleteCol: '.mb-col-del',
-  deleteTable: '.mb-table-del',
-};
+
 
 type CaretDoc = Document & {
   caretRangeFromPoint?(x: number, y: number): Range | null;
@@ -274,13 +266,6 @@ export class EditorContextMenu {
     }
   }
 
-  private tableAction(a: TableAction): void {
-    const block = this.target?.block;
-    if (!block) return;
-    const cell = this.target?.cell ?? block.querySelector<HTMLElement>('.mb-cell');
-    if (a !== 'deleteTable') cell?.focus({ preventScroll: true });
-    block.querySelector<HTMLButtonElement>(TABLE_BUTTONS[a])?.click();
-  }
 
   private actions(t: CtxTarget): CtxActions {
     const p = this.host.platform;
@@ -304,7 +289,6 @@ export class EditorContextMenu {
         : undefined,
       uploadImage: this.host.uploadImage,
       deleteImage: (withFile) => void this.deleteImage(withFile),
-      tableAction: (a) => this.tableAction(a),
       editBlock: () => {
         const pv = t.block?.querySelector('.mb-preview');
         pv?.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true, button: 0 }));

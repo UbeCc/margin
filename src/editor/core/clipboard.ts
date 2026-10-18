@@ -2,7 +2,7 @@
 import type { EditorCore } from './editor';
 import { Doc, contPrefix, leafContent, widgetRaw } from './model';
 import { isTextLeaf } from './edit';
-import { docHTML } from './html';
+import { docHTML, esc } from './html';
 import { splitBlockMeta } from './render-inline';
 import { htmlToMarkdown } from './paste';
 import { MARGIN_MIME, buildCopyFlavors, pickPasteMarkdown, writeFlavors, type CopyFlavors } from './clipboard-flavors';
@@ -44,12 +44,15 @@ export function expandToBlockStart(doc: Doc, from: number, to: number): number {
 /**
  * Rendered HTML of the copied markdown. Widgets (tables, code, math…) that are
  * copied whole render through their mounted instance, matched by exact source.
+ * `mathSource` (#127 "Use LaTeX Source"): math blocks / inline math keep their
+ * `$$…$$` / `$…$` source instead of the KaTeX render.
  */
-export function selectionHTML(ed: EditorCore, md: string): string {
+export function selectionHTML(ed: EditorCore, md: string, mathSource = false): string {
   const key = (l: Parameters<typeof widgetRaw>[0]) => widgetRaw(l).replace(/\n+$/, '');
   const mounted = new Map<string, string>();
   for (const l of ed.doc.leaves) if (!isTextLeaf(l)) mounted.set(key(l), l.id);
-  return docHTML(new Doc(md), ed.view.inlineCtx(), (l) => {
+  return docHTML(new Doc(md), { ...ed.view.inlineCtx(), mathSource }, (l) => {
+    if (mathSource && l.type === 'math_block') return `<p>${esc(widgetRaw(l))}</p>`;
     const id = mounted.get(key(l));
     if (!id) return null;
     try {

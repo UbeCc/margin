@@ -28,8 +28,7 @@ export interface CtxActions {
   uploadImage?(src: string): void;
   deleteImage(withFile: boolean): void;
   copyImageTo?(src: string, move: boolean): void;
-  /** Widget actions (table tools, edit, diagram image). */
-  tableAction(action: TableAction): void;
+  /** Widget actions (edit block, diagram image). */
   editBlock(): void;
   copyDiagramImage(): void;
   saveDiagram(): void;
@@ -91,8 +90,15 @@ function editItems(t: CtxTarget, s: CtxState, a: CtxActions): MenuItem[] {
   return out;
 }
 
+/** Table ▸ submenu (#140): every entry is an EditorCommand, so menu, palette and the
+ * native menu share one implementation (ops act on the table with the caret). */
 function tableMenu(a: CtxActions): MenuItem {
-  const t = (id: TableAction, label: string, keys?: string): MenuItem => ({ id: 'table:' + id, label, hint: keys ? formatShortcut(keys) : undefined, run: () => a.tableAction(id) });
+  const t = (op: TableAction, label: string, keys?: string): MenuItem => ({
+    id: 'table:' + op,
+    label,
+    hint: keys ? formatShortcut(keys) : undefined,
+    run: () => (a.restore(), a.exec({ kind: 'table', op: op === 'deleteTable' ? 'delete' : op })),
+  });
   return {
     id: 'table',
     label: 'Table',
@@ -106,29 +112,32 @@ function tableMenu(a: CtxActions): MenuItem {
       t('deleteRow', 'Delete Row', 'Mod+Shift+Backspace'),
       t('deleteCol', 'Delete Column'),
       sep,
-      { id: 'table:copy', label: 'Copy Table', run: () => (a.restore(), a.exec({ kind: 'copyBlock', part: 'source' })) },
-      { id: 'table:prettify', label: 'Prettify Source Code', disabled: true, run: () => {} },
-      { id: 'table:delete', label: 'Delete Table', run: () => a.tableAction('deleteTable') },
+      { id: 'table:copy', label: 'Copy Table', run: () => (a.restore(), a.exec({ kind: 'table', op: 'copy' })) },
+      { id: 'table:prettify', label: 'Prettify Source Code', run: () => (a.restore(), a.exec({ kind: 'table', op: 'prettify' })) },
+      { id: 'table:delete', label: 'Delete Table', run: () => (a.restore(), a.exec({ kind: 'table', op: 'delete' })) },
     ],
   };
 }
 
+/** Code Tools ▸ (#140): Copy Code Content, Auto Indent Whole / Selected Code (fence, math and HTML blocks). */
 function codeTools(a: CtxActions): MenuItem {
+  const c = (op: 'copy' | 'indentAll' | 'indentSelected', label: string): MenuItem => ({
+    id: 'code:' + op,
+    label,
+    run: () => (a.restore(), a.exec({ kind: 'code', op })),
+  });
   return {
     id: 'code-tools',
     label: 'Code Tools',
-    submenu: [
-      { id: 'copyCode', label: 'Copy Code Content', run: () => (a.restore(), a.exec({ kind: 'copyBlock', part: 'content' })) },
-      { id: 'indentAll', label: 'Auto Indent Whole Code', disabled: true, run: () => {} },
-      { id: 'indentSelected', label: 'Auto Indent Selected Code', disabled: true, run: () => {} },
-    ],
+    submenu: [c('copy', 'Copy Code Content'), c('indentAll', 'Auto Indent Whole Code'), c('indentSelected', 'Auto Indent Selected Code')],
   };
 }
 
+/** Copy Math ▸ (#127): Copy as Tex / MathML / Image — block and inline variants share the
+ * caret-based MathOp commands; Copy as Image rasterizes through the app (KaTeX → PNG). */
 function copyMath(a: CtxActions, inline: boolean): MenuItem {
   const c = (id: CommandId, label: string): MenuItem => ({ id, label, run: () => (a.restore(), a.run(id)) });
-  const items = [c('copyAs:tex', 'Copy as Tex'), c('copyAs:mathml', 'Copy as MathML')];
-  if (inline) items.push({ id: 'copyAsImageInline', label: 'Copy as Image', disabled: true, run: () => {} });
+  const items = [c('copyAs:tex', 'Copy as Tex'), c('copyAs:mathml', 'Copy as MathML'), c('math:copyImage', 'Copy as Image')];
   return { id: inline ? 'copyMathInline' : 'copyMathBlock', label: 'Copy Math', submenu: items };
 }
 

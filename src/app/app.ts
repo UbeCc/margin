@@ -13,6 +13,7 @@ import { ExportController, registerPandocExporters } from './export-actions';
 import { DEFAULT_PRINT_SETUP, effectivePage, pageCss, type PrintSetup } from './export-settings';
 import { confirmOverwriteDialog, openExportingSheet, openPageSetup } from './export-ui';
 import { runImport, type ImportHost } from './import';
+import { copyMathAsImage } from './math-image';
 import { FindBar } from './findbar';
 import type { FindOpts } from './findmatches';
 import { extras } from './platform-extras';
@@ -371,6 +372,12 @@ export class App {
       storeImage: (input) => this.storeImage(input),
       openLink: (href) => void this.openLink(href),
       ...(this.platform.writeClipboardRich ? { writeClipboardRich: (d) => this.platform.writeClipboardRich!(d) } : {}),
+      // #127 Copy Math ▸ Copy as Image: rasterize KaTeX → PNG on the clipboard.
+      copyMathImage: async (tex, display) => {
+        const ok = await copyMathAsImage(tex, display);
+        if (!ok) toast('Could not copy the math image.', { timeout: 3000 });
+        return ok;
+      },
       ...(this.platform.readClipboard ? { readClipboard: () => this.platform.readClipboard!() } : {}),
       spellcheck: this.settings.spellcheck,
       focusMode: this.settings.focusMode,
@@ -1209,9 +1216,13 @@ export class App {
   }
 
   commandPalette(): void {
-    const items: { id: string; text: string; label: string; detail: string; hint?: string }[] = [];
+    // #127 menu enable state: Code Tools items run only inside a code fence / math / HTML block
+    // (Typora Paragraph › Code Tools, fe-contextmenus-tools §7).
+    const block = this.editor.caretBlockType();
+    const codeToolsOk = block === 'code_fence' || block === 'diagram' || block === 'math_block' || block === 'html_block';
+    const items: { id: string; text: string; label: string; detail: string; hint?: string; disabled?: boolean }[] = [];
     for (const c of COMMANDS) {
-      items.push({ id: c.id, text: `${c.category}: ${c.label}`, label: `${c.category}: ${c.label}`, detail: '', hint: c.keys?.[0] ? formatShortcut(c.keys[0]) : undefined });
+      items.push({ id: c.id, text: `${c.category}: ${c.label}`, label: `${c.category}: ${c.label}`, detail: '', hint: c.keys?.[0] ? formatShortcut(c.keys[0]) : undefined, disabled: c.id.startsWith('code:') ? !codeToolsOk : undefined });
     }
     for (const n of this.themes.names()) {
       const active = this.themes.current === n;
@@ -1237,6 +1248,7 @@ export class App {
           detail: item.detail || undefined,
           hint: item.hint,
           kind: 'command',
+          disabled: item.disabled,
         })),
       pick: (it) => {
         if (it.id.startsWith('custom:')) void this.exports.export(it.id);

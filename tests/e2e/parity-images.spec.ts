@@ -40,6 +40,9 @@ const rightClickImage = (page: Page, i = 0) => page.locator('.md-editor .md-imag
 const ctxItem = (page: Page, label: string | RegExp) => page.locator('.context-item', { hasText: label });
 
 test.beforeEach(async ({ page }) => {
+  // Fake hosts: fail fast so webkit/chromium don't sit on pending requests through a
+  // live proxy (breaks click actionability); never touch the localhost dev server.
+  await page.route(/^(https?:\/\/(x\.example|cdn\.example|example\.com)\b.*)$/, (r) => r.fulfill({ status: 404, body: '' }));
   await boot(page);
   await putPng(page, '/pics/shot.png');
 });

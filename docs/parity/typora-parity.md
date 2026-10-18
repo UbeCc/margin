@@ -14,7 +14,7 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 | missing | 8 |
 | out of scope | 8 |
 
-REA ledger `rol_636e0b62eae5dc60bef9c5f6b16b0eff045cf0eddb620f6fee61a5348b30a7ad` (closure `22079c4d347265d8…`): status **unknown**; unowned 8, implemented 156, out-of-scope 8, unknown 5.
+REA ledger `rol_94466f25a53e05275e23898a3c583fa2f33cdcec735610c1409a02e509dc01c3` (closure `4d5f641666d24634…`): status **unknown**; unowned 8, implemented 156, out-of-scope 8, unknown 5.
 
 REA coverage boundary `margin.typora-parity`: status **unknown**; 133/164 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 8, package-proof-missing 1, verifier-missing 24, verifier-unknown 7.
 
