@@ -1,6 +1,7 @@
 //! Margin native shell: commands backing `Platform` (src/contracts.ts), native
 //! menus, file-open events, close-request veto and window chrome.
 
+mod clipboard_macos;
 mod commands;
 mod fsops;
 mod images;
@@ -233,6 +234,7 @@ pub fn run() {
             commands::trash_path,
             commands::create_dir,
             commands::reveal_path,
+            clipboard_macos::clipboard_write_rich,
         ])
         .setup(|app| {
             let handle = app.handle().clone();
