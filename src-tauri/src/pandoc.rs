@@ -7,12 +7,14 @@
 //! - Every path ends in `Ok` or an `Err(message)`: not-found, not-executable,
 //!   too-old, non-zero exit (stderr surfaced) and timeout (process killed).
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::ffi::OsStr;
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Command, ExitStatus, Stdio};
-use std::sync::mpsc;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::{mpsc, Arc, Mutex, OnceLock};
 use std::time::{Duration, Instant};
 
 pub const DEFAULT_TIMEOUT: Duration = Duration::from_secs(120);
@@ -136,8 +138,27 @@ fn collect(rx: &mpsc::Receiver<Vec<u8>>) -> String {
     rx.recv_timeout(Duration::from_secs(2)).map(|b| String::from_utf8_lossy(&b).into_owned()).unwrap_or_default()
 }
 
+/// Error message of an export stopped with the Abort button (#90). The UI matches it
+/// exactly and shows no error dialog (Typora: an aborted export reports nothing).
+pub const ABORTED: &str = "Export aborted";
+
 /// Run `bin args…` with optional stdin, cwd and a hard timeout (the child is killed on expiry).
 pub fn run(bin: &Path, args: &[String], input: Option<String>, cwd: Option<&Path>, timeout: Duration) -> Result<RunOutput, String> {
+    run_cancellable(bin, args, input, cwd, timeout, None)
+}
+
+/// [`run`] that also kills the child as soon as `cancel` is set → `Err(ABORTED)`.
+pub fn run_cancellable(
+    bin: &Path,
+    args: &[String],
+    input: Option<String>,
+    cwd: Option<&Path>,
+    timeout: Duration,
+    cancel: Option<&AtomicBool>,
+) -> Result<RunOutput, String> {
+    if cancel.is_some_and(|c| c.load(Ordering::SeqCst)) {
+        return Err(ABORTED.into());
+    }
     check_executable(bin)?;
     let mut cmd = Command::new(bin);
     cmd.args(args).stdout(Stdio::piped()).stderr(Stdio::piped());
@@ -176,6 +197,11 @@ pub fn run(bin: &Path, args: &[String], input: Option<String>, cwd: Option<&Path
     let status = loop {
         match child.try_wait() {
             Ok(Some(s)) => break s,
+            Ok(None) if cancel.is_some_and(|c| c.load(Ordering::SeqCst)) => {
+                let _ = child.kill();
+                let _ = child.wait();
+                return Err(ABORTED.into());
+            }
             Ok(None) if Instant::now() >= deadline => {
                 let _ = child.kill();
                 let _ = child.wait();
@@ -223,6 +249,26 @@ pub fn detect(configured: Option<&str>, path_env: Option<&OsStr>, fallbacks: &[P
     Ok(PandocInfo { path: bin.to_string_lossy().into_owned(), version })
 }
 
+/// Per-format Pandoc options (Preferences › Export, #90). Empty strings = unset.
+#[derive(Debug, Clone, Default, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase", default)]
+pub struct PandocOptions {
+    /// `--pdf-engine=<v>` (PDF via LaTeX only).
+    pub pdf_engine: String,
+    /// `--css <v>` (epub).
+    pub css: String,
+    /// `--reference-doc <v>` (docx / odt).
+    pub reference_doc: String,
+    /// `--template <v>`.
+    pub template: String,
+    /// `--epub-chapter-level=<n>` (epub; 0 = unset).
+    pub epub_chapter_level: u32,
+    /// `--toc`.
+    pub toc: bool,
+    /// Extra arguments as typed: POSIX-style quoting, `${outputPath}` etc. expanded per token.
+    pub extra_arguments: String,
+}
+
 pub struct ExportRequest<'a> {
     pub markdown: String,
     pub out: &'a Path,
@@ -231,6 +277,54 @@ pub struct ExportRequest<'a> {
     pub doc_dir: Option<&'a Path>,
     pub title: Option<&'a str>,
     pub timeout: Duration,
+    pub options: PandocOptions,
+    /// Set by the Abort button ([`pandoc_abort`]).
+    pub cancel: Option<Arc<AtomicBool>>,
+}
+
+/// Variables available in extra arguments (Typora's `processExportVariables` subset).
+pub fn arg_vars(out: &Path, doc_dir: Option<&Path>, title: Option<&str>) -> HashMap<String, String> {
+    let mut v = HashMap::new();
+    v.insert("outputPath".into(), out.to_string_lossy().into_owned());
+    let folder = out.parent().map(|p| p.to_string_lossy().into_owned()).unwrap_or_default();
+    v.insert("outputFolder".into(), folder);
+    if let Some(stem) = out.file_stem() {
+        v.insert("outputFileName".into(), stem.to_string_lossy().into_owned());
+    }
+    if let Some(d) = doc_dir {
+        v.insert("currentFolder".into(), d.to_string_lossy().into_owned());
+    }
+    if let Some(t) = title {
+        v.insert("title".into(), t.to_string());
+    }
+    v
+}
+
+/// Option argv in Typora's order: pdf-engine, css, reference-doc, template,
+/// epub-chapter-level, toc, then the extra arguments.
+pub fn option_args(o: &PandocOptions, vars: &HashMap<String, String>) -> Result<Vec<String>, String> {
+    let mut a = Vec::new();
+    let t = |s: &str| s.trim().to_string();
+    if !o.pdf_engine.trim().is_empty() {
+        a.push(format!("--pdf-engine={}", t(&o.pdf_engine)));
+    }
+    for (flag, v) in [("--css", &o.css), ("--reference-doc", &o.reference_doc), ("--template", &o.template)] {
+        if !v.trim().is_empty() {
+            a.push(flag.into());
+            a.push(crate::export_custom::expand_token(&t(v), vars));
+        }
+    }
+    if o.epub_chapter_level > 0 {
+        a.push(format!("--epub-chapter-level={}", o.epub_chapter_level.min(6)));
+    }
+    if o.toc {
+        a.push("--toc".into());
+    }
+    if !o.extra_arguments.trim().is_empty() {
+        let toks = crate::upload::split_command(&o.extra_arguments).map_err(|e| format!("Extra arguments: {}", e.replace("upload command", "argument list")))?;
+        a.extend(toks.iter().map(|tok| crate::export_custom::expand_token(tok, vars)));
+    }
+    Ok(a)
 }
 
 /// argv for one export (without the binary).
@@ -247,6 +341,7 @@ pub fn export_args(req: &ExportRequest) -> Result<Vec<String>, String> {
         // `pagetitle` is only a fallback: a front-matter `title` still wins.
         a.push(format!("--metadata=pagetitle:{t}"));
     }
+    a.extend(option_args(&req.options, &arg_vars(req.out, req.doc_dir, req.title))?);
     Ok(a)
 }
 
@@ -257,7 +352,7 @@ pub fn export(bin: &Path, req: ExportRequest) -> Result<String, String> {
     }
     let args = export_args(&req)?;
     let cwd = req.doc_dir.filter(|d| d.is_dir()).or_else(|| req.out.parent().filter(|d| d.is_dir()));
-    let out = run(bin, &args, Some(req.markdown), cwd, req.timeout)?;
+    let out = run_cancellable(bin, &args, Some(req.markdown), cwd, req.timeout, req.cancel.as_deref())?;
     if !out.status.success() {
         let detail = excerpt(&out.stderr);
         return Err(if detail.is_empty() { format!("Pandoc failed ({})", out.status) } else { format!("Pandoc failed ({}):\n{detail}", out.status) });
@@ -266,6 +361,34 @@ pub fn export(bin: &Path, req: ExportRequest) -> Result<String, String> {
         return Err(format!("Pandoc exited successfully but did not create {}", req.out.display()));
     }
     Ok(excerpt(&out.stderr))
+}
+
+/// Running exports by UI-chosen id, for the Abort button.
+fn running() -> &'static Mutex<HashMap<String, Arc<AtomicBool>>> {
+    static M: OnceLock<Mutex<HashMap<String, Arc<AtomicBool>>>> = OnceLock::new();
+    M.get_or_init(Default::default)
+}
+
+/// Register an export id; the returned flag is set by [`abort`].
+pub fn register(id: &str) -> Arc<AtomicBool> {
+    let flag = Arc::new(AtomicBool::new(false));
+    running().lock().unwrap_or_else(|e| e.into_inner()).insert(id.to_string(), flag.clone());
+    flag
+}
+
+pub fn unregister(id: &str) {
+    running().lock().unwrap_or_else(|e| e.into_inner()).remove(id);
+}
+
+/// Abort a running export. false if it already finished (or never started).
+pub fn abort(id: &str) -> bool {
+    match running().lock().unwrap_or_else(|e| e.into_inner()).get(id) {
+        Some(f) => {
+            f.store(true, Ordering::SeqCst);
+            true
+        }
+        None => false,
+    }
 }
 
 // ------------------------------------------------------------------ tauri commands
@@ -294,20 +417,38 @@ pub async fn pandoc_export(
     title: Option<String>,
     pandoc_path: Option<String>,
     timeout_ms: Option<u64>,
+    options: Option<PandocOptions>,
+    export_id: Option<String>,
 ) -> R<String> {
     let own = state.own_writes.clone();
-    blocking(move || {
+    let cancel = export_id.as_deref().map(register);
+    let id = export_id.clone();
+    let res = blocking(move || {
+        if cancel.as_ref().is_some_and(|c| c.load(Ordering::SeqCst)) {
+            return Err(ABORTED.to_string());
+        }
         let info = detect(pandoc_path.as_deref(), std::env::var_os("PATH").as_deref(), &fallback_dirs(), VERSION_TIMEOUT)?;
         let out = PathBuf::from(&out_path);
         let existed = out.exists();
         let doc = doc_dir.map(PathBuf::from).filter(|d| d.is_absolute());
         let timeout = timeout_ms.map(Duration::from_millis).unwrap_or(DEFAULT_TIMEOUT).clamp(Duration::from_secs(1), Duration::from_secs(1800));
-        let req = ExportRequest { markdown, out: &out, format: &format, doc_dir: doc.as_deref(), title: title.as_deref(), timeout };
+        let options = options.unwrap_or_default();
+        let req = ExportRequest { markdown, out: &out, format: &format, doc_dir: doc.as_deref(), title: title.as_deref(), timeout, options, cancel };
         let warnings = export(Path::new(&info.path), req)?;
         own.record(&out, existed);
         Ok(warnings)
     })
-    .await
+    .await;
+    if let Some(id) = id {
+        unregister(&id);
+    }
+    res
+}
+
+/// Abort button of the "Exporting…" notice (#90). Ok(false) if the export already ended.
+#[tauri::command]
+pub fn pandoc_abort(export_id: String) -> bool {
+    abort(&export_id)
 }
 
 #[cfg(test)]

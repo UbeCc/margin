@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { Platform } from '../../contracts';
 import { ExportController, keepBothPath, type ExportHost } from '../export-actions';
 import { checkImageSize, imageDimensions, imageFormatForPath, ImageTooLargeError, qualitySettings } from '../export-image';
-import { DEFAULT_EXPORT, expandVars, frontMatter, migrateExportSettings, pageCss, paperSizeMm, resolveMeta, type ExportSettings } from '../export-settings';
+import { DEFAULT_EXPORT, DEFAULT_PRINT_SETUP, effectivePage, expandVars, FOOTER_PRESETS, HEADER_PRESETS, migratePageSetup, MM_TO_PT, PAPER_LABELS, frontMatter, migrateExportSettings, pageCss, pandocArgsPreview, PANDOC_FORMAT_FIELDS, PANDOC_FORMAT_IDS, paperSizeMm, resolveMeta, type ExportSettings } from '../export-settings';
 import { printPageCss, withPrintPageCss } from '../../platform/common';
 import { buildPlainHtml } from '../export';
 import { migrateSettings } from '../settings';
@@ -11,7 +11,7 @@ describe('export settings', () => {
   it('migrates garbage to defaults and clamps values', () => {
     expect(migrateExportSettings(undefined)).toEqual(DEFAULT_EXPORT);
     const m = migrateExportSettings({ general: { folder: 'nope', afterExport: 'open' }, image: { width: 99999, quality: 'ultra', format: 'jpeg' }, pdf: { page: { paper: 'Letter', margins: { top: -4 } }, pageBreaks: 'h2' } });
-    expect(m.general.folder).toBe('same');
+    expect(m.general.folder).toBe('last'); // Typora's default "Auto"
     expect(m.general.afterExport).toBe('open');
     expect(m.image).toMatchObject({ width: 4000, quality: 'high', format: 'jpeg' });
     expect(m.pdf.page.paper).toBe('Letter');
@@ -30,6 +30,27 @@ describe('export settings', () => {
     expect(pageCss({ ...page, paper: 'Letter' }, 'h1')).toContain('size: 215.9mm 279.4mm');
     expect(pageCss(page, 'h1')).toContain('break-before: page');
     expect(pageCss(page, 'none')).not.toContain('break-before');
+  });
+  it('Typora paper/margin defaults and Page Setup precedence (native-commands §4)', () => {
+    const d = migrateExportSettings({}).pdf.page;
+    expect(d).toMatchObject({ paper: 'default', marginMode: 'default' });
+    expect(PAPER_LABELS.map(([, l]) => l)).toEqual(['Default', 'A5', 'A4', 'A3', 'US Letter', 'US Legal', 'Tabloid', 'Custom']);
+    // Default paper → Page Setup's paper and orientation; default margins 45/36 pt.
+    const e = effectivePage(d, { paper: 'Letter', custom: [1, 1], orientation: 'landscape' });
+    expect(paperSizeMm(e)).toEqual([279.4, 215.9]);
+    expect(e.margins.top * MM_TO_PT).toBeCloseTo(45, 6);
+    expect(e.margins.left * MM_TO_PT).toBeCloseTo(36, 6);
+    // A paper in the export settings wins; orientation still from Page Setup; custom margins kept.
+    const own = effectivePage({ ...d, paper: 'A5', marginMode: 'custom', margins: { top: 1, right: 2, bottom: 3, left: 4 } }, { ...DEFAULT_PRINT_SETUP, paper: 'Letter', orientation: 'landscape' });
+    expect(paperSizeMm(own)).toEqual([210, 148]);
+    expect(own.margins).toEqual({ top: 1, right: 2, bottom: 3, left: 4 });
+    expect(effectivePage(d).paper).toBe('A4');
+    // Legacy settings: old A4 + 16/13 mm default becomes Default/Default; B5 is gone.
+    expect(migratePageSetup({ paper: 'A4', margins: { top: 16, right: 13, bottom: 16, left: 13 } })).toMatchObject({ paper: 'default', marginMode: 'default' });
+    expect(migratePageSetup({ paper: 'Letter', margins: { top: 20, right: 13, bottom: 16, left: 13 } })).toMatchObject({ paper: 'Letter', marginMode: 'custom', margins: { top: 20 } });
+    expect(migratePageSetup({ paper: 'B5' }).paper).toBe('default');
+    expect(HEADER_PRESETS).toEqual(['${title}', '${author}', '${pageNo}', '${today}']);
+    expect(FOOTER_PRESETS[1]).toBe('No. ${pageNo} / ${totalPages}');
   });
 });
 
@@ -206,5 +227,87 @@ describe('Pandoc exporters in the shared pipeline', () => {
     });
     expect(await c.export(null, 'overwrite')).toBe(false);
     expect(f.notes[f.notes.length - 1]).toMatch(/boom/);
+  });
+});
+
+describe('pandoc options (#90)', () => {
+  it('default to unset for every format and are validated', () => {
+    const d = migrateExportSettings({});
+    expect(Object.keys(d.pandoc).sort()).toEqual([...PANDOC_FORMAT_IDS].sort());
+    expect(d.pandoc.docx).toEqual({ referenceDoc: '', template: '', css: '', epubChapterLevel: 0, extraArguments: '' });
+    const m = migrateExportSettings({ pandoc: { epub: { css: 'a.css', epubChapterLevel: '9' }, docx: { referenceDoc: 5 }, bogus: {} } });
+    expect(m.pandoc.epub.css).toBe('a.css');
+    expect(m.pandoc.epub.epubChapterLevel).toBe(4);
+    expect(m.pandoc.docx.referenceDoc).toBe('');
+    expect('bogus' in m.pandoc).toBe(false);
+  });
+
+  it('fields follow Typora per-format table', () => {
+    expect(PANDOC_FORMAT_FIELDS.docx).toEqual(['extraArguments', 'referenceDoc']);
+    expect(PANDOC_FORMAT_FIELDS.odt).toEqual(['extraArguments', 'template']);
+    expect(PANDOC_FORMAT_FIELDS.epub).toEqual(['extraArguments', 'css', 'epubChapterLevel']);
+    for (const f of ['rtf', 'latex', 'mediawiki', 'rst', 'textile', 'opml'] as const) expect(PANDOC_FORMAT_FIELDS[f]).toEqual(['extraArguments']);
+  });
+
+  it('arguments preview mirrors the native argv', () => {
+    const o = { referenceDoc: 'my ref.docx', template: '', css: '', epubChapterLevel: 0, extraArguments: '' };
+    expect(pandocArgsPreview('docx', o)).toBe('-f markdown -t docx -o ${outputPath} --reference-doc "my ref.docx"');
+    expect(pandocArgsPreview('epub', { ...o, referenceDoc: '', css: 'e.css', epubChapterLevel: 2 })).toBe('-f markdown -t epub -o ${outputPath} --css e.css --epub-chapter-level=2');
+    expect(pandocArgsPreview('latex', { ...o, referenceDoc: '', extraArguments: '--toc' })).toBe('-f markdown -t latex -s -o ${outputPath} --toc');
+  });
+});
+
+describe('Pandoc Abort in the shared pipeline (#90)', () => {
+  it('aborted export: no error notice, settings options forwarded, not recorded as previous', async () => {
+    const { registerPandocExporters } = await import('../export-actions');
+    const f = fakeHost();
+    f.host.updateExportSettings(migrateExportSettings({ pandoc: { docx: { referenceDoc: '/t/ref.docx' } } }));
+    const c = new ExportController(f.host);
+    let abort: (() => void) | undefined;
+    registerPandocExporters(c, { pandocPath: () => '', title: () => 'Doc', progress: (_m, a) => ((abort = a), () => undefined) });
+    let reject: (e: Error) => void = () => {};
+    const seen: unknown[] = [];
+    Object.assign(f.platform, {
+      pandocExport: vi.fn((_md: string, _out: string, o: unknown) => {
+        seen.push(o);
+        return new Promise<string>((_, r) => (reject = r));
+      }),
+      pandocAbort: vi.fn(async () => (reject(new Error('Export aborted')), true)),
+    });
+    f.dialogs.push('/out/Doc.docx');
+    const p = c.export('pandoc:docx');
+    for (let i = 0; i < 10 && !abort; i++) await new Promise((r) => setTimeout(r, 0));
+    abort!();
+    expect(await p).toBe(false);
+    expect(f.notes).toEqual([]);
+    expect((seen[0] as { options: { referenceDoc: string } }).options.referenceDoc).toBe('/t/ref.docx');
+    expect(c.last).toBeNull();
+  });
+});
+
+describe('custom command Exporting sheet + Abort (#90)', () => {
+  it('shows the sheet, aborts by id, ends silently', async () => {
+    let abort: (() => void) | undefined;
+    let closed = 0;
+    const f = fakeHost({ exportProgress: (a) => ((abort = a), () => void closed++) });
+    f.host.updateExportSettings(migrateExportSettings({ custom: [{ id: 'x', name: 'Slow', command: 'slow ${outputPath}', extension: 'out' }] }));
+    let reject: (e: Error) => void = () => {};
+    const ids: unknown[] = [];
+    Object.assign(f.platform, {
+      runExportCommand: vi.fn((...a: unknown[]) => {
+        ids.push(a[5]);
+        return new Promise((_, r) => (reject = r));
+      }),
+      pandocAbort: vi.fn(async (id: string) => (ids.push(`abort:${id}`), reject(new Error('Export aborted')), true)),
+    });
+    const c = new ExportController(f.host);
+    f.dialogs.push('/out/Doc.out');
+    const p = c.export('custom:x');
+    for (let i = 0; i < 10 && !abort; i++) await new Promise((r) => setTimeout(r, 0));
+    abort!();
+    expect(await p).toBe(false);
+    expect(f.notes).toEqual([]);
+    expect(closed).toBe(1);
+    expect(ids[1]).toBe(`abort:${ids[0]}`);
   });
 });

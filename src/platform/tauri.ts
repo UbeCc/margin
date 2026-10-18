@@ -134,9 +134,13 @@ export class TauriPlatform implements Platform {
   pandocExport(
     markdown: string,
     outPath: string,
-    opts: { format: string; docDir: string | null; title: string | null; pandocPath: string | null; timeoutMs: number },
+    opts: { format: string; docDir: string | null; title: string | null; pandocPath: string | null; timeoutMs: number; options?: object; exportId?: string },
   ): Promise<string> {
-    return call('pandoc_export', { markdown, outPath, ...opts });
+    return call('pandoc_export', { markdown, outPath, ...opts, options: opts.options ?? null, exportId: opts.exportId ?? null });
+  }
+
+  pandocAbort(exportId: string): Promise<boolean> {
+    return call('pandoc_abort', { exportId });
   }
 
   pandocDetect(pandocPath: string | null): Promise<{ path: string; version: string }> {
@@ -166,8 +170,8 @@ export class TauriPlatform implements Platform {
     return call('pandoc_import', { inputPath, pandocPath, timeoutMs });
   }
 
-  runExportCommand(command: string, vars: Record<string, string>, stdin: string | null, cwd: string | null, timeoutMs: number): Promise<{ stdout: string; stderr: string }> {
-    return call('run_export_command', { command, vars, stdin, cwd, timeoutMs });
+  runExportCommand(command: string, vars: Record<string, string>, stdin: string | null, cwd: string | null, timeoutMs: number, exportId?: string): Promise<{ stdout: string; stderr: string }> {
+    return call('run_export_command', { command, vars, stdin, cwd, timeoutMs, exportId: exportId ?? null });
   }
 
   /** Open a file exported in this session with its default application. */

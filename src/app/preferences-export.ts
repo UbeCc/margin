@@ -3,9 +3,21 @@
  * plus per-format options (PDF, HTML, HTML without styles, Image).
  */
 import { themeLabel } from '../themes';
-import { CUSTOM_EXPORT_TEMPLATES, migrateExportSettings, type CustomExport, type ExportSettings } from './export-settings';
+import {
+  CUSTOM_EXPORT_TEMPLATES,
+  FOOTER_PRESETS,
+  HEADER_PRESETS,
+  migrateExportSettings,
+  pandocArgsPreview,
+  PANDOC_FORMAT_FIELDS,
+  PANDOC_FORMAT_IDS,
+  type CustomExport,
+  type ExportSettings,
+  type PandocFormatId,
+  type PandocFormatOptions,
+} from './export-settings';
 import { confirmDialog } from './ui/modal';
-import { pageSetupFields } from './export-ui';
+import { pdfPaperFields } from './export-ui';
 import { h, debounce } from './util/dom';
 
 export interface ExportPrefsHost {
@@ -13,6 +25,7 @@ export interface ExportPrefsHost {
   set(next: ExportSettings): void;
   themeNames(): string[];
   pickFolder(): Promise<string | null>;
+  pickFile?(name: string, extensions: string[]): Promise<string | null>;
 }
 
 type Fmt = 'general' | 'pdf' | 'html' | 'htmlPlain' | 'image';
@@ -74,30 +87,44 @@ export function exportPrefsSection(host: ExportPrefsHost): HTMLElement {
     },
   });
   const folder = sel('general', 'folder', [
-    ['same', 'Same folder as the document'],
-    ['last', 'Last used export folder'],
-    ['custom', 'Custom folder…'],
+    ['last', 'Auto'],
+    ['same', 'Same folder with current file'],
+    ['custom', 'Custom location'],
   ]);
 
   const vars = 'Variables: ${title} ${author} ${today} ${currentFileName} ${pageNo} ${totalPages}';
+  // Header / Footer: free text with Typora's preset list; empty shows "None".
+  const preset = (key: 'header' | 'footer', presets: string[]): HTMLElement => {
+    const el = text('pdf', key, 'None') as HTMLInputElement;
+    const id = `export-pdf-${key}-presets`;
+    el.setAttribute('list', id);
+    return h('span.inline', null, el, h('datalist', { id }, ...presets.map((p) => h('option', { value: p }))));
+  };
+  const pageBreak = (): HTMLInputElement => {
+    const el = h('input.switch', { type: 'checkbox', role: 'switch', 'data-export': 'pdf.pageBreaks' });
+    el.checked = host.get().pdf.pageBreaks !== 'none';
+    el.addEventListener('change', () => patch('pdf', 'pageBreaks', el.checked ? 'h1' : 'none'));
+    return el;
+  };
   return h(
     'section.pref-section',
     { 'data-section': 'export' },
     heading('General'),
     row('Default Folder for Exported File', folder),
     row('Custom folder', h('span.inline', null, customFolder, browse)),
-    row('After Export', sel('general', 'afterExport', [['none', 'Do nothing'], ['open', 'Open exported file'], ['reveal', 'Reveal in folder']])),
-    row('Allow YAML front matter to override export settings', check('general', 'allowYamlOverrides'), 'title, author, subject, keywords, header, footer'),
+    row('After Export', sel('general', 'afterExport', [['none', 'Do nothing'], ['open', 'Open exported file'], ['reveal', 'Open exported file location']])),
+    row('Read and overwrite export settings from YAML front matters', check('general', 'allowYamlOverrides'), 'title, author, subject, keywords, header, footer'),
     row('Do not warn before “Export and Overwrite with Previous”', check('general', 'noOverwriteWarning')),
     row('Run command after export', text('general', 'runAfterExport', 'open -R ${outputPath}'), 'Executable and arguments; no shell. ${outputPath} ${outputFolder} ${currentPath} …'),
     heading('PDF'),
-    pageSetupFields(host.get().pdf.page, (page) => patch('pdf', 'page', page)),
+    pdfPaperFields(host.get().pdf.page, (page) => patch('pdf', 'page', page)),
     row('Theme', sel('pdf', 'theme', themes)),
-    row('Page Breaks', sel('pdf', 'pageBreaks', [['none', 'None'], ['h1', 'Before each Heading 1'], ['h2', 'Before each Heading 1 and 2']])),
-    row('Header', text('pdf', 'header', '${title}'), vars),
-    row('Footer', text('pdf', 'footer', '${pageNo} / ${totalPages}')),
+    row('Page Break Between Top Headings', pageBreak()),
+    row('Header', preset('header', HEADER_PRESETS), vars),
+    row('Footer', preset('footer', FOOTER_PRESETS)),
     row('Bookmarks (outline from headings)', check('pdf', 'outline')),
     row('Author', text('pdf', 'author')),
+    row('Append Extra Content (HTML)', text('pdf', 'appendBody', '', true)),
     heading('HTML'),
     row('Theme', sel('html', 'theme', themes)),
     row('Append in <head>', text('html', 'appendHead', '<meta name="robots" content="noindex">', true)),
@@ -111,9 +138,100 @@ export function exportPrefsSection(host: ExportPrefsHost): HTMLElement {
     row('Image Width', num('image', 'width', 200, 4000, 'px')),
     row('Font Size', num('image', 'fontSize', 8, 48, 'px')),
     row('Theme', sel('image', 'theme', themes)),
+    heading('Pandoc'),
+    pandocOptionsEditor(host),
     heading('Custom Export Commands'),
     customExportsEditor(host),
   );
+}
+
+/** Menu labels of the Pandoc exports (File › Export). */
+const PANDOC_LABELS: Record<PandocFormatId, string> = {
+  docx: 'Word (.docx)',
+  odt: 'OpenOffice',
+  rtf: 'RTF',
+  epub: 'Epub',
+  latex: 'LaTeX',
+  mediawiki: 'Media Wiki',
+  rst: 'reStructuredText',
+  textile: 'Textile',
+  opml: 'OPML',
+};
+
+/** Typora's labels; file fields carry the picker filter (typora-re#9). */
+const FIELD_LABELS: Record<keyof PandocFormatOptions, [string, string, string[]?]> = {
+  referenceDoc: ['Style Reference', 'reference.docx', ['docx']],
+  template: ['Template', 'template.opendocument', ['opendocument']],
+  css: ['Custom CSS', 'epub.css', ['css']],
+  epubChapterLevel: ['Chapter Level', ''],
+  extraArguments: ['Extra Arguments', '--toc --number-sections'],
+};
+
+/** Per-format Pandoc options (#90) with a read-only preview of the resulting arguments. */
+function pandocOptionsEditor(host: ExportPrefsHost): HTMLElement {
+  const box = h('div.pandoc-options', { 'data-export': 'pandoc' });
+  for (const f of PANDOC_FORMAT_IDS) {
+    const cur = (): PandocFormatOptions => host.get().pandoc[f];
+    const preview = h('input.text-input.args-preview', { type: 'text', readonly: 'true', disabled: 'true', 'data-export': `pandoc.${f}.args` }) as HTMLInputElement;
+    const refresh = (): void => {
+      preview.value = pandocArgsPreview(f, cur());
+    };
+    const save = (key: keyof PandocFormatOptions, value: string | number): void => {
+      const all = host.get();
+      host.set(migrateExportSettings({ ...all, pandoc: { ...all.pandoc, [f]: { ...all.pandoc[f], [key]: value } } }));
+      refresh();
+    };
+    const fields = PANDOC_FORMAT_FIELDS[f].map((key) => {
+      const [label, placeholder] = FIELD_LABELS[key];
+      let el: HTMLInputElement | HTMLSelectElement;
+      if (key === 'epubChapterLevel') {
+        // 1–4, no preset: the empty choice passes no --epub-chapter-level.
+        el = h('select.select', { 'data-export': `pandoc.${f}.${key}` }, h('option', { value: '0', text: '' }), ...[1, 2, 3, 4].map((n) => h('option', { value: String(n), text: String(n) })));
+        el.value = String(cur()[key]);
+        el.addEventListener('change', () => save(key, Number(el.value)));
+      } else {
+        el = h('input.text-input', { type: 'text', spellcheck: 'false', placeholder, 'data-export': `pandoc.${f}.${key}` }) as HTMLInputElement;
+        el.value = String(cur()[key]);
+        const input = el;
+        const commit = debounce(() => save(key, input.value), 300);
+        el.addEventListener('input', () => {
+          commit();
+          preview.value = pandocArgsPreview(f, { ...cur(), [key]: input.value });
+        });
+        el.addEventListener('change', () => commit.flush());
+        el.addEventListener('blur', () => commit.flush());
+      }
+      const hint = key === 'extraArguments' ? 'Quoted like a shell; ${outputPath} ${outputFolder} ${currentFolder} ${title}' : undefined;
+      const exts = FIELD_LABELS[key][2];
+      const pick =
+        exts && host.pickFile
+          ? h('button.btn.btn-small', {
+              type: 'button',
+              text: 'Choose…',
+              'data-export': `pandoc.${f}.${key}.choose`,
+              onclick: async () => {
+                const p = await host.pickFile!(label, exts);
+                if (!p) return;
+                (el as HTMLInputElement).value = p;
+                save(key, p);
+              },
+            })
+          : null;
+      return h('label.pref-row', null, h('span.pref-label', null, label, hint ? h('span.pref-hint', { text: hint }) : null), h('span.pref-control', null, pick ? h('span.inline', null, el, pick) : el));
+    });
+    refresh();
+    box.appendChild(
+      h(
+        'div.pandoc-format',
+        { 'data-format': f },
+        h('h4.pref-subsubhead', { text: PANDOC_LABELS[f] }),
+        // Typora's order: read-only Arguments, Extra Arguments, then the format's own fields.
+        h('label.pref-row', null, h('span.pref-label', null, 'Arguments'), h('span.pref-control', null, preview)),
+        ...fields,
+      ),
+    );
+  }
+  return box;
 }
 
 /** Add / edit / delete custom export commands (File › Export › Custom…). */
