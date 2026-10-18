@@ -351,19 +351,24 @@ pub async fn export_pdf_impl<Rt: Runtime>(
     base_dir: Option<PathBuf>,
     options: crate::export_cmds::PdfOptions,
 ) -> R<()> {
+    let base = base_dir
+        .or_else(|| out.parent().map(Path::to_path_buf))
+        .unwrap_or_else(|| PathBuf::from("/"));
+    allow_assets(app, &base, true);
     #[cfg(target_os = "macos")]
     {
-        let base = base_dir.or_else(|| out.parent().map(Path::to_path_buf)).unwrap_or_else(|| PathBuf::from("/"));
-        allow_assets(app, &base, true);
         crate::pdf_macos::export_pdf(app, html, base, out.clone(), options).await?;
-        crate::export_cmds::record_export(&out);
-        Ok(())
     }
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(target_os = "linux")]
     {
-        let _ = (app, html, out, base_dir, options);
-        Err("unsupported: native PDF export is macOS-only; use the print dialog".into())
+        crate::pdf_linux::export_pdf(app, html, base, out.clone(), options).await?;
     }
+    #[cfg(target_os = "windows")]
+    {
+        crate::pdf_windows::export_pdf(app, html, base, out.clone(), options).await?;
+    }
+    crate::export_cmds::record_export(&out);
+    Ok(())
 }
 
 #[tauri::command]
