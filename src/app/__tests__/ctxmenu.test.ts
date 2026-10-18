@@ -144,7 +144,7 @@ describe('context menu items', () => {
   it('video and emoji targets: Save Video As… after system items; Copy <char> for :emoji:', () => {
     const root = doc(
       '<div data-bid="h" data-type="html_block"><div class="inner"><video src="assets/v.mp4" controls></video></div></div>' +
-        '<p data-bid="p" data-type="paragraph"><span class="md-wrap md-entity"><span class="md-src">:smile:</span><span class="md-entity-char">😄</span></span></p>',
+        '<p data-bid="p" data-type="paragraph"><span class="md-wrap md-entity"><span class="md-meta">:smile:</span><span class="md-entity-char">😄</span></span></p>',
     );
     const a = acts();
     a.saveVideoAs = vi.fn();

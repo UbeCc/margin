@@ -142,7 +142,7 @@ test.describe('parity: context menus (#97)', () => {
     await load(page, 'Top\n\n$$\nE=mc^2\n$$\n\nEnd\n');
     const math = page.locator('.md-editor .md-block[data-type=math_block]');
     await math.click({ button: 'right' });
-    expect(await labels(page)).toEqual(['Cut', 'Copy', 'Paste', 'Copy / Paste As…', 'Edit', 'Copy Math', 'Code Tools', 'Insert Paragraph Before', 'Insert Paragraph After', 'Delete']);
+    expect(await labels(page)).toEqual(['Cut', 'Copy', 'Paste', 'Copy / Paste As…', 'Edit', 'Copy Math', 'Save Math As…', 'Code Tools', 'Insert Paragraph Before', 'Insert Paragraph After', 'Delete']);
     await item(page, 'Insert Paragraph After').click();
     await expect.poll(() => editorValue(page)).toMatch(/^Top\n\n\$\$\nE=mc\^2\n\$\$\n\n\n+End\n$/);
     await expect(page.locator('.md-editor .md-paragraph')).toHaveCount(3);
@@ -163,6 +163,12 @@ test.describe('parity: context menus (#97)', () => {
     await item(page, 'Copy Math').hover();
     await item(page, 'Copy as Tex').click();
     expect(await clipboardText(page)).toBe('a^2+b^2');
+    // #139: a rendered :emoji: gets "Copy '<char>'" before the system items
+    await page.evaluate((m) => window.__margin!.editor.setMarkdown(m), 'Smile :smile: now\n');
+    await page.locator('.md-editor .md-entity-char').click({ button: 'right', force: true });
+    expect(await labels(page)).toEqual(["Copy '😄'", 'Cut', 'Copy', 'Paste', 'Copy / Paste As…']);
+    await item(page, "Copy '😄'").click();
+    expect(await clipboardText(page)).toBe('😄');
   });
 
   test('tools.code.delete: Code tools: Delete Code Block', async ({ page }) => {

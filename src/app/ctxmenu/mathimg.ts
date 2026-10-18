@@ -17,15 +17,15 @@ import fraktur from 'katex/dist/fonts/KaTeX_Fraktur-Regular.woff2?url';
 import frakturBold from 'katex/dist/fonts/KaTeX_Fraktur-Bold.woff2?url';
 import main from 'katex/dist/fonts/KaTeX_Main-Regular.woff2?url';
 import mainBold from 'katex/dist/fonts/KaTeX_Main-Bold.woff2?url';
-import mainItalic from 'katex/dist/fonts/KaTeX_Main-Italic.woff2?url';
 import mainBoldItalic from 'katex/dist/fonts/KaTeX_Main-BoldItalic.woff2?url';
 import math from 'katex/dist/fonts/KaTeX_Math-Italic.woff2?url';
-import mathBold from 'katex/dist/fonts/KaTeX_Math-BoldItalic.woff2?url';
-import sans from 'katex/dist/fonts/KaTeX_SansSerif-Regular.woff2?url';
-import sansBold from 'katex/dist/fonts/KaTeX_SansSerif-Bold.woff2?url';
 import sansItalic from 'katex/dist/fonts/KaTeX_SansSerif-Italic.woff2?url';
-import sansBoldItalic from 'katex/dist/fonts/KaTeX_SansSerif-BoldItalic.woff2?url';
+import sans from 'katex/dist/fonts/KaTeX_SansSerif-Regular.woff2?url';
+import mainItalic from 'katex/dist/fonts/KaTeX_Main-Italic.woff2?url';
 import script from 'katex/dist/fonts/KaTeX_Script-Regular.woff2?url';
+import mathBold from 'katex/dist/fonts/KaTeX_Math-BoldItalic.woff2?url';
+import sansBold from 'katex/dist/fonts/KaTeX_SansSerif-Bold.woff2?url';
+import sansBoldItalic from 'katex/dist/fonts/KaTeX_SansSerif-Bold.woff2?url'; // KaTeX ships no SansSerif-BoldItalic; Bold is the closest
 import size1 from 'katex/dist/fonts/KaTeX_Size1-Regular.woff2?url';
 import size2 from 'katex/dist/fonts/KaTeX_Size2-Regular.woff2?url';
 import size3 from 'katex/dist/fonts/KaTeX_Size3-Regular.woff2?url';
@@ -48,7 +48,7 @@ const FONT_URLS: Record<string, string> = {
   'KaTeX_SansSerif-Regular': sans,
   'KaTeX_SansSerif-Bold': sansBold,
   'KaTeX_SansSerif-Italic': sansItalic,
-  'KaTeX_SansSerif-BoldItalic': sansBoldItalic,
+  'KaTeX_SansSerif-BoldItalic': sansBoldItalic, // katex.min.css may synthesize it; KaTeX ships no such file, Bold stands in
   'KaTeX_Script-Regular': script,
   'KaTeX_Size1-Regular': size1,
   'KaTeX_Size2-Regular': size2,

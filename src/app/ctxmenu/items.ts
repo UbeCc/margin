@@ -56,6 +56,8 @@ export interface ImageCtxOps {
   syntax(): { isHtml: boolean; switchTo(to: 'markdown' | 'html'): void } | null;
   /** "Save Image As…" */
   saveAs(): void;
+  /** Delete Image / Delete Image File (confirm + Trash) via the image tools. */
+  remove(withFile: boolean): void;
 }
 export type TableAction = 'rowAbove' | 'rowBelow' | 'colBefore' | 'colAfter' | 'deleteRow' | 'deleteCol' | 'deleteTable';
 

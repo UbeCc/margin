@@ -2,10 +2,10 @@
  "generated_from": {
   "spec": "typora-re/parity-spec.md",
   "prose": "typora-re/sections/*.md",
-  "margin_head": "3070635e592421898263e0391cd90c9294cc6732"
+  "margin_head": "462814bbbd60838a9a28098d043b4323722f3a4b"
  },
  "summary": {
-  "head": "3070635e592421898263e0391cd90c9294cc6732",
+  "head": "462814bbbd60838a9a28098d043b4323722f3a4b",
   "artifact_sha256": "2491191748b667e40df75da48cca12dd918bd8a79d02e0d11bd87d30d1e240db",
   "inventory": {
    "total": 172,
@@ -16,8 +16,8 @@
    "verified_by_test": 132
   },
   "ledger": {
-   "ledger_id": "rol_5d85adf767191690c127e1f14b3953edea8d06a80433ad61cf50f319ceff5621",
-   "closure_digest": "ad3bab706185fef46fc0b9c910179d0fe42790212c1f378379df53e11f0d1789",
+   "ledger_id": "rol_125b3c35399a73ff066ca1fd4d97f70d4e52aca7cf0c0fdb9b7965ceff79bed4",
+   "closure_digest": "e05e595be51ec1abdc72886fa0c9da6f19905926f31429c60a793a5236caa798",
    "status": "unknown",
    "summary": {
     "total": 177,
@@ -119,7 +119,7 @@
      }
     ]
    },
-   "evidence_id": "ev_88cbddda718af7c6babb91f7180e027564c82c3084bd9d5cfecad82eab357ad9"
+   "evidence_id": "ev_dfa97df7bdad786fa7be050f39ad85c588e647f438d0c6cbd5feccb9fd17685e"
   },
   "coverage": {
    "status": "unknown",
@@ -3299,7 +3299,7 @@
    "owner": {
     "path": "src/app/ctxmenu/targets.ts",
     "anchor": "export function contextTarget",
-    "sha256": "3113e26b691559e85af2206a9101f02272f757f3b85e9f3b5fc8e7714e6dff51"
+    "sha256": "43daadbadb25c0206fe4887ce668f1fd4d153eabf43e73d25f61bb3da46c00e4"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -3340,7 +3340,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "label: 'Copy / Paste As…'",
-    "sha256": "6072bfaf59a047d63984a9bf2d3f36f0dd12362aa1cbd32db086ec357a548441"
+    "sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -3382,7 +3382,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "label: 'Copy Link Address'",
-    "sha256": "6072bfaf59a047d63984a9bf2d3f36f0dd12362aa1cbd32db086ec357a548441"
+    "sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -3425,7 +3425,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "block('para:insertBefore', 'Insert Paragraph Before')",
-    "sha256": "6072bfaf59a047d63984a9bf2d3f36f0dd12362aa1cbd32db086ec357a548441"
+    "sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -3473,7 +3473,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "function copyMath",
-    "sha256": "6072bfaf59a047d63984a9bf2d3f36f0dd12362aa1cbd32db086ec357a548441"
+    "sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -3841,7 +3841,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "'Delete Code Block'",
-    "sha256": "6072bfaf59a047d63984a9bf2d3f36f0dd12362aa1cbd32db086ec357a548441"
+    "sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -4433,13 +4433,13 @@
    "priority": null,
    "epic": "images",
    "owner": {
-    "path": "src/app/images/context-menu.ts",
+    "path": "src/app/ctxmenu/items.ts",
     "anchor": "Open Image Location",
-    "sha256": "5417dd9aa6e5b7031beffc11969d2aa54fff7138ab32f15c6e84827af6c7ae9e"
+    "sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
    },
    "verifier": {
     "file": "tests/e2e/parity-images.spec.ts",
-    "test": "images.reveal-open: Image context: Open Image Location / Open in Browser / Copy Image Content",
+    "test": "images.reveal-open: Image context: Open Image Location… / Open in Browser… / Copy Image Content",
     "kind": "e2e"
    },
    "spec": {
@@ -4480,7 +4480,7 @@
    },
    "verifier": {
     "file": "tests/e2e/parity-images.spec.ts",
-    "test": "images.zoom: Image zoom (Zoom Image to N%) and switch Markdown/HTML image syntax",
+    "test": "images.zoom: Image zoom (direct entry + presets) and switch Markdown/HTML image syntax",
     "kind": "e2e"
    },
    "spec": {

@@ -1,21 +1,8 @@
 import type { Platform } from '../../contracts';
 import { extras } from '../platform-extras';
-import { showContextMenu, tidy, type MenuItem } from '../ui/contextmenu';
 import { findImageRefs } from '../upload';
-import { basename, isUrlLike } from '../util/path';
-import { REMOTE_RE } from './rules';
-import { parseImage, zoomChoices, zoomOf } from './syntax';
-import { locate, type ImageTools, type Located } from './tools';
-
-/** Shell callbacks the image context menu needs. */
-export interface ImageMenuHost {
-  tools: ImageTools;
-  platform: Platform;
-  upload(src: string): void;
-  uploadAll(): void;
-  uploading(): boolean;
-  notify(m: string, k: 'info' | 'error' | 'success'): void;
-}
+import { basename } from '../util/path';
+import { locate, type Located } from './tools';
 
 /** All rendered images of the editor, in document order (inline images and HTML-block previews). */
 const IMG_SEL = '.md-image img.md-img, .mb-html-block img';
@@ -42,9 +29,12 @@ export function refForImage(img: HTMLImageElement, root: HTMLElement, md: string
   return cands[Math.max(0, k)] ?? cands[0] ?? null;
 }
 
+/**
+ * Copy the rendered image to the clipboard as PNG (#136): native copy of the file
+ * bytes first, canvas re-encode only for non-PNG or remote sources.
+ */
 export async function copyImageContent(img: HTMLImageElement, abs?: string | null, native?: (path: string) => Promise<boolean>): Promise<boolean> {
   try {
-    // Native copy of the file bytes first (#136) when the platform offers it.
     if (abs && native && (await native(abs))) return true;
     const blob = await (await fetch(img.src)).blob();
     let png = blob;
@@ -62,81 +52,24 @@ export async function copyImageContent(img: HTMLImageElement, abs?: string | nul
   }
 }
 
-/** Right-click on a rendered image → Typora's image menu. Returns a detach function. */
-export function attachImageMenu(root: HTMLElement, host: ImageMenuHost, md: () => string, resolve: (src: string) => string): () => void {
-  const onMenu = (e: MouseEvent): void => {
-    const img = e.target instanceof Element ? e.target.closest('img') : null;
-    if (!img || !root.contains(img) || !img.matches(IMG_SEL)) return;
-    const r = refForImage(img as HTMLImageElement, root, md(), resolve);
-    if (!r) return;
-    e.preventDefault();
-    void buildMenu(host, r, img as HTMLImageElement).then((items) => showContextMenu(e.clientX, e.clientY, items));
-  };
-  root.addEventListener('contextmenu', onMenu);
-  return () => root.removeEventListener('contextmenu', onMenu);
-}
-
-export async function buildMenu(host: ImageMenuHost, r: Located, img: HTMLImageElement): Promise<MenuItem[]> {
-  const t = host.tools;
-  const ex = extras(host.platform);
-  const native = ex as { writeClipboardImage?: (path: string) => Promise<boolean> };
-  const abs = t.absOf(r.src);
-  const remote = REMOTE_RE.test(r.src);
-  const local = !!abs && !remote && !isUrlLike(r.src);
-  const ok = img.complete && img.naturalWidth > 0;
-  const html = parseImage(r.raw)?.html ?? false;
-  const scale = local && ex.imageScale ? await ex.imageScale(abs!).catch(() => 1) : 1;
-  const zoomNow = zoomOf(r.raw);
-  const target = t.targetFolder();
-
-  const zoomMenu = (): void => {
-    const rect = img.getBoundingClientRect();
-    showContextMenu(rect.left + 8, rect.top + 8, zoomChoices(scale).map((z) => ({ label: `Zoom Image to ${z}${zoomNow === z ? ' ✓' : ''}`, run: () => void t.zoom(r, z) })));
-  };
-
-  // fe-contextmenus-tools §1.2/§1.3: reveal, Copy to <folder>, Copy Image to…,
-  // Move to <folder>, Rename or Move Image to…, Upload Image | Copy Image
-  // Content | Zoom ▸, Switch Syntax ▸, Delete Image File / Delete Image |
-  // Save Image As… (error images keep reveal / zoom / syntax / delete only).
-  const items: MenuItem[] = [];
-  if (remote) items.push({ label: 'Open Image in Browser', run: () => void host.platform.openExternal(r.src.trim()) });
-  else if (local) items.push({ label: 'Open Image Location', disabled: !ex.revealInFolder, run: () => void ex.revealInFolder?.(abs!) });
-  if (ok) {
-    if (target && !(abs ?? '').startsWith(target + '/')) {
-      items.push({ label: `Copy to ${target}`, run: () => void t.copyOne(r, target, false) });
-      if (local) items.push({ label: `Move to ${target}`, run: () => void t.copyOne(r, target, true) });
-    }
-    items.push(
-      { label: 'Copy Image to…', run: () => void host.platform.openFileDialog({ directory: true }).then((d) => (d ? t.copyOne(r, d, false) : null)) },
-      { label: 'Rename or Move Image to…', disabled: !local, run: () => void moveImageDialog(host, r) },
-      { label: 'Upload Image', disabled: host.uploading(), run: () => host.upload(r.src) },
-    );
-  }
-  if (ok) items.push({ separator: true });
-  if (ok) items.push({ label: 'Copy Image Content', run: () => void copyImageContent(img, abs, native.writeClipboardImage).then((done) => host.notify(done ? 'Image copied.' : 'Could not copy the image.', done ? 'success' : 'error')) });
-  items.push(
-    { label: 'Zoom Image', run: zoomMenu },
-    { label: html ? 'Switch Image Syntax › Markdown Style' : 'Switch Image Syntax › HTML Style', run: () => void t.switchSyntax(r, html ? 'markdown' : 'html') },
-  );
-  if (local) items.push({ label: 'Delete Image File', danger: true, run: () => void t.deleteImageFile(r) });
-  else items.push({ label: 'Delete Image', danger: false, run: () => void t.deleteImage(r) });
-  items.push({ separator: true }, { label: 'Save Image As…', disabled: !ok, run: () => void saveMediaAs(host, abs, r.src, 'Image') });
-  items.push({ separator: true }, { label: 'Upload All Local Images', disabled: host.uploading(), run: () => host.uploadAll() });
-  return tidy(items);
-}
-
-/** "Rename or Move Image to…": a save dialog choosing the destination (and new name). */
-export function moveImageDialog(host: ImageMenuHost, r: Located): Promise<void> {
-  const abs = host.tools.absOf(r.src);
+/**
+ * "Rename or Move Image to…" (#141): a save dialog choosing the destination folder
+ * and the new name; delegates to the image tools' copy/move.
+ */
+export function moveImageDialog(openSave: { saveFileDialog(o?: { defaultPath?: string; filters?: { name: string; extensions: string[] }[] }): Promise<string | null> }, tools: { absOf(src: string): string | null; copyOne(r: Located, dir: string, move: boolean, name?: string): Promise<boolean> }, r: Located): Promise<void> {
+  const abs = tools.absOf(r.src);
   const ext = (abs ? basename(abs) : r.src).split('.').pop() || 'png';
-  return host.platform
+  return openSave
     .saveFileDialog({ defaultPath: abs ?? basename(r.src), filters: [{ name: 'Images', extensions: [ext] }] })
-    .then((p) => (p ? host.tools.copyOne(r, p.slice(0, p.lastIndexOf('/')) || '/', true, basename(p)) : null))
+    .then((p) => (p ? tools.copyOne(r, p.slice(0, p.lastIndexOf('/')) || '/', true, basename(p)) : null))
     .then(() => undefined);
 }
 
-/** "Save %@ As…" (#138): local file bytes (or a fetched remote) written through the platform's binary export. */
-export async function saveMediaAs(host: Pick<ImageMenuHost, 'platform' | 'notify'>, abs: string | null, src: string, kind: 'Image' | 'Video'): Promise<void> {
+/**
+ * "Save %@ As…" (#138): local file bytes (or a fetched remote) written through the
+ * platform's binary export. Used for images, videos and remote downloads.
+ */
+export async function saveMediaAs(host: { platform: Platform; notify(m: string, k: 'info' | 'error' | 'success'): void }, abs: string | null, src: string, kind: 'Image' | 'Video'): Promise<void> {
   const p = host.platform;
   const ex = extras(p);
   try {

@@ -113,9 +113,10 @@ export function contextTarget(
   if (point && block && !el.closest('.md-wrap')) el = wrapAt(block, point.x, point.y) ?? el;
 
   const img = el.closest('img');
-  const imageWrap = img?.closest<HTMLElement>('.md-image') ?? undefined;
-  if (img && imageWrap) {
-    const src = imageMarkdownSrc(imageWrap.querySelector('.md-src')?.textContent ?? '') ?? img.getAttribute('src') ?? '';
+  if (img) {
+    const imageWrap = img.closest<HTMLElement>('.md-image') ?? undefined;
+    // Markdown image: exact source from .md-src; HTML-block <img>: its src attribute.
+    const src = imageMarkdownSrc(imageWrap?.querySelector('.md-src')?.textContent ?? '') ?? img.getAttribute('src') ?? '';
     const loaded = img.complete && img.naturalWidth > 0;
     const local = !/^([a-z][\w+.-]*:|\/\/)/i.test(src) || /^file:/i.test(src);
     return {
@@ -145,7 +146,7 @@ export function contextTarget(
   const emoji = el.closest<HTMLElement>('.md-entity');
   if (emoji) {
     // §1.2 Emoji (:smile: rendered): "Copy '<char>'" before the system items (#139).
-    const code = emoji.querySelector('.md-src')?.textContent ?? '';
+    const code = emoji.querySelector('.md-meta')?.textContent ?? '';
     const ch = emoji.querySelector('.md-entity-char')?.textContent ?? '';
     if (/^:[\w+-]+:$/.test(code) && ch) return { ...base, kind: 'text', src: ch, keys: [`copyEmoji-${ch}`, '|', 'normal'] };
   }

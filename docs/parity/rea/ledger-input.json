@@ -7963,7 +7963,7 @@
     "owner": {
      "module_path": "src/app/ctxmenu/targets.ts",
      "symbol": "export function contextTarget",
-     "owner_sha256": "3113e26b691559e85af2206a9101f02272f757f3b85e9f3b5fc8e7714e6dff51"
+     "owner_sha256": "43daadbadb25c0206fe4887ce668f1fd4d153eabf43e73d25f61bb3da46c00e4"
     },
     "parser_type": null,
     "original_cases": [
@@ -8004,7 +8004,7 @@
     "owner": {
      "module_path": "src/app/ctxmenu/items.ts",
      "symbol": "label: 'Copy / Paste As…'",
-     "owner_sha256": "6072bfaf59a047d63984a9bf2d3f36f0dd12362aa1cbd32db086ec357a548441"
+     "owner_sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
     },
     "parser_type": null,
     "original_cases": [
@@ -8022,7 +8022,7 @@
     "owner": {
      "module_path": "src/app/ctxmenu/items.ts",
      "symbol": "label: 'Copy Link Address'",
-     "owner_sha256": "6072bfaf59a047d63984a9bf2d3f36f0dd12362aa1cbd32db086ec357a548441"
+     "owner_sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
     },
     "parser_type": null,
     "original_cases": [
@@ -8063,7 +8063,7 @@
     "owner": {
      "module_path": "src/app/ctxmenu/items.ts",
      "symbol": "block('para:insertBefore', 'Insert Paragraph Before')",
-     "owner_sha256": "6072bfaf59a047d63984a9bf2d3f36f0dd12362aa1cbd32db086ec357a548441"
+     "owner_sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
     },
     "parser_type": null,
     "original_cases": [
@@ -8104,7 +8104,7 @@
     "owner": {
      "module_path": "src/app/ctxmenu/items.ts",
      "symbol": "function copyMath",
-     "owner_sha256": "6072bfaf59a047d63984a9bf2d3f36f0dd12362aa1cbd32db086ec357a548441"
+     "owner_sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
     },
     "parser_type": null,
     "original_cases": [
@@ -8409,7 +8409,7 @@
     "owner": {
      "module_path": "src/app/ctxmenu/items.ts",
      "symbol": "'Delete Code Block'",
-     "owner_sha256": "6072bfaf59a047d63984a9bf2d3f36f0dd12362aa1cbd32db086ec357a548441"
+     "owner_sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
     },
     "parser_type": null,
     "original_cases": [
@@ -8940,9 +8940,9 @@
    {
     "obligation_id": "typora.images.reveal-open",
     "owner": {
-     "module_path": "src/app/images/context-menu.ts",
+     "module_path": "src/app/ctxmenu/items.ts",
      "symbol": "Open Image Location",
-     "owner_sha256": "5417dd9aa6e5b7031beffc11969d2aa54fff7138ab32f15c6e84827af6c7ae9e"
+     "owner_sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
     },
     "parser_type": null,
     "original_cases": [
@@ -8965,7 +8965,7 @@
     "verifier": {
      "verifier_id": "margin.playwright.images.reveal-open",
      "claim_id": "claim.images.reveal-open",
-     "command": "npx playwright test tests/e2e/parity-images.spec.ts -g \"images.reveal-open: Image context: Open Image Location / Open in Browser / Copy Image Content\"",
+     "command": "npx playwright test tests/e2e/parity-images.spec.ts -g \"images.reveal-open: Image context: Open Image Location… / Open in Browser… / Copy Image Content\"",
      "authority": "renderer",
      "status": "pass",
      "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
@@ -9006,7 +9006,7 @@
     "verifier": {
      "verifier_id": "margin.playwright.images.zoom",
      "claim_id": "claim.images.zoom",
-     "command": "npx playwright test tests/e2e/parity-images.spec.ts -g \"images.zoom: Image zoom (Zoom Image to N%) and switch Markdown/HTML image syntax\"",
+     "command": "npx playwright test tests/e2e/parity-images.spec.ts -g \"images.zoom: Image zoom (direct entry + presets) and switch Markdown/HTML image syntax\"",
      "authority": "renderer",
      "status": "pass",
      "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",

@@ -307,7 +307,7 @@ export class EditorContextMenu {
           }
         : undefined,
       uploadImage: this.host.uploadImage,
-      deleteImage: (withFile) => void this.deleteImage(withFile),
+      deleteImage: (withFile) => (ops ? ops.remove(withFile) : void this.deleteImage(withFile)),
       copyImageTo: (_src, move) => ops?.copyTo(move),
       imageTarget: () => ops?.target() ?? null,
       zoomChoices: () => ops?.zoom() ?? null,

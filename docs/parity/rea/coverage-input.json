@@ -6,7 +6,7 @@
    {
     "artifact_id": "margin-src",
     "artifact_sha256": "2491191748b667e40df75da48cca12dd918bd8a79d02e0d11bd87d30d1e240db",
-    "version": "3070635e592421898263e0391cd90c9294cc6732",
+    "version": "462814bbbd60838a9a28098d043b4323722f3a4b",
     "environment_sha256": "20aa30e081a969eaed6bd1d8c33d9e966312a547a57b9f2a8a471dd04b5549ae",
     "evidence_ids": [
      "ev_1fff77de0927975cf6c8e1ae1f4f756642727a508cab1ec65759d425f7ebbded"
@@ -2940,7 +2940,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/ctxmenu/targets.ts",
      "owner_export": "export function contextTarget",
-     "owner_sha256": "3113e26b691559e85af2206a9101f02272f757f3b85e9f3b5fc8e7714e6dff51",
+     "owner_sha256": "43daadbadb25c0206fe4887ce668f1fd4d153eabf43e73d25f61bb3da46c00e4",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2952,7 +2952,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/ctxmenu/items.ts",
      "owner_export": "label: 'Copy / Paste As…'",
-     "owner_sha256": "6072bfaf59a047d63984a9bf2d3f36f0dd12362aa1cbd32db086ec357a548441",
+     "owner_sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2964,7 +2964,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/ctxmenu/items.ts",
      "owner_export": "label: 'Copy Link Address'",
-     "owner_sha256": "6072bfaf59a047d63984a9bf2d3f36f0dd12362aa1cbd32db086ec357a548441",
+     "owner_sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2976,7 +2976,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/ctxmenu/items.ts",
      "owner_export": "block('para:insertBefore', 'Insert Paragraph Before')",
-     "owner_sha256": "6072bfaf59a047d63984a9bf2d3f36f0dd12362aa1cbd32db086ec357a548441",
+     "owner_sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2988,7 +2988,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/ctxmenu/items.ts",
      "owner_export": "function copyMath",
-     "owner_sha256": "6072bfaf59a047d63984a9bf2d3f36f0dd12362aa1cbd32db086ec357a548441",
+     "owner_sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -3084,7 +3084,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/ctxmenu/items.ts",
      "owner_export": "'Delete Code Block'",
-     "owner_sha256": "6072bfaf59a047d63984a9bf2d3f36f0dd12362aa1cbd32db086ec357a548441",
+     "owner_sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -3238,9 +3238,9 @@
     "surface_id": "images.reveal-open",
     "ownership": {
      "disposition": "implemented",
-     "owner_path": "src/app/images/context-menu.ts",
+     "owner_path": "src/app/ctxmenu/items.ts",
      "owner_export": "Open Image Location",
-     "owner_sha256": "5417dd9aa6e5b7031beffc11969d2aa54fff7138ab32f15c6e84827af6c7ae9e",
+     "owner_sha256": "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -9427,7 +9427,7 @@
      "2491191748b667e40df75da48cca12dd918bd8a79d02e0d11bd87d30d1e240db"
     ],
     "owner_sha256s": [
-     "3113e26b691559e85af2206a9101f02272f757f3b85e9f3b5fc8e7714e6dff51"
+     "43daadbadb25c0206fe4887ce668f1fd4d153eabf43e73d25f61bb3da46c00e4"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -9450,7 +9450,7 @@
      "2491191748b667e40df75da48cca12dd918bd8a79d02e0d11bd87d30d1e240db"
     ],
     "owner_sha256s": [
-     "6072bfaf59a047d63984a9bf2d3f36f0dd12362aa1cbd32db086ec357a548441"
+     "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -9473,7 +9473,7 @@
      "2491191748b667e40df75da48cca12dd918bd8a79d02e0d11bd87d30d1e240db"
     ],
     "owner_sha256s": [
-     "6072bfaf59a047d63984a9bf2d3f36f0dd12362aa1cbd32db086ec357a548441"
+     "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -9496,7 +9496,7 @@
      "2491191748b667e40df75da48cca12dd918bd8a79d02e0d11bd87d30d1e240db"
     ],
     "owner_sha256s": [
-     "6072bfaf59a047d63984a9bf2d3f36f0dd12362aa1cbd32db086ec357a548441"
+     "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -9519,7 +9519,7 @@
      "2491191748b667e40df75da48cca12dd918bd8a79d02e0d11bd87d30d1e240db"
     ],
     "owner_sha256s": [
-     "6072bfaf59a047d63984a9bf2d3f36f0dd12362aa1cbd32db086ec357a548441"
+     "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -9703,7 +9703,7 @@
      "2491191748b667e40df75da48cca12dd918bd8a79d02e0d11bd87d30d1e240db"
     ],
     "owner_sha256s": [
-     "6072bfaf59a047d63984a9bf2d3f36f0dd12362aa1cbd32db086ec357a548441"
+     "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -10002,7 +10002,7 @@
      "2491191748b667e40df75da48cca12dd918bd8a79d02e0d11bd87d30d1e240db"
     ],
     "owner_sha256s": [
-     "5417dd9aa6e5b7031beffc11969d2aa54fff7138ab32f15c6e84827af6c7ae9e"
+     "9606e153a913438edf191f9dd22eee683793846d5c178f4b8459de058ed5cb2d"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,

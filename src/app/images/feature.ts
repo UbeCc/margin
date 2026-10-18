@@ -3,7 +3,7 @@ import type { FullPlatform } from '../platform-extras';
 import type { ImageUploader } from '../upload-actions';
 import { dirname, isUrlLike, relative } from '../util/path';
 import type { ImageCtxOps } from '../ctxmenu/items';
-import { attachImageMenu, copyImageContent, moveImageDialog, refForImage, saveMediaAs } from './context-menu';
+import { copyImageContent, moveImageDialog, refForImage, saveMediaAs } from './context-menu';
 import { insertImage, type ImageInput } from './insert';
 import { REMOTE_RE, resolveWithRoot, rootDirOf, setFrontMatterValue } from './rules';
 import { ImageTools, type Located } from './tools';
@@ -105,24 +105,12 @@ export class ImageFeature {
     });
   }
 
-  attach(root: HTMLElement): () => void {
-    return attachImageMenu(
-      root,
-      this.menuHost(),
-      () => this.host.editor().getMarkdown(),
-      (src) => this.host.resolveAsset(src),
-    );
-  }
-
-  private menuHost() {
-    return {
-      tools: this.tools,
-      platform: this.host.platform,
-      upload: (src: string) => void this.host.uploader.uploadSrcs([src]),
-      uploadAll: () => void this.host.uploader.uploadAll(),
-      uploading: () => this.host.uploader.uploading,
-      notify: (m: string, k: 'info' | 'error' | 'success') => this.host.notify(m, k),
-    };
+  /**
+   * Editor right-clicks on images are handled by the editor context menu
+   * (`EditorContextMenu` + `ctxOps`); kept as a no-op detach for callers.
+   */
+  attach(_root: HTMLElement): () => void {
+    return () => {};
   }
 
   /** Editor-context-menu ops for one right-clicked image (#141): builds on the same tools as the image menu. */
@@ -132,7 +120,10 @@ export class ImageFeature {
     const t = this.tools;
     const zoomNow = zoomOf(ref.raw);
     return {
-      copyTo: (move) => void (move ? moveImageDialog(this.menuHost(), ref) : this.host.platform.openFileDialog({ directory: true }).then((d) => (d ? t.copyOne(ref, d, false) : null))),
+      copyTo: (move) =>
+        void (move
+          ? moveImageDialog(this.host.platform, t, ref)
+          : this.host.platform.openFileDialog({ directory: true }).then((d) => (d ? t.copyOne(ref, d, false) : null))),
       target: () => {
         const dir = t.targetFolder();
         const abs = t.absOf(ref.src);
@@ -149,7 +140,8 @@ export class ImageFeature {
         const html = parseImage(ref.raw)?.html === true;
         return { isHtml: html, switchTo: (to) => void t.switchSyntax(ref, to) };
       },
-      saveAs: () => void saveMediaAs(this.menuHost(), t.absOf(ref.src), ref.src, 'Image'),
+      saveAs: () => void saveMediaAs({ platform: this.host.platform, notify: (m, k) => this.host.notify(m, k) }, t.absOf(ref.src), ref.src, 'Image'),
+      remove: (withFile) => void (withFile ? t.deleteImageFile(ref) : t.deleteImage(ref)),
     };
   }
 
