@@ -36,6 +36,8 @@ const COMMANDS: &[&str] = &[
     "reveal_path",
     "export_binary",
     "open_exported_file",
+    "pandoc_import",
+    "run_export_command",
     "upload_images",
     "pandoc_detect",
     "pandoc_export",
