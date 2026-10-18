@@ -82,7 +82,7 @@ test('context menu: new file, rename (open doc follows), new folder, trash', asy
 
   // Rename keeps the open document attached to the file.
   await page.locator(`[data-path="${ROOT}/Journal/Saturday.md"]`).click({ button: 'right' });
-  await page.locator('.context-item', { hasText: 'Rename' }).click();
+  await page.locator('.context-item', { hasText: /^Rename…$/ }).click();
   await page.locator('.dialog .text-input').fill('Sunday.md');
   await page.keyboard.press('Enter');
   await expect(page.locator(`.tree-row[data-path="${ROOT}/Journal/Sunday.md"]`)).toHaveClass(/active/);
@@ -95,7 +95,7 @@ test('context menu: new file, rename (open doc follows), new folder, trash', asy
 
   // Rename onto an existing name is refused with an error toast.
   await page.locator(`[data-path="${ROOT}/Journal/Sunday.md"]`).click({ button: 'right' });
-  await page.locator('.context-item', { hasText: 'Rename…' }).click();
+  await page.locator('.context-item', { hasText: /^Rename…$/ }).click();
   await page.locator('.dialog .text-input').fill('2026-10-17.md');
   await page.keyboard.press('Enter');
   await expect(page.locator('.toast').last()).toContainText("Couldn't rename");

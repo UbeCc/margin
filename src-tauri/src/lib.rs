@@ -9,6 +9,14 @@ mod export_custom;
 mod fsops;
 #[cfg(unix)]
 mod fsops_unix;
+#[cfg(target_os = "linux")]
+mod drop_linux;
+#[cfg(target_os = "linux")]
+mod pdf_linux;
+#[cfg(target_os = "windows")]
+mod pdf_windows;
+#[cfg(target_os = "windows")]
+mod drop_windows;
 mod image_tools;
 mod images;
 mod menu;
@@ -18,8 +26,15 @@ mod pandoc_import;
 mod drop_macos;
 #[cfg(target_os = "macos")]
 mod pdf_macos;
+mod quicklook_macos;
 #[cfg(target_os = "macos")]
 mod pdf_post_macos;
+#[cfg(target_os = "macos")]
+mod start_drag_macos;
+#[cfg(target_os = "linux")]
+mod start_drag_linux;
+#[cfg(target_os = "windows")]
+mod start_drag_windows;
 mod quick_open;
 mod remote_images;
 #[doc(hidden)]
@@ -53,7 +68,6 @@ pub const EV_MENU: &str = "margin://menu";
 pub const EV_FS: &str = "margin://fs-events";
 pub const EV_OPEN_FILES: &str = "margin://open-files";
 pub const EV_CLOSE_REQUESTED: &str = "margin://close-requested";
-#[cfg(target_os = "macos")]
 pub const EV_FILE_DROP: &str = "margin://file-drop";
 
 #[derive(Default)]
@@ -177,11 +191,25 @@ pub fn new_window<R: Runtime>(app: &AppHandle<R>, label: &str, path: Option<&str
         let p = pos.to_logical::<f64>(scale);
         b = b.position(p.x + 28.0, p.y + 28.0);
     }
-    b.build().map(|_| ())
+    let win = b.build()?;
+    install_drop_hook(app, &win);
+    Ok(())
+}
+
+/// OS file-drop interception for `win` (#23 macOS, #129 Linux/Windows).
+pub fn install_drop_hook<R: Runtime>(app: &AppHandle<R>, win: &tauri::WebviewWindow<R>) {
+    #[cfg(target_os = "macos")]
+    {
+        let h = app.clone();
+        drop_macos::install(win, move |w, paths, x, y| file_dropped(&h, w, paths, x, y));
+    }
+    #[cfg(target_os = "linux")]
+    drop_linux::install(app, win);
+    #[cfg(target_os = "windows")]
+    drop_windows::install(app, win);
 }
 
 /// Payload of `margin://file-drop` (#23): `FileDrop` in src/contracts.ts.
-#[cfg(target_os = "macos")]
 #[derive(Clone, Serialize)]
 pub struct FileDrop {
     pub paths: Vec<String>,
@@ -189,7 +217,18 @@ pub struct FileDrop {
     pub y: f64,
 }
 
-/// Finder files dropped on the window whose NSWindow is `ns_window` (#23).
+/// Files dropped from the OS on `win`: scope their folders for the asset
+/// protocol, focus the window and notify the page (#23, #129).
+pub fn emit_file_drop<R: Runtime>(win: &tauri::WebviewWindow<R>, paths: &[String], x: f64, y: f64) {
+    let app = win.app_handle();
+    for p in paths {
+        allow_assets_for_file(app, Path::new(p));
+    }
+    let _ = win.set_focus();
+    let _ = app.emit_to(win.label(), EV_FILE_DROP, FileDrop { paths: paths.to_vec(), x, y });
+}
+
+/// Files from Finder dropped on the window whose NSWindow is `ns_window` (#23).
 #[cfg(target_os = "macos")]
 fn file_dropped<R: Runtime>(app: &AppHandle<R>, ns_window: usize, paths: Vec<String>, x: f64, y: f64) {
     let Some(win) = app
@@ -199,11 +238,7 @@ fn file_dropped<R: Runtime>(app: &AppHandle<R>, ns_window: usize, paths: Vec<Str
     else {
         return;
     };
-    for p in &paths {
-        allow_assets_for_file(app, Path::new(p));
-    }
-    let _ = win.set_focus();
-    let _ = app.emit_to(win.label(), EV_FILE_DROP, FileDrop { paths, x, y });
+    emit_file_drop(&win, &paths, x, y);
 }
 
 pub fn open_files<R: Runtime>(app: &AppHandle<R>, paths: Vec<PathBuf>) {
@@ -393,6 +428,7 @@ pub fn run() {
             commands::save_dialog,
             commands::export_html,
             commands::export_pdf,
+            commands::start_file_drag,
             pandoc::pandoc_detect,
             pandoc::pandoc_export,
             pandoc::pandoc_abort,
@@ -427,7 +463,9 @@ pub fn run() {
             image_tools::image_scale,
             image_tools::open_images_dialog,
             clipboard_macos::clipboard_write_rich,
+            clipboard_macos::clipboard_write_image,
             clipboard_read::clipboard_read,
+            quicklook_macos::quick_look_file,
         ])
         .setup(|app| {
             let handle = app.handle().clone();
@@ -451,10 +489,8 @@ pub fn run() {
                 allow_assets(&handle, &dir, true);
             }
             open_files(&handle, cli_paths());
-            #[cfg(target_os = "macos")]
             if let Some(w) = app.get_webview_window("main") {
-                let h = handle.clone();
-                drop_macos::install(&w, move |win, paths, x, y| file_dropped(&h, win, paths, x, y));
+                install_drop_hook(&handle, &w);
             }
             #[cfg(debug_assertions)]
             maybe_pdf_selftest(&handle);

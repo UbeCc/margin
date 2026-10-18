@@ -19,6 +19,8 @@ export interface SourceModeLike {
   /** Optional caret / scroll hand-off (#35): 0-based line at the viewport top, scroll a line to the top. */
   getTopLine?(): number;
   scrollToLine?(line: number): void;
+  /** Insert markdown at a viewport point (falling back to the caret) — OS drops in source mode (#129). */
+  insertAt?(markdown: string, x?: number, y?: number): boolean;
   /** Main selection as markdown offsets (feature-detected). */
   getSelection?(): { anchor: number; head: number };
   setSelection?(anchor: number, head: number): void;

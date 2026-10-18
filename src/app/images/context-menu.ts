@@ -31,11 +31,12 @@ export function refForImage(img: HTMLImageElement, root: HTMLElement, md: string
 
 /**
  * Copy the rendered image to the clipboard as PNG (#136): native copy of the file
- * bytes first, canvas re-encode only for non-PNG or remote sources.
+ * bytes first (WKWebView fetch of a file asset URL can fail), canvas re-encode
+ * only for non-PNG or remote sources.
  */
 export async function copyImageContent(img: HTMLImageElement, abs?: string | null, native?: (path: string) => Promise<boolean>): Promise<boolean> {
+  if (abs && native && (await native(abs).catch(() => false))) return true;
   try {
-    if (abs && native && (await native(abs))) return true;
     const blob = await (await fetch(img.src)).blob();
     let png = blob;
     if (blob.type !== 'image/png') {

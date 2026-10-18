@@ -9,14 +9,14 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 | | surfaces |
 |---|---|
 | total | 172 |
-| owned (implemented) | 147 (with a named passing test: 134) |
+| owned (implemented) | 148 (with a named passing test: 135) |
 | partial | 9 |
-| missing | 8 |
+| missing | 7 |
 | out of scope | 8 |
 
-REA ledger `rol_49f54e05ee0a3e17e3faa3e5e4bd5401853fb633722d4cd5e0246204d09bd6a9` (closure `19b82cb79ece67e6…`): status **unknown**; unowned 8, implemented 156, out-of-scope 8, unknown 5.
+REA ledger `rol_498c4412406d80cfb1fde61e8d1480499e82e4f5d070ed715c12e82104366a40` (closure `4d28d4a0644c12ae…`): status **unknown**; unowned 7, implemented 157, out-of-scope 8, unknown 5.
 
-REA coverage boundary `margin.typora-parity`: status **unknown**; 134/164 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 8, package-proof-missing 1, verifier-missing 24, verifier-unknown 6.
+REA coverage boundary `margin.typora-parity`: status **unknown**; 135/164 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 7, package-proof-missing 1, verifier-missing 23, verifier-unknown 6.
 
 Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): build exit 0, cargo-test exit 0, independence exit 0, playwright exit 0, vitest exit 0. See `rea/summary.json`.
 
@@ -40,7 +40,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `tools` Table, code-fence and math tools | P1 | 1 |
 | `images` Image pipeline: insert-local, copy/move/upload, zoom, syntax switch, image root path | P1 | 0 |
 | `prefs` Preferences completeness (General, Editor, Image, Markdown, Export, Appearance panes) | P1 | 2 |
-| `sidebar` Sidebar & outline: list view, file search, sort, collapsible outline, filter | P1 | 1 |
+| `sidebar` Sidebar & outline: list view, file search, sort, collapsible outline, filter | P1 | 0 |
 | `syntax` Markdown syntax options & whitespace/line-break settings | P2 | 1 |
 | `chrome` Window chrome & writing aids: status bar, always-on-top, spelling, substitutions, speech, emoji | P2 | 9 |
 
@@ -260,8 +260,8 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `sidebar.search` | Sidebar full-text search across the folder — "Searching"/"Gathering more results" belong to Quick Open and "No Results" to in-document Find (fe-sidebar-statusbar-find §10); "File Results" is unused in 1.5.12 | owned |  | `src/app/sidebar/search.ts` `export class SidebarSearch` | `tests/e2e/parity-sidebar.spec.ts` › sidebar.search: Sidebar full-text search | 4 |
 | `sidebar.sort` | File tree sorting (name/natural/created/modified, asc/desc) — deliberate fix: Typora code −3 serves both natural-desc and creation-desc; Margin keeps all eight orders distinct. Sort menu sits in the files header (Typora: footer menu) | owned |  | `src/app/sidebar/sort.ts` `export const SORT_OPTIONS` | `tests/e2e/parity-sidebar.spec.ts` › sidebar.sort: File tree sorting | 9 |
 | `sidebar.outline` | Outline: headings, jump, highlight current header | owned |  | `src/app/sidebar/outline.ts` `activeId` | `tests/e2e/app-navigation.spec.ts` › outline lists headings and jumps on click | 2 |
-| `sidebar.outline-collapse` | Outline: collapsible/flat outline, expand/collapse all, filter, unpin — pin/unpin (outline drop-down) not implemented | owned |  | `src/app/sidebar/outline.ts` `export function filterHeadings` | `tests/e2e/parity-sidebar.spec.ts` › sidebar.outline-collapse: Outline: collapsible/flat outline | 7 |
-| `sidebar.drag` | Drag files from sidebar into the editor / other apps; drop files to open — #23 | owned |  | `src/app/sidebar/drag.ts` `export function dropMarkdown` | `tests/e2e/parity-sidebar.spec.ts` › sidebar.drag: Drag files from sidebar | 1 |
+| `sidebar.outline-collapse` | Outline: collapsible/flat outline, expand/collapse all, filter, pin/unpin (drop-down outline) — #131: unpin hides the sidebar for a floating drop-down outline (Escape/outside click closes, View ▸ Outline reopens); pin restores the sidebar Outline tab | owned |  | `src/app/sidebar/outline.ts` `export function filterHeadings` | `tests/e2e/parity-sidebar.spec.ts` › sidebar.outline-collapse: Outline: collapsible/flat outline, expand/collapse all, filter, unpin | 7 |
+| `sidebar.drag` | Drag files from sidebar into the editor / other apps; drop files to open — #23; #131: drag-move asks 'Are you sure you want to move %@?' (suppressible) and offers Undo Move / Undo Rename %@ | owned |  | `src/app/sidebar/drag.ts` `export function dropMarkdown` | `tests/e2e/parity-sidebar.spec.ts` › sidebar.drag: Drag files from sidebar | 1 |
 
 ## Export / print / import
 
@@ -311,9 +311,9 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `beh.files.folder-watch` | Folder watcher: incremental tree updates, rename pairing, hidden/unsupported filtered | owned |  | `src-tauri/src/watch.rs` `fn ` | `src/platform/web.test.ts` › suppresses own modifications but reports creations and external changes | 1 |
 | `beh.files.title-dirty` | Window title shows document name and edited state | owned |  | `src/app/app.ts` `setDocumentEdited` | none | 0 |
 | `beh.files.single-instance` | Single instance: opening files from Finder reuses the running app | owned |  | `src-tauri/src/lib.rs` `on_second_instance` | `tests/e2e/parity-files.spec.ts` › beh.files.single-instance: Single instance: opening files from Finder reuses the running app | 0 |
-| `beh.files.drop` | Drop files from the OS: open Markdown/folders, insert images and links — #23; macOS native paths via src-tauri/src/drop_macos.rs; Linux/Windows drops not intercepted yet | owned |  | `src/app/filedrop.ts` `export async function handleFileDrop(` | `tests/e2e/parity-files.spec.ts` › beh.files.drop: Drop files from the OS: open Markdown/folders, insert images and links | 0 |
+| `beh.files.drop` | Drop files from the OS: open Markdown/folders, insert images and links — #23 #129; native paths on all platforms (src-tauri/src/drop_macos.rs, drop_linux.rs, drop_windows.rs); source mode inserts at the drop point (source-mode.ts insertAt) | owned |  | `src/app/filedrop.ts` `export async function handleFileDrop(` | `tests/e2e/parity-files.spec.ts` › beh.files.drop: Drop files from the OS: open Markdown/folders, insert images and links | 0 |
 | `beh.files.snapshot-undo` | Reopen keeps undo history and caret (per-document snapshot) | owned |  | `src/app/doctabs.ts` `private async revive(` | `tests/e2e/parity-files.spec.ts` › beh.files.snapshot-undo: Reopen keeps undo history and caret (per-document snapshot) | 4 |
-| `beh.files.quicklook` | Quick Look / preview of a file from the sidebar | **missing** | P2 | — | none | 3 |
+| `beh.files.quicklook` | Quick Look / preview of a file from the sidebar — #131: shared QLPreviewPanel via main-thread bridge; Space on a focused row, tree + Articles menus | owned |  | `src-tauri/src/quicklook_macos.rs` `pub fn quick_look_file` | `tests/e2e/parity-sidebar-r3.spec.ts` › sidebar.quicklook: Quick Look in tree/list menus and Space on a focused row | 3 |
 | `beh.files.asset-scope` | Asset access scoped to doc/folder (no whole-disk file:// access) — prose flags Typora granting "/" read access; Margin scopes per folder (#48 open) | owned |  | `src-tauri/src/commands.rs` `allow_asset_dir` | none | 0 |
 
 ## Behaviors — settings

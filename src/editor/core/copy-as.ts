@@ -177,7 +177,10 @@ export function copyPayload(ed: EditorCore, format: Exclude<CopyAsFormat, 'image
   const sel = selectionMarkdown(ed);
   if (!sel) return null;
   if (format === 'markdown') return { 'text/plain': sel.md };
-  const html = selectionHTML(ed, sel.md);
+  // #127 "When copy / export as HTML (without style)": "Use LaTeX Source" keeps $$…$$ / $…$
+  const mathSource = format === 'html' || format === 'unstyled';
+  const latex = ed.settings.markdown?.mathCopyFormat === 'latex';
+  const html = selectionHTML(ed, sel.md, mathSource && latex);
   switch (format) {
     case 'html':
       return { 'text/plain': html };

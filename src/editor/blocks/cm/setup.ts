@@ -5,7 +5,7 @@
  */
 import { Annotation, Compartment, EditorState, Extension, Prec, Transaction } from '@codemirror/state';
 import { EditorView, keymap, lineNumbers, highlightActiveLine, drawSelection, placeholder as cmPlaceholder } from '@codemirror/view';
-import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
+import { defaultKeymap, history, historyKeymap, indentLess, indentSelection, indentWithTab } from '@codemirror/commands';
 import { LanguageDescription, LanguageSupport, bracketMatching, indentOnInput, indentUnit, syntaxHighlighting } from '@codemirror/language';
 import { languages } from '@codemirror/language-data';
 import { classHighlighter } from '@lezer/highlight';
@@ -135,6 +135,8 @@ export interface CodeEditorOptions {
   lineWrapping?: boolean;
   /** Spaces per indent; 0 = indent with tabs (Preferences › Code Fences, #100). Default 4. */
   indentSize?: number;
+  /** #127 "Use Shift+Tab to auto indent selected code": on = Shift+Tab auto-indents, off (default) = outdents. */
+  shiftTabAutoIndent?: boolean;
   placeholder?: string;
   exit: ExitHandlers;
   onDocChange(doc: string): void;
@@ -149,6 +151,8 @@ export interface CodeEditor {
   setLineNumbers(on: boolean): void;
   setLineWrapping(on: boolean): void;
   setIndentSize(n: number): void;
+  /** #127: live-update the Shift+Tab behavior. */
+  setShiftTabAutoIndent(on: boolean): void;
   setDoc(doc: string): void;
   getDoc(): string;
   focus(at: 'start' | 'end'): void;
@@ -165,6 +169,7 @@ export function createCodeEditor(o: CodeEditorOptions): CodeEditor {
   const indent = new Compartment();
   const indentExt = (n: number) => [EditorState.tabSize.of(n || 4), indentUnit.of(n ? ' '.repeat(n) : '\t')];
   let langName = '';
+  let shiftTabAutoIndent = !!o.shiftTabAutoIndent;
   const view = new EditorView({
     parent: o.parent,
     state: EditorState.create({
@@ -177,6 +182,8 @@ export function createCodeEditor(o: CodeEditorOptions): CodeEditor {
         bracketMatching(),
         highlightActiveLine(),
         syntaxHighlighting(classHighlighter),
+        // #127 Shift+Tab: outdent, or auto-indent when "Use Shift+Tab to auto indent selected code" is on.
+        Prec.high(keymap.of([{ key: 'Shift-Tab', run: (v) => (shiftTabAutoIndent ? indentSelection(v) : indentLess(v)) }])),
         keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
         lang.of([]),
         theme.of(themeExtension(o.dark)),
@@ -221,6 +228,9 @@ export function createCodeEditor(o: CodeEditorOptions): CodeEditor {
     },
     setIndentSize(n) {
       view.dispatch({ effects: indent.reconfigure(indentExt(n)) });
+    },
+    setShiftTabAutoIndent(on) {
+      shiftTabAutoIndent = on;
     },
     setDoc(doc) {
       setDocKeepSelection(view, doc);

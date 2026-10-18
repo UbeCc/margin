@@ -117,16 +117,21 @@ export class TauriPlatform implements Platform {
   }
 
   /**
-   * macOS: paginated PDF via WebKit's print pipeline (hidden window). Relative
-   * `src`s resolve against the output file's directory; asset URLs work as-is.
-   * Other platforms: falls back to the system print dialog (user picks "Save as PDF").
+   * Native PDF via the platform webview's print pipeline in a hidden window
+   * (macOS WKWebView, Windows WebView2 PrintToPdf, Linux WebKitPrintOperation).
+   * Relative `src`s resolve against the output file's directory. Falls back to
+   * the system print dialog (user picks "Save as PDF") when the platform has no
+   * native path or the runtime is too old for it (#14).
    */
   async exportPdf(html: string, outPath: string, opts?: PdfExportOptions): Promise<void> {
     try {
       const { baseDir, ...options } = opts ?? {};
       await call('export_pdf', { html, outPath, baseDir: baseDir ?? null, options });
     } catch (e) {
-      if (String((e as Error).message).startsWith('unsupported')) return printHtmlInIframe(withPrintPageCss(html, opts));
+      const msg = String((e as Error).message);
+      if (msg.startsWith('unsupported') || msg.includes('WebView2 runtime too old')) {
+        return printHtmlInIframe(withPrintPageCss(html, opts));
+      }
       throw e;
     }
   }
@@ -219,6 +224,11 @@ export class TauriPlatform implements Platform {
     return call('reveal_path', { path });
   }
 
+  /** Quick Look a file (`window.previewFile` → QLPreviewPanel, #131). */
+  quickLook(path: string): Promise<void> {
+    return call('quick_look_file', { path });
+  }
+
   /** #80: custom command (argv, no shell) or PicGo on 127.0.0.1; one URL per path. */
   uploadImages(paths: string[], config: UploadConfig): Promise<string[]> {
     return call('upload_images', { paths, config });
@@ -265,6 +275,11 @@ export class TauriPlatform implements Platform {
   writeClipboardRich(data: RichClipboardData): Promise<boolean> {
     return call<boolean>('clipboard_write_rich', { data });
   }
+  /** #136: image file → system clipboard as PNG+TIFF (macOS; other OSes resolve false). */
+  writeClipboardImage(path: string): Promise<boolean> {
+    return call<boolean>('clipboard_write_image', { path });
+  }
+
 
   /** #96: general pasteboard plain/HTML (+ HTML from RTF); empty off macOS. */
   async readClipboard(): Promise<ClipboardSnapshot | null> {
@@ -334,6 +349,11 @@ export class TauriPlatform implements Platform {
   /** #23: Finder drops, intercepted natively (src-tauri/src/drop_macos.rs) so paths are known. */
   onFileDrop(cb: (drop: FileDrop) => void): () => void {
     return subscribe<FileDrop>(EV.fileDrop, cb);
+  }
+
+  /** #129: begin a native drag of `paths` from the current mouse gesture (sidebar rows). */
+  startFileDrag(paths: string[]): void {
+    if (paths.length) void call('start_file_drag', { paths }).catch(() => {});
   }
 
   onCloseRequested(cb: () => Promise<boolean>): () => void {

@@ -11,6 +11,8 @@ export interface PaletteItem {
   /** Right-aligned hint, e.g. a shortcut. */
   hint?: string;
   kind?: string;
+  /** #127: shown greyed out; Enter/click is a no-op (menu enable state). */
+  disabled?: boolean;
 }
 
 export interface PaletteOptions {
@@ -75,11 +77,12 @@ export function openPalette(opts: PaletteOptions): void {
       }
       const li = h(
         'li.palette-item',
-        { role: 'option', 'aria-selected': String(i === selected), 'data-id': it.id, 'data-kind': it.kind ?? null },
+        { role: 'option', 'aria-selected': String(i === selected), 'aria-disabled': String(!!it.disabled), 'data-id': it.id, 'data-kind': it.kind ?? null },
         h('span.palette-text', null, label, detail),
         it.hint ? h('kbd.palette-hint', { text: it.hint }) : null,
       );
       if (i === selected) li.classList.add('selected');
+      if (it.disabled) li.classList.add('disabled');
       li.addEventListener('mousemove', () => {
         if (selected !== i) {
           selected = i;
@@ -114,7 +117,7 @@ export function openPalette(opts: PaletteOptions): void {
   };
   const choose = (i: number, alt: boolean): void => {
     const it = items[i];
-    if (!it) return;
+    if (!it || it.disabled) return;
     close();
     prevFocus?.focus?.();
     opts.pick(it, { alt });

@@ -26,6 +26,9 @@ export interface ImageFeatureHost {
   openImagePreferences(): void;
   /** The shell's EditorSettings.resolveAsset (to match rendered HTML-block images). */
   resolveAsset(src: string): string;
+  /** #136: called when the active document's root url changed — the shell bumps the
+   *  editors' `assetKey` so image-bearing widgets (html blocks) re-render. */
+  assetsChanged(): void;
 }
 
 /**
@@ -86,12 +89,15 @@ export class ImageFeature {
     const changed = root !== this.rootDir;
     this.rootKey = key;
     this.rootDir = root;
-    if (changed) this.refreshImages();
+    if (changed) {
+      this.refreshImages();
+      this.host.assetsChanged();
+    }
   }
 
   /**
    * Re-resolve rendered inline images in place (root url changed). Done on the DOM so
-   * the caret / selection survive; widgets re-resolve on their next render.
+   * the caret / selection survive; image-bearing widgets re-render via `assetsChanged`.
    */
   refreshImages(): void {
     const root = this.host.editorRoot();
@@ -218,8 +224,10 @@ export class ImageFeature {
         if (!abs || !p.revealInFolder) return false;
         await p.revealInFolder(abs);
         return true;
-      case 'copyContent':
-        return copyImageContent(img);
+      case 'copyContent': {
+        const write = p.writeClipboardImage;
+        return copyImageContent(img, abs, write ? (path) => write.call(p, path) : undefined);
+      }
       case 'syntaxMarkdown':
         return t.switchSyntax(ref, 'markdown');
       case 'syntaxHtml':

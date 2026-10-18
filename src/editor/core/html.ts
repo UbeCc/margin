@@ -56,6 +56,11 @@ export function inlineHTML(nodes: INode[], ctx: InlineCtx): string {
         s += `<img src="${esc(ctx.resolveAsset(n.src))}" alt="${esc(n.alt)}"${n.title ? ` title="${esc(n.title)}"` : ''}>`;
         break;
       case 'math': {
+        if (ctx.mathSource) {
+          // #127 "Use LaTeX Source": the source text (with $ delimiters) instead of the render.
+          s += `<span class="md-math">$${esc(n.tex)}$</span>`;
+          break;
+        }
         if (ctx.inlineMath && typeof document !== 'undefined') {
           const e = document.createElement('span');
           try {

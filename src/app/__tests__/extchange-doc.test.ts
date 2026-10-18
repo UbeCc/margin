@@ -20,6 +20,7 @@ function fakeEditor(): EditorHandle & { type(s: string): void; set(s: string): v
     getStats: () => countStats(md),
     setSourceMode: () => undefined,
     isSourceMode: () => false,
+    caretBlockType: () => null,
     updateSettings: () => undefined,
     renderHTML: () => '',
     focus: () => undefined,

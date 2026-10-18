@@ -151,6 +151,7 @@ export const COMMANDS: CommandSpec[] = [
     ['code:indentSelected', 'Code Tools: Auto Indent Selected Code'],
     ['math:copyTex', 'Math Tools: Copy as Tex'],
     ['math:copyMathML', 'Math Tools: Copy as MathML'],
+    ['math:copyImage', 'Math Tools: Copy as Image'],
     ['math:delete', 'Math Tools: Delete Math'],
     ['math:refresh', 'Math Tools: Refresh All Math Expressions'],
   ] as const).map(([id, label]): CommandSpec => ({ id, label, category: 'Paragraph', scope: 'editor' })),
@@ -193,6 +194,7 @@ export const COMMANDS: CommandSpec[] = [
   { id: 'toggleLineEnding', label: 'Toggle Line Endings (LF / CRLF)', category: 'View' },
   { id: 'toggleFinalNewline', label: 'Insert Final New Line On Save', category: 'Edit' },
   { id: 'openThemesFolder', label: 'Open Themes Folder', category: 'Theme' },
+  { id: 'takePicture', label: 'Take Picture', category: 'Format', scope: 'editor' },
   { id: 'uploadAllImages', label: 'Upload All Local Images', category: 'Format' },
   // #99 Format › Image (per-image entries act on the image at the caret)
   ...(

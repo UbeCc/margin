@@ -132,7 +132,7 @@ describe('context menu items', () => {
     expect(a.run).toHaveBeenCalledWith('delete:block');
     const tools = items.find((i) => 'submenu' in i && i.label === 'Code Tools') as { submenu: { label: string; run(): void }[] };
     tools.submenu[0].run();
-    expect(a.exec).toHaveBeenCalledWith({ kind: 'copyBlock', part: 'content' });
+    expect(a.exec).toHaveBeenCalledWith({ kind: 'code', op: 'copy' });
   });
 
   it('input menu has only Cut / Copy / Paste', () => {

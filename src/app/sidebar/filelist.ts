@@ -2,6 +2,7 @@ import type { DirEntry, Platform } from '../../contracts';
 import { h, clearChildren } from '../util/dom';
 import { basename, dirname, extname, relative, stripExt } from '../util/path';
 import { showContextMenu } from '../ui/contextmenu';
+import { extras } from '../platform-extras';
 import { fileMenu, type SideFileOps } from './file-menus';
 import { compareBy, DEFAULT_SORT, type SortOrder } from './sort';
 import { collectDocs, dateLabel, LIST_LIMIT, summarize } from './walk';
@@ -133,7 +134,7 @@ export class FileList {
       h('div.list-summary', { text: this.summaries.get(d.path) ?? '' }),
     );
     if (d.path === this.active) row.classList.add('active');
-    makeDraggable(row, d.path);
+    makeDraggable(row, d.path, this.host.platform);
     row.addEventListener('click', () => {
       row.focus({ preventScroll: true });
       this.host.openFile(d.path);
@@ -153,6 +154,7 @@ export class FileList {
     if (e.key === 'ArrowDown') rows[Math.min(rows.length - 1, i + 1)].focus();
     else if (e.key === 'ArrowUp') rows[Math.max(0, i - 1)].focus();
     else if (e.key === 'Enter' && i >= 0) rows[i].click();
+    else if (e.key === ' ' && i >= 0) void extras(this.host.platform).quickLook?.(rows[i].dataset.path ?? '');
     else return;
     e.preventDefault();
   }

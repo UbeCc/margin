@@ -37,10 +37,14 @@ export interface EditorSettings {
   storeImage?(input: { bytes?: Uint8Array; mime?: string; path?: string; name?: string }): Promise<string | null>;
   /** Open an external link. */
   openLink?(href: string): void;
+  /** Changes whenever the shell's asset resolution changes (typora-root-url); image-bearing widgets re-render. */
+  assetKey?: string;
   /** Optional (#79): add native rich flavours (RTF) after a copy; see `RichClipboardData`. */
   writeClipboardRich?(data: RichClipboardData): Promise<boolean>;
   /** Optional (#96): read the system clipboard outside a paste event (native menu Paste as Plain Text). */
   readClipboard?(): Promise<ClipboardSnapshot | null>;
+  /** Optional (#127): rasterize TeX and write it to the clipboard as a PNG (Copy Math ▸ Copy as Image). */
+  copyMathImage?(tex: string, display: boolean): Promise<boolean>;
   spellcheck: boolean;
   /** Visual modes. */
   focusMode: boolean;
@@ -80,6 +84,8 @@ export interface MarkdownOptions {
   codeLineWrap: boolean;
   /** Spaces per tab in code fences; 0 = Preserve tabs. */
   codeIndentSize: 0 | 2 | 3 | 4;
+  /** "Use Shift+Tab to auto indent selected code" (Typora `shiftTabAutoIndent`): on = Shift+Tab auto-indents, off = outdents. */
+  shiftTabAutoIndent: boolean;
   /** Smart Punctuation: 'input' converts while typing (saved curly), 'rendering' only displays (#133). */
   smartPunctuation: 'input' | 'rendering';
   smartQuote: boolean;
@@ -96,6 +102,8 @@ export interface MarkdownOptions {
   mathNumbering: 'all' | 'ams' | 'none';
   mathPhysics: boolean;
   mathLineBreaks: boolean;
+  /** Math: "When copy / export as HTML (without style)" (Typora `mathFormatOnCopy`): rendered HTML vs `$$…$$`/`$…$` source. */
+  mathCopyFormat: 'svg' | 'latex';
 }
 
 /**
@@ -121,6 +129,7 @@ export const DEFAULT_MARKDOWN_OPTIONS: Readonly<MarkdownOptions> = Object.freeze
   codeLineNumbers: false,
   codeLineWrap: true,
   codeIndentSize: 4,
+  shiftTabAutoIndent: false,
   smartPunctuation: 'input',
   smartQuote: false,
   smartDash: false,
@@ -131,6 +140,7 @@ export const DEFAULT_MARKDOWN_OPTIONS: Readonly<MarkdownOptions> = Object.freeze
   mathNumbering: 'ams',
   mathPhysics: false,
   mathLineBreaks: true,
+  mathCopyFormat: 'svg',
 });
 
 /** Inline formats toggled by Format menu commands (`underline`/`sub`/`sup` = `<u>`/`<sub>`/`<sup>`, `math` = `$…$`, `comment` = `<!-- … -->`). */
@@ -189,7 +199,7 @@ export type TableOp =
 /** Code Tools (#98): copy the fence body; re-indent the whole body / the selected lines. */
 export type CodeOp = 'copy' | 'indentAll' | 'indentSelected';
 /** Math Tools (#98): copy the math at the caret as TeX / MathML, delete it, re-render all math. */
-export type MathOp = 'copyTex' | 'copyMathML' | 'delete' | 'refresh';
+export type MathOp = 'copyTex' | 'copyMathML' | 'copyImage' | 'delete' | 'refresh';
 
 /**
  * Edit › Copy as (#96). markdown = source only; html = the rendered HTML *source*
@@ -222,6 +232,8 @@ export interface EditorHandle {
   getStats(): EditorStats;
   setSourceMode(on: boolean): void;
   isSourceMode(): boolean;
+  /** Widget block type holding the caret (else the last caret, else the focused block); null = text/no block (#127 menu states). */
+  caretBlockType(): WidgetBlockType | null;
   updateSettings(patch: Partial<EditorSettings>): void;
   /** Rendered HTML for export (no editing chrome, md-meta removed). */
   renderHTML(): string;
@@ -354,6 +366,8 @@ export type MenuAction =
   | `code:${CodeOp}`
   | `math:${MathOp}`
   // #99 (additive): Format › Image submenu
+  // #136 (additive): Format › Take Picture (camera dialog)
+  | 'takePicture'
   | `image:${ImageMenuAction}`;
 
 /** Format › Image entries (#99), in Typora's menu order; per-image ones act on the image at the caret. */
@@ -424,6 +438,13 @@ export interface Platform {
    * paths and the drop point in viewport CSS px. Platforms without native drop paths omit it.
    */
   onFileDrop?(cb: (drop: FileDrop) => void): () => void;
+  /**
+   * Optional (#129, Typora `controller.startDrag`): begin a native drag of the given
+   * absolute paths from the current mouse position (sidebar rows dragged out of the
+   * window, or onto the editor / a folder row). Platforms without a native source omit it
+   * and the sidebar keeps in-page HTML5 drags.
+   */
+  startFileDrag?(paths: string[]): void;
   /** Return false from cb to cancel closing (e.g. unsaved changes). */
   onCloseRequested(cb: () => Promise<boolean>): () => void;
   /**
@@ -431,6 +452,13 @@ export interface Platform {
    * `command` is tokenized into argv and run without a shell; PicGo is contacted on 127.0.0.1 only.
    */
   uploadImages?(paths: string[], config: UploadConfig): Promise<string[]>;
+  /** Optional (#137): cancel a running upload (native side terminates the child / aborts). */
+  cancelUpload?(): void;
+  /**
+   * Optional (#137/#136, macOS): write an image file (PNG + TIFF flavours, Typora's
+   * `clipboard.writeImage`) to the system clipboard. Absent → the web fallback is used.
+   */
+  writeClipboardImage?(path: string): Promise<boolean>;
   /** Optional (#79, macOS): add public.rtf to the pasteboard after WebKit wrote `marker`'s copy. */
   writeClipboardRich?(data: RichClipboardData): Promise<boolean>;
   /** Optional (#96, macOS): plain/HTML of the general pasteboard, plus HTML converted from RTF/RTFD. */
@@ -461,4 +489,5 @@ export interface RichClipboardData {
 /** #80 image uploader config passed to `Platform.uploadImages`. timeoutSecs is per image. */
 export type UploadConfig =
   | { kind: 'command'; command: string; timeoutSecs?: number }
-  | { kind: 'picgo'; port?: number; timeoutSecs?: number };
+  | { kind: 'picgo'; port?: number; timeoutSecs?: number }
+  | { kind: 'picgo-app'; port?: number; timeoutSecs?: number };
