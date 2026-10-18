@@ -52,19 +52,30 @@ pub fn walk(root: &Path) -> Vec<String> {
         })
         .build();
     for entry in walker.flatten() {
-        if !entry.file_type().is_some_and(|t| t.is_file()) {
+        let Ok(rel) = entry.path().strip_prefix(root) else { continue };
+        let rel = rel.to_string_lossy().replace('\\', "/");
+        let is_dir = entry.file_type().is_some_and(|t| t.is_dir());
+        // A `.textbundle` folder is one file (fe-sidebar §1); its children never list.
+        if is_dir {
+            if crate::textbundle::is_textbundle(entry.path())
+                && !crate::textbundle::inside_textbundle(entry.path())
+                && out.len() < MAX_INDEX
+                && !rel.split('/').any(|c| c.starts_with('.'))
+            {
+                out.push(rel);
+            }
+            continue;
+        }
+        if !entry.file_type().is_some_and(|t| t.is_file()) || crate::textbundle::inside_textbundle(entry.path()) {
             continue;
         }
         visited += 1;
         if visited > MAX_VISIT {
             break;
         }
-        if let Ok(rel) = entry.path().strip_prefix(root) {
-            let rel = rel.to_string_lossy().replace('\\', "/");
-            // Past the cap keep collecting notes: a big asset tree must not hide them.
-            if out.len() < MAX_INDEX || (is_markdown(&rel) && out.len() < 2 * MAX_INDEX) {
-                out.push(rel);
-            }
+        // Past the cap keep collecting notes: a big asset tree must not hide them.
+        if out.len() < MAX_INDEX || (is_markdown(&rel) && out.len() < 2 * MAX_INDEX) {
+            out.push(rel);
         }
     }
     out
@@ -212,7 +223,15 @@ impl QuickOpen {
     pub fn on_created(&self, path: &Path, is_dir: bool) {
         self.update_with_root(path, |root, files, rel| {
             if is_dir {
+                // A `.textbundle` folder is one file; other new dirs rebuild lazily.
+                if crate::textbundle::is_textbundle(path) && !is_excluded(root, rel) && !files.iter().any(|f| f == rel) {
+                    files.push(rel.to_string());
+                    return true;
+                }
                 return false; // unknown contents: rebuild lazily
+            }
+            if crate::textbundle::inside_textbundle(path) {
+                return true; // bundle internals never list
             }
             if !files.iter().any(|f| f == rel) && !is_excluded(root, rel) {
                 files.push(rel.to_string());

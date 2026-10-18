@@ -41,6 +41,7 @@ mod remote_images;
 pub mod recent;
 mod settings;
 mod watch;
+mod textbundle;
 mod window_style;
 mod upload;
 mod watch_state;

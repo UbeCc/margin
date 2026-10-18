@@ -1,5 +1,6 @@
 import type { ImageRule } from '../../contracts';
 import { isAbsolute, join, normalize, relative } from '../util/path';
+import { isTextBundlePath, TEXTBUNDLE_ASSETS } from '../textbundle';
 
 /**
  * Image insertion rules (#99), modelled on Typora's behaviour (typora-re images §3):
@@ -100,7 +101,7 @@ export function setFrontMatterValue(md: string, key: string, value: string | nul
 // ---------------------------------------------------------------- target folder
 
 export type ImageTarget =
-  | { kind: 'copy'; rule: ImageRule; source: 'yaml' | 'settings' }
+  | { kind: 'copy'; rule: ImageRule; source: 'textbundle' | 'yaml' | 'settings' }
   | { kind: 'upload'; source: 'yaml' | 'settings' }
   | { kind: 'keep' };
 
@@ -109,12 +110,16 @@ export interface TargetContext {
   globalRule: ImageRule;
   options: ImageOptions;
   sourceMode?: boolean;
+  /** Path of the current document: a `.textbundle` fixes the target folder (images §3.1). */
+  docPath?: string | null;
 }
 
 export type TargetResult = ImageTarget & { warning?: string };
 
-/** Typora's `getTargetImageStorageFolder` order: front matter → global preference. */
+/** Typora's `getTargetImageStorageFolder` order: TextBundle → front matter → global preference. */
 export function imageTarget(ctx: TargetContext): TargetResult {
+  if (isTextBundlePath(ctx.docPath))
+    return { kind: 'copy', rule: { kind: 'relative', dir: TEXTBUNDLE_ASSETS }, source: 'textbundle' };
   const yaml = ctx.sourceMode ? null : frontMatterValue(ctx.markdown, 'typora-copy-images-to');
   let warning: string | undefined;
   if (yaml) {
@@ -133,12 +138,15 @@ export function imageTarget(ctx: TargetContext): TargetResult {
 
 export const REMOTE_RE = /^\s*(?:https?|ftp):\/\//i;
 
-/** Typora's `shouldTriggerMove` scope checks (folder equality is checked natively). */
-export function shouldApplyRule(src: string | undefined, o: ImageOptions): boolean {
+/**
+ * Typora's `shouldTriggerMove` scope checks (folder equality is checked natively).
+ * A TextBundle document copies even remote images (images §3.2).
+ */
+export function shouldApplyRule(src: string | undefined, o: ImageOptions, textBundle = false): boolean {
   if (!src) return true; // pasted image data is always stored
   if (/^\s*data:/i.test(src)) return false;
-  if (REMOTE_RE.test(src)) return o.imageApplyOnline;
-  return o.imageApplyLocal;
+  if (REMOTE_RE.test(src)) return textBundle || o.imageApplyOnline;
+  return textBundle || o.imageApplyLocal;
 }
 
 // ---------------------------------------------------------------- src formatting

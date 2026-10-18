@@ -277,17 +277,51 @@ export class WebPlatform implements Platform {
     const p = normalizePath(path);
     const n = this.nodes.get(p);
     if (!n) throw new Error(`ENOENT: ${path}`);
-    if (n.kind === 'dir') throw new Error(`EISDIR: ${path}`);
+    if (n.kind === 'dir') {
+      // A `.textbundle` folder is one document (#157): content in markdown.md (v2) / text.md (v1).
+      if (!p.toLowerCase().endsWith('.textbundle')) throw new Error(`EISDIR: ${path}`);
+      const content = this.bundleContentPath(p);
+      if (!content) throw new Error(`ENOENT: ${path}/markdown.md`);
+      return this.readTextFile(content);
+    }
     return n.binary ? '' : n.content;
+  }
+
+  private bundleContentPath(bundle: string): string | null {
+    for (const name of ['markdown.md', 'text.md']) {
+      const p = `${bundle}/${name}`;
+      if (this.nodes.get(p)?.kind === 'file') return p;
+    }
+    return null;
   }
 
   /** Our own writes don't produce `modified` events (same as desktop); new files do produce `created`. */
   async writeTextFile(path: string, content: string): Promise<void> {
     const p = normalizePath(path);
+    if (p.toLowerCase().endsWith('.textbundle') && this.nodes.get(p)?.kind !== 'file') {
+      await this.writeBundle(p, content);
+      return;
+    }
     const created = this.putFile(p, content, false);
     this.persist();
     this.emit(created.map((c) => ({ kind: 'created', path: c })));
     await this.writeThrough(p, content);
+  }
+
+  /** Write a TextBundle document: create `text.json` + `assets/` once, save the content file. */
+  private async writeBundle(bundle: string, content: string): Promise<void> {
+    const created = this.ensureDir(bundle);
+    created.push(...this.ensureDir(`${bundle}/assets`));
+    if (!this.nodes.has(`${bundle}/text.json`)) {
+      this.nodes.set(`${bundle}/text.json`, { kind: 'file', content: '{"version":2,"type":"net.daringfireball.markdown"}', mtime: Date.now(), ctime: Date.now() });
+      created.push(`${bundle}/text.json`);
+    }
+    const contentPath = this.bundleContentPath(bundle) ?? `${bundle}/markdown.md`;
+    if (!this.nodes.has(contentPath)) created.push(contentPath);
+    const now = Date.now();
+    this.nodes.set(contentPath, { kind: 'file', content, mtime: now, ctime: now });
+    this.persist();
+    this.emit(created.map((c) => ({ kind: 'created', path: c })));
   }
 
   async stat(path: string): Promise<DirEntry | null> {
@@ -327,10 +361,12 @@ export class WebPlatform implements Platform {
     const prefix = r === '/' ? '/' : r + '/';
     const rels: string[] = [];
     for (const [p, n] of this.nodes) {
-      if (n.kind !== 'file' || !p.startsWith(prefix)) continue;
+      if (!p.startsWith(prefix)) continue;
       const rel = p.slice(prefix.length);
       if (rel.split('/').some((s) => s.startsWith('.') || s === 'node_modules')) continue;
-      rels.push(rel);
+      const inBundle = rel.split('/').slice(0, -1).some((s) => s.toLowerCase().endsWith('.textbundle'));
+      if (inBundle) continue; // a TextBundle is one file; its children stay inside
+      if (n.kind === 'file' || rel.toLowerCase().endsWith('.textbundle')) rels.push(rel);
     }
     return rankPaths(rels, query, limit).map((rel) => prefix + rel);
   }
@@ -343,21 +379,23 @@ export class WebPlatform implements Platform {
     input: { bytes?: Uint8Array; mime?: string; path?: string; name?: string },
   ): Promise<string> {
     if (input.path && /^(https?:|data:|blob:)/.test(input.path)) return input.path;
+    // A TextBundle document stores into and references from the bundle root (#157).
+    const base = docPath ? (docPath.toLowerCase().endsWith('.textbundle') ? normalizePath(docPath) : dirname(docPath)) : null;
     const srcNode = input.path ? this.nodes.get(normalizePath(input.path)) : undefined;
     let dataUrl: string | null = null;
     if (input.bytes) dataUrl = await bytesToDataUrl(input.bytes, input.mime ?? `image/${extForImage(input.mime, input.name)}`);
     else if (srcNode?.kind === 'file') dataUrl = srcNode.binary ? srcNode.content : `data:text/plain,${encodeURIComponent(srcNode.content)}`;
-    else if (input.path) return toMarkdownSrc(docPath ? relativePath(dirname(docPath), normalizePath(input.path)) : input.path);
+    else if (input.path) return toMarkdownSrc(base ? relativePath(base, normalizePath(input.path)) : input.path);
     if (!dataUrl) throw new Error('storeImage: need bytes or path');
 
     // `none` rule or unsaved document → inline data URL (nowhere sensible to write).
     if (rule.kind === 'none' || (rule.kind === 'relative' && !docPath)) {
-      if (input.path && srcNode) return toMarkdownSrc(docPath ? relativePath(dirname(docPath), normalizePath(input.path)) : input.path);
+      if (input.path && srcNode) return toMarkdownSrc(base ? relativePath(base, normalizePath(input.path)) : input.path);
       return dataUrl;
     }
     const expanded = expandImageDir(rule.dir, docPath);
     const targetDir =
-      expanded.startsWith('/') ? normalizePath(expanded) : docPath ? joinPath(dirname(docPath), expanded) : joinPath(WEB_ROOT, expanded);
+      expanded.startsWith('/') ? normalizePath(expanded) : base ? joinPath(base, expanded) : joinPath(WEB_ROOT, expanded);
     let dest: string;
     if (input.path && srcNode) {
       const name = basename(input.path);
@@ -374,7 +412,7 @@ export class WebPlatform implements Platform {
     this.persist();
     this.emit(created.map((c) => ({ kind: 'created', path: c })));
     if (input.bytes) await this.writeThroughBytes(dest, input.bytes);
-    const rel = rule.kind === 'absolute' || !docPath ? dest : relativePath(dirname(docPath), dest);
+    const rel = rule.kind === 'absolute' || !base ? dest : relativePath(base, dest);
     return toMarkdownSrc(rel);
   }
 

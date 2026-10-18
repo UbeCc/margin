@@ -136,6 +136,52 @@ describe('WebPlatform storeImage', () => {
   });
 });
 
+describe('WebPlatform textbundle (#157)', () => {
+  const png = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 1, 2, 3]);
+
+  it('reads markdown.md, falls back to text.md, refuses other folders', async () => {
+    const p = fresh({ seed: false });
+    await p.writeTextFile('/n/a.textbundle/markdown.md', '# v2\n');
+    await p.writeTextFile('/n/b.textbundle/text.md', '# v1\n');
+    expect(await p.readTextFile('/n/a.textbundle')).toBe('# v2\n');
+    expect(await p.readTextFile('/n/b.textbundle')).toBe('# v1\n');
+    await p.writeTextFile('/n/b.textbundle/markdown.md', '# both\n'); // v2 wins once present
+    expect(await p.readTextFile('/n/b.textbundle')).toBe('# both\n');
+    await expect(p.readTextFile('/n')).rejects.toThrow(/EISDIR/);
+  });
+
+  it('writing a bundle creates text.json + assets/ and keeps saving the content file', async () => {
+    const p = fresh({ seed: false });
+    await p.writeTextFile('/n/journal.textbundle', '# one\n');
+    expect(JSON.parse(await p.readTextFile('/n/journal.textbundle/text.json'))).toMatchObject({ version: 2 });
+    expect((await p.stat('/n/journal.textbundle/assets'))?.isDir).toBe(true);
+    expect(await p.readTextFile('/n/journal.textbundle/markdown.md')).toBe('# one\n');
+    await p.writeTextFile('/n/journal.textbundle', '# two\n');
+    expect(await p.readTextFile('/n/journal.textbundle/markdown.md')).toBe('# two\n');
+    expect(await p.readTextFile('/n/journal.textbundle/text.json')).toMatch(/"version":2/); // untouched
+  });
+
+  it('stores images into <bundle>/assets and references them from the bundle root', async () => {
+    const p = fresh({ seed: false });
+    await p.writeTextFile('/n/journal.textbundle', '');
+    const src = await p.storeImage('/n/journal.textbundle', { kind: 'relative', dir: 'assets' }, { bytes: png, mime: 'image/png' });
+    expect(src).toMatch(/^assets\/image-\d{17}(?:-\d+)?\.png$/);
+    const abs = `/n/journal.textbundle/${src}`;
+    expect((await p.stat(abs))?.isDir).toBe(false);
+    expect(p.assetUrl(abs)).toMatch(/^data:image\/png;base64,/);
+    // Target priority (bundle assets/ over YAML / global rules) lives in rules.ts `imageTarget`.
+  });
+
+  it('quickOpen lists a bundle as one file and hides its children', async () => {
+    const p = fresh({ seed: false });
+    await p.writeTextFile('/n/journal.textbundle', '# j\n');
+    await p.writeTextFile('/n/plain.md', '# p\n');
+    const r = await p.quickOpen('/n', 'j');
+    expect(r).toContain('/n/journal.textbundle');
+    expect(r.some((x) => x.includes('markdown.md') || x.includes('text.json'))).toBe(false);
+  });
+});
+
 describe('WebPlatform settings & themes', () => {
   it('returns defaults, round-trips and normalizes', async () => {
     const p = new WebPlatform({ useFileSystemAccess: false });

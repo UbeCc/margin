@@ -5,6 +5,7 @@
  */
 import type { DirEntry, Platform } from '../../contracts';
 import { extras } from '../platform-extras';
+import { isTextBundlePath } from '../textbundle';
 import { h } from '../util/dom';
 import { basename, dirname } from '../util/path';
 import type { MenuItem } from '../ui/contextmenu';
@@ -70,13 +71,15 @@ function undoItems(ops: SideFileOps, dir: string): MenuItem[] {
  */
 export function fileMenu(o: { ops: SideFileOps; entry: DirEntry | null; view: 'tree' | 'list'; active: 'tree' | 'list' | 'search'; rootDir: string }): MenuItem[] {
   const { ops, entry, view } = o;
-  const dir = entry ? (entry.isDir ? entry.path : dirname(entry.path)) : o.rootDir;
+  // A `.textbundle` folder is one document (fe-sidebar §1): file menu semantics.
+  const isDir = !!entry?.isDir && !isTextBundlePath(entry.path);
+  const dir = entry ? (isDir ? entry.path : dirname(entry.path)) : o.rootDir;
   const items: MenuItem[] = [];
   if (entry) {
-    if (!entry.isDir) items.push({ label: 'Open', run: () => ops.open(entry) });
+    if (!isDir) items.push({ label: 'Open', run: () => ops.open(entry) });
     if (ops.openInNewWindow) items.push({ label: 'Open in New Window', run: () => ops.openInNewWindow!(entry.path) });
     // Quick Look after Open (#131): tree + Articles, files only.
-    if (entry && !entry.isDir) {
+    if (!isDir) {
       const ql = extras(ops.platform).quickLook;
       items.push({ label: 'Quick Look', run: () => void ql?.call(ops.platform, entry.path), disabled: !ql });
     }
@@ -95,7 +98,7 @@ export function fileMenu(o: { ops: SideFileOps; entry: DirEntry | null; view: 't
   // Tree: file | folder | root share the head; the file adds Duplicate before Rename….
   items.push(sep, ...newItems(ops, dir), sep, { label: 'Search', run: () => ops.search() }, sep, ...viewItems(ops, o.active === 'list' ? 'list' : 'tree', true), sep);
   if (entry) {
-    if (!entry.isDir && ops.duplicate) items.push({ label: 'Duplicate', run: () => ops.duplicate!(entry) });
+    if (!isDir && ops.duplicate) items.push({ label: 'Duplicate', run: () => ops.duplicate!(entry) });
     if (ops.rename) items.push({ label: 'Rename…', run: () => ops.rename!(entry) });
     items.push(sep, { label: 'Get Info…', run: () => ops.getInfo(entry) }, { label: 'Delete…', danger: true, run: () => ops.remove(entry) }, sep);
   }

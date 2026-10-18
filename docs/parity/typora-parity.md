@@ -8,15 +8,15 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 
 | | surfaces |
 |---|---|
-| total | 173 |
-| owned (implemented) | 163 (with a named passing test: 150) |
+| total | 174 |
+| owned (implemented) | 164 (with a named passing test: 151) |
 | partial | 2 |
 | missing | 0 |
 | out of scope | 8 |
 
-REA ledger `rol_e09e3c15b1411c2391bce30882a1c5d03cd7165c6a19ba0f6450fa0d273509cf` (closure `ba7eefa04824816d…`): status **unknown**; implemented 165, out-of-scope 8, unknown 5.
+REA ledger `rol_1cc39528e3a14003cb6e9358f71d5a6ac32e0af1de6064efed74c518cccac397` (closure `54efde8504d54ece…`): status **unknown**; implemented 166, out-of-scope 8, unknown 5.
 
-REA coverage boundary `margin.typora-parity`: status **unknown**; 150/165 claims qualified by controlled-replay verifier Evidence. Reasons: package-proof-missing 1, verifier-missing 13, verifier-unknown 2.
+REA coverage boundary `margin.typora-parity`: status **unknown**; 151/166 claims qualified by controlled-replay verifier Evidence. Reasons: package-proof-missing 1, verifier-missing 13, verifier-unknown 2.
 
 Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): build exit 0, cargo-test exit 0, independence exit 0, playwright exit 0, vitest exit 0. See `rea/summary.json`.
 
@@ -225,7 +225,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `images.paste-drop` | Paste/drop images: copy into target folder by rule, unique names | owned |  | `src/app/images/insert.ts` `export async function insertImage(` | `src/platform/web.test.ts` › copies (never moves) an existing image and dedupes names | 12 |
 | `images.rules-scope` | Image rule options: apply to local/online images, relative path, ./ prefix, escape URL, YAML override — front matter typora-copy-images-to (${filename}; upload/ipic gated by Allow upload…) overrides Preferences; scope toggles, relative / ./, escape, Preferred Image Syntax | owned |  | `src/app/images/rules.ts` `export function imageTarget` | `tests/e2e/parity-images.spec.ts` › images.rules-scope: Image rule options: apply to local/online images, relative path, ./ prefix, escape URL, YAML override | 12 |
 | `images.root-path` | Image root path (typora-root-url) — Use Image Root Path toggles typora-root-url (written relative to the document); srcs written site-root style and rendered from the root | owned |  | `src/app/images/rules.ts` `export function rootDirOf` | `tests/e2e/parity-images.spec.ts` › images.root-path: Image root path (typora-root-url) | 2 |
-| `images.remote-download` | Download remote images into the target folder — downloaded natively (curl, with timeout) only when Apply above rules to online images is on (Typora default off) | owned |  | `src/app/images/insert.ts` `shouldApplyRule(input.path, opts)` | `tests/e2e/parity-images.spec.ts` › images.remote-download: Download remote images into the target folder | 0 |
+| `images.remote-download` | Download remote images into the target folder — downloaded natively (curl, with timeout) only when Apply above rules to online images is on (Typora default off) | owned |  | `src/app/images/insert.ts` `shouldApplyRule(input.path, opts, isTextBundlePath(docPath))` | `tests/e2e/parity-images.spec.ts` › images.remote-download: Download remote images into the target folder | 0 |
 | `images.copy-move-all` | Image Tools: Copy / Move All Images to… (and per-image copy/move/rename) — duplicate names get Typora stem-<last 7 digits of unix seconds>.ext; Margin deviation: identical bytes reuse the existing copy and explicit names never clobber | owned |  | `src/app/images/tools.ts` `async copyAll(move: boolean` | `tests/e2e/parity-images.spec.ts` › images.copy-move-all: Image Tools: Copy / Move All Images to… (and per-image copy/move/rename) | 15 |
 | `images.delete` | Image context: Delete Image / Delete Image File (undoable) — Delete Image File moves the file to the Trash after confirmation; removing the reference is one undo step | owned |  | `src/app/images/tools.ts` `async deleteImageFile(` | `tests/e2e/parity-images.spec.ts` › images.delete: Image context: Delete Image / Delete Image File (undoable) | 9 |
 | `images.reveal-open` | Image context: Open Image Location / Open in Browser / Copy Image Content — Open Image in Browser only for remote images (desktop openExternal allows http(s) only) | owned |  | `src/app/ctxmenu/items.ts` `Open Image Location` | `tests/e2e/parity-images.spec.ts` › images.reveal-open: Image context: Open Image Location… / Open in Browser… / Copy Image Content | 5 |
@@ -233,6 +233,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `images.reload` | Image Tools: Reload All Images | owned |  | `src/app/images/tools.ts` `reloadAll(root: HTMLElement)` | `tests/e2e/parity-images.spec.ts` › images.reload: Image Tools: Reload All Images | 1 |
 | `images.upload` | Image upload: custom command (argv) / PicGo; upload one / all local images; test uploader — DELIBERATE DEVIATION (security): the command is tokenized to argv and run without a shell (Typora runs bash -c with only backslash and double quote escaped, so $() or backticks in file names execute); success also needs exit status 0. Same as Typora: 20 s per image, 60 s batch cap (child killed), URL lines http(s)/ftp/file/host.tld scanned from the tail, last URL for one image, exactly n for a batch, Test Uploader needs exactly 2 URLs; upload-on-insert keeps the local image on failure; Cancel kills the run | owned |  | `src-tauri/src/upload.rs` `pub fn test_upload(` | `tests/e2e/parity-images.spec.ts` › images.upload: Image upload: custom command (argv) / PicGo; upload one / all local images; test uploader | 32 |
 | `images.ipic` | iPic uploader (third-party macOS app, private pasteboard protocol) — Proprietary third-party integration with an undocumented pasteboard protocol; command/PicGo uploaders cover the use case. | out-of-scope |  | — | none | 4 |
+| `images.textbundle` | TextBundle: opens as one document, images go to <bundle>/assets, rename guard — #157: .textbundle (spec v2, text.md v1 fallback) is a folder document — sidebar/quick-open list it as one file; relative image rules resolve from the bundle root so assets/ wins over typora-copy-images-to and the global default (§3.1); Markdown ↔ TextBundle renames are refused unless the file is empty (fe-sidebar §5 wording) | owned |  | `src/app/textbundle.ts` `export const RENAME_MD_TO_BUNDLE` | `tests/e2e/parity-images-r4.spec.ts` › images.textbundle: TextBundle opens as one document, images go to <bundle>/assets, rename guard | 0 |
 
 ## Preferences
 

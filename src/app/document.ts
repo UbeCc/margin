@@ -2,7 +2,8 @@ import type { EditorHandle, FsEvent, ImageRule, Platform } from '../contracts';
 import { localImageSrcs } from './relocate';
 import { decodeBytes, detectEncoding, encodingLabel } from './encoding';
 import { extras } from './platform-extras';
-import { basename, dirname, join } from './util/path';
+import { docBaseDir, isTextBundlePath } from './textbundle';
+import { basename, join } from './util/path';
 import { debounce } from './util/dom';
 
 export type Eol = '\n' | '\r\n';
@@ -134,10 +135,11 @@ export class DocumentController {
   get name(): string {
     return this.path ? basename(this.path) : 'Untitled';
   }
-
   get dir(): string | null {
-    return this.path ? dirname(this.path) : null;
+    // A TextBundle is its own containing folder: `assets/…` resolves inside it.
+    return this.path ? docBaseDir(this.path) : null;
   }
+
 
   /** LF-normalized content as last loaded/saved (the clean baseline). */
   get savedText(): string {
@@ -302,7 +304,7 @@ export class DocumentController {
         this.host.notify(`Couldn't create ${basename(path)}: ${errMsg(e)}`, 'error');
         return false;
       }
-    } else if (st.isDir) {
+    } else if (st.isDir && !isTextBundlePath(path)) {
       this.host.notify(`Open Failed: ${basename(path)} is a folder.`, 'error');
       return false;
     }
