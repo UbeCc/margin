@@ -548,3 +548,16 @@ button { cursor: default; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+.context-check { display: inline-block; width: 1.2em; }
+
+/* #103 window chrome & writing aids */
+.app.statusbar-hidden { grid-template-rows: var(--titlebar-h) 1fr 0; }
+.app.statusbar-hidden .statusbar { display: none; }
+.word-count-floating { position: fixed; right: 12px; bottom: 8px; z-index: 20; background: var(--margin-bg); border: 1px solid var(--margin-border); border-radius: 6px; padding: 2px 8px; color: var(--margin-fg-muted); font-size: 12px; }
+.word-count-floating[hidden] { display: none; }
+.emoji-popup { position: fixed; z-index: 60; min-width: 180px; max-height: 240px; overflow: auto; background: var(--margin-bg); border: 1px solid var(--margin-border); border-radius: 8px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16); padding: 4px; font-size: 13px; }
+.emoji-popup[hidden] { display: none; }
+.emoji-item { display: flex; gap: 8px; align-items: center; padding: 3px 8px; border-radius: 5px; cursor: default; }
+.emoji-item[aria-selected='true'] { background: var(--margin-active); }
+.emoji-char { width: 1.4em; text-align: center; }
+.emoji-name { color: var(--margin-fg-muted); font-family: var(--margin-font-mono); font-size: 12px; }

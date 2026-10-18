@@ -214,7 +214,10 @@ export type MenuAction =
   | 'pastePlain'
   | `select:${'word' | 'line' | 'block' | 'styled'}`
   | `delete:${'word' | 'line' | 'block' | 'styled' | 'range'}`
-  | `jump:${'top' | 'bottom' | 'selection'}`;
+  | `jump:${'top' | 'bottom' | 'selection'}`
+  // #103 (additive): window chrome & writing aids
+  | 'toggleStatusBar' | 'alwaysOnTop' | 'toggleDevtools' | 'toggleMagnification'
+  | 'spell:toggle' | 'subst:quotes' | 'subst:dashes' | 'speech:start' | 'speech:stop';
 
 export interface Platform {
   readonly kind: 'tauri' | 'web';

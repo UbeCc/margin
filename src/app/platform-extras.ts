@@ -17,6 +17,14 @@ export interface PlatformExtras {
   pandocExport?(markdown: string, outPath: string, opts: PandocExportOptions): Promise<string>;
   /** Locate pandoc (configured path → PATH → common dirs) and check version ≥ 2. */
   pandocDetect?(pandocPath: string | null): Promise<{ path: string; version: string }>;
+  /** Float this window above others (#103; per window, not persisted). Resolves the new state. */
+  setAlwaysOnTop?(on: boolean): Promise<boolean>;
+  /** Tick / untick a native check menu item (#103 menu state sync). */
+  setMenuChecked?(id: string, checked: boolean): Promise<void>;
+  /** Open / close the web inspector (debug builds only). */
+  toggleDevtools?(): Promise<void>;
+  /** Trackpad pinch zoom of the web view (View › Allow Magnification). */
+  setMagnification?(allow: boolean): Promise<void>;
 }
 
 export interface PandocExportOptions {

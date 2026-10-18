@@ -11,7 +11,8 @@ export type AppCommand =
   | 'reloadFromDisk'
   | 'openThemesFolder'
   | 'toggleLineEnding'
-  | 'uploadAllImages';
+  | 'uploadAllImages'
+  | 'wordCount';
 
 export type CommandId = MenuAction | AppCommand;
 
@@ -129,6 +130,16 @@ export const COMMANDS: CommandSpec[] = [
   { id: 'zoomOut', label: 'Zoom Out', category: 'View', keys: ['Mod+-', 'Mod+Shift+-'] },
   { id: 'clearRecent', label: 'Clear Recent Files', category: 'File' },
   { id: 'zoomReset', label: 'Actual Size', category: 'View', keys: ['Mod+Shift+0'] },
+  { id: 'toggleStatusBar', label: 'Show Status Bar', category: 'View' },
+  { id: 'alwaysOnTop', label: 'Always on Top', category: 'View' },
+  { id: 'toggleMagnification', label: 'Allow Magnification', category: 'View' },
+  { id: 'toggleDevtools', label: 'Toggle DevTools', category: 'View' },
+  { id: 'spell:toggle', label: 'Check Spelling While Typing', category: 'Edit' },
+  { id: 'subst:quotes', label: 'Smart Quotes', category: 'Edit' },
+  { id: 'subst:dashes', label: 'Smart Dashes', category: 'Edit' },
+  { id: 'speech:start', label: 'Start Speaking', category: 'Edit' },
+  { id: 'speech:stop', label: 'Stop Speaking', category: 'Edit' },
+  { id: 'wordCount', label: 'Word Count', category: 'View' },
   { id: 'toggleLineEnding', label: 'Toggle Line Endings (LF / CRLF)', category: 'View' },
   { id: 'openThemesFolder', label: 'Open Themes Folder', category: 'Theme' },
   { id: 'uploadAllImages', label: 'Upload All Local Images', category: 'Format' },

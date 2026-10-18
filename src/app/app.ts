@@ -11,6 +11,8 @@ import { DEFAULT_SETTINGS, migrateSettings, pushRecent, type MarginSettings } fr
 import { FileTree } from './sidebar/filetree';
 import { OutlineView } from './sidebar/outline';
 import { StatusBar } from './statusbar';
+import { countMarkdown, countWords } from './wordcount';
+import { EmojiComplete, installSmartPunctuation, startSpeaking, stopSpeaking } from './writing-aids';
 import { ThemeManager } from './themes';
 import { themeLabel } from '../themes';
 import { ask } from './ui/modal';
@@ -63,7 +65,11 @@ export class App {
   private saveSettingsSoon = debounce(() => void this.persistSettings(), 400);
   private refreshOutlineSoon = debounce(() => this.refreshOutline(), 250);
   private refreshFindSoon = debounce(() => this.findbar.refresh(), 150);
-  private refreshStatsSoon = debounce(() => this.status.setStats(this.editor.getStats()), 200);
+  private refreshStatsSoon = debounce(() => this.refreshStats(), 200);
+  private refreshSelectionSoon = debounce(() => this.refreshSelectionStats(), 50);
+  /** View › Always on Top: per window, never persisted (native-commands §5.1). */
+  private alwaysOnTop = false;
+  private magnification = true;
   private colorScheme: 'light' | 'dark' = 'light';
 
   constructor(private wiring: Wiring, mount: HTMLElement) {
@@ -124,6 +130,7 @@ export class App {
     this.editor.onSelectionChange(() => {
       cancelAnimationFrame(selRaf);
       selRaf = requestAnimationFrame(() => this.outline.setActive(this.editor.getActiveHeadingId()));
+      this.refreshSelectionSoon();
     });
 
     this.installKeys();
@@ -144,7 +151,7 @@ export class App {
     if (opts.initialFile && (await this.platform.stat(opts.initialFile))) await this.doc.open(opts.initialFile);
     else this.onDocState(this.doc.state());
     this.refreshOutline();
-    this.status.setStats(this.editor.getStats());
+    this.refreshStats();
     this.status.setSource(this.editor.isSourceMode());
     this.root.classList.add('ready');
   }
@@ -225,9 +232,13 @@ export class App {
       toggleSidebar: () => void this.run('toggleSidebar'),
       toggleSource: () => void this.run('toggleSource'),
       toggleEol: () => void this.run('toggleLineEnding'),
+      setUnit: (u) => this.updateSettings({ wordCountUnit: u }),
     });
+    const aids = { root: this.editorHost, editor: () => this.editor, smart: () => ({ quotes: this.settings.smartQuotes, dashes: this.settings.smartDashes }) };
+    installSmartPunctuation(aids);
+    document.body.appendChild(new EmojiComplete(aids).el);
 
-    this.root.replaceChildren(titlebar, h('div.workspace', null, this.sidebar, main), this.status.el);
+    this.root.replaceChildren(titlebar, h('div.workspace', null, this.sidebar, main), this.status.el, this.status.floating);
   }
 
   private installResizer(handle: HTMLElement): void {
@@ -268,6 +279,13 @@ export class App {
     this.root.classList.toggle('focus-mode', s.focusMode);
     this.root.classList.toggle('typewriter-mode', s.typewriterMode);
     this.status?.setModes({ focus: s.focusMode, typewriter: s.typewriterMode });
+    this.root.classList.toggle('statusbar-hidden', !s.statusBarVisible);
+    if (this.status) {
+      this.status.floating.hidden = s.statusBarVisible || !s.alwaysShowWordCount;
+      this.status.setUnit(s.wordCountUnit);
+      this.status.setReadingSpeed(s.wordsPerMinute);
+    }
+    this.syncMenuChecks();
     document.documentElement.style.setProperty('zoom', s.zoom === 1 ? '' : String(s.zoom));
   }
 
@@ -278,6 +296,41 @@ export class App {
       this.colorScheme = scheme;
       this.editor?.updateSettings({ colorScheme: scheme });
     }
+  }
+
+  /** Status bar counts from the raw Markdown (fe-sidebar-statusbar-find §8). */
+  private refreshStats(): void {
+    this.status.setStats(countMarkdown(this.editor.getMarkdown()));
+  }
+
+  private refreshSelectionStats(): void {
+    const sel = window.getSelection();
+    const inside = !!sel && !sel.isCollapsed && !!sel.anchorNode && this.editorHost.contains(sel.anchorNode);
+    const text = inside ? sel!.toString() : '';
+    const all = inside && text.length >= (this.editorHost.innerText ?? '').trim().length;
+    this.status.setSelection(text && !all ? { words: countWords(text), characters: text.length } : null);
+  }
+
+  private lastChecks = '';
+  /** Native check marks follow app state (#103 menu.state-sync). */
+  private syncMenuChecks(): void {
+    const set = extras(this.platform).setMenuChecked;
+    if (!set) return;
+    const s = this.settings;
+    const checks: [string, boolean][] = [
+      ['toggleStatusBar', s.statusBarVisible],
+      ['alwaysOnTop', this.alwaysOnTop],
+      ['toggleMagnification', this.magnification],
+      ['spell:toggle', s.spellcheck],
+      ['subst:quotes', s.smartQuotes],
+      ['subst:dashes', s.smartDashes],
+      ['toggleFocus', s.focusMode],
+      ['toggleTypewriter', s.typewriterMode],
+    ];
+    const key = JSON.stringify(checks);
+    if (key === this.lastChecks) return;
+    this.lastChecks = key;
+    for (const [id, on] of checks) void set.call(this.platform, id, on).catch(() => {});
   }
 
   private showSidebarTab(id: 'files' | 'outline'): void {
@@ -608,6 +661,48 @@ export class App {
       case 'find':
       case 'replace':
         this.findbar.open(id === 'replace');
+        return true;
+      case 'toggleStatusBar':
+        this.updateSettings({ statusBarVisible: !this.settings.statusBarVisible });
+        return true;
+      case 'wordCount':
+        this.status.openPopover(this.settings.statusBarVisible || this.status.floating.hidden ? undefined : this.status.floating);
+        return true;
+      case 'alwaysOnTop': {
+        const set = extras(this.platform).setAlwaysOnTop;
+        if (!set) {
+          toast('Always on Top is available in the desktop app', { kind: 'info' });
+          return true;
+        }
+        this.alwaysOnTop = await set.call(this.platform, !this.alwaysOnTop).catch(() => this.alwaysOnTop);
+        this.lastChecks = '';
+        this.syncMenuChecks();
+        return true;
+      }
+      case 'toggleMagnification': {
+        const set = extras(this.platform).setMagnification;
+        this.magnification = !this.magnification;
+        await set?.call(this.platform, this.magnification).catch(() => {});
+        this.syncMenuChecks();
+        return true;
+      }
+      case 'toggleDevtools':
+        await extras(this.platform).toggleDevtools?.call(this.platform).catch(() => {});
+        return true;
+      case 'spell:toggle':
+        this.updateSettings({ spellcheck: !this.settings.spellcheck });
+        return true;
+      case 'subst:quotes':
+        this.updateSettings({ smartQuotes: !this.settings.smartQuotes });
+        return true;
+      case 'subst:dashes':
+        this.updateSettings({ smartDashes: !this.settings.smartDashes });
+        return true;
+      case 'speech:start':
+        if (!startSpeaking(this.editorHost)) toast('Speech is not available here', { kind: 'warning' });
+        return true;
+      case 'speech:stop':
+        stopSpeaking();
         return true;
       case 'toggleSidebar':
         this.updateSettings({ sidebarVisible: !this.settings.sidebarVisible });

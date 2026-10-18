@@ -1,4 +1,5 @@
 import type { AppSettings, ImageRule } from '../contracts';
+import { DEFAULT_WPM, UNIT_CODES, type CountUnit } from './wordcount';
 
 /**
  * App-side settings: the `AppSettings` contract plus shell-only preferences.
@@ -16,6 +17,17 @@ export interface MarginSettings extends AppSettings {
   sidebarVisible: boolean;
   sidebarTab: 'files' | 'outline';
   sidebarWidth: number;
+  /** View › Show Status Bar (#103; Typora Win/Linux `showStatusBar`). */
+  statusBarVisible: boolean;
+  /** Keep a word count visible while the status bar is hidden (`always_show_wordcount`). */
+  alwaysShowWordCount: boolean;
+  /** Unit shown in the status bar (`wordCountDelimiter`). */
+  wordCountUnit: CountUnit;
+  /** Reading speed for the reading-time count (`wordsPerMinute`, 1–999). */
+  wordsPerMinute: number;
+  /** Edit › Substitutions, converted on input (`smartQuote` / `smartDash`). */
+  smartQuotes: boolean;
+  smartDashes: boolean;
   /** Auto-save delay in ms after the last edit. */
   autoSaveDelay: number;
   restoreLastFolder: boolean;
@@ -45,6 +57,12 @@ export const DEFAULT_SETTINGS: Readonly<MarginSettings> = Object.freeze({
   sidebarVisible: true,
   sidebarTab: 'files',
   sidebarWidth: 260,
+  statusBarVisible: true,
+  alwaysShowWordCount: false,
+  wordCountUnit: 'words',
+  wordsPerMinute: DEFAULT_WPM,
+  smartQuotes: false,
+  smartDashes: false,
   restoreLastFolder: true,
   pandocPath: '',
 });
@@ -123,6 +141,12 @@ export function migrateSettings(input: unknown): MarginSettings {
     sidebarVisible: bool(raw.sidebarVisible, d.sidebarVisible),
     sidebarTab: tab === 'files' || tab === 'outline' ? tab : d.sidebarTab,
     sidebarWidth: Math.round(num(raw.sidebarWidth, d.sidebarWidth, 180, 520)),
+    statusBarVisible: bool(raw.statusBarVisible, d.statusBarVisible),
+    alwaysShowWordCount: bool(raw.alwaysShowWordCount, d.alwaysShowWordCount),
+    wordCountUnit: UNIT_CODES.includes(raw.wordCountUnit as CountUnit) ? (raw.wordCountUnit as CountUnit) : d.wordCountUnit,
+    wordsPerMinute: Math.round(num(raw.wordsPerMinute, d.wordsPerMinute, 1, 999)),
+    smartQuotes: bool(raw.smartQuotes, d.smartQuotes),
+    smartDashes: bool(raw.smartDashes, d.smartDashes),
     restoreLastFolder: bool(raw.restoreLastFolder, d.restoreLastFolder),
     pandocPath: typeof raw.pandocPath === 'string' ? raw.pandocPath.trim() : '',
   };
