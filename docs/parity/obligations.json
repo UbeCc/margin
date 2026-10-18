@@ -2,22 +2,22 @@
  "generated_from": {
   "spec": "typora-re/parity-spec.md",
   "prose": "typora-re/sections/*.md",
-  "margin_head": "2db44c74216aa9565de5412384731481b90df6bf"
+  "margin_head": "c38a8fd4934c1d2f7667b5e468bd6d9b5dd83341"
  },
  "summary": {
-  "head": "2db44c74216aa9565de5412384731481b90df6bf",
-  "artifact_sha256": "552e5e3a7fb04f150fba37d4a812a1b5811d9a2193f11b933820cd109a6e754b",
+  "head": "c38a8fd4934c1d2f7667b5e468bd6d9b5dd83341",
+  "artifact_sha256": "d0bbeab98def31e30c713d8ad64442ef2751bb020e5828d3a017c891a9e26613",
   "inventory": {
    "total": 171,
-   "owned": 101,
-   "partial": 17,
-   "missing": 45,
+   "owned": 113,
+   "partial": 15,
+   "missing": 35,
    "oos": 8,
-   "verified_by_test": 88
+   "verified_by_test": 100
   },
   "ledger": {
-   "ledger_id": "rol_158346f21f99ff9b3e30ee2ef4e75b8ee13e6fbf1ce7b6295117a3df4b65a1cd",
-   "closure_digest": "2df08569c7570680d01119f3483ecfc508c3a23628fd81fe85d2e97676d99c22",
+   "ledger_id": "rol_aa81eb160074b9b09e7cb8c6a814a20c4d2d0a9618bdd406d464d6c51d3c94b0",
+   "closure_digest": "059f37a6466cfcc5279813ba5a1d99b2fcb9d57427573fecfd6d41364b4872d9",
    "status": "unknown",
    "summary": {
     "total": 176,
@@ -27,7 +27,7 @@
     "by_status": [
      {
       "key": "unowned",
-      "count": 45
+      "count": 35
      },
      {
       "key": "characterized",
@@ -35,7 +35,7 @@
      },
      {
       "key": "implemented",
-      "count": 118
+      "count": 128
      },
      {
       "key": "verified",
@@ -119,18 +119,18 @@
      }
     ]
    },
-   "evidence_id": "ev_f208b688d2d43c5d3ff2870a57ed486815f1ae4d3bdb09a425dc5516fc2758ec"
+   "evidence_id": "ev_2591a72be6fc3eab8227c828d36e0d6f3e49960ce1a71e7903fda2b05e35c85b"
   },
   "coverage": {
    "status": "unknown",
    "reason_counts": {
-    "owner-missing": 45,
+    "owner-missing": 35,
     "package-proof-missing": 1,
-    "verifier-missing": 67,
-    "verifier-unknown": 8
+    "verifier-missing": 56,
+    "verifier-unknown": 7
    },
    "claims_total": 163,
-   "claims_qualified_by_controlled_replay": 88,
+   "claims_qualified_by_controlled_replay": 100,
    "evidence_ids_cited": 175
   },
   "verifier_runs": {
@@ -172,7 +172,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "About Margin",
-    "sha256": "f2dcad5e9f5d71676e6696925ea7f28354d122538495e2a03869ff6465bd9373"
+    "sha256": "f2c54d982f99ab2a7cafdcff541e71bf8388bbbce9406cc08d8a113149c545d0"
    },
    "verifier": null,
    "spec": {
@@ -206,7 +206,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'preferences'",
-    "sha256": "42e54baaafd30346006c32c5d78fc1fe55fb238e9ce00ba0a1abd4258411aa89"
+    "sha256": "d48f127cc6d837c923197d5d8a179c116100f4c3ad884157966ff11c3f4133da"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -244,7 +244,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "PredefinedMenuItem::hide_others",
-    "sha256": "f2dcad5e9f5d71676e6696925ea7f28354d122538495e2a03869ff6465bd9373"
+    "sha256": "f2c54d982f99ab2a7cafdcff541e71bf8388bbbce9406cc08d8a113149c545d0"
    },
    "verifier": null,
    "spec": {
@@ -282,7 +282,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'new'",
-    "sha256": "42e54baaafd30346006c32c5d78fc1fe55fb238e9ce00ba0a1abd4258411aa89"
+    "sha256": "d48f127cc6d837c923197d5d8a179c116100f4c3ad884157966ff11c3f4133da"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -391,7 +391,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'open'",
-    "sha256": "42e54baaafd30346006c32c5d78fc1fe55fb238e9ce00ba0a1abd4258411aa89"
+    "sha256": "d48f127cc6d837c923197d5d8a179c116100f4c3ad884157966ff11c3f4133da"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -438,7 +438,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'openFolder'",
-    "sha256": "42e54baaafd30346006c32c5d78fc1fe55fb238e9ce00ba0a1abd4258411aa89"
+    "sha256": "d48f127cc6d837c923197d5d8a179c116100f4c3ad884157966ff11c3f4133da"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -485,7 +485,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "quickOpen(): void",
-    "sha256": "42e54baaafd30346006c32c5d78fc1fe55fb238e9ce00ba0a1abd4258411aa89"
+    "sha256": "d48f127cc6d837c923197d5d8a179c116100f4c3ad884157966ff11c3f4133da"
    },
    "verifier": {
     "file": "tests/e2e/app-navigation.spec.ts",
@@ -606,7 +606,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'save'",
-    "sha256": "42e54baaafd30346006c32c5d78fc1fe55fb238e9ce00ba0a1abd4258411aa89"
+    "sha256": "d48f127cc6d837c923197d5d8a179c116100f4c3ad884157966ff11c3f4133da"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -654,7 +654,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'saveAs'",
-    "sha256": "42e54baaafd30346006c32c5d78fc1fe55fb238e9ce00ba0a1abd4258411aa89"
+    "sha256": "d48f127cc6d837c923197d5d8a179c116100f4c3ad884157966ff11c3f4133da"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -804,7 +804,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'reloadFromDisk'",
-    "sha256": "42e54baaafd30346006c32c5d78fc1fe55fb238e9ce00ba0a1abd4258411aa89"
+    "sha256": "d48f127cc6d837c923197d5d8a179c116100f4c3ad884157966ff11c3f4133da"
    },
    "verifier": null,
    "spec": {
@@ -870,7 +870,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'toggleLineEnding'",
-    "sha256": "42e54baaafd30346006c32c5d78fc1fe55fb238e9ce00ba0a1abd4258411aa89"
+    "sha256": "d48f127cc6d837c923197d5d8a179c116100f4c3ad884157966ff11c3f4133da"
    },
    "verifier": {
     "file": "src/app/__tests__/document.test.ts",
@@ -1017,7 +1017,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'print'",
-    "sha256": "42e54baaafd30346006c32c5d78fc1fe55fb238e9ce00ba0a1abd4258411aa89"
+    "sha256": "d48f127cc6d837c923197d5d8a179c116100f4c3ad884157966ff11c3f4133da"
    },
    "verifier": null,
    "spec": {
@@ -1053,7 +1053,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'close'",
-    "sha256": "42e54baaafd30346006c32c5d78fc1fe55fb238e9ce00ba0a1abd4258411aa89"
+    "sha256": "d48f127cc6d837c923197d5d8a179c116100f4c3ad884157966ff11c3f4133da"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -1147,7 +1147,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'undo'",
-    "sha256": "42e54baaafd30346006c32c5d78fc1fe55fb238e9ce00ba0a1abd4258411aa89"
+    "sha256": "d48f127cc6d837c923197d5d8a179c116100f4c3ad884157966ff11c3f4133da"
    },
    "verifier": {
     "file": "tests/e2e/core-cases.ts",
@@ -1237,7 +1237,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "case 'selectAll'",
-    "sha256": "80c2acf83994988d83230f09a6353d14cac63e17dc773d153105a8fb7ddf18aa"
+    "sha256": "31b037f9c17345af57bbd6a7c6dda36da97231a42bcb5e35db241b8b0bd2d2af"
    },
    "verifier": {
     "file": "tests/e2e/blocks-core.spec.ts",
@@ -1729,7 +1729,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "case 'heading'",
-    "sha256": "80c2acf83994988d83230f09a6353d14cac63e17dc773d153105a8fb7ddf18aa"
+    "sha256": "31b037f9c17345af57bbd6a7c6dda36da97231a42bcb5e35db241b8b0bd2d2af"
    },
    "verifier": {
     "file": "tests/e2e/app-navigation.spec.ts",
@@ -1773,7 +1773,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "case 'headingLevel'",
-    "sha256": "80c2acf83994988d83230f09a6353d14cac63e17dc773d153105a8fb7ddf18aa"
+    "sha256": "31b037f9c17345af57bbd6a7c6dda36da97231a42bcb5e35db241b8b0bd2d2af"
    },
    "verifier": {
     "file": "tests/e2e/parity-core-cmds.spec.ts",
@@ -1804,17 +1804,17 @@
    "obligation_id": "typora.menu.para.table",
    "id": "menu.para.table",
    "title": "Paragraph › Table / Insert Table (with rows×columns dialog)",
-   "status": "partial",
-   "priority": "P1",
+   "status": "owned",
+   "priority": null,
    "epic": "tools",
    "owner": {
-    "path": "src/editor/core/commands.ts",
-    "anchor": "case 'table'",
-    "sha256": "80c2acf83994988d83230f09a6353d14cac63e17dc773d153105a8fb7ddf18aa"
+    "path": "src/app/ui/table-dialog.ts",
+    "anchor": "export function insertTableDialog",
+    "sha256": "81f75ac5de18e8b34589d3db715b05651f57e8250e01ecd9b30fd0910356c025"
    },
    "verifier": {
-    "file": "tests/e2e/core-cases.ts",
-    "test": "table shortcut mounts the table widget",
+    "file": "tests/e2e/parity-tools.spec.ts",
+    "test": "menu.para.table:",
     "kind": "e2e"
    },
    "spec": {
@@ -1835,16 +1835,16 @@
      "editor-core §7.4"
     ]
    },
-   "note": "inserts a fixed 2×2 table; no size dialog",
+   "note": "3 columns × 4 rows incl. header, remembers the last size, 1–40 cols / 1–99 rows (typora-re#4); inserts after the caret block instead of splitting the paragraph; no Touch Bar",
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-case",
-    "missing-verifier",
     "static-only",
-    "weak-original-case-authority"
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.menu.para.math-block",
@@ -1856,7 +1856,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "case 'math'",
-    "sha256": "80c2acf83994988d83230f09a6353d14cac63e17dc773d153105a8fb7ddf18aa"
+    "sha256": "31b037f9c17345af57bbd6a7c6dda36da97231a42bcb5e35db241b8b0bd2d2af"
    },
    "verifier": {
     "file": "tests/e2e/blocks-widgets.spec.ts",
@@ -1898,7 +1898,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "case 'code'",
-    "sha256": "80c2acf83994988d83230f09a6353d14cac63e17dc773d153105a8fb7ddf18aa"
+    "sha256": "31b037f9c17345af57bbd6a7c6dda36da97231a42bcb5e35db241b8b0bd2d2af"
    },
    "verifier": {
     "file": "tests/e2e/core-cases.ts",
@@ -1941,7 +1941,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "case 'html'",
-    "sha256": "80c2acf83994988d83230f09a6353d14cac63e17dc773d153105a8fb7ddf18aa"
+    "sha256": "31b037f9c17345af57bbd6a7c6dda36da97231a42bcb5e35db241b8b0bd2d2af"
    },
    "verifier": {
     "file": "tests/e2e/parity-core-cmds.spec.ts",
@@ -1979,7 +1979,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "case 'quote'",
-    "sha256": "80c2acf83994988d83230f09a6353d14cac63e17dc773d153105a8fb7ddf18aa"
+    "sha256": "31b037f9c17345af57bbd6a7c6dda36da97231a42bcb5e35db241b8b0bd2d2af"
    },
    "verifier": {
     "file": "tests/e2e/core-qa.spec.ts",
@@ -2141,7 +2141,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "case 'linkRef'",
-    "sha256": "80c2acf83994988d83230f09a6353d14cac63e17dc773d153105a8fb7ddf18aa"
+    "sha256": "31b037f9c17345af57bbd6a7c6dda36da97231a42bcb5e35db241b8b0bd2d2af"
    },
    "verifier": {
     "file": "tests/e2e/parity-core-cmds.spec.ts",
@@ -2218,7 +2218,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "case 'hr'",
-    "sha256": "80c2acf83994988d83230f09a6353d14cac63e17dc773d153105a8fb7ddf18aa"
+    "sha256": "31b037f9c17345af57bbd6a7c6dda36da97231a42bcb5e35db241b8b0bd2d2af"
    },
    "verifier": {
     "file": "tests/e2e/core-cases.ts",
@@ -2254,7 +2254,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "case 'toc'",
-    "sha256": "80c2acf83994988d83230f09a6353d14cac63e17dc773d153105a8fb7ddf18aa"
+    "sha256": "31b037f9c17345af57bbd6a7c6dda36da97231a42bcb5e35db241b8b0bd2d2af"
    },
    "verifier": {
     "file": "tests/e2e/blocks-widgets.spec.ts",
@@ -2294,7 +2294,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "case 'front_matter'",
-    "sha256": "80c2acf83994988d83230f09a6353d14cac63e17dc773d153105a8fb7ddf18aa"
+    "sha256": "31b037f9c17345af57bbd6a7c6dda36da97231a42bcb5e35db241b8b0bd2d2af"
    },
    "verifier": {
     "file": "tests/e2e/parity-core-cmds.spec.ts",
@@ -2330,7 +2330,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "case 'mark'",
-    "sha256": "80c2acf83994988d83230f09a6353d14cac63e17dc773d153105a8fb7ddf18aa"
+    "sha256": "31b037f9c17345af57bbd6a7c6dda36da97231a42bcb5e35db241b8b0bd2d2af"
    },
    "verifier": {
     "file": "tests/e2e/app-navigation.spec.ts",
@@ -2376,7 +2376,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "underline: ['<u>', '</u>']",
-    "sha256": "80c2acf83994988d83230f09a6353d14cac63e17dc773d153105a8fb7ddf18aa"
+    "sha256": "31b037f9c17345af57bbd6a7c6dda36da97231a42bcb5e35db241b8b0bd2d2af"
    },
    "verifier": {
     "file": "tests/e2e/parity-core-cmds.spec.ts",
@@ -2412,7 +2412,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "math: ['$', '$']",
-    "sha256": "80c2acf83994988d83230f09a6353d14cac63e17dc773d153105a8fb7ddf18aa"
+    "sha256": "31b037f9c17345af57bbd6a7c6dda36da97231a42bcb5e35db241b8b0bd2d2af"
    },
    "verifier": {
     "file": "tests/e2e/parity-core-cmds.spec.ts",
@@ -2448,7 +2448,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "sub: ['<sub>', '</sub>']",
-    "sha256": "80c2acf83994988d83230f09a6353d14cac63e17dc773d153105a8fb7ddf18aa"
+    "sha256": "31b037f9c17345af57bbd6a7c6dda36da97231a42bcb5e35db241b8b0bd2d2af"
    },
    "verifier": {
     "file": "tests/e2e/parity-core-cmds.spec.ts",
@@ -2485,7 +2485,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "comment: ['<!-- ', ' -->']",
-    "sha256": "80c2acf83994988d83230f09a6353d14cac63e17dc773d153105a8fb7ddf18aa"
+    "sha256": "31b037f9c17345af57bbd6a7c6dda36da97231a42bcb5e35db241b8b0bd2d2af"
    },
    "verifier": {
     "file": "tests/e2e/parity-core-cmds.spec.ts",
@@ -2521,7 +2521,7 @@
    "owner": {
     "path": "src/editor/core/commands.ts",
     "anchor": "case 'mark'",
-    "sha256": "80c2acf83994988d83230f09a6353d14cac63e17dc773d153105a8fb7ddf18aa"
+    "sha256": "31b037f9c17345af57bbd6a7c6dda36da97231a42bcb5e35db241b8b0bd2d2af"
    },
    "verifier": {
     "file": "tests/e2e/core-cases.ts",
@@ -2638,7 +2638,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'toggleSource'",
-    "sha256": "42e54baaafd30346006c32c5d78fc1fe55fb238e9ce00ba0a1abd4258411aa89"
+    "sha256": "d48f127cc6d837c923197d5d8a179c116100f4c3ad884157966ff11c3f4133da"
    },
    "verifier": {
     "file": "tests/e2e/core-cases.ts",
@@ -2684,7 +2684,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'toggleFocus'",
-    "sha256": "42e54baaafd30346006c32c5d78fc1fe55fb238e9ce00ba0a1abd4258411aa89"
+    "sha256": "d48f127cc6d837c923197d5d8a179c116100f4c3ad884157966ff11c3f4133da"
    },
    "verifier": {
     "file": "tests/e2e/app-navigation.spec.ts",
@@ -2728,7 +2728,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'toggleSidebar'",
-    "sha256": "42e54baaafd30346006c32c5d78fc1fe55fb238e9ce00ba0a1abd4258411aa89"
+    "sha256": "d48f127cc6d837c923197d5d8a179c116100f4c3ad884157966ff11c3f4133da"
    },
    "verifier": {
     "file": "tests/e2e/app-navigation.spec.ts",
@@ -2830,7 +2830,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'zoomIn'",
-    "sha256": "42e54baaafd30346006c32c5d78fc1fe55fb238e9ce00ba0a1abd4258411aa89"
+    "sha256": "d48f127cc6d837c923197d5d8a179c116100f4c3ad884157966ff11c3f4133da"
    },
    "verifier": null,
    "spec": {
@@ -2869,7 +2869,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "PredefinedMenuItem::fullscreen",
-    "sha256": "f2dcad5e9f5d71676e6696925ea7f28354d122538495e2a03869ff6465bd9373"
+    "sha256": "f2c54d982f99ab2a7cafdcff541e71bf8388bbbce9406cc08d8a113149c545d0"
    },
    "verifier": null,
    "spec": {
@@ -2987,7 +2987,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "THEMES_SUBMENU_ID",
-    "sha256": "f2dcad5e9f5d71676e6696925ea7f28354d122538495e2a03869ff6465bd9373"
+    "sha256": "f2c54d982f99ab2a7cafdcff541e71bf8388bbbce9406cc08d8a113149c545d0"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -3029,7 +3029,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'openThemesFolder'",
-    "sha256": "42e54baaafd30346006c32c5d78fc1fe55fb238e9ce00ba0a1abd4258411aa89"
+    "sha256": "d48f127cc6d837c923197d5d8a179c116100f4c3ad884157966ff11c3f4133da"
    },
    "verifier": null,
    "spec": {
@@ -3121,7 +3121,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "PredefinedMenuItem::minimize",
-    "sha256": "f2dcad5e9f5d71676e6696925ea7f28354d122538495e2a03869ff6465bd9373"
+    "sha256": "f2c54d982f99ab2a7cafdcff541e71bf8388bbbce9406cc08d8a113149c545d0"
    },
    "verifier": null,
    "spec": {
@@ -3155,7 +3155,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "ID_HELP_MARKDOWN",
-    "sha256": "f2dcad5e9f5d71676e6696925ea7f28354d122538495e2a03869ff6465bd9373"
+    "sha256": "f2c54d982f99ab2a7cafdcff541e71bf8388bbbce9406cc08d8a113149c545d0"
    },
    "verifier": null,
    "spec": {
@@ -3219,11 +3219,19 @@
    "obligation_id": "typora.ctx.framework",
    "id": "ctx.framework",
    "title": "Context-menu framework: target-aware item lists for the editor",
-   "status": "missing",
-   "priority": "P1",
+   "status": "owned",
+   "priority": null,
    "epic": "ctx",
-   "owner": null,
-   "verifier": null,
+   "owner": {
+    "path": "src/app/ctxmenu/targets.ts",
+    "anchor": "export function contextTarget",
+    "sha256": "e632198a8d292e6829c061e1953b863ad0338f61097b7439b13b56718358fa2f"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-ctx.spec.ts",
+    "test": "ctx.framework:",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [],
     "panel": [],
@@ -3233,48 +3241,60 @@
     "prose": [
      "clipboard-contextmenu §6.1",
      "clipboard-contextmenu §6.3",
-     "clipboard-contextmenu §9"
+     "clipboard-contextmenu §9",
+     "fe-contextmenus-tools §1.1"
     ]
    },
-   "note": "only the sidebar has a context menu (src/app/ui/contextmenu.ts)",
+   "note": "in-app menu (no native NSMenu merge): key lists per target, actions bound to the right-clicked element",
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.ctx.text",
    "id": "ctx.text",
    "title": "Text context menu: cut/copy/paste, copy-as, insert, format, paragraph submenus, search with…",
-   "status": "missing",
+   "status": "partial",
    "priority": "P1",
    "epic": "ctx",
-   "owner": null,
-   "verifier": null,
+   "owner": {
+    "path": "src/app/ctxmenu/items.ts",
+    "anchor": "label: 'Copy / Paste As…'",
+    "sha256": "21e23f483375a18c28ebc1332acb98a5d337e46aca76f9b47fba558159f9066b"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-ctx.spec.ts",
+    "test": "ctx.text:",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [
-     "More Actions",
-     "Search With…",
      "Search with Google",
-     "Copy '%@'"
+     "Copy / Paste As",
+     "More Actions",
+     "Search With…"
     ],
     "panel": [],
     "bridge": [],
     "prose": [
-     "clipboard-contextmenu §6.5"
+     "clipboard-contextmenu §6.5",
+     "fe-contextmenus-tools §1.1"
     ]
    },
-   "note": null,
+   "note": "Cut/Copy/Paste + Copy / Paste As… + Search with Google; WebKit spelling suggestions, Look Up, Speech, Substitutions are not reproduced by the in-app menu",
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
    ],
    "coverage_claim_qualified": false
   },
@@ -3282,11 +3302,19 @@
    "obligation_id": "typora.ctx.link",
    "id": "ctx.link",
    "title": "Link context menu: Open Link / Copy Link Address / Hyperlink Actions",
-   "status": "missing",
-   "priority": "P1",
+   "status": "owned",
+   "priority": null,
    "epic": "ctx",
-   "owner": null,
-   "verifier": null,
+   "owner": {
+    "path": "src/app/ctxmenu/items.ts",
+    "anchor": "label: 'Copy Link Address'",
+    "sha256": "21e23f483375a18c28ebc1332acb98a5d337e46aca76f9b47fba558159f9066b"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-ctx.spec.ts",
+    "test": "ctx.link:",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [
      "Open Link",
@@ -3298,72 +3326,108 @@
      "path.openURL"
     ],
     "prose": [
-     "clipboard-contextmenu §6.1"
+     "clipboard-contextmenu §6.1",
+     "fe-contextmenus-tools §1.2"
     ]
    },
    "note": null,
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.ctx.block-generic",
    "id": "ctx.block-generic",
    "title": "Block context menu: Insert Paragraph Before/After, Delete (atomic blocks)",
-   "status": "missing",
-   "priority": "P1",
+   "status": "owned",
+   "priority": null,
    "epic": "ctx",
-   "owner": null,
-   "verifier": null,
+   "owner": {
+    "path": "src/app/ctxmenu/items.ts",
+    "anchor": "block('para:insertBefore', 'Insert Paragraph Before')",
+    "sha256": "21e23f483375a18c28ebc1332acb98a5d337e46aca76f9b47fba558159f9066b"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-ctx.spec.ts",
+    "test": "ctx.block-generic:",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [
-     "Delete Selected"
+     "Delete Selected",
+     "Insert Paragraph Before",
+     "Insert Paragraph After",
+     "Delete",
+     "Edit",
+     "Table",
+     "Copy Math",
+     "Code Tools",
+     "Save %@ As"
     ],
     "panel": [],
     "bridge": [],
     "prose": [
-     "clipboard-contextmenu §6.1"
+     "clipboard-contextmenu §6.1",
+     "fe-contextmenus-tools §1.2",
+     "fe-contextmenus-tools §1.4"
     ]
    },
-   "note": null,
+   "note": "table/HTML/math/diagram/code/atomic lists; Save Math/Image As… not yet (gap)",
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.ctx.emoji",
    "id": "ctx.emoji",
    "title": "Emoji/inline-math context entries (copy emoji, copy inline math)",
-   "status": "missing",
+   "status": "partial",
    "priority": "P2",
    "epic": "ctx",
-   "owner": null,
-   "verifier": null,
+   "owner": {
+    "path": "src/app/ctxmenu/items.ts",
+    "anchor": "function copyMath",
+    "sha256": "21e23f483375a18c28ebc1332acb98a5d337e46aca76f9b47fba558159f9066b"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-ctx.spec.ts",
+    "test": "ctx.emoji:",
+    "kind": "e2e"
+   },
    "spec": {
-    "menu": [],
+    "menu": [
+     "Copy '%@'",
+     "Copy Math",
+     "Copy as Tex",
+     "Copy as MathML"
+    ],
     "panel": [],
     "bridge": [],
     "prose": [
-     "clipboard-contextmenu §6.1"
+     "clipboard-contextmenu §6.1",
+     "fe-contextmenus-tools §1.2"
     ]
    },
-   "note": null,
+   "note": "inline math Copy Math ▸ Tex/MathML; Margin renders no :emoji: shortcodes, inline Copy as Image disabled",
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "missing-case",
+    "missing-verifier",
+    "static-only",
+    "weak-original-case-authority"
    ],
    "coverage_claim_qualified": false
   },
@@ -3404,17 +3468,17 @@
    "obligation_id": "typora.tools.table.rows-cols",
    "id": "tools.table.rows-cols",
    "title": "Table: add row above/below, column before/after, delete row/column",
-   "status": "partial",
-   "priority": "P1",
+   "status": "owned",
+   "priority": null,
    "epic": "tools",
    "owner": {
     "path": "src/editor/blocks/table.ts",
-    "anchor": "Table tools",
-    "sha256": "fb22eaff30b843984169a1c140884b2e7aa516bc6da14988c83f1e25b23ef15a"
+    "anchor": "private runOp",
+    "sha256": "37679a344757a8394d62f63539005e4e4edfccd963339c30aea7649bf8520279"
    },
    "verifier": {
-    "file": "tests/e2e/blocks-widgets.spec.ts",
-    "test": "Tab at last cell adds a row; Enter moves down; toolbar ops",
+    "file": "tests/e2e/parity-tools.spec.ts",
+    "test": "tools.table.rows-cols:",
     "kind": "e2e"
    },
    "spec": {
@@ -3429,29 +3493,38 @@
     "panel": [],
     "bridge": [],
     "prose": [
-     "editor-core §7.4"
+     "editor-core §7.4",
+     "clipboard-contextmenu §6.5"
     ]
    },
-   "note": "toolbar ops exist; no menu/context entries",
+   "note": "Paragraph › Table submenu + palette + toolbar; ⌘↩ / ⌘⇧⌫ stay cell keys",
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-case",
-    "missing-verifier",
     "static-only",
-    "weak-original-case-authority"
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.tools.table.move",
    "id": "tools.table.move",
    "title": "Table: Move Row Up/Down, Move Column Left/Right",
-   "status": "missing",
-   "priority": "P1",
+   "status": "owned",
+   "priority": null,
    "epic": "tools",
-   "owner": null,
-   "verifier": null,
+   "owner": {
+    "path": "src/editor/blocks/table.ts",
+    "anchor": "case 'moveRowUp'",
+    "sha256": "37679a344757a8394d62f63539005e4e4edfccd963339c30aea7649bf8520279"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-tools.spec.ts",
+    "test": "tools.table.move:",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [
      "Move Row Up",
@@ -3464,31 +3537,38 @@
      "Move Down"
     ],
     "bridge": [],
-    "prose": []
+    "prose": [
+     "editor-core §7.4"
+    ]
    },
-   "note": null,
+   "note": "header row never moves; ⌘⌥ arrows in a cell",
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.tools.table.align-resize",
    "id": "tools.table.align-resize",
    "title": "Table: column alignment and Resize Table dialog",
-   "status": "partial",
-   "priority": "P1",
+   "status": "owned",
+   "priority": null,
    "epic": "tools",
    "owner": {
     "path": "src/editor/blocks/table.ts",
-    "anchor": "Table tools",
-    "sha256": "fb22eaff30b843984169a1c140884b2e7aa516bc6da14988c83f1e25b23ef15a"
+    "anchor": "private buildResize",
+    "sha256": "37679a344757a8394d62f63539005e4e4edfccd963339c30aea7649bf8520279"
    },
-   "verifier": null,
+   "verifier": {
+    "file": "tests/e2e/parity-tools.spec.ts",
+    "test": "tools.table.align-resize:",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [],
     "panel": [
@@ -3500,28 +3580,38 @@
      "Width x Height"
     ],
     "bridge": [],
-    "prose": []
+    "prose": [
+     "editor-core §7.4"
+    ]
    },
-   "note": "alignment via toolbar; no resize dialog",
+   "note": "Width = columns, Height = rows incl. header (typora-re#4)",
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-case",
-    "missing-verifier",
     "static-only",
-    "weak-original-case-authority"
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.tools.table.copy-delete",
    "id": "tools.table.copy-delete",
    "title": "Table: Copy Table / Delete Table",
-   "status": "missing",
-   "priority": "P1",
+   "status": "owned",
+   "priority": null,
    "epic": "tools",
-   "owner": null,
-   "verifier": null,
+   "owner": {
+    "path": "src/editor/blocks/table.ts",
+    "anchor": "private copyTable",
+    "sha256": "37679a344757a8394d62f63539005e4e4edfccd963339c30aea7649bf8520279"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-tools.spec.ts",
+    "test": "tools.table.copy-delete:",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [
      "Copy Table",
@@ -3531,17 +3621,21 @@
      "Delete Table"
     ],
     "bridge": [],
-    "prose": []
+    "prose": [
+     "clipboard-contextmenu §5.4",
+     "clipboard-contextmenu §6.5"
+    ]
    },
-   "note": null,
+   "note": "copy = markdown plain + bordered HTML; Prettify Source Code re-formats the table",
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.tools.table.cells",
@@ -3553,7 +3647,7 @@
    "owner": {
     "path": "src/editor/blocks/table.ts",
     "anchor": "Table tools",
-    "sha256": "fb22eaff30b843984169a1c140884b2e7aa516bc6da14988c83f1e25b23ef15a"
+    "sha256": "37679a344757a8394d62f63539005e4e4edfccd963339c30aea7649bf8520279"
    },
    "verifier": {
     "file": "tests/e2e/blocks-core.spec.ts",
@@ -3589,7 +3683,7 @@
    "owner": {
     "path": "src/editor/blocks/code-fence.ts",
     "anchor": "mount",
-    "sha256": "0019da5ea1dd298f25e2abb95bdbb5b85602b49d3e5a794875b6a331c93481ec"
+    "sha256": "cea87070675748155c3cb3bbfd4a95a91fbdb7254654030cc9c09c4286d449f9"
    },
    "verifier": {
     "file": "tests/e2e/blocks-widgets.spec.ts",
@@ -3625,11 +3719,19 @@
    "obligation_id": "typora.tools.code.indent-prettify",
    "id": "tools.code.indent-prettify",
    "title": "Code tools: Auto Indent Selected/Whole Code, Prettify Source Code",
-   "status": "missing",
-   "priority": "P2",
+   "status": "owned",
+   "priority": null,
    "epic": "tools",
-   "owner": null,
-   "verifier": null,
+   "owner": {
+    "path": "src/editor/blocks/code-fence.ts",
+    "anchor": "command(op: string)",
+    "sha256": "cea87070675748155c3cb3bbfd4a95a91fbdb7254654030cc9c09c4286d449f9"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-tools.spec.ts",
+    "test": "tools.code.indent-prettify:",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [
      "Auto Indent Selected Code",
@@ -3640,53 +3742,60 @@
      "Use Shift+Tab key to auto indent selected code"
     ],
     "bridge": [],
-    "prose": []
+    "prose": [
+     "clipboard-contextmenu §6.5"
+    ]
    },
-   "note": null,
+   "note": "Paragraph › Code Tools (Copy Code Content / Auto Indent); Prettify Source Code is the Table op; Shift+Tab pref not wired",
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.tools.code.delete",
    "id": "tools.code.delete",
    "title": "Code tools: Delete Code Block",
-   "status": "partial",
-   "priority": "P2",
+   "status": "owned",
+   "priority": null,
    "epic": "ctx",
    "owner": {
-    "path": "src/editor/blocks/code-fence.ts",
-    "anchor": "onRemove",
-    "sha256": "0019da5ea1dd298f25e2abb95bdbb5b85602b49d3e5a794875b6a331c93481ec"
+    "path": "src/app/ctxmenu/items.ts",
+    "anchor": "'Delete Code Block'",
+    "sha256": "21e23f483375a18c28ebc1332acb98a5d337e46aca76f9b47fba558159f9066b"
    },
    "verifier": {
-    "file": "tests/e2e/blocks-widgets.spec.ts",
-    "test": "arrow keys exit at edges; backspace in empty removes",
+    "file": "tests/e2e/parity-ctx.spec.ts",
+    "test": "tools.code.delete:",
     "kind": "e2e"
    },
    "spec": {
     "menu": [
-     "Delete Code Block"
+     "Delete Code Block",
+     "Code Tools",
+     "Copy Code Content"
     ],
     "panel": [],
     "bridge": [],
-    "prose": []
+    "prose": [
+     "fe-contextmenus-tools §1.2"
+    ]
    },
-   "note": "backspace in empty fence only",
+   "note": "deliberate fix: Typora requests \"delete-fences\" but its native table is keyed \"deleteFences\", so the item never shows on macOS; Margin shows it",
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-case",
-    "missing-verifier",
     "static-only",
-    "weak-original-case-authority"
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.tools.code.line-numbers",
@@ -3762,11 +3871,19 @@
    "obligation_id": "typora.tools.math.copy",
    "id": "tools.math.copy",
    "title": "Math tools: Copy Math / Copy as TeX / Copy as MathML / Delete Math",
-   "status": "missing",
-   "priority": "P1",
+   "status": "owned",
+   "priority": null,
    "epic": "tools",
-   "owner": null,
-   "verifier": null,
+   "owner": {
+    "path": "src/editor/core/block-tools.ts",
+    "anchor": "export function mathTool",
+    "sha256": "e4498e4b1e1f99625958afae0ab9242d5ae63db81d8a04f0baa5c585dd278ac5"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-tools.spec.ts",
+    "test": "tools.math.copy:",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [
      "Math Tools",
@@ -3780,27 +3897,38 @@
      "Use Rendered SVG"
     ],
     "bridge": [],
-    "prose": []
+    "prose": [
+     "clipboard-contextmenu §6.6"
+    ]
    },
-   "note": null,
+   "note": "copy: block + inline; Delete Math: blocks only (typora-re#4); Copy as Image and Use LaTeX Source / Use Rendered SVG → #127",
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.tools.math.refresh",
    "id": "tools.math.refresh",
    "title": "Math tools: Refresh All Math Expressions",
-   "status": "missing",
-   "priority": "P2",
+   "status": "owned",
+   "priority": null,
    "epic": "tools",
-   "owner": null,
-   "verifier": null,
+   "owner": {
+    "path": "src/editor/core/block-tools.ts",
+    "anchor": "export function refreshMath",
+    "sha256": "e4498e4b1e1f99625958afae0ab9242d5ae63db81d8a04f0baa5c585dd278ac5"
+   },
+   "verifier": {
+    "file": "tests/e2e/parity-tools.spec.ts",
+    "test": "tools.math.refresh:",
+    "kind": "e2e"
+   },
    "spec": {
     "menu": [
      "Refresh All Math Expressions"
@@ -3811,13 +3939,14 @@
    },
    "note": null,
    "out_of_scope_rationale": null,
-   "rea_ledger_status": "unowned",
+   "rea_ledger_status": "implemented",
    "rea_diagnostics": [
-    "missing-original-case",
-    "missing-owner",
-    "static-only"
+    "static-only",
+    "weak-fixture-authority",
+    "weak-original-case-authority",
+    "weak-verifier-authority"
    ],
-   "coverage_claim_qualified": false
+   "coverage_claim_qualified": true
   },
   {
    "obligation_id": "typora.tools.math.numbering",
@@ -5170,7 +5299,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "private createExports(",
-    "sha256": "42e54baaafd30346006c32c5d78fc1fe55fb238e9ce00ba0a1abd4258411aa89"
+    "sha256": "d48f127cc6d837c923197d5d8a179c116100f4c3ad884157966ff11c3f4133da"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -6254,7 +6383,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "setDocumentEdited",
-    "sha256": "42e54baaafd30346006c32c5d78fc1fe55fb238e9ce00ba0a1abd4258411aa89"
+    "sha256": "d48f127cc6d837c923197d5d8a179c116100f4c3ad884157966ff11c3f4133da"
    },
    "verifier": null,
    "spec": {
@@ -6415,7 +6544,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "applyAppearance",
-    "sha256": "42e54baaafd30346006c32c5d78fc1fe55fb238e9ce00ba0a1abd4258411aa89"
+    "sha256": "d48f127cc6d837c923197d5d8a179c116100f4c3ad884157966ff11c3f4133da"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
