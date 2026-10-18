@@ -125,6 +125,19 @@ export class TauriPlatform implements Platform {
     }
   }
 
+  // ---- optional Pandoc export (PlatformExtras, #81)
+  pandocExport(
+    markdown: string,
+    outPath: string,
+    opts: { format: string; docDir: string | null; title: string | null; pandocPath: string | null; timeoutMs: number },
+  ): Promise<string> {
+    return call('pandoc_export', { markdown, outPath, ...opts });
+  }
+
+  pandocDetect(pandocPath: string | null): Promise<{ path: string; version: string }> {
+    return call('pandoc_detect', { pandocPath });
+  }
+
   /**
    * After the first save of a document: copy images that were stored while it was
    * unsaved (`<app data>/images`, absolute srcs) under `rule`. Returns
