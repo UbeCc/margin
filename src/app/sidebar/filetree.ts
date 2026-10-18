@@ -1,9 +1,11 @@
 import type { DirEntry, FsEvent, Platform } from '../../contracts';
 import { extras } from '../platform-extras';
 import { h, icon, clearChildren } from '../util/dom';
-import { basename, dirname, isInside, isMarkdownPath, isValidFileName, join, naturalCompare, uniqueName, extname } from '../util/path';
+import { basename, dirname, isInside, isMarkdownPath, isValidFileName, join, uniqueName, extname } from '../util/path';
+import { DEFAULT_SORT, sortEntries, type SortOrder } from './sort';
+import { canMoveInto, draggedPath, endDrag, makeDraggable } from './drag';
 import { showContextMenu, type MenuItem } from '../ui/contextmenu';
-import { confirmDialog, promptDialog } from '../ui/modal';
+import { ask, confirmDialog, promptDialog } from '../ui/modal';
 
 export interface FileTreeHost {
   platform: Platform;
@@ -18,6 +20,10 @@ export interface FileTreeHost {
   openFolderDialog(): void;
   openFolder(path: string): void;
   recentFolders(): string[];
+  /** Extra header buttons (sort, list/tree switch, search). */
+  extraActions?(): (HTMLElement | null)[];
+  /** Refresh button outside tree mode (list / search). */
+  refreshMode?(): void;
 }
 
 interface DirNode {
@@ -30,12 +36,10 @@ interface DirNode {
   list: HTMLUListElement;
 }
 
-/** Sort: folders first, then natural name order; hide dotfiles. */
-export function sortEntries(entries: DirEntry[]): DirEntry[] {
-  return entries
-    .filter((e) => !e.name.startsWith('.'))
-    .sort((a, b) => (a.isDir === b.isDir ? naturalCompare(a.name, b.name) : a.isDir ? -1 : 1));
-}
+export { sortEntries } from './sort';
+
+/** Files panel modes: lazy tree, flat Articles list, or full-text search results. */
+export type FilesMode = 'tree' | 'list' | 'search';
 
 export class FileTree {
   readonly el: HTMLElement;
@@ -45,17 +49,30 @@ export class FileTree {
   private dirs = new Map<string, DirNode>();
   private rows = new Map<string, HTMLElement>();
   private active: string | null = null;
+  private order: SortOrder = DEFAULT_SORT;
+  private groupFolders = true;
+  mode: FilesMode = 'tree';
 
   constructor(private host: FileTreeHost) {
     this.header = h('div.tree-header');
     this.body = h('div.tree-body', { role: 'tree', tabindex: '0', 'aria-label': 'Files' });
-    this.el = h('div.file-tree', null, this.header, this.body);
+    this.el = h('div.file-tree', { 'data-mode': 'tree' }, this.header, this.body);
     this.body.addEventListener('contextmenu', (e) => {
       if ((e.target as HTMLElement).closest('.tree-row') || !this.root) return;
       e.preventDefault();
       this.showMenu(e.clientX, e.clientY, null);
     });
     this.body.addEventListener('keydown', (e) => this.onKey(e));
+    this.body.addEventListener('dragover', (e) => {
+      if (this.root && draggedPath(e) !== null) e.preventDefault();
+    });
+    this.body.addEventListener('drop', (e) => {
+      const src = draggedPath(e);
+      if (!src || !this.root) return;
+      e.preventDefault();
+      endDrag();
+      void this.move(src, this.root);
+    });
     this.renderEmpty();
   }
 
@@ -76,6 +93,55 @@ export class FileTree {
     if (this.active) this.setActive(this.active);
   }
 
+  /** Mount the list / search views under the shared header. */
+  mountPanel(el: HTMLElement): void {
+    this.el.appendChild(el);
+  }
+
+  setMode(mode: FilesMode): void {
+    this.mode = mode;
+    this.el.dataset.mode = mode;
+    if (this.root) this.renderHeader();
+  }
+
+  get sortOrder(): SortOrder {
+    return this.order;
+  }
+
+  /** Re-sort every loaded folder in place (keeps expansion state). */
+  setSort(order: SortOrder): void {
+    if (order === this.order) return;
+    this.order = order;
+    // Date orders need fresh stat data (in-place "modified" events don't re-list).
+    if (/^(created|modified)/.test(order)) {
+      void this.refreshAll();
+      return;
+    }
+    for (const node of this.dirs.values()) {
+      if (!node.loaded) continue;
+      node.children = sortEntries(node.children, order, this.groupFolders);
+      this.renderChildren(node);
+    }
+    if (this.active) this.setActive(this.active);
+  }
+
+  /** "Group By Folder": folders first (on) or interleaved with files (off). */
+  setGrouped(on: boolean): void {
+    if (on === this.groupFolders) return;
+    this.groupFolders = on;
+    for (const node of this.dirs.values()) {
+      if (!node.loaded) continue;
+      node.children = sortEntries(node.children, this.order, on);
+      this.renderChildren(node);
+    }
+    if (this.active) this.setActive(this.active);
+  }
+
+  /** Re-render the header (e.g. after a mode / sort change). */
+  refreshHeader(): void {
+    if (this.root) this.renderHeader();
+  }
+
   private renderHeader(): void {
     clearChildren(this.header);
     if (!this.root) return;
@@ -86,7 +152,8 @@ export class FileTree {
         null,
         h('button.icon-btn', { type: 'button', title: 'New File', 'aria-label': 'New File', onclick: () => void this.newFile(this.root!) }, icon('plus')),
         h('button.icon-btn', { type: 'button', title: 'Reveal Active File', 'aria-label': 'Reveal Active File', onclick: () => this.active && void this.reveal(this.active) }, icon('target')),
-        h('button.icon-btn', { type: 'button', title: 'Refresh', 'aria-label': 'Refresh', onclick: () => void this.refreshAll() }, icon('refresh')),
+        h('button.icon-btn', { type: 'button', title: 'Refresh', 'aria-label': 'Refresh', onclick: () => (this.mode === 'tree' ? void this.refreshAll() : this.host.refreshMode?.()) }, icon('refresh')),
+        ...(this.host.extraActions?.() ?? []),
       ),
     );
   }
@@ -133,7 +200,7 @@ export class FileTree {
     node.loading = (async () => {
       let entries: DirEntry[] = [];
       try {
-        entries = sortEntries(await this.host.platform.listDir(node.path));
+        entries = sortEntries(await this.host.platform.listDir(node.path), this.order, this.groupFolders);
       } catch (e) {
         this.host.notify(`Couldn't list ${basename(node.path)}: ${e instanceof Error ? e.message : e}`, 'error');
       }
@@ -185,6 +252,8 @@ export class FileTree {
       }
     }
     if (entry.path === this.active) row.classList.add('active');
+    makeDraggable(row, entry.path);
+    if (entry.isDir) this.dropTarget(row, entry.path);
     row.addEventListener('click', (e) => {
       row.focus({ preventScroll: true });
       if (entry.isDir) void this.toggle(entry.path);
@@ -262,7 +331,7 @@ export class FileTree {
       if (ev.kind === 'renamed') {
         dirs.add(dirname(ev.from));
         dirs.add(dirname(ev.to));
-      } else if (ev.kind !== 'modified' || !this.rows.has(ev.path)) dirs.add(dirname(ev.path)); // atomic saves can surface as 'modified' of a new path
+      } else if (ev.kind !== 'modified' || !this.rows.has(ev.path) || this.order.startsWith('modified')) dirs.add(dirname(ev.path)); // atomic saves can surface as 'modified' of a new path
     }
     for (const d of dirs) void this.refreshDir(d);
   }
@@ -320,18 +389,96 @@ export class FileTree {
     } catch (e) {
       return this.host.notify(`Couldn't rename: ${errMsg(e)}`, 'error');
     }
-    // Keep expansion state of renamed folders.
+    this.relocated(entry.path, to);
+    await this.refreshDir(dirname(entry.path));
+  }
+
+  /** Bookkeeping after `from` became `to` (keeps expansion state of moved folders). */
+  private relocated(from: string, to: string): void {
     for (const [p, node] of [...this.dirs]) {
-      if (isInside(entry.path, p)) {
+      if (isInside(from, p)) {
         this.dirs.delete(p);
-        node.path = to + p.slice(entry.path.length);
+        node.path = to + p.slice(from.length);
         this.dirs.set(node.path, node);
         node.loaded = false;
       }
     }
-    if (this.active && isInside(entry.path, this.active)) this.active = to + this.active.slice(entry.path.length);
-    this.host.onRenamed(entry.path, to);
-    await this.refreshDir(dirname(entry.path));
+    if (this.active && isInside(from, this.active)) this.active = to + this.active.slice(from.length);
+    this.host.onRenamed(from, to);
+  }
+
+  /** Move a file or folder into `destDir` (sidebar drag & drop). */
+  async move(src: string, destDir: string): Promise<boolean> {
+    const rename = extras(this.host.platform).rename;
+    if (!rename || !canMoveInto(src, destDir)) return false;
+    let to = join(destDir, basename(src));
+    if (await this.host.platform.stat(to)) {
+      const choice = await ask({
+        title: 'File/directory already exists at target path.',
+        message: basename(to),
+        buttons: [
+          { id: 'cancel', label: 'Cancel' },
+          { id: 'keep', label: 'Keep Both' },
+          { id: 'replace', label: 'Replace', primary: true },
+        ],
+        cancelId: 'cancel',
+      });
+      if (choice === 'cancel') return false;
+      if (choice === 'keep') {
+        while (await this.host.platform.stat(to)) to = join(destDir, copyName(basename(to)));
+      } else {
+        const remove = extras(this.host.platform).remove;
+        if (!remove) return false;
+        try {
+          await remove.call(this.host.platform, to);
+        } catch (e) {
+          this.host.notify(`Couldn't replace: ${errMsg(e)}`, 'error');
+          return false;
+        }
+      }
+    }
+    try {
+      await rename.call(this.host.platform, src, to);
+    } catch (e) {
+      this.host.notify(`Couldn't move: ${errMsg(e)}`, 'error');
+      return false;
+    }
+    this.relocated(src, to);
+    await this.refreshDir(dirname(src));
+    await this.toggle(destDir, true);
+    await this.refreshDir(destDir);
+    return true;
+  }
+
+  private dropTarget(el: HTMLElement, dir: string): void {
+    let hover = 0;
+    const stopHover = (): void => {
+      clearTimeout(hover);
+      hover = 0;
+    };
+    el.addEventListener('dragover', (e) => {
+      if (draggedPath(e) === null) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+      el.classList.add('drop-target');
+      // Hovering a collapsed folder expands it after 1 s.
+      if (!hover && !this.dirs.get(dir)?.expanded) hover = window.setTimeout(() => void this.toggle(dir, true), 1000);
+    });
+    el.addEventListener('dragleave', () => {
+      el.classList.remove('drop-target');
+      stopHover();
+    });
+    el.addEventListener('drop', (e) => {
+      stopHover();
+      el.classList.remove('drop-target');
+      const src = draggedPath(e);
+      if (!src) return;
+      e.preventDefault();
+      e.stopPropagation();
+      endDrag();
+      void this.move(src, dir);
+    });
   }
 
   async delete(entry: DirEntry): Promise<void> {
@@ -419,6 +566,12 @@ export class FileTree {
     }
     e.preventDefault();
   }
+}
+
+/** "a.b.md" → "a (copy).b.md": " (copy)" goes before the first dot. */
+export function copyName(name: string): string {
+  const i = name.indexOf('.', 1);
+  return i < 0 ? `${name} (copy)` : `${name.slice(0, i)} (copy)${name.slice(i)}`;
 }
 
 function nameError(v: string): string | null {

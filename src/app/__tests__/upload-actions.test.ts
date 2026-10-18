@@ -40,7 +40,7 @@ describe('ImageUploader', () => {
   it('uploads a single image via PicGo config', async () => {
     const t = setup({ settings: { uploader: 'picgo', picgoPort: 4000 }, upload: async () => ['https://p/1'] });
     expect((await t.uploader.uploadSrcs(['assets/a.png'])).ok).toBe(true);
-    expect(t.uploadImages).toHaveBeenCalledWith(['/docs/assets/a.png'], { kind: 'picgo', port: 4000, timeoutSecs: 30 });
+    expect(t.uploadImages).toHaveBeenCalledWith(['/docs/assets/a.png'], { kind: 'picgo', port: 4000, timeoutSecs: 20 });
     expect(t.editor.getMarkdown()).toContain('![one](https://p/1)');
     expect(t.editor.getMarkdown()).toContain('<b c.png>');
   });

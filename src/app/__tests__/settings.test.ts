@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_SETTINGS, imageRulePresetId, migrateImageRule, migrateSettings, pushRecent, SETTINGS_VERSION } from '../settings';
+import { DEFAULT_SETTINGS, imageRulePresetId, launchPlan, migrateImageRule, TYPORA_MARKDOWN_DEFAULTS, migrateSettings, newFileEol, pushRecent, SETTINGS_VERSION } from '../settings';
+import { DEFAULT_MARKDOWN_OPTIONS } from '../../contracts';
 import { effectiveTheme, isDarkThemeCss } from '../themes';
 // Vitest stubs `?raw` CSS imports to '' — read the theme files directly.
 // @ts-expect-error node builtin without @types/node
@@ -73,5 +74,62 @@ describe('themes', () => {
     for (const css of Object.values(BUILTIN_THEMES))
       for (const v of ['--margin-fg', '--margin-bg', '--margin-accent', '--margin-code-bg', '--margin-border', '--margin-font-body', '--margin-font-mono'])
         expect(css).toContain(`${v}:`);
+  });
+});
+
+describe('preferences completeness (#100, #102)', () => {
+  it('defaults: Typora-style On Launch and Markdown options', () => {
+    const s = migrateSettings({});
+    expect(s.onLaunch).toBe('newFile');
+    expect(s.defaultLineEnding).toBe('auto');
+    expect(s.markdown).toEqual(TYPORA_MARKDOWN_DEFAULTS);
+    expect(s.markdown).toMatchObject({ inlineMath: false, highlight: false, subscript: false, superscript: false, strict: true, emoji: true, expandSimpleBlock: false, mathNumbering: 'none', visibleBr: true, codeLineWrap: true, autoPairBrackets: true, autoPairMarkdown: false });
+  });
+
+  it('an install that predates #102 keeps its rendering (no markdown block yet)', () => {
+    expect(migrateSettings({ settingsVersion: 2, theme: 'paper' }).markdown).toEqual(DEFAULT_MARKDOWN_OPTIONS);
+    expect(migrateSettings({ settingsVersion: 3, markdown: {} }).markdown).toEqual(TYPORA_MARKDOWN_DEFAULTS);
+    expect(migrateSettings({}).keyBinding).toEqual({});
+  });
+
+  it('migrates restoreLastFolder → onLaunch restoreFolders', () => {
+    expect(migrateSettings({ restoreLastFolder: true }).onLaunch).toBe('restoreFolders');
+    expect(migrateSettings({ restoreLastFolder: false }).onLaunch).toBe('newFile');
+    expect(migrateSettings({ restoreLastFolder: true, onLaunch: 'customFolder' }).onLaunch).toBe('customFolder');
+    expect(migrateSettings({ onLaunch: 'bogus' }).onLaunch).toBe('newFile');
+  });
+
+  it('validates nested markdown options field by field', () => {
+    const m = migrateSettings({ markdown: { emoji: true, ulStyle: '*', olStyle: 'x', codeIndentSize: 7, mathNumbering: 'all', strict: 'nope' } }).markdown;
+    expect(m.emoji).toBe(true);
+    expect(m.ulStyle).toBe('*');
+    expect(m.olStyle).toBe('increment');
+    expect(m.codeIndentSize).toBe(4);
+    expect(m.mathNumbering).toBe('all');
+    expect(m.strict).toBe(true);
+  });
+
+  it('text column width is 0 (theme default) or 400–3000', () => {
+    expect(migrateSettings({ textColumnWidth: 120 }).textColumnWidth).toBe(0);
+    expect(migrateSettings({ textColumnWidth: 900 }).textColumnWidth).toBe(900);
+    expect(migrateSettings({ textColumnWidth: 9000 }).textColumnWidth).toBe(3000);
+  });
+
+  it('launchPlan follows On Launch', () => {
+    const base = { defaultFolder: '/custom', lastFolder: '/last', recentFiles: ['/last/a.md'] };
+    const demo = { initialFolder: '/demo', initialFile: '/demo/Welcome.md' };
+    expect(launchPlan({ ...base, onLaunch: 'newFile' }, demo)).toEqual({ folder: '/demo', file: '/demo/Welcome.md' });
+    expect(launchPlan({ ...base, onLaunch: 'newFile' })).toEqual({ folder: null, file: null });
+    expect(launchPlan({ ...base, onLaunch: 'restoreFolders' })).toEqual({ folder: '/last', file: null });
+    expect(launchPlan({ ...base, onLaunch: 'restoreAll' }, demo)).toEqual({ folder: '/last', file: '/last/a.md' });
+    expect(launchPlan({ ...base, onLaunch: 'customFolder' })).toEqual({ folder: '/custom', file: null });
+    expect(launchPlan({ ...base, defaultFolder: '', onLaunch: 'customFolder' }, demo).folder).toBe('/demo');
+  });
+
+  it('newFileEol: Auto follows the OS', () => {
+    expect(newFileEol('auto', false)).toBe('\n');
+    expect(newFileEol('auto', true)).toBe('\r\n');
+    expect(newFileEol('crlf', false)).toBe('\r\n');
+    expect(newFileEol('lf', true)).toBe('\n');
   });
 });

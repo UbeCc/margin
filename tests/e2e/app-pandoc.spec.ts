@@ -15,7 +15,7 @@ test('pandoc export in the web build reports an error and never leaves a progres
 test('preferences: pandoc path is editable and persisted', async ({ page }) => {
   await boot(page);
   await page.keyboard.press(`${MOD}+Comma`);
-  await page.locator('.preferences').getByText('Files', { exact: true }).click();
+  await page.locator('.preferences').locator('.pref-tab[data-section=export]').click();
   const input = page.locator('input[data-pref=pandocPath]');
   await expect(input).toHaveValue('');
   await input.fill('/opt/homebrew/bin/pandoc');
@@ -25,6 +25,6 @@ test('preferences: pandoc path is editable and persisted', async ({ page }) => {
   await expect(page.locator('[data-pref-status=pandoc]')).toContainText('desktop app');
   await page.keyboard.press('Escape');
   await page.keyboard.press(`${MOD}+Comma`);
-  await page.locator('.preferences').getByText('Files', { exact: true }).click();
+  await page.locator('.preferences').locator('.pref-tab[data-section=export]').click();
   await expect(page.locator('input[data-pref=pandocPath]')).toHaveValue('/opt/homebrew/bin/pandoc');
 });

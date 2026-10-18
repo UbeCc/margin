@@ -1,0 +1,67 @@
+{
+  "ok": false,
+  "total_seconds": 282,
+  "cache": [
+    "e2e port: 32769",
+    "node_modules: hit (lock 975215959a357a01)",
+    "cargo debug target: warm",
+    "cargo release target: warm"
+  ],
+  "stages": [
+    {
+      "stage": "npm_ci",
+      "status": "pass",
+      "seconds": 0,
+      "notes": ""
+    },
+    {
+      "stage": "typecheck",
+      "status": "pass",
+      "seconds": 2,
+      "notes": ""
+    },
+    {
+      "stage": "vitest",
+      "status": "pass",
+      "seconds": 4,
+      "notes": "485/485 tests"
+    },
+    {
+      "stage": "e2e",
+      "status": "fail",
+      "seconds": 55,
+      "notes": "chromium 136/137, webkit 133/137, **1 failed**",
+      "tail": "    - Press `⌘/` to flip between rich and source view.·\n    ## Writing·\n    > Simplicity is the ultimate sophistication.·\n    Inline `code`, *emphasis*, ==highlights== and [links](https://example.com) all work.·\n    ### 中文排版·\n    在 Margin 里，中英文混排也应该舒服：行高宽松，标点不挤，字体回退合理。·\n    ## Next steps·\n    1. Open a folder from the sidebar.\n    2. Try the themes in Preferences.file:///Users/demo/Notes/Ideas/Roadmap.md\n    \"\n    Call Log:\n    - Timeout 5000ms exceeded while waiting on the predicate\n      127 |   // Into the editor: a relative link at the drop point.\n      128 |   await roadmap.dragTo(page.locator('.md-editor .md-block').last());\n    > 129 |   await expect.poll(() => editorValue(page)).toContain('[Roadmap](Ideas/Roadmap.md)');\n          |                                              ^\n      130 |   // Onto a folder: move it there (open document path follows).\n      131 |   await tree(page).locator(`.tree-row[data-path=\"${ROOT}/notes.txt\"]`).dragTo(tree(page).locator(`.tree-row[data-path=\"${ROOT}/Journal\"]`));\n      132 |   await expect(tree(page).locator(`.tree-row[data-path=\"${ROOT}/Journal/notes.txt\"]`)).toBeVisible();\n        at /ci/work/tests/e2e/parity-sidebar.spec.ts:129:46\n    Error Context: test-results/parity-sidebar-sidebar-dra-812b8-her-apps-drop-files-to-open-webkit-retry1/error-context.md\n    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────\n    test-results/parity-sidebar-sidebar-dra-812b8-her-apps-drop-files-to-open-webkit-retry1/trace.zip\n    Usage:\n        npx playwright show-trace test-results/parity-sidebar-sidebar-dra-812b8-her-apps-drop-files-to-open-webkit-retry1/trace.zip\n    ────────────────────────────────────────────────────────────────────────────────────────────────\n  1 failed\n    [webkit] › tests/e2e/parity-sidebar.spec.ts:122:1 › sidebar.drag: Drag files from sidebar into the editor / other apps; drop files to open \n  4 skipped\n  269 passed (54.2s)"
+    },
+    {
+      "stage": "cargo_test",
+      "status": "pass",
+      "seconds": 20,
+      "notes": "133 passed, 0 failed / 0 passed, 0 failed / 0 passed, 0 failed"
+    },
+    {
+      "stage": "clippy",
+      "status": "pass",
+      "seconds": 26,
+      "notes": "clean"
+    },
+    {
+      "stage": "bundle",
+      "status": "pass",
+      "seconds": 193,
+      "notes": "Margin_0.1.0_amd64.AppImage (81.3 MB), Margin_0.1.0_amd64.deb (6.3 MB)"
+    },
+    {
+      "stage": "smoke",
+      "status": "pass",
+      "seconds": 11,
+      "notes": "window ok, screenshot stddev 0.377856"
+    },
+    {
+      "stage": "native_qa",
+      "status": "pass",
+      "seconds": 32,
+      "notes": "11/13 pass"
+    }
+  ]
+}

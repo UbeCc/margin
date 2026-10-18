@@ -8,6 +8,7 @@ test('theme switching via preferences persists across reloads', async ({ page })
   await expect(root).toHaveAttribute('data-theme', 'paper');
 
   await page.keyboard.press(`${MOD}+Comma`);
+  await page.locator('.pref-tab[data-section=appearance]').click();
   const prefs = page.locator('.preferences');
   await expect(prefs).toBeVisible();
   await prefs.locator('select[data-pref=theme]').selectOption('github');
@@ -48,6 +49,7 @@ test('command palette theme entry and custom CSS', async ({ page }) => {
   await page.keyboard.press('Enter');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'github');
   await page.keyboard.press(`${MOD}+Comma`);
+  await page.locator('.pref-tab[data-section=appearance]').click();
   await page.locator('textarea[data-pref=customCss]').fill('.margin-doc { letter-spacing: 3px; }');
   await page.keyboard.press('Escape');
   await expect.poll(() => page.evaluate(() => getComputedStyle(document.querySelector('.editor-host')!).letterSpacing)).toBe('3px');
@@ -72,6 +74,7 @@ test('preferences: Theme lists light themes, Dark theme lists dark ones', async 
   await page.emulateMedia({ colorScheme: 'light' });
   await boot(page);
   await page.keyboard.press(`${MOD}+Comma`);
+  await page.locator('.pref-tab[data-section=appearance]').click();
   const values = (sel: string) => page.locator(sel).locator('option').evaluateAll((os) => os.map((o) => (o as HTMLOptionElement).value));
   expect(await values('select[data-pref=theme]')).toEqual(['paper', 'github']);
   expect(await values('select[data-pref=darkTheme]')).toEqual(['night']);

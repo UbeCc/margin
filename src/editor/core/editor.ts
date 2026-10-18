@@ -3,7 +3,7 @@
  * positions, the change pipeline (record undo → re-render → place caret →
  * notify). Event handling lives in input.ts, commands in commands.ts.
  */
-import type { EditorSettings, Heading } from '../../contracts';
+import { DEFAULT_MARKDOWN_OPTIONS, type EditorSettings, type Heading, type MarkdownOptions } from '../../contracts';
 import { Doc, leafContent } from './model';
 import { View, EMPTY_ID } from './view';
 import { History, type Sel } from './history';
@@ -70,6 +70,17 @@ export class EditorCore {
     this.root.classList.toggle('md-typewriter', !!this.settings.typewriterMode);
     this.root.spellcheck = !!this.settings.spellcheck;
     this.root.dataset.scheme = this.settings.colorScheme;
+    // #102 whitespace / display options are pure CSS over the unchanged source.
+    const md = this.md();
+    this.root.classList.toggle('md-ignore-linebreak', !md.preserveLineBreak);
+    this.root.classList.toggle('md-visible-br', md.visibleBr);
+    this.root.classList.toggle('md-indent-first', md.indentFirstLine);
+    this.root.classList.toggle('md-no-expand-simple', !md.expandSimpleBlock);
+  }
+
+  /** Effective Markdown / Editor preferences (#100, #102). */
+  md(): MarkdownOptions {
+    return { ...DEFAULT_MARKDOWN_OPTIONS, ...this.settings.markdown };
   }
 
   // ------------------------------------------------------------ selection mapping
@@ -235,7 +246,8 @@ export class EditorCore {
   }
 
   /** Replace document range with text (one text leaf → local edit, else re-parse). */
-  replaceRange(from: number, to: number, text: string, key: string | null): void {
+  /** Replace [from, to) with `text`; the caret ends `back` characters before the end of the inserted text. */
+  replaceRange(from: number, to: number, text: string, key: string | null, back = 0): void {
     this.change(() => {
       if (!this.doc.leaves.length) {
         this.doc.replace(0, 0, text);
@@ -248,10 +260,10 @@ export class EditorCore {
         const c = leafContent(l);
         const base = this.doc.start(a.i);
         this.doc.setContent(a.i, c.slice(0, a.off) + text + c.slice(b.off));
-        return { pos: posIn(l.lines, base, a.off + text.length) };
+        return { pos: posIn(l.lines, base, a.off + text.length - back) };
       }
       this.doc.replace(from, to, text);
-      return { pos: from + text.length };
+      return { pos: from + text.length - back };
     }, key);
   }
 

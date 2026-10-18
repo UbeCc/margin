@@ -11,6 +11,7 @@ export type AppCommand =
   | 'reloadFromDisk'
   | 'openThemesFolder'
   | 'toggleLineEnding'
+  | 'toggleFinalNewline'
   | 'uploadAllImages';
 
 export type CommandId = MenuAction | AppCommand;
@@ -179,6 +180,8 @@ export const COMMANDS: CommandSpec[] = [
   { id: 'toggleSidebar', label: 'Toggle Sidebar', category: 'View', keys: ['Mod+\\', 'Mod+Shift+L'] },
   { id: 'showOutline', label: 'Show Outline', category: 'View', keys: ['Mod+Shift+1'] },
   { id: 'showFiles', label: 'Show Files', category: 'View', keys: ['Mod+Shift+3'] },
+  { id: 'showArticles', label: 'Show Articles (List View)', category: 'View', keys: ['Mod+Shift+2'] },
+  { id: 'sidebarSearch', label: 'Search in Folder', category: 'View', keys: ['Mod+Shift+F'] },
   { id: 'revealActiveFile', label: 'Reveal Active File in Sidebar', category: 'View' },
   { id: 'toggleSource', label: 'Toggle Source Code Mode', category: 'View', keys: ['Mod+/'] },
   { id: 'toggleFocus', label: 'Focus Mode', category: 'View', keys: ['F8'] },
@@ -188,8 +191,32 @@ export const COMMANDS: CommandSpec[] = [
   { id: 'clearRecent', label: 'Clear Recent Files', category: 'File' },
   { id: 'zoomReset', label: 'Actual Size', category: 'View', keys: ['Mod+Shift+0'] },
   { id: 'toggleLineEnding', label: 'Toggle Line Endings (LF / CRLF)', category: 'View' },
+  { id: 'toggleFinalNewline', label: 'Insert Final New Line On Save', category: 'Edit' },
   { id: 'openThemesFolder', label: 'Open Themes Folder', category: 'Theme' },
   { id: 'uploadAllImages', label: 'Upload All Local Images', category: 'Format' },
+  // #99 Format › Image (per-image entries act on the image at the caret)
+  ...(
+    [
+      ['insert', 'Insert Image'],
+      ['insertLocal', 'Insert Local Images…'],
+      ['openLocation', 'Open Image Location…'],
+      ['copyContent', 'Copy Image Content'],
+      ['syntaxMarkdown', 'Switch Image Syntax: Markdown Style'],
+      ['syntaxHtml', 'Switch Image Syntax: HTML Style'],
+      ['deleteFile', 'Delete Image File'],
+      ['copyTo', 'Copy Image to…'],
+      ['moveTo', 'Rename or Move Image to…'],
+      ['upload', 'Upload Image'],
+      ['copyAll', 'Copy All Images to…'],
+      ['moveAll', 'Move All Images to…'],
+      ['reloadAll', 'Reload All Images'],
+      ['insertCopyToFolder', 'When Insert Local Image: Copy Image File to Folder…'],
+      ['insertUpload', 'When Insert Local Image: Upload Image'],
+      ['rootPath', 'Use Image Root Path'],
+      ['settings', 'Global Image Settings…'],
+    ] as const
+  ).map(([a, label]): CommandSpec => ({ id: `image:${a}`, label, category: 'Format', scope: a === 'settings' ? 'global' : 'editor' })),
+  ...([25, 33, 50, 67, 80, 100, 150, 200] as const).map((z): CommandSpec => ({ id: `image:zoom-${z}`, label: `Zoom Image to ${z}%`, category: 'Format', scope: 'editor' })),
 ];
 
 /** 'Mod+Shift+S' form of a native menu accelerator (src/platform/shortcuts.ts). */
@@ -217,13 +244,37 @@ const PARSED: { spec: CommandSpec; keys: ParsedShortcut[] }[] = COMMANDS.filter(
   keys: spec.keys!.map(parseShortcut),
 }));
 
+let CUSTOM: { spec: CommandSpec; keys: ParsedShortcut[] }[] = [];
+
+/**
+ * Preferences › Custom Shortcut Keys (#100): `{ "<command id or label>": "Mod+Shift+K" }`
+ * (several keys separated by ","). Custom keys win over built-in ones; an empty string
+ * leaves the default. Returns the entries that could not be resolved.
+ */
+export function setCustomKeys(map: Record<string, string>): string[] {
+  const bad: string[] = [];
+  CUSTOM = [];
+  for (const [name, accel] of Object.entries(map)) {
+    if (!accel.trim()) continue;
+    const spec = BY_ID.get(name as CommandId) ?? COMMANDS.find((c) => c.label.toLowerCase() === name.trim().toLowerCase());
+    const keys = accel.split(',').map((k) => k.trim()).filter(Boolean);
+    if (!spec || !keys.length) {
+      bad.push(name);
+      continue;
+    }
+    CUSTOM.push({ spec, keys: keys.map(parseShortcut) });
+  }
+  return bad;
+}
+
 /** Find the command bound to a key event, if any. */
 export function commandForKey(e: KeyLike, mac = isMac): CommandSpec | null {
+  for (const { spec, keys } of CUSTOM) if (keys.some((k) => matchShortcut(e, k, mac))) return { ...spec, passthrough: false };
   for (const { spec, keys } of PARSED) if (keys.some((k) => matchShortcut(e, k, mac))) return spec;
   return null;
 }
 
 /** Validate a string coming from native menus / IPC. */
 export function isCommandId(s: string): s is CommandId {
-  return BY_ID.has(s as CommandId) || s.startsWith('theme:') || /^heading:[0-6]$/.test(s);
+  return BY_ID.has(s as CommandId) || s.startsWith('theme:') || /^heading:[0-6]$/.test(s) || s === 'image:uploadAll';
 }

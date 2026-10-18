@@ -211,12 +211,50 @@ const FORMAT: &[Item] = &[
     ("-", "", None),
     ("clearFormat", "Clear Format", None),
 ];
+// Format › Image (#99): Typora's menu order; per-image entries act on the image at the caret.
+const IMAGE_TOP: &[Item] = &[
+    ("image:insert", "Insert Image", None),
+    ("image:insertLocal", "Insert Local Images…", None),
+    ("-", "", None),
+    ("image:openLocation", "Open Image Location…", None),
+    ("image:copyContent", "Copy Image Content", None),
+];
+const IMAGE_ZOOM: &[Item] = &[
+    ("image:zoom-25", "25%", None),
+    ("image:zoom-33", "33%", None),
+    ("image:zoom-50", "50%", None),
+    ("image:zoom-67", "67%", None),
+    ("image:zoom-80", "80%", None),
+    ("image:zoom-100", "100%", None),
+    ("image:zoom-150", "150%", None),
+    ("image:zoom-200", "200%", None),
+];
+const IMAGE_SYNTAX: &[Item] = &[("image:syntaxMarkdown", "Markdown Style", None), ("image:syntaxHtml", "HTML Style", None)];
+const IMAGE_FILE: &[Item] = &[
+    ("image:deleteFile", "Delete Image File", None),
+    ("image:copyTo", "Copy Image to…", None),
+    ("image:moveTo", "Rename or Move Image to…", None),
+    ("image:upload", "Upload Image", None),
+    ("-", "", None),
+    ("image:copyAll", "Copy All Images to…", None),
+    ("image:moveAll", "Move All Images to…", None),
+    ("image:uploadAll", "Upload All Local Images", None),
+    ("image:reloadAll", "Reload All Images", None),
+    ("-", "", None),
+];
+const IMAGE_WHEN_INSERT: &[Item] = &[("image:insertCopyToFolder", "Copy Image File to Folder…", None), ("image:insertUpload", "Upload Image", None)];
+const IMAGE_BOTTOM: &[Item] = &[("image:rootPath", "Use Image Root Path", None), ("image:settings", "Global Image Settings…", None)];
+#[cfg(test)]
+const IMAGE_ALL: &[&[Item]] = &[IMAGE_TOP, IMAGE_ZOOM, IMAGE_SYNTAX, IMAGE_FILE, IMAGE_WHEN_INSERT, IMAGE_BOTTOM];
+
 const VIEW: &[Item] = &[
     ("commandPalette", "Command Palette…", Some("CmdOrCtrl+Shift+A")),
     ("-", "", None),
     ("toggleSidebar", "Toggle Sidebar", Some("CmdOrCtrl+Backslash")),
     ("showOutline", "Outline", Some("CmdOrCtrl+Shift+1")),
+    ("showArticles", "Articles", Some("CmdOrCtrl+Shift+2")),
     ("showFiles", "Files", Some("CmdOrCtrl+Shift+3")),
+    ("sidebarSearch", "Search", Some("CmdOrCtrl+Shift+F")),
     ("revealActiveFile", "Reveal Active File in Sidebar", None),
     ("toggleSource", "Source Code Mode", Some("CmdOrCtrl+Slash")),
     ("-", "", None),
@@ -236,6 +274,7 @@ pub fn all_actions() -> Vec<&'static str> {
     let mut v: Vec<&'static str> = [FILE_OPEN, FILE, EXPORT, EXPORT_MORE, EDIT_TOP, EDIT_FIND, PARAGRAPH, FORMAT, VIEW, WINDOW_TABS]
         .iter()
         .chain(EDIT_EXTRA.iter())
+        .chain(IMAGE_ALL.iter())
         .chain(SUBMENUS.iter().map(|(_, items)| items))
         .flat_map(|g| g.iter().map(|i| i.0))
         .filter(|id| *id != "-" && !id.starts_with('@'))
@@ -355,7 +394,14 @@ pub fn build<R: Runtime>(
     menu = menu.item(&edit);
 
     menu = menu.item(&add_items(app, SubmenuBuilder::new(app, "Paragraph"), PARAGRAPH)?.build()?);
-    menu = menu.item(&add_items(app, SubmenuBuilder::new(app, "Format"), FORMAT)?.build()?);
+    let image = add_items(app, SubmenuBuilder::new(app, "Image"), IMAGE_TOP)?
+        .item(&add_items(app, SubmenuBuilder::new(app, "Zoom Image"), IMAGE_ZOOM)?.build()?)
+        .item(&add_items(app, SubmenuBuilder::new(app, "Switch Image Syntax"), IMAGE_SYNTAX)?.build()?);
+    let image = add_items(app, image.separator(), IMAGE_FILE)?
+        .item(&add_items(app, SubmenuBuilder::new(app, "When Insert Local Image"), IMAGE_WHEN_INSERT)?.build()?);
+    let image = add_items(app, image, IMAGE_BOTTOM)?.build()?;
+    let format = add_items(app, SubmenuBuilder::new(app, "Format"), FORMAT)?.separator().item(&image);
+    menu = menu.item(&format.build()?);
     let view = add_items(app, SubmenuBuilder::new(app, "View"), VIEW)?
         .separator()
         .item(&PredefinedMenuItem::fullscreen(app, None)?)
@@ -441,7 +487,7 @@ mod tests {
                 "new", "open", "openFolder", "save", "saveAs", "close", "exportHtml", "exportPdf", "print", "undo",
                 "redo", "find", "replace", "toggleSidebar", "toggleSource", "toggleFocus", "toggleTypewriter",
                 "quickOpen", "zoomIn", "zoomOut", "zoomReset", "preferences", "clearRecent", "commandPalette", "showOutline",
-                "showFiles", "revealActiveFile", "reloadFromDisk", "toggleLineEnding", "exportHtmlPlain", "exportImage",
+                "showFiles", "showArticles", "sidebarSearch", "revealActiveFile", "reloadFromDisk", "toggleLineEnding", "exportHtmlPlain", "exportImage",
                 "exportPrevious", "exportOverwrite", "exportSettings", "pageSetup",
                 "exportDocx", "exportLatex",
                 "exportEpub", "clearFormat", "exportOdt", "exportRtf", "exportMediawiki", "exportRst", "exportTextile", "exportOpml",
@@ -463,7 +509,8 @@ mod tests {
                 || a.starts_with("delete:")
                 || a.starts_with("table:")
                 || a.starts_with("code:")
-                || a.starts_with("math:");
+                || a.starts_with("math:")
+                || a.starts_with("image:");
             assert!(ok, "{a} is not a MenuAction");
         }
     }
