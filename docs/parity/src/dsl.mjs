@@ -22,6 +22,7 @@ export const T = {
   set: 'src/app/__tests__/settings.test.ts::',
   util: 'src/app/__tests__/util.test.ts::',
   web: 'src/platform/web.test.ts::',
+  pexp: 'tests/e2e/parity-export.spec.ts::',
   pclip: 'tests/e2e/parity-clipboard.spec.ts::',
   pimg: 'tests/e2e/parity-images.spec.ts::',
 };

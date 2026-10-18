@@ -4,6 +4,7 @@ import { themeLabel } from '../themes';
 import type { MarginSettings } from './settings';
 import { h, debounce } from './util/dom';
 import { openModal } from './ui/modal';
+import { exportPrefsSection } from './preferences-export';
 import { uploadPrefsSection } from './upload-prefs';
 import { imageRulesSection } from './images/prefs';
 
@@ -14,13 +15,15 @@ export interface PreferencesHost {
   isDarkTheme(name: string): boolean;
   openThemesFolder(): void;
   pickFolder(): Promise<string | null>;
+  /** File picker limited to `extensions` (Pandoc Style Reference / Template / Custom CSS). */
+  pickFile?(name: string, extensions: string[]): Promise<string | null>;
   /** Locate pandoc for the given path ('' = auto); resolves to a status line, never rejects. */
   detectPandoc?(path: string): Promise<string>;
   /** #92: Preferences › Images › Test Uploader (desktop). */
   testUploader?(config: UploadConfig): Promise<UploaderTestReport>;
 }
 
-type Section = 'appearance' | 'editor' | 'files' | 'images';
+type Section = 'appearance' | 'editor' | 'files' | 'images' | 'export';
 
 let openHandle: { close(): void } | null = null;
 
@@ -152,6 +155,16 @@ export function openPreferences(host: PreferencesHost, initial: Section = 'appea
     editor: ['Editor', editor],
     files: ['Files', files],
     images: ['Images', images],
+    export: [
+      'Export',
+      exportPrefsSection({
+        get: () => host.settings().export,
+        set: (next) => set({ export: next }),
+        themeNames: () => host.themeNames(),
+        pickFolder: () => host.pickFolder(),
+        pickFile: host.pickFile ? (n, e) => host.pickFile!(n, e) : undefined,
+      }),
+    ],
   };
   const nav = h('nav.pref-nav', { role: 'tablist' });
   const panel = h('div.pref-panel');

@@ -1,4 +1,4 @@
-import type { AppSettings, DirEntry, FsEvent, ImageRule, MenuAction, Platform } from '../contracts';
+import type { AppSettings, DirEntry, FsEvent, ImageRule, MenuAction, PdfExportOptions, Platform } from '../contracts';
 import {
   basename,
   builtinThemes,
@@ -11,6 +11,7 @@ import {
   normalizePath,
   normalizeSettings,
   printHtmlInIframe,
+  withPrintPageCss,
   relativePath,
   toMarkdownSrc,
 } from './common';
@@ -149,7 +150,9 @@ export class WebPlatform implements Platform {
   private opts: Required<WebPlatformOptions>;
   /** Overridable dialog (e2e tests): return a path or null. */
   dialogHook: DialogHook | null = null;
-  readonly exports: { kind: 'html' | 'pdf'; path: string; html: string }[] = [];
+  readonly exports: { kind: 'html' | 'pdf' | 'image'; path: string; html: string; bytes?: Uint8Array; opts?: PdfExportOptions }[] = [];
+  /** Files opened via `openExportedFile` (e2e inspection). */
+  readonly openedExports: string[] = [];
   title = '';
 
   constructor(options: WebPlatformOptions = {}) {
@@ -447,7 +450,7 @@ export class WebPlatform implements Platform {
     return this.opts.useFileSystemAccess && typeof window !== 'undefined' ? (window as FsaWindow) : null;
   }
 
-  async openFileDialog(opts?: { directory?: boolean }): Promise<string | null> {
+  async openFileDialog(opts?: { directory?: boolean; filters?: { name: string; extensions: string[] }[] }): Promise<string | null> {
     const kind = opts?.directory ? 'openFolder' : 'open';
     const hook = this.hook();
     if (hook) return hook(kind, opts);
@@ -567,9 +570,23 @@ export class WebPlatform implements Platform {
   }
 
   /** Browsers cannot write PDFs: opens the print dialog with the HTML (user picks "Save as PDF"). */
-  async exportPdf(html: string, outPath: string): Promise<void> {
-    this.exports.push({ kind: 'pdf', path: outPath, html });
-    if (!navigatorIsAutomated() && typeof document !== 'undefined') await printHtmlInIframe(html);
+  async exportPdf(html: string, outPath: string, opts?: PdfExportOptions): Promise<void> {
+    this.exports.push({ kind: 'pdf', path: outPath, html, opts });
+    if (!navigatorIsAutomated() && typeof document !== 'undefined') await printHtmlInIframe(withPrintPageCss(html, opts));
+  }
+
+  /** Export › Image: keeps the bytes (as a data: URL file in the memfs) and downloads them. */
+  async exportBinary(bytes: Uint8Array, outPath: string): Promise<void> {
+    const mime = /\.jpe?g$/i.test(outPath) ? 'image/jpeg' : 'image/png';
+    this.exports.push({ kind: 'image', path: outPath, html: '', bytes });
+    let bin = '';
+    for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+    await this.writeTextFile(outPath, `data:${mime};base64,${btoa(bin)}`);
+    if (!navigatorIsAutomated()) downloadBlob(new Blob([bytes as BlobPart], { type: mime }), basename(outPath) || 'export.png');
+  }
+
+  async openExportedFile(path: string): Promise<void> {
+    this.openedExports.push(path);
   }
 
   async allowAssetDir(_path: string): Promise<void> {}

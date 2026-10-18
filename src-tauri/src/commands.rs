@@ -328,30 +328,47 @@ pub async fn export_html(state: State<'_, AppState>, html: String, out_path: Str
     let own = state.own_writes.clone();
     blocking(move || {
         let existed = p.exists();
-        fsops::atomic_write(&p, html.as_bytes()).map(|_| own.record(&p, existed))
+        fsops::atomic_write(&p, html.as_bytes()).map(|_| {
+            own.record(&p, existed);
+            crate::export_cmds::record_export(&p);
+        })
     })
     .await?
     .map_err(err)
 }
 
-pub async fn export_pdf_impl<Rt: Runtime>(app: &AppHandle<Rt>, html: String, out: PathBuf, base_dir: Option<PathBuf>) -> R<()> {
+pub async fn export_pdf_impl<Rt: Runtime>(
+    app: &AppHandle<Rt>,
+    html: String,
+    out: PathBuf,
+    base_dir: Option<PathBuf>,
+    options: crate::export_cmds::PdfOptions,
+) -> R<()> {
     #[cfg(target_os = "macos")]
     {
         let base = base_dir.or_else(|| out.parent().map(Path::to_path_buf)).unwrap_or_else(|| PathBuf::from("/"));
         allow_assets(app, &base, true);
-        crate::pdf_macos::export_pdf(app, html, base, out).await
+        crate::pdf_macos::export_pdf(app, html, base, out.clone(), options).await?;
+        crate::export_cmds::record_export(&out);
+        Ok(())
     }
     #[cfg(not(target_os = "macos"))]
     {
-        let _ = (app, html, out, base_dir);
+        let _ = (app, html, out, base_dir, options);
         Err("unsupported: native PDF export is macOS-only; use the print dialog".into())
     }
 }
 
 #[tauri::command]
-pub async fn export_pdf<Rt: Runtime>(app: AppHandle<Rt>, html: String, out_path: String, base_dir: Option<String>) -> R<()> {
+pub async fn export_pdf<Rt: Runtime>(
+    app: AppHandle<Rt>,
+    html: String,
+    out_path: String,
+    base_dir: Option<String>,
+    options: Option<crate::export_cmds::PdfOptions>,
+) -> R<()> {
     let out = abs(&out_path)?;
-    export_pdf_impl(&app, html, out, base_dir.map(PathBuf::from)).await
+    export_pdf_impl(&app, html, out, base_dir.map(PathBuf::from), options.unwrap_or_default()).await
 }
 
 /// Print the main window's current content (system print dialog).

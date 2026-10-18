@@ -4,6 +4,8 @@
 mod clipboard_macos;
 mod clipboard_read;
 mod commands;
+mod export_cmds;
+mod export_custom;
 mod fsops;
 #[cfg(unix)]
 mod fsops_unix;
@@ -11,8 +13,11 @@ mod image_tools;
 mod images;
 mod menu;
 mod pandoc;
+mod pandoc_import;
 #[cfg(target_os = "macos")]
 mod pdf_macos;
+#[cfg(target_os = "macos")]
+mod pdf_post_macos;
 mod quick_open;
 mod remote_images;
 #[doc(hidden)]
@@ -211,13 +216,18 @@ fn maybe_pdf_selftest<R: Runtime>(app: &AppHandle<R>) {
         }
         html.push_str("<p><img src='margin-selftest%20dot.svg' width=120></p>");
         for i in 1..=6 {
-            html.push_str(&format!("<h1>Section {i} — 中文标题</h1>"));
+            html.push_str(&format!("<p><a href='#s{i}'>Go to section {i}</a></p><h1 id='s{i}'>Section {i} — 中文标题</h1>"));
             for j in 0..12 {
                 html.push_str(&format!("<p>Paragraph {j}: Lorem ipsum dolor sit amet, consectetur adipiscing elit. 敏捷的棕色狐狸跳过了懒狗。</p>"));
             }
             html.push_str("<pre>fn main() { println!(\"hi\"); }</pre>");
         }
-        let res = commands::export_pdf_impl(&app, html, PathBuf::from(&out), None).await;
+        // Optional PDF options (#95), e.g. MARGIN_PDF_SELFTEST_OPTS='{"footer":"${pageNo} / ${totalPages}"}'.
+        let opts = std::env::var("MARGIN_PDF_SELFTEST_OPTS")
+            .ok()
+            .and_then(|j| serde_json::from_str::<export_cmds::PdfOptions>(&j).ok())
+            .unwrap_or_default();
+        let res = commands::export_pdf_impl(&app, html, PathBuf::from(&out), None, opts).await;
         eprintln!("MARGIN_PDF_SELFTEST result: {res:?}");
         app.exit(if res.is_ok() { 0 } else { 1 });
     });
@@ -278,6 +288,7 @@ pub fn run() {
             commands::export_pdf,
             pandoc::pandoc_detect,
             pandoc::pandoc_export,
+            pandoc::pandoc_abort,
             commands::print_window,
             commands::load_settings,
             commands::save_settings,
@@ -296,6 +307,10 @@ pub fn run() {
             commands::trash_path,
             commands::create_dir,
             commands::reveal_path,
+            export_cmds::export_binary,
+            export_cmds::open_exported_file,
+            pandoc_import::pandoc_import,
+            export_custom::run_export_command,
             upload::upload_images,
             upload::test_uploader,
             upload::cancel_upload,
