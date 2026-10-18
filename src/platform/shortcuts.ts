@@ -60,6 +60,8 @@ export const SHORTCUTS: Shortcut[] = [
   m('mark:strike', 'KeyX', { shift: true }),
   m('mark:highlight', 'KeyH', { shift: true }),
   m('mark:link', 'KeyK'),
+  m('mark:underline', 'KeyU'),
+  m('mark:math', 'KeyM', { shift: true }),
   m('toggleSidebar', 'Backslash'),
   m('toggleSource', 'Slash'),
   { action: 'toggleFocus', code: 'F8', mod: false },
