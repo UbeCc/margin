@@ -139,7 +139,7 @@ test('syntax.save-normalize: On save: insert final newline, remap Unicode punctu
   await expect.poll(() => diskFile(page, `${ROOT}/Welcome.md`)).toBe(v + '?');
   // Remap Unicode Punctuation on Parse: preference persisted (Markdown › Smart Punctuation)
   const p = await md(page);
-  await p.locator('[data-pref=remapPunctuation]').check();
+  await p.locator('[data-pref="markdown.remapPunctuation"]').check();
   await close(page);
-  await expect.poll(() => page.evaluate(() => (window.__margin as unknown as { settings: { remapPunctuation: boolean } }).settings.remapPunctuation)).toBe(true);
+  await expect.poll(() => page.evaluate(() => (window.__margin as unknown as { settings: { markdown: { remapPunctuation: boolean } } }).settings.markdown.remapPunctuation)).toBe(true);
 });
