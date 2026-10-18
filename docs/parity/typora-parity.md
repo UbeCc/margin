@@ -9,14 +9,14 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 | | surfaces |
 |---|---|
 | total | 172 |
-| owned (implemented) | 160 (with a named passing test: 147) |
-| partial | 4 |
+| owned (implemented) | 162 (with a named passing test: 149) |
+| partial | 2 |
 | missing | 0 |
 | out of scope | 8 |
 
-REA ledger `rol_54d431abd7a8072ff254fca17f318856576d8def44fc3bcc3d82205f0f7fe6f4` (closure `3dcc184ae0b70002…`): status **unknown**; implemented 164, out-of-scope 8, unknown 5.
+REA ledger `rol_a327194a73a1ee2daec3f110fdac8e0bcb877896d763796cfdaf4299973e73d8` (closure `5ef96cd36c7877e7…`): status **unknown**; implemented 164, out-of-scope 8, unknown 5.
 
-REA coverage boundary `margin.typora-parity`: status **unknown**; 147/164 claims qualified by controlled-replay verifier Evidence. Reasons: package-proof-missing 1, verifier-missing 13, verifier-unknown 4.
+REA coverage boundary `margin.typora-parity`: status **unknown**; 149/164 claims qualified by controlled-replay verifier Evidence. Reasons: package-proof-missing 1, verifier-missing 13, verifier-unknown 2.
 
 Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): build exit 0, cargo-test exit 0, independence exit 0, playwright exit 0, vitest exit 0. See `rea/summary.json`.
 
@@ -35,8 +35,8 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `core-cmds` Paragraph & Format menu commands (headings, inline styles, insert/convert blocks) | P0 | 0 |
 | `files` File lifecycle: tabs/windows, recent, duplicate/move/rename, encoding, versions, recovery | P0 | 0 |
 | `export` Export, import & print: image/Pandoc/custom formats, export settings, export-with-previous | P0 | 0 |
-| `clipboard` Clipboard & selection: copy-as / paste-as, selection & delete scopes, jump-to | P0 | 1 |
-| `ctx` Editor & sidebar context menus (text, link, table, image, code, math, diagram, outline, files) | P1 | 1 |
+| `clipboard` Clipboard & selection: copy-as / paste-as, selection & delete scopes, jump-to | P0 | 0 |
+| `ctx` Editor & sidebar context menus (text, link, table, image, code, math, diagram, outline, files) | P1 | 0 |
 | `tools` Table, code-fence and math tools | P1 | 0 |
 | `images` Image pipeline: insert-local, copy/move/upload, zoom, syntax switch, image root path | P1 | 0 |
 | `prefs` Preferences completeness (General, Editor, Image, Markdown, Export, Appearance panes) | P1 | 1 |
@@ -87,7 +87,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `menu.edit.cut-copy-paste` | Edit › Cut / Copy / Paste (markdown + HTML round-trip) | owned |  | `src/editor/core/clipboard.ts` `export function onPaste` | `tests/e2e/core-cases.ts` › paste HTML becomes markdown; copy gives markdown | 5 |
 | `menu.edit.delete-select-all` | Edit › Delete / Select All | owned |  | `src/editor/core/commands.ts` `case 'selectAll'` | `tests/e2e/blocks-core.spec.ts` › Cmd/Ctrl+A in a table cell selects the cell | 2 |
 | `menu.edit.find-replace` | Edit › Find / Find Next / Previous / Replace / Replace Next | owned |  | `src/app/findbar.ts` `caseSensitive` | `tests/e2e/app-navigation.spec.ts` › find keeps focus in the bar, counts and cycles matches | 15 |
-| `menu.edit.find-options` | Find options: whole word and regular expression — Match Case / Whole Word / Regular Expression ($1 replacement) done; no In Selection | **partial** | P1 | `src/editor/core/query.ts` `export function compileQuery` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.find-options: Find options: whole word and regular expression | 3 |
+| `menu.edit.find-options` | Find options: whole word and regular expression — Match Case / Whole Word / Regular Expression ($1 replacement) done; Typora 1.5.12 has no In Selection find scope — fe-sidebar-statusbar-find §85 ("In Selection" is only the word-count popover heading; margin gap #113) | owned |  | `src/editor/core/query.ts` `export function compileQuery` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.find-options: Find options: whole word and regular expression | 3 |
 | `menu.edit.copy-as` | Edit › Copy as Markdown / HTML Code / Plain Text / without Theme Styling / to MS Word — source mode: every variant copies the selected source text (#116); WKWebView execCommand refusal falls back to clipboard_write_payload | owned |  | `src/editor/core/copy-as.ts` `export function copyAs` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.copy-as: Edit › Copy as Markdown / HTML Code / Plain Text / without Theme Styling / to MS Word | 11 |
 | `menu.edit.paste-plain` | Edit › Paste as Plain Text — source mode: the system plain paste — native read + replaceSelection (#116) | owned |  | `src/editor/core/copy-as.ts` `export function pastePlain` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.paste-plain: Edit › Paste as Plain Text | 2 |
 | `menu.edit.select-scopes` | Edit › Selection: Select Word / Line-Sentence / Paragraph-Block / Styled Scope | owned |  | `src/editor/core/scopes.ts` `export function selectScope` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.select-scopes: Edit › Selection | 5 |
@@ -177,7 +177,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
 | `ctx.framework` | Context-menu framework: target-aware item lists for the editor — in-app menu (no native NSMenu merge): key lists per target, actions bound to the right-clicked element | owned |  | `src/app/ctxmenu/targets.ts` `export function contextTarget` | `tests/e2e/parity-ctx.spec.ts` › ctx.framework: | 1 |
-| `ctx.text` | Text context menu: cut/copy/paste, copy-as, insert, format, paragraph submenus, search with… — Cut/Copy/Paste + Copy / Paste As… + Search with Google; WebKit spelling suggestions, Look Up, Speech, Substitutions are not reproduced by the in-app menu | **partial** | P1 | `src/app/ctxmenu/items.ts` `label: 'Copy / Paste As…'` | `tests/e2e/parity-ctx.spec.ts` › ctx.text: | 4 |
+| `ctx.text` | Text context menu: cut/copy/paste, copy-as, insert, format, paragraph submenus, search with… — Cut/Copy/Paste + Copy / Paste As… + Search with Google; retained WebKit items per §1.2: Look Up “…” (dict: lookup), Spelling and Grammar ▸, Substitutions ▸, Speech ▸ with check state (input menus keep Speech, §6.3); engine spelling-suggestion lists are not exposed to JS — not reproduced | owned |  | `src/app/ctxmenu/items.ts` `label: 'Copy / Paste As…'` | `tests/e2e/parity-ctx.spec.ts` › ctx.text: | 4 |
 | `ctx.link` | Link context menu: Open Link / Copy Link Address / Hyperlink Actions | owned |  | `src/app/ctxmenu/items.ts` `label: 'Copy Link Address'` | `tests/e2e/parity-ctx.spec.ts` › ctx.link: | 4 |
 | `ctx.block-generic` | Block context menu: Insert Paragraph Before/After, Delete (atomic blocks) — table/HTML/math/diagram/code/atomic lists; Save Math/Image As… not yet (gap) | owned |  | `src/app/ctxmenu/items.ts` `block('para:insertBefore', 'Insert Paragraph Before')` | `tests/e2e/parity-ctx.spec.ts` › ctx.block-generic: | 9 |
 | `ctx.emoji` | Emoji/inline-math context entries (copy emoji, copy inline math, copy as image) — :smile: renders (EMOJI map); inline Copy as Image rasterizes the KaTeX node to PNG (mathimg.ts) | owned |  | `src/app/ctxmenu/items.ts` `function copyMath` | `tests/e2e/parity-ctx.spec.ts` › ctx.emoji: | 5 |

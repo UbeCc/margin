@@ -19,6 +19,7 @@ const acts = (): CtxActions => ({
   writeText: vi.fn(),
   openLink: vi.fn(),
   openExternal: vi.fn(),
+  lookup: vi.fn(),
   deleteImage: vi.fn(),
   tableAction: vi.fn(),
   editBlock: vi.fn(),
@@ -109,14 +110,46 @@ describe('context menu items', () => {
   it('text menu: Cut / Copy / Paste / Copy / Paste As, Search with Google on a selection', () => {
     const root = doc('<p data-bid="a" data-type="paragraph">hello</p>');
     const t = contextTarget(root.querySelector('p'), root);
-    expect(labels(buildItems(t, { selection: '' }, acts()))).toEqual(['Cut', 'Copy', 'Paste', 'Copy / Paste As…']);
+    expect(labels(buildItems(t, { selection: '' }, acts()))).toEqual([
+      'Cut', 'Copy', 'Paste', 'Copy / Paste As…', '|', 'Spelling and Grammar', 'Substitutions', 'Speech',
+    ]);
     const a = acts();
     const items = buildItems(t, { selection: 'hello' }, a);
-    expect(labels(items)).toEqual(['Cut', 'Copy', 'Paste', 'Copy / Paste As…', '|', 'Search with Google']);
-    (items[items.length - 1] as { run(): void }).run();
+    expect(labels(items)).toEqual([
+      'Look Up “hello”', '|', 'Cut', 'Copy', 'Paste', 'Copy / Paste As…', '|', 'Search with Google',
+      'Spelling and Grammar', 'Substitutions', 'Speech',
+    ]);
+    (items.find((i) => !('separator' in i) && !('submenu' in i) && i.label === 'Look Up “hello”') as { run(): void }).run();
+    expect(a.lookup).toHaveBeenCalledWith('hello');
+    (items.find((i) => !('separator' in i) && !('submenu' in i) && i.label === 'Search with Google') as { run(): void }).run();
     expect(a.openExternal).toHaveBeenCalledWith('https://www.google.com/search?q=hello');
-    const sub = items.find((i) => 'submenu' in i) as { submenu: MenuItem[] };
+    const sub = items.find((i) => 'submenu' in i && i.label === 'Copy / Paste As…') as { submenu: MenuItem[] };
     expect(labels(sub.submenu)).toEqual(['Copy as Markdown', 'Copy as HTML Code', 'Copy without Theme Styling', '|', 'Paste as Plain Text']);
+  });
+
+  it('text menu: Spelling and Grammar ▸ / Substitutions ▸ with check state, Speech ▸', () => {
+    const root = doc('<p data-bid="a" data-type="paragraph">hi</p>');
+    const t = contextTarget(root.querySelector('p'), root);
+    const a = acts();
+    a.checks = (id) => (id === 'spell:toggle' || id === 'subst:quotes' ? true : false);
+    const items = buildItems(t, { selection: '' }, a);
+    const spelling = items.find((i) => 'submenu' in i && i.label === 'Spelling and Grammar') as { submenu: MenuItem[] };
+    expect(labels(spelling.submenu)).toEqual([
+      'Show Spelling and Grammar', 'Check Document Now', 'Check Spelling While Typing',
+      'Check Grammar With Spelling', 'Correct Spelling Automatically',
+    ]);
+    expect((spelling.submenu[2] as { checked?: boolean }).checked).toBe(true);
+    spelling.submenu[1] && (spelling.submenu[1] as { run(): void }).run();
+    expect(a.run).toHaveBeenCalledWith('spell:now');
+    const subst = items.find((i) => 'submenu' in i && i.label === 'Substitutions') as { submenu: MenuItem[] };
+    expect(labels(subst.submenu)).toEqual(['Smart Quotes', 'Smart Dashes', 'Text Replacement', '|', 'More Options…']);
+    expect((subst.submenu[0] as { checked?: boolean }).checked).toBe(true);
+    (subst.submenu[0] as { run(): void }).run();
+    expect(a.run).toHaveBeenCalledWith('subst:quotes');
+    const speech = items.find((i) => 'submenu' in i && i.label === 'Speech') as { submenu: MenuItem[] };
+    expect(labels(speech.submenu)).toEqual(['Start Speaking', 'Stop Speaking']);
+    (speech.submenu[0] as { run(): void }).run();
+    expect(a.run).toHaveBeenCalledWith('speech:start');
   });
 
   it('link menu puts Copy Link Address next to Copy', () => {
@@ -143,7 +176,8 @@ describe('context menu items', () => {
   it('input menu has only Cut / Copy / Paste', () => {
     doc('');
     const t = contextTarget(document.getElementById('field'), document.querySelector('.md-editor'));
-    expect(labels(buildItems(t, { selection: 'x' }, acts()))).toEqual(['Cut', 'Copy', 'Paste']);
+    // §6.3: the field menu keeps Speech alongside Cut/Copy/Paste.
+    expect(labels(buildItems(t, { selection: 'x' }, acts()))).toEqual(['Cut', 'Copy', 'Paste', '|', 'Speech']);
   });
 
   it('video and emoji targets: Save Video As… after system items; Copy <char> for :emoji:', () => {
@@ -154,7 +188,7 @@ describe('context menu items', () => {
     const a = acts();
     a.saveVideoAs = vi.fn();
     const v = buildItems(contextTarget(root.querySelector('video'), root), { selection: '' }, a);
-    expect(labels(v)).toEqual(['Cut', 'Copy', 'Paste', 'Copy / Paste As…', '|', 'Save Video As…']);
+    expect(labels(v)).toEqual(['Cut', 'Copy', 'Paste', 'Copy / Paste As…', '|', 'Spelling and Grammar', 'Substitutions', 'Speech', '|', 'Save Video As…']);
     (v[v.length - 1] as { run(): void }).run();
     expect(a.saveVideoAs).toHaveBeenCalledWith('assets/v.mp4');
     const e = buildItems(contextTarget(root.querySelector('.md-entity-char'), root), { selection: '' }, a);

@@ -29,7 +29,9 @@ export interface CtxHost {
   imageOps?(t: CtxTarget): ImageCtxOps | null;
   saveVideoAs?(src: string): void;
   /** #154: true when the image storage target is an uploader (Upload Image leads the menu). */
-  imageUploadFirst?(): boolean;
+ imageUploadFirst?(): boolean;
+ /** Check-mark state for the WebKit-native submenu items (spell:/subst:). */
+ menuChecks?(id: CommandId): boolean | undefined;
 }
 
 const TABLE_BUTTONS: Record<TableAction, string> = {
@@ -310,6 +312,8 @@ export class EditorContextMenu {
       writeText: (text) => void writeText(text).then((ok) => ok || this.host.notify('Could not write to the clipboard.', 'error')),
       openLink: (href) => this.host.openLink(href),
       openExternal: (url) => void p.openExternal(url),
+      lookup: (word) => void p.openExternal('dict://' + encodeURIComponent(word)),
+      checks: (id) => this.host.menuChecks?.(id),
       revealImage: extras(p).revealInFolder
         ? (src) => {
             const path = this.imagePath(src);

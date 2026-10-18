@@ -23,6 +23,10 @@ export interface CtxActions {
   writeText(text: string): void;
   openLink(href: string): void;
   openExternal(url: string): void;
+  /** Look Up "…" (macOS dictionary); opens the system dictionary for the word. */
+  lookup?(word: string): void;
+  /** Check-mark state for tickable submenu items (spell:/subst:, like the native menu). */
+  checks?(id: CommandId): boolean | undefined;
   /** Image actions; absent ones are shown disabled. */
   revealImage?(src: string): void;
   uploadImage?(src: string): void;
@@ -99,10 +103,70 @@ function copyPasteAs(a: CtxActions, hasSel: boolean): MenuItem {
   };
 }
 
+/** Spelling and Grammar ▸ — the WebKit submenu Typora keeps in text menus; the
+ * entries are the Edit menu's spell:* commands with their check state. */
+function spellingMenu(a: CtxActions): MenuItem {
+  const c = (id: CommandId, label: string): MenuItem => ({
+    id,
+    label,
+    hint: hint(id),
+    checked: a.checks?.(id),
+    run: () => (a.restore(), a.run(id)),
+  });
+  return {
+    id: 'spelling',
+    label: 'Spelling and Grammar',
+    submenu: [
+      c('spell:panel', 'Show Spelling and Grammar'),
+      c('spell:now', 'Check Document Now'),
+      c('spell:toggle', 'Check Spelling While Typing'),
+      c('spell:grammar', 'Check Grammar With Spelling'),
+      c('spell:autocorrect', 'Correct Spelling Automatically'),
+    ],
+  };
+}
+
+/** Substitutions ▸ — Smart Quotes / Smart Dashes / Text Replacement (WebKit
+ * order; Smart Links and Transformations have no Margin equivalent). */
+function substitutionsMenu(a: CtxActions): MenuItem {
+  const c = (id: CommandId, label: string): MenuItem => ({
+    id,
+    label,
+    checked: a.checks?.(id),
+    run: () => (a.restore(), a.run(id)),
+  });
+  return {
+    id: 'substitutions',
+    label: 'Substitutions',
+    submenu: [
+      c('subst:quotes', 'Smart Quotes'),
+      c('subst:dashes', 'Smart Dashes'),
+      c('subst:textReplacement', 'Text Replacement'),
+      sep,
+      c('subst:more', 'More Options…'),
+    ],
+  };
+}
+
+/** Speech ▸ Start/Stop Speaking — also the only extra the input menu keeps (§6.3). */
+function speechMenu(a: CtxActions): MenuItem {
+  const c = (id: CommandId, label: string): MenuItem => ({
+    id,
+    label,
+    run: () => (a.restore(), a.run(id)),
+  });
+  return { id: 'speech', label: 'Speech', submenu: [c('speech:start', 'Start Speaking'), c('speech:stop', 'Stop Speaking')] };
+}
+
 /** The default edit items that replace the WebKit menu (`normal` / `input`). */
 function editItems(t: CtxTarget, s: CtxState, a: CtxActions): MenuItem[] {
   const hasSel = s.selection.length > 0;
+  const word = s.selection.trim();
   const out: MenuItem[] = [];
+  // §1.2: the retained WebKit spelling items and Look Up lead the text menu
+  // (Margin's engine exposes no suggestion list, so only Look Up applies).
+  if (t.kind === 'text' && word)
+    out.push({ id: 'lookup', label: `Look Up “${word}”`, run: () => (a.restore(), a.lookup?.(word)) }, sep);
   out.push({ id: 'cut', label: 'Cut', hint: formatShortcut('Mod+X'), disabled: !hasSel, run: () => a.cut() });
   out.push({ id: 'copy', label: 'Copy', hint: formatShortcut('Mod+C'), disabled: !hasSel, run: () => a.copy() });
   if (t.kind === 'image' && t.loaded !== false)
@@ -110,9 +174,16 @@ function editItems(t: CtxTarget, s: CtxState, a: CtxActions): MenuItem[] {
   if (t.kind === 'link' && t.href !== undefined) out.push({ id: 'copyLink', label: 'Copy Link Address', run: () => a.writeText(t.href!) });
   out.push({ id: 'paste', label: 'Paste', hint: formatShortcut('Mod+V'), run: () => a.paste() });
   if (t.kind !== 'input') out.push(copyPasteAs(a, hasSel));
-  // remaining system items (WebKit's "Search with Google" for a text selection)
+  if (t.kind === 'input') {
+    // §6.3 `returnDefaultContextMenu`: the field menu is Cut/Copy/Paste + Speech.
+    out.push(sep, speechMenu(a));
+    return out;
+  }
   const q = s.selection.trim();
-  if (q && t.kind !== 'input') out.push(sep, { id: 'searchGoogle', label: 'Search with Google', run: () => a.openExternal('https://www.google.com/search?q=' + encodeURIComponent(q)) });
+  if (q) out.push(sep, { id: 'searchGoogle', label: 'Search with Google', run: () => a.openExternal('https://www.google.com/search?q=' + encodeURIComponent(q)) });
+  // §1.2 remainder: the retained WebKit submenus in WebKit order (Transformations
+  // and Writing Direction are not implemented in Margin). Text menus only.
+  if (t.kind === 'text') out.push(...(q ? [] : [sep]), spellingMenu(a), substitutionsMenu(a), speechMenu(a));
   return out;
 }
 

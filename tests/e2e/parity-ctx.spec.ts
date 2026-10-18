@@ -77,7 +77,7 @@ test.describe('parity: context menus (#97)', () => {
     await load(page, 'Plain text here.\n\n| a | b |\n|---|---|\n| 1 | 2 |\n');
     await page.locator('.md-editor .md-paragraph', { hasText: 'Plain text' }).click({ button: 'right' });
     await expect(menu(page)).toBeVisible();
-    expect(await labels(page)).toEqual(['Cut', 'Copy', 'Paste', 'Copy / Paste As…']);
+    expect(await labels(page)).toEqual(['Cut', 'Copy', 'Paste', 'Copy / Paste As…', 'Spelling and Grammar', 'Substitutions', 'Speech']);
     await page.keyboard.press('Escape');
     await expect(page.locator('.context-menu')).toHaveCount(0);
 
@@ -98,11 +98,47 @@ test.describe('parity: context menus (#97)', () => {
     await load(page, 'Some **bold** words\n');
     await selectText(page, 'bold');
     await rightClickSelection(page);
-    expect(await labels(page)).toEqual(['Cut', 'Copy', 'Paste', 'Copy / Paste As…', 'Search with Google']);
+    expect(await labels(page)).toEqual(['Look Up “bold”', 'Cut', 'Copy', 'Paste', 'Copy / Paste As…', 'Search with Google', 'Spelling and Grammar', 'Substitutions', 'Speech']);
     await item(page, 'Copy / Paste As…').hover();
     await expect(page.locator('.context-submenu .context-label')).toHaveText(['Copy as Markdown', 'Copy as HTML Code', 'Copy without Theme Styling', 'Paste as Plain Text']);
     await item(page, 'Copy as Markdown').click();
     expect(await clipboardText(page)).toContain('bold');
+
+    // ctx.text completion: the retained WebKit-native items (fe-contextmenus-tools §1.2).
+    // Look Up opens the dictionary for the selection; Spelling and Grammar ▸ /
+    // Substitutions ▸ carry check state that toggles; Speech ▸ Start/Stop.
+    await page.evaluate(() => {
+      const w = window as unknown as { __MARGIN_WEB__: Record<string, unknown>; __calls?: string[] };
+      w.__calls = [];
+      w.__MARGIN_WEB__.openExternal = async (u: string) => void w.__calls!.push(u);
+    });
+    await selectText(page, 'bold');
+    await rightClickSelection(page);
+    await item(page, 'Look Up “bold”').click();
+    expect(await page.evaluate(() => (window as unknown as { __calls: string[] }).__calls)).toEqual(['dict://bold']);
+
+    await selectText(page, 'bold');
+    await rightClickSelection(page);
+    await item(page, 'Spelling and Grammar').hover();
+    await expect(page.locator('.context-submenu .context-label')).toHaveText([
+      'Show Spelling and Grammar', 'Check Document Now', 'Check Spelling While Typing',
+      'Check Grammar With Spelling', 'Correct Spelling Automatically',
+    ]);
+    const spellToggle = page.locator('.context-submenu .context-item', { hasText: 'Check Spelling While Typing' });
+    await expect(spellToggle).toHaveAttribute('role', 'menuitemcheckbox');
+    const wasOn = (await spellToggle.getAttribute('aria-checked')) === 'true';
+    await spellToggle.click();
+    await selectText(page, 'bold');
+    await rightClickSelection(page);
+    await item(page, 'Spelling and Grammar').hover();
+    await expect(spellToggle).toHaveAttribute('aria-checked', wasOn ? 'false' : 'true');
+
+    await item(page, 'Substitutions').hover();
+    await expect(page.locator('.context-submenu .context-label')).toHaveText(['Smart Quotes', 'Smart Dashes', 'Text Replacement', 'More Options…']);
+    await item(page, 'Speech').hover();
+    await expect(page.locator('.context-submenu .context-label')).toHaveText(['Start Speaking', 'Stop Speaking']);
+    await page.keyboard.press('Escape');
+    await expect(page.locator('.context-menu')).toHaveCount(0);
 
     // Copy from the menu, then Paste from the menu where the pointer is
     await selectText(page, 'bold');
@@ -192,7 +228,7 @@ test.describe('parity: context menus (#97)', () => {
       .toBe('png');
     await page.evaluate((m) => window.__margin!.editor.setMarkdown(m), 'Smile :smile: now\n');
     await page.locator('.md-editor .md-entity-char').click({ button: 'right', force: true });
-    expect(await labels(page)).toEqual(["Copy '😄'", 'Cut', 'Copy', 'Paste', 'Copy / Paste As…']);
+    expect(await labels(page)).toEqual(["Copy '😄'", 'Cut', 'Copy', 'Paste', 'Copy / Paste As…', 'Spelling and Grammar', 'Substitutions', 'Speech']);
     await item(page, "Copy '😄'").click();
     expect(await clipboardText(page)).toBe('😄');
   });
