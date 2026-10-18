@@ -25,6 +25,12 @@ fn harness(root: &Path) -> Harness {
     .unwrap();
     // FSEvents needs a moment before it reports changes made after the stream starts.
     std::thread::sleep(Duration::from_millis(350));
+    // #104: drop late deliveries about the fixture setup. FSEvents coalesces by
+    // latency, and under parallel `cargo test` load the writes made just before the
+    // stream started can still arrive afterwards (as a "modified" of a fixture file,
+    // e.g. `[Modified out.md, Created in.md, Removed out.md]`). Tests assert only on
+    // the changes they make after this point.
+    while rx.recv_timeout(Duration::from_millis(300)).is_ok() {}
     Harness { rx, own, _w: w }
 }
 
