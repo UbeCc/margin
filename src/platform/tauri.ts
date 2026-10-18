@@ -1,7 +1,7 @@
 import { convertFileSrc, invoke } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
-import type { AppSettings, DirEntry, FsEvent, ImageRule, MenuAction, Platform, RichClipboardData, ClipboardSnapshot, UploadConfig } from '../contracts';
+import type { FileDrop, AppSettings, DirEntry, FsEvent, ImageRule, MenuAction, Platform, RichClipboardData, ClipboardSnapshot, UploadConfig } from '../contracts';
 import { builtinThemes, normalizeSettings, printHtmlInIframe } from './common';
 
 /** Event names emitted by `src-tauri/src/lib.rs`. */
@@ -10,6 +10,7 @@ const EV = {
   fs: 'margin://fs-events',
   openFiles: 'margin://open-files',
   closeRequested: 'margin://close-requested',
+  fileDrop: 'margin://file-drop',
 } as const;
 
 async function call<T>(cmd: string, args?: Record<string, unknown>): Promise<T> {
@@ -279,6 +280,11 @@ export class TauriPlatform implements Platform {
         if (paths.length) cb(paths);
       });
     return off;
+  }
+
+  /** #23: Finder drops, intercepted natively (src-tauri/src/drop_macos.rs) so paths are known. */
+  onFileDrop(cb: (drop: FileDrop) => void): () => void {
+    return subscribe<FileDrop>(EV.fileDrop, cb);
   }
 
   onCloseRequested(cb: () => Promise<boolean>): () => void {

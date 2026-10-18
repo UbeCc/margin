@@ -210,6 +210,15 @@ export function onDrop(ed: EditorCore, e: DragEvent): void {
   void storeFiles(ed, files).then((imgs) => imgs.length && insertMarkdown(ed, imgs.join(' '), range));
 }
 
+/** #23: insert markdown at a viewport point (OS file drop); the selection when the point misses the text. */
+export function insertAtPoint(ed: EditorCore, md: string, x: number, y: number): boolean {
+  if (!md) return false;
+  const pos = caretFromPoint(x, y);
+  const at = pos && ed.root.contains(pos.node) ? ed.pointToPos(pos.node, pos.offset) : null;
+  insertMarkdown(ed, md.replace(/\r\n?/g, ed.doc.eol), at === null ? ed.sel() : { from: at, to: at });
+  return true;
+}
+
 function caretFromPoint(x: number, y: number): { node: Node; offset: number } | null {
   const d = document as Document & {
     caretPositionFromPoint?(x: number, y: number): { offsetNode: Node; offset: number } | null;

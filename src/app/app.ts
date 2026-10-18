@@ -21,6 +21,7 @@ import { themeLabel } from '../themes';
 import { ask } from './ui/modal';
 import { closePalette, isPaletteOpen, openPalette, type PaletteItem } from './ui/palette';
 import { toast } from './ui/toast';
+import { handleFileDrop } from './filedrop';
 import { exportWithPandoc, PANDOC_ACTIONS, type PandocFormat } from './export-pandoc';
 import { closeContextMenu } from './ui/contextmenu';
 import { ImageUploader } from './upload-actions';
@@ -143,6 +144,20 @@ export class App {
     this.installKeys();
     this.platform.onMenu((a) => this.onMenu(a));
     this.platform.onOpenFiles((paths) => void this.openPaths(paths));
+    this.platform.onFileDrop?.((drop) =>
+      void handleFileDrop(
+        {
+          platform: this.platform,
+          editor: () => this.editor,
+          editorHost: () => this.docs.active.host,
+          docDir: () => this.doc.dir,
+          storeImage: (input) => this.storeImage(input),
+          openPaths: (paths) => this.openPaths(paths),
+          notify: (m) => void toast(m, { kind: 'info' }),
+        },
+        drop,
+      ),
+    );
     this.platform.onCloseRequested(async () => {
       const ok = await this.docs.confirmAll('before closing the window');
       if (ok) {
