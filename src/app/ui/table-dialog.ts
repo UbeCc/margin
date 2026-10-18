@@ -29,7 +29,7 @@ export function insertTableDialog(init = TABLE_DEFAULT): Promise<{ rows: number;
     const field = (label: string, input: HTMLInputElement) => h('label.dialog-field', null, h('span', { text: label }), input);
     const form = h(
       'form.dialog.table-dialog',
-      null,
+      { novalidate: true },
       h('h2.dialog-title', { text: 'Insert Table' }),
       field('Columns', cols),
       field('Rows', rows),

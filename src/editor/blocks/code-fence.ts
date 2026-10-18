@@ -11,7 +11,7 @@ import { highlightToHtml } from './cm/highlight';
 import { indentRange } from '@codemirror/language';
 import { indentSelection } from '@codemirror/commands';
 import { buildFenceRaw, FenceParts, parseFence, rawRangeToBody, withFenceInfo } from './util/delimited';
-import { escapeHtml, h, isolateEvents, offsetAtPoint } from './util/dom';
+import { copyText, escapeHtml, h, isolateEvents, offsetAtPoint } from './util/dom';
 
 export interface CodeFenceOptions {
   /** Show line numbers in every fence (per-fence: info `{.numberLines}`). */
@@ -204,17 +204,8 @@ class CodeFenceInstance implements WidgetInstance {
     this.editor?.setLineNumbers(wantsLineNumbers(this.parts.info, !!this.opts.lineNumbers));
   }
 
-  private async copy() {
-    const text = this.parts.body;
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch {
-      const ta = h('textarea', null, text);
-      document.body.append(ta);
-      ta.select();
-      document.execCommand('copy');
-      ta.remove();
-    }
+  private copy() {
+    copyText(this.parts.body);
     this.copyBtn.textContent = 'Copied';
     this.copyBtn.classList.add('mb-done');
     setTimeout(() => {
@@ -244,7 +235,7 @@ class CodeFenceInstance implements WidgetInstance {
   /** Code Tools (#98): Copy Code Content, Auto Indent Whole Code, Auto Indent Selected Code. */
   command(op: string): boolean {
     if (op === 'copy') {
-      void this.copy();
+      this.copy();
       return true;
     }
     if (op !== 'indentAll' && op !== 'indentSelected') return false;

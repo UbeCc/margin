@@ -28,7 +28,7 @@ interface Hit {
   inst: WidgetInstance | undefined;
 }
 
-/** Widget block of type `types` with the caret, the last caret, or the focused block. */
+/** Widget block of type `types` with the caret (else the last caret, else the focused block). */
 export function widgetAtCaret(ed: EditorCore, types: WidgetBlockType[]): Hit | null {
   const doc = ed.doc;
   if (!doc.leaves.length) return null;
@@ -40,8 +40,7 @@ export function widgetAtCaret(ed: EditorCore, types: WidgetBlockType[]): Hit | n
     return { i, leaf: l, inst: rec.inst };
   };
   const s = ed.readSel() ?? ed.lastSel;
-  const a = s ? ok(doc.locate(s.focus).i) : null;
-  if (a) return a;
+  if (s) return ok(doc.locate(s.focus).i);
   const f = ed.view.focusId;
   return f ? ok(doc.indexOf(f)) : null;
 }

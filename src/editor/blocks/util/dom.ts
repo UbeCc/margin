@@ -89,3 +89,27 @@ export function offsetAtPoint(container: HTMLElement, x: number, y: number): num
   r.setEnd(node, off);
   return r.toString().length;
 }
+
+/**
+ * Copy plain text synchronously through a `copy` event (works inside the user
+ * gesture of a menu / key / click), falling back to the async Clipboard API.
+ */
+export function copyText(text: string): void {
+  let done = false;
+  const onCopy = (e: ClipboardEvent) => {
+    if (!e.clipboardData) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    e.clipboardData.setData('text/plain', text);
+    done = true;
+  };
+  document.addEventListener('copy', onCopy, { capture: true });
+  try {
+    document.execCommand('copy');
+  } catch {
+    /* refused */
+  } finally {
+    document.removeEventListener('copy', onCopy, { capture: true });
+  }
+  if (!done) void navigator.clipboard?.writeText(text).catch(() => undefined);
+}
