@@ -1,7 +1,7 @@
 import { ExternalChangeBanner } from './ui/extchange';
 import type { EditorHandle, EditorSettings, MenuAction, Platform } from '../contracts';
 import type { Wiring } from './wiring';
-import { COMMANDS, commandForKey, commandSpec, isCommandId, type CommandId } from './commands';
+import { COMMANDS, commandForKey, commandSpec, isCommandId, setCustomKeys, type CommandId } from './commands';
 import { DocumentController, type DocState } from './document';
 import { buildExportHtml, documentTitle, loadKatexCss, needsKatex } from './export';
 import { FindBar } from './findbar';
@@ -87,6 +87,9 @@ export class App {
     }
     document.documentElement.dataset.platform = isMac ? 'mac' : 'other';
     document.documentElement.dataset.shell = this.platform.kind;
+    // #100 Appearance › Show Outline Panel by Default
+    if (this.settings.showOutlineByDefault) this.settings = { ...this.settings, sidebarTab: 'outline', sidebarVisible: true };
+    setCustomKeys(this.settings.keyBinding);
     this.buildLayout();
     this.applyAppearance();
     this.applyLayoutSettings();
@@ -102,6 +105,8 @@ export class App {
       autoSave: () => ({ enabled: this.settings.autoSave, delay: this.settings.autoSaveDelay }),
       imageRule: () => this.settings.imageRule,
       willLoad: (p) => this.editor.updateSettings({ baseDir: p ? dirname(p) : null }),
+      defaultEol: () => newFileEol(this.settings.defaultLineEnding),
+      finalNewline: () => this.settings.insertFinalNewline,
       onState: (s) => this.onDocState(s),
       onOpened: (p) => this.onOpened(p),
       defaultDir: () => this.folder,
@@ -137,11 +142,15 @@ export class App {
     });
     window.addEventListener('blur', () => void this.doc.flushAutoSave());
 
-    // Initial content
-    const folder =
-      (this.settings.restoreLastFolder && this.settings.lastFolder) || opts.initialFolder || null;
+    // Initial content — General › On Launch (#100)
+    const s0 = this.settings;
+    const launchFolder =
+      s0.onLaunch === 'customFolder' ? s0.defaultFolder || null : s0.onLaunch === 'restoreAll' || s0.onLaunch === 'restoreFolders' ? s0.lastFolder : null;
+    const folder = opts.initialFolder || launchFolder || null;
     if (folder) await this.openFolder(folder, { quiet: true });
-    if (opts.initialFile && (await this.platform.stat(opts.initialFile))) await this.doc.open(opts.initialFile);
+    const lastFile = !opts.initialFile && s0.onLaunch === 'restoreAll' ? s0.recentFiles[0] : undefined;
+    const file = opts.initialFile ?? lastFile;
+    if (file && (await this.platform.stat(file))) await this.doc.open(file);
     else this.onDocState(this.doc.state());
     this.refreshOutline();
     this.status.setStats(this.editor.getStats());
@@ -161,6 +170,7 @@ export class App {
       focusMode: this.settings.focusMode,
       typewriterMode: this.settings.typewriterMode,
       colorScheme: this.colorScheme,
+      markdown: { ...this.settings.markdown },
     };
   }
 
@@ -269,6 +279,9 @@ export class App {
     this.root.classList.toggle('typewriter-mode', s.typewriterMode);
     this.status?.setModes({ focus: s.focusMode, typewriter: s.typewriterMode });
     document.documentElement.style.setProperty('zoom', s.zoom === 1 ? '' : String(s.zoom));
+    // #100 Appearance › Text Column Width (0 = theme default)
+    this.root.style.setProperty('--margin-column-width', s.textColumnWidth ? `${s.textColumnWidth}px` : '');
+    this.root.dataset.windowStyle = s.windowStyle;
   }
 
   private applyAppearance(): void {
@@ -302,6 +315,11 @@ export class App {
     if (s.spellcheck !== prev.spellcheck) ed.spellcheck = s.spellcheck;
     if (s.focusMode !== prev.focusMode) ed.focusMode = s.focusMode;
     if (s.typewriterMode !== prev.typewriterMode) ed.typewriterMode = s.typewriterMode;
+    if (JSON.stringify(s.markdown) !== JSON.stringify(prev.markdown)) ed.markdown = { ...s.markdown };
+    if (JSON.stringify(s.keyBinding) !== JSON.stringify(prev.keyBinding)) {
+      const bad = setCustomKeys(s.keyBinding);
+      if (bad.length) void toast(`Unknown command in custom shortcut keys: ${bad.join(', ')}`, { kind: 'warning' });
+    }
     if (Object.keys(ed).length) this.editor.updateSettings(ed);
     this.applyLayoutSettings();
     this.saveSettingsSoon();
@@ -856,4 +874,9 @@ export class App {
   get commandSpec(): typeof commandSpec {
     return commandSpec;
   }
+}
+
+/** Files › Default Line Ending: "Auto ( Recommended )" follows the OS (#100). */
+export function newFileEol(pref: MarginSettings['defaultLineEnding'], windows = /Win/i.test(navigator.platform || '')): '\n' | '\r\n' {
+  return pref === 'crlf' || (pref === 'auto' && windows) ? '\r\n' : '\n';
 }

@@ -1,4 +1,4 @@
-import type { AppSettings, ImageRule } from '../contracts';
+import { DEFAULT_MARKDOWN_OPTIONS, type AppSettings, type ImageRule, type MarkdownOptions } from '../contracts';
 
 /**
  * App-side settings: the `AppSettings` contract plus shell-only preferences.
@@ -21,7 +21,35 @@ export interface MarginSettings extends AppSettings {
   restoreLastFolder: boolean;
   /** Pandoc binary (or its folder) for docx/latex/epub export; '' = auto-detect (#81). */
   pandocPath: string;
+  // ---- #100 Preferences completeness
+  /** General › On Launch. */
+  onLaunch: OnLaunch;
+  /** Folder opened on launch when `onLaunch === 'customFolder'`. */
+  defaultFolder: string;
+  /** Quit the app when the last window closes (desktop; applied after restart). */
+  quitOnLastWindowClose: boolean;
+  /** UI language ('auto' = based on current OS). Only English strings ship today. */
+  language: string;
+  /** Files › Default Line Ending for new files. */
+  defaultLineEnding: 'auto' | 'lf' | 'crlf';
+  /** Insert a final newline when saving (#102). */
+  insertFinalNewline: boolean;
+  /** Remap Unicode punctuation on parse (#102; persisted, see PR notes). */
+  remapPunctuation: boolean;
+  /** Appearance › Window Style (desktop, applied after restart). */
+  windowStyle: 'seamless' | 'unibody' | 'native';
+  /** Appearance › Text Column Width in px; 0 = theme default. */
+  textColumnWidth: number;
+  showOutlineByDefault: boolean;
+  collapsibleOutline: boolean;
+  /** Advanced › custom shortcut keys: command id → accelerator (e.g. "Mod+Shift+K"). */
+  keyBinding: Record<string, string>;
+  /** Markdown / Editor options forwarded to the editing core (#102). */
+  markdown: MarkdownOptions;
 }
+
+export type OnLaunch = 'newFile' | 'restoreAll' | 'restoreFolders' | 'customFolder';
+export const ON_LAUNCH: readonly OnLaunch[] = ['restoreAll', 'restoreFolders', 'newFile', 'customFolder'];
 
 export const SETTINGS_VERSION = 2;
 
@@ -45,8 +73,21 @@ export const DEFAULT_SETTINGS: Readonly<MarginSettings> = Object.freeze({
   sidebarVisible: true,
   sidebarTab: 'files',
   sidebarWidth: 260,
-  restoreLastFolder: true,
+  restoreLastFolder: false,
   pandocPath: '',
+  onLaunch: 'newFile',
+  defaultFolder: '',
+  quitOnLastWindowClose: false,
+  language: 'auto',
+  defaultLineEnding: 'auto',
+  insertFinalNewline: false,
+  remapPunctuation: false,
+  windowStyle: 'seamless',
+  textColumnWidth: 0,
+  showOutlineByDefault: false,
+  collapsibleOutline: false,
+  keyBinding: {},
+  markdown: { ...DEFAULT_MARKDOWN_OPTIONS },
 });
 
 export const MAX_RECENT = 15;
@@ -100,6 +141,9 @@ export function migrateSettings(input: unknown): MarginSettings {
   if (raw.autoSave === undefined && raw.autosave !== undefined) raw.autoSave = raw.autosave;
   if (raw.imageRule === undefined && raw.imageFolder !== undefined) raw.imageRule = raw.imageFolder;
 
+  // v2 "restoreLastFolder" boolean → onLaunch (#100).
+  if (raw.onLaunch === undefined && raw.restoreLastFolder === true) raw.onLaunch = 'restoreFolders';
+  const onLaunch = (ON_LAUNCH as unknown[]).includes(raw.onLaunch) ? (raw.onLaunch as OnLaunch) : d.onLaunch;
   const scheme = raw.colorScheme;
   const tab = raw.sidebarTab;
   return {
@@ -123,9 +167,56 @@ export function migrateSettings(input: unknown): MarginSettings {
     sidebarVisible: bool(raw.sidebarVisible, d.sidebarVisible),
     sidebarTab: tab === 'files' || tab === 'outline' ? tab : d.sidebarTab,
     sidebarWidth: Math.round(num(raw.sidebarWidth, d.sidebarWidth, 180, 520)),
-    restoreLastFolder: bool(raw.restoreLastFolder, d.restoreLastFolder),
+    restoreLastFolder: onLaunch === 'restoreAll' || onLaunch === 'restoreFolders',
     pandocPath: typeof raw.pandocPath === 'string' ? raw.pandocPath.trim() : '',
+    onLaunch,
+    defaultFolder: typeof raw.defaultFolder === 'string' ? raw.defaultFolder.trim() : '',
+    quitOnLastWindowClose: bool(raw.quitOnLastWindowClose, d.quitOnLastWindowClose),
+    language: str(raw.language, d.language),
+    defaultLineEnding: oneOf(raw.defaultLineEnding, ['auto', 'lf', 'crlf'] as const, d.defaultLineEnding),
+    insertFinalNewline: bool(raw.insertFinalNewline, d.insertFinalNewline),
+    remapPunctuation: bool(raw.remapPunctuation, d.remapPunctuation),
+    windowStyle: oneOf(raw.windowStyle, ['seamless', 'unibody', 'native'] as const, d.windowStyle),
+    textColumnWidth: columnWidth(raw.textColumnWidth),
+    showOutlineByDefault: bool(raw.showOutlineByDefault, d.showOutlineByDefault),
+    collapsibleOutline: bool(raw.collapsibleOutline, d.collapsibleOutline),
+    keyBinding: keyBinding(raw.keyBinding),
+    markdown: migrateMarkdown(raw.markdown),
   };
+}
+
+/** 0 (theme default) or 400–3000 px. */
+function columnWidth(v: unknown): number {
+  const n = Math.round(num(v, 0, 0, 3000));
+  return n < 400 ? 0 : n;
+}
+
+function oneOf<T extends string>(v: unknown, opts: readonly T[], d: T): T {
+  return (opts as readonly unknown[]).includes(v) ? (v as T) : d;
+}
+
+function keyBinding(v: unknown): Record<string, string> {
+  if (!isObj(v)) return {};
+  const out: Record<string, string> = {};
+  for (const [k, x] of Object.entries(v)) if (typeof x === 'string' && k) out[k] = x.trim();
+  return out;
+}
+
+/** Validate the nested Markdown options; unknown / malformed fields fall back to defaults. */
+export function migrateMarkdown(v: unknown): MarkdownOptions {
+  const raw: Raw = isObj(v) ? v : {};
+  const d = DEFAULT_MARKDOWN_OPTIONS;
+  const out = { ...d } as MarkdownOptions;
+  for (const k of Object.keys(d) as (keyof MarkdownOptions)[]) {
+    const dv = d[k];
+    if (typeof dv === 'boolean') (out as unknown as Raw)[k] = bool(raw[k], dv);
+  }
+  out.ulStyle = oneOf(raw.ulStyle, ['-', '*', '+'] as const, d.ulStyle);
+  out.olStyle = oneOf(raw.olStyle, ['.', ')'] as const, d.olStyle);
+  const ci = Number(raw.codeIndentSize);
+  out.codeIndentSize = ci === 0 || ci === 2 || ci === 3 || ci === 4 ? ci : d.codeIndentSize;
+  out.mathNumbering = oneOf(raw.mathNumbering, ['all', 'ams', 'none'] as const, d.mathNumbering);
+  return out;
 }
 
 /** Move `item` to the front of a recent list (dedup, capped). */

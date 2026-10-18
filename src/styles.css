@@ -228,7 +228,7 @@ button { cursor: default; }
 .editor-scroll { flex: 1; overflow: auto; scroll-behavior: auto; scrollbar-gutter: stable; }
 .editor-page { min-height: 100%; padding: 32px 56px 0; }
 .editor-host {
-  max-width: var(--margin-doc-width);
+  max-width: var(--margin-column-width, var(--margin-doc-width));
   margin: 0 auto;
   padding-bottom: 40vh;
   min-height: 100%;
