@@ -40,7 +40,8 @@ All raw handling is lossless: when the body is unchanged a widget hands back `ct
 - **Undo**: CM editors have local history while focused. External changes arrive via `update(raw)`, which applies a minimal diff that keeps the cursor and does not touch CM history. `update()` with the current raw is a no-op.
 - **Theme**: `updateSettings(settings)` switches CM theme and re-renders mermaid when `colorScheme` changes.
 - **TOC refresh**: `update()`, a `document` event `margin:outline-changed` (`OUTLINE_CHANGED_EVENT`, optional, dispatch it after heading edits), plus an 800 ms poll that compares signatures.
-- **Export**: `renderHTML()` returns static HTML: `<pre class="md-fences" lang><code>` with `tok-*` spans, KaTeX HTML, mermaid SVG (last successful render), `<figure class="md-table-fig"><table>`, `<div class="md-toc">` with `href="#<heading id>"`, so the core's heading export must use the heading block id as the element `id`. Include `blocksCSS` and the KaTeX CSS in exported documents.
+- **Export**: `renderHTML()` returns static HTML: `<pre class="md-fences" lang><code>` with `tok-*` spans, KaTeX HTML, mermaid SVG (last successful render), `<figure class="md-table-fig"><table>`, `<div class="md-toc">` with `href="#<heading id>"`, so the core's heading export must use the heading block id as the element `id`. Include `blocksCSS` and the KaTeX CSS in exported documents; its `tok-*` colours and `--tok-*` variables also apply to bare `pre.md-fences` (dark via `data-scheme="dark"` on the fence or an ancestor, #61).
+- **Find** (#35): `select(from, to)` selects a range of `raw` — fences / math / diagram / html / front matter map it into the body editor (false on delimiter/info lines), tables only within one cell, TOC returns false.
 
 ### Table keys
 

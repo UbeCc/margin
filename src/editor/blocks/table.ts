@@ -14,6 +14,7 @@ import {
   deleteRow,
   insertCol,
   insertRow,
+  locateCell,
   moveCol,
   moveRow,
   ParsedTable,
@@ -499,6 +500,19 @@ class TableInstance implements WidgetInstance {
   focus(at: 'start' | 'end'): void {
     if (at === 'start') this.focusCell({ r: 0, c: 0 }, 'start');
     else this.focusCell({ r: this.model.rows.length - 1, c: this.model.align.length - 1 }, 'end');
+  }
+
+  /** Find (#35): select text inside one cell; ranges over pipes/several cells → false. */
+  select(from: number, to: number): boolean {
+    const t = parseTable(this.raw);
+    const hit = locateCell(t, from, to);
+    if (!hit || this.model.rows[hit.r]?.[hit.c] !== t.rows[hit.r]?.[hit.c]) return false;
+    const cell = this.cells[hit.r]?.[hit.c];
+    if (!cell) return false;
+    this.focusCell({ r: hit.r, c: hit.c }, hit.from);
+    selectRange(cell, hit.from, hit.to);
+    cell.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    return true;
   }
 
   renderHTML(): string {
