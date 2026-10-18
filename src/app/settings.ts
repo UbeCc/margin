@@ -1,5 +1,6 @@
 import type { AppSettings, ImageRule } from '../contracts';
 import { DEFAULT_SORT, isSortOrder, type SortOrder } from './sidebar/sort';
+import { DEFAULT_EXPORT, migrateExportSettings, type ExportSettings } from './export-settings';
 
 /**
  * App-side settings: the `AppSettings` contract plus shell-only preferences.
@@ -36,6 +37,8 @@ export interface MarginSettings extends AppSettings {
   /** Auto-save delay in ms after the last edit. */
   autoSaveDelay: number;
   restoreLastFolder: boolean;
+  /** Export / print settings (#95). */
+  export: ExportSettings;
   /** Pandoc binary (or its folder) for docx/latex/epub export; '' = auto-detect (#81). */
   pandocPath: string;
 }
@@ -72,6 +75,7 @@ export const DEFAULT_SETTINGS: Readonly<MarginSettings> = Object.freeze({
   fileSearchUseRegexp: false,
   outlineCollapsible: false,
   restoreLastFolder: true,
+  export: DEFAULT_EXPORT,
   pandocPath: '',
 });
 
@@ -159,6 +163,7 @@ export function migrateSettings(input: unknown): MarginSettings {
     fileSearchUseRegexp: bool(raw.fileSearchUseRegexp, d.fileSearchUseRegexp),
     outlineCollapsible: bool(raw.outlineCollapsible, d.outlineCollapsible),
     restoreLastFolder: bool(raw.restoreLastFolder, d.restoreLastFolder),
+    export: migrateExportSettings(raw.export),
     pandocPath: typeof raw.pandocPath === 'string' ? raw.pandocPath.trim() : '',
   };
 }
