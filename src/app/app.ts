@@ -18,13 +18,15 @@ import { copyMathAsImage } from './math-image';
 import { FindBar } from './findbar';
 import type { FindOpts } from './findmatches';
 import { extras } from './platform-extras';
-import { openPreferences } from './preferences';
+import { openPreferences, type Section } from './preferences';
 import { DEFAULT_SETTINGS, launchPlan, newFileEol, migrateSettings, pushRecent, type MarginSettings } from './settings';
 import type { FileTree } from './sidebar/filetree';
 import { FilesPanel } from './sidebar/files-panel';
 import { installSidebarDrop } from './sidebar/drop-editor';
 import { OutlineView } from './sidebar/outline';
 import { StatusBar } from './statusbar';
+import { countMarkdown, countWords } from './wordcount';
+import { EmojiComplete, installSmartPunctuation, startSpeaking, stopSpeaking } from './writing-aids';
 import { ThemeManager } from './themes';
 import { themeLabel } from '../themes';
 import { ask } from './ui/modal';
@@ -64,6 +66,10 @@ export class App {
   get doc(): DocumentController {
     return this.docs.active.doc;
   }
+  /** Host element of the active tab's editor (writing aids / speech scope). */
+  get editorHost(): HTMLElement {
+    return this.docs.active.host;
+  }
   exports!: ExportController;
   settings: MarginSettings = { ...DEFAULT_SETTINGS };
   themes: ThemeManager;
@@ -101,7 +107,10 @@ export class App {
   private saveSettingsSoon = debounce(() => void this.persistSettings(), 400);
   private refreshOutlineSoon = debounce(() => this.refreshOutline(), 250);
   private refreshFindSoon = debounce(() => this.findbar.refresh(), 150);
-  private refreshStatsSoon = debounce(() => this.status.setStats(this.editor.getStats()), 200);
+  private refreshStatsSoon = debounce(() => this.refreshStats(), 200);
+  private refreshSelectionSoon = debounce(() => this.refreshSelectionStats(), 50);
+  /** View › Always on Top: per window, never persisted (native-commands §5.1). */
+  private alwaysOnTop = false;
   private colorScheme: 'light' | 'dark' = 'light';
 
   constructor(private wiring: Wiring, mount: HTMLElement) {
@@ -171,7 +180,7 @@ export class App {
       uploader: this.uploader,
       notify: (m, k, action) => void toast(m, { kind: k, ...(action ? { action } : {}) }),
       saveAs: () => void this.doc.saveAs(),
-      openImagePreferences: () => this.preferences('images'),
+      openImagePreferences: () => this.preferences('images', '[data-pref-group="image-rules"]'),
       resolveAsset: (src) => this.resolveAsset(src),
       assetsChanged: () => this.assetsChanged(),
     });
@@ -229,7 +238,7 @@ export class App {
     if (file && !opts.fresh && (await this.platform.stat(file))) await this.docs.openPath(file, 'replace');
     else this.onDocState(this.doc.state());
     this.refreshOutline();
-    this.status.setStats(this.editor.getStats());
+    this.refreshStats();
     this.status.setSource(this.editor.isSourceMode());
     this.root.classList.add('ready');
     if (!opts.fresh) void this.offerDrafts();
@@ -238,6 +247,15 @@ export class App {
   /** One editor per tab; chrome refreshes only follow the active one. */
   private createTabEditor(host: HTMLElement, tab: DocTab): EditorHandle {
     const ed = this.wiring.createEditor(host, this.editorSettings(tab));
+    // #103 writing aids: smart punctuation + :emoji: autocomplete live on each
+    // tab's host; the popup is fixed-position and dies with the tab.
+    const aids = {
+      root: host,
+      editor: () => ed,
+      smart: () => ({ quotes: this.settings.markdown.smartQuote, dashes: this.settings.markdown.smartDash, onInput: this.settings.markdown.smartPunctuation === 'input' }),
+    };
+    installSmartPunctuation(aids);
+    host.appendChild(new EmojiComplete(aids).el);
     ed.onChange(() => {
       if (tab.doc?.dirty) this.saveDraftsSoon();
       if (this.docs.active !== tab) return;
@@ -251,6 +269,7 @@ export class App {
       if (this.docs.active !== tab) return;
       cancelAnimationFrame(selRaf);
       selRaf = requestAnimationFrame(() => this.outline.setActive(ed.getActiveHeadingId()));
+      this.refreshSelectionSoon();
     });
     return ed;
   }
@@ -385,6 +404,10 @@ export class App {
       },
       ...(this.platform.readClipboard ? { readClipboard: () => this.platform.readClipboard!() } : {}),
       spellcheck: this.settings.spellcheck,
+      autocorrect: this.settings.spellAutocorrect || this.settings.smartTextReplacement,
+      typewriterCaret: this.settings.typewriterCaret,
+      copyMarkdownByDefault: this.settings.copyMarkdownByDefault,
+      lineWiseCopyCut: this.settings.lineWiseCopyCut,
       focusMode: this.settings.focusMode,
       typewriterMode: this.settings.typewriterMode,
       colorScheme: this.colorScheme,
@@ -481,9 +504,11 @@ export class App {
       toggleSidebar: () => void this.run('toggleSidebar'),
       toggleSource: () => void this.run('toggleSource'),
       toggleEol: () => void this.run('toggleLineEnding'),
+      setUnit: (u) => this.updateSettings({ wordCountUnit: u }),
     });
+    // #103 writing aids attach per tab host in createTabEditor (docs exist only after buildLayout).
 
-    this.root.replaceChildren(titlebar, h('div.workspace', null, this.sidebar, main), this.status.el);
+    this.root.replaceChildren(titlebar, h('div.workspace', null, this.sidebar, main), this.status.el, this.status.floating);
   }
 
   private installResizer(handle: HTMLElement): void {
@@ -524,6 +549,13 @@ export class App {
     this.root.classList.toggle('focus-mode', s.focusMode);
     this.root.classList.toggle('typewriter-mode', s.typewriterMode);
     this.status?.setModes({ focus: s.focusMode, typewriter: s.typewriterMode });
+    this.root.classList.toggle('statusbar-hidden', !s.statusBarVisible);
+    if (this.status) {
+      this.status.floating.hidden = s.statusBarVisible || !s.alwaysShowWordCount;
+      this.status.setUnit(s.wordCountUnit);
+      this.status.setReadingSpeed(s.wordsPerMinute);
+    }
+    this.syncMenuChecks();
     document.documentElement.style.setProperty('zoom', s.zoom === 1 ? '' : String(s.zoom));
     // #100 Appearance › Text Column Width (0 = theme default)
     this.root.style.setProperty('--margin-column-width', s.textColumnWidth ? `${s.textColumnWidth}px` : '');
@@ -537,6 +569,52 @@ export class App {
       this.colorScheme = scheme;
       for (const ed of this.docs?.editors() ?? []) ed.updateSettings({ colorScheme: scheme });
     }
+  }
+
+  /** Status bar counts from the raw Markdown (fe-sidebar-statusbar-find §8). */
+  private refreshStats(): void {
+    this.status.setStats(countMarkdown(this.editor.getMarkdown()));
+  }
+
+  private refreshSelectionStats(): void {
+    const sel = window.getSelection();
+    const inside = !!sel && !sel.isCollapsed && !!sel.anchorNode && this.editorHost.contains(sel.anchorNode);
+    const text = inside ? sel!.toString() : '';
+    const all = inside && text.length >= (this.editorHost.innerText ?? '').trim().length;
+    this.status.setSelection(text && !all ? { words: countWords(text), characters: text.length } : null);
+  }
+
+  private lastChecks = '';
+  /** Native check marks follow app state (#103 menu.state-sync). */
+  private syncMenuChecks(): void {
+    const set = extras(this.platform).setMenuChecked;
+    if (!set) return;
+    const s = this.settings;
+    // §5.4: in Convert-on-Input mode with quotes or dashes on, Remap Unicode
+    // Punctuation on Parse is forced on and greyed out.
+    const remapForced = s.markdown.smartPunctuation === 'input' && (s.markdown.smartQuote || s.markdown.smartDash);
+    const checks: [string, boolean][] = [
+      ['toggleStatusBar', s.statusBarVisible],
+      ['alwaysOnTop', this.alwaysOnTop],
+      ['toggleMagnification', s.allowMagnification],
+      ['spell:toggle', s.spellcheck],
+      ['spell:grammar', s.spellGrammar],
+      ['spell:autocorrect', s.spellAutocorrect],
+      ['subst:input', s.markdown.smartPunctuation === 'input'],
+      ['subst:render', s.markdown.smartPunctuation === 'rendering'],
+      ['subst:quotes', s.markdown.smartQuote],
+      ['subst:dashes', s.markdown.smartDash],
+      ['subst:textReplacement', s.smartTextReplacement],
+      ['subst:remap', remapForced || s.markdown.remapPunctuation],
+      ['toggleFocus', s.focusMode],
+      ['toggleTypewriter', s.typewriterMode],
+    ];
+    const key = JSON.stringify(checks);
+    if (key === this.lastChecks) return;
+    this.lastChecks = key;
+    const enable = extras(this.platform).setMenuEnabled;
+    void enable?.call(this.platform, 'subst:remap', !remapForced).catch(() => {});
+    for (const [id, on] of checks) void set.call(this.platform, id, on).catch(() => {});
   }
 
   private showSidebarTab(id: 'files' | 'outline'): void {
@@ -606,6 +684,9 @@ export class App {
       this.applyAppearance();
     const ed: Partial<EditorSettings> = {};
     if (s.spellcheck !== prev.spellcheck) ed.spellcheck = s.spellcheck;
+    const auto = s.spellAutocorrect || s.smartTextReplacement;
+    if (auto !== (prev.spellAutocorrect || prev.smartTextReplacement)) ed.autocorrect = auto;
+    if (s.typewriterCaret !== prev.typewriterCaret) ed.typewriterCaret = s.typewriterCaret;
     if (s.focusMode !== prev.focusMode) ed.focusMode = s.focusMode;
     if (s.typewriterMode !== prev.typewriterMode) ed.typewriterMode = s.typewriterMode;
     if (JSON.stringify(s.markdown) !== JSON.stringify(prev.markdown)) ed.markdown = { ...s.markdown };
@@ -1007,10 +1088,92 @@ export class App {
       case 'replace':
         this.findbar.open(id === 'replace');
         return true;
+      case 'toggleStatusBar':
+        this.updateSettings({ statusBarVisible: !this.settings.statusBarVisible });
+        return true;
+      case 'wordCount':
+        this.status.openPopover(this.settings.statusBarVisible || this.status.floating.hidden ? undefined : this.status.floating);
+        return true;
+      case 'alwaysOnTop': {
+        const set = extras(this.platform).setAlwaysOnTop;
+        if (!set) {
+          toast('Always on Top is available in the desktop app', { kind: 'info' });
+          return true;
+        }
+        this.alwaysOnTop = await set.call(this.platform, !this.alwaysOnTop).catch(() => this.alwaysOnTop);
+        this.lastChecks = '';
+        this.syncMenuChecks();
+        return true;
+      }
+      case 'toggleMagnification':
+        this.updateSettings({ allowMagnification: !this.settings.allowMagnification });
+        void extras(this.platform).setMagnification?.call(this.platform, this.settings.allowMagnification).catch(() => {});
+        return true;
+      case 'toggleDevtools':
+        await extras(this.platform).toggleDevtools?.call(this.platform).catch(() => {});
+        return true;
+      case 'spell:toggle':
+        this.updateSettings({ spellcheck: !this.settings.spellcheck });
+        return true;
+      case 'spell:panel':
+        await extras(this.platform).showSpellingPanel?.call(this.platform).catch(() => {});
+        return true;
+      case 'spell:now': {
+        // Typora runs the system checker over the editable area (§5.3); on the
+        // web the closest equivalent is re-running the browser spellcheck pass.
+        const ed = this.editorHost.querySelector('.md-editor') as HTMLElement | null;
+        if (ed?.spellcheck) {
+          ed.spellcheck = false;
+          void ed.offsetHeight;
+          ed.spellcheck = true;
+        }
+        return true;
+      }
+      case 'spell:grammar':
+        this.updateSettings({ spellGrammar: !this.settings.spellGrammar });
+        return true;
+      case 'spell:autocorrect':
+        this.updateSettings({ spellAutocorrect: !this.settings.spellAutocorrect });
+        return true;
+      case 'subst:input':
+      case 'subst:render':
+        this.updateSettings({ markdown: { ...this.settings.markdown, smartPunctuation: id === 'subst:input' ? 'input' : 'rendering' } });
+        return true;
+      case 'subst:quotes':
+      case 'subst:dashes': {
+        const quotes = id === 'subst:quotes' ? !this.settings.markdown.smartQuote : this.settings.markdown.smartQuote;
+        const dashes = id === 'subst:dashes' ? !this.settings.markdown.smartDash : this.settings.markdown.smartDash;
+        // §5.4: converting on input locks "Remap Unicode Punctuation on Parse" on.
+        const forced = this.settings.markdown.smartPunctuation === 'input' && (quotes || dashes);
+        this.updateSettings({
+          markdown: { ...this.settings.markdown, smartQuote: quotes, smartDash: dashes, ...(forced ? { remapPunctuation: true } : {}) },
+        });
+        return true;
+      }
+      case 'subst:textReplacement':
+        this.updateSettings({ smartTextReplacement: !this.settings.smartTextReplacement });
+        return true;
+      case 'subst:remap':
+        this.updateSettings({ markdown: { ...this.settings.markdown, remapPunctuation: !this.settings.markdown.remapPunctuation } });
+        return true;
+      case 'subst:more':
+        this.preferences('markdown', '[data-group="Smart Punctuation"]');
+        return true;
+      case 'emojiPicker': {
+        // "Emoji and Symbols": the system picker on desktop; here, open the
+        // :shortcode: autocomplete at the caret (fe-preferences §10).
+        this.editorHost.dispatchEvent(new CustomEvent('margin:emoji'));
+        return true;
+      }
+      case 'speech:start':
+        if (!startSpeaking(this.editorHost)) toast('Speech is not available here', { kind: 'warning' });
+        return true;
+      case 'speech:stop':
+        stopSpeaking();
+        return true;
       case 'toggleSidebar':
         this.updateSettings({ sidebarVisible: !this.settings.sidebarVisible });
         return true;
-      case 'showFiles':
       case 'showFiles':
       case 'showOutline': {
         const tab = id === 'showFiles' ? 'files' : 'outline';
@@ -1132,7 +1295,7 @@ export class App {
     toast(`${key === 'inlineMath' ? 'Inline Math' : 'Highlight'} syntax enabled (Preferences › Markdown › Syntax Support)`, { timeout: 3000 });
   }
 
-  private preferences(section?: 'export' | 'images'): void {
+  private preferences(section?: Section, deepLink?: string): void {
     openPreferences({
       settings: () => this.settings,
       update: (p) => this.updateSettings(p),
@@ -1156,7 +1319,7 @@ export class App {
         const test = extras(this.platform).testUploader;
         return test ? test.call(this.platform, config) : Promise.reject(new Error('Image upload is only available in the desktop app.'));
       },
-    }, section);
+    }, section, deepLink);
   }
 
   private async openThemesFolder(): Promise<void> {

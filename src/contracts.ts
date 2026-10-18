@@ -53,6 +53,13 @@ export interface EditorSettings {
   /** Visual modes. */
   focusMode: boolean;
   typewriterMode: boolean;
+  /** #103 Substitutions › Text Replacement + Spelling › autocorrect: WebKit typing aids on the contenteditable. */
+  autocorrect?: boolean;
+  /** #134 Editor › Typewriter: false = keep caret visible instead of centered (Typora `no_mid_caret`). */
+  typewriterCaret?: boolean;
+  /** #134 Editor › Default Copy Behavior. */
+  copyMarkdownByDefault?: boolean;
+  lineWiseCopyCut?: boolean;
   /** "light" | "dark" — widgets (code highlight, mermaid) follow it. */
   colorScheme: 'light' | 'dark';
   /** Optional (#100/#102): Markdown syntax / editing preferences. Missing keys = `DEFAULT_MARKDOWN_OPTIONS`. */
@@ -370,9 +377,15 @@ export type MenuAction =
   | `code:${CodeOp}`
   | `math:${MathOp}`
   // #99 (additive): Format › Image submenu
+  | `image:${ImageMenuAction}`
   // #136 (additive): Format › Take Picture (camera dialog)
   | 'takePicture'
-  | `image:${ImageMenuAction}`;
+  // #103 (additive): window chrome & writing aids
+  | 'toggleStatusBar' | 'alwaysOnTop' | 'toggleDevtools' | 'toggleMagnification'
+  | 'spell:toggle' | 'spell:panel' | 'spell:now' | 'spell:grammar' | 'spell:autocorrect'
+  | 'subst:quotes' | 'subst:dashes' | 'subst:input' | 'subst:render' | 'subst:textReplacement' | 'subst:remap' | 'subst:more'
+  | 'speech:start' | 'speech:stop'
+  | 'emojiPicker';
 
 /** Format › Image entries (#99), in Typora's menu order; per-image ones act on the image at the caret. */
 export type ImageMenuAction =

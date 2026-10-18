@@ -33,7 +33,7 @@ export type Section = 'general' | 'appearance' | 'editor' | 'images' | 'markdown
 
 let openHandle: { close(): void } | null = null;
 
-export function openPreferences(host: PreferencesHost, initial: Section = 'general'): void {
+export function openPreferences(host: PreferencesHost, initial: Section = 'general', deepLink?: string): void {
   if (openHandle) return;
   const s = host.settings();
   const set = (patch: Partial<MarginSettings>): void => host.update(patch);
@@ -42,13 +42,6 @@ export function openPreferences(host: PreferencesHost, initial: Section = 'gener
   const row = (label: string, control: HTMLElement, hint?: string): HTMLElement =>
     h('label.pref-row', null, h('span.pref-label', null, label, hint ? h('span.pref-hint', { text: hint }) : null), h('span.pref-control', null, control));
 
-  const toggle = (key: keyof MarginSettings, label: string, hint?: string): HTMLElement => {
-    const input = h('input.switch', { type: 'checkbox', role: 'switch', 'data-pref': key });
-    input.checked = Boolean(s[key]);
-    input.addEventListener('change', () => set({ [key]: input.checked } as Partial<MarginSettings>));
-    return row(label, input, hint);
-  };
-
   const select = (key: string, options: [string, string][], value: string, onChange: (v: string) => void): HTMLSelectElement => {
     const el = h('select.select', { 'data-pref': key }, ...options.map(([v, l]) => h('option', { value: v, text: l })));
     el.value = value;
@@ -56,14 +49,18 @@ export function openPreferences(host: PreferencesHost, initial: Section = 'gener
     return el;
   };
 
-  // ---------------------------------------------------------------- appearance
+  // ---------------------------------------------------------------- appearance (fe-preferences §4)
   const names = host.themeNames();
   const darkNames = names.filter((n) => host.isDarkTheme(n));
-  const fontSize = h('input.number', { type: 'number', min: '10', max: '32', step: '1', value: String(s.fontSize), 'data-pref': 'fontSize' });
-  fontSize.addEventListener('change', () => {
-    const v = Math.round(Number(fontSize.value));
-    if (v >= 10 && v <= 32) set({ fontSize: v });
-  });
+  // Font Size: "Auto ( Recommended )" / "Customized" + 9–24 px box, clamped on blur (#134).
+  const sizeBox = h('input.number', { type: 'number', min: '9', max: '24', step: '1', value: String(s.customFontSize), 'data-pref': 'fontSize', 'aria-label': 'Font size in px' });
+  const applyFontSize = (): void => {
+    const v = Math.max(9, Math.min(24, Math.round(Number(sizeBox.value) || 14)));
+    sizeBox.value = String(v);
+    set({ customFontSize: v, useCustomFontSize: true, fontSize: v });
+  };
+  sizeBox.addEventListener('change', applyFontSize);
+  sizeBox.addEventListener('blur', applyFontSize);
   const columnWidth = h('input.number', {
     type: 'number',
     min: '400',
@@ -82,44 +79,64 @@ export function openPreferences(host: PreferencesHost, initial: Section = 'gener
   const saveCss = debounce(() => set({ customCss: customCss.value }), 400);
   customCss.addEventListener('input', saveCss);
   customCss.addEventListener('blur', () => saveCss.flush());
+  // Reading Speed: 1–999 words/min, default 382; presets 120 / 240 / 382 (fe-preferences §4.3).
+  const wpmBox = h('input.number', { type: 'number', min: '1', max: '999', step: '1', value: String(s.wordsPerMinute), 'data-pref': 'wordsPerMinute' });
+  wpmBox.addEventListener('change', () => {
+    const v = Math.max(1, Math.min(999, Math.round(Number(wpmBox.value) || 382)));
+    wpmBox.value = String(v);
+    set({ wordsPerMinute: v });
+  });
+  const wpmReset = h('button.btn', { type: 'button', text: 'Reset to Default', onclick: () => { wpmBox.value = '382'; set({ wordsPerMinute: 382 }); } });
+  const wpmPreset = select('wordsPerMinutePreset', [['', 'Presets…'], ['120', '120  words/minute (Slow)'], ['240', '240  words/minute (Medium)'], ['382', '382  words/minute (Fast)']], '', (v) => {
+    if (!v) return;
+    wpmBox.value = v;
+    set({ wordsPerMinute: Number(v) });
+  });
 
   const appearance = h(
     'section.pref-section',
     { 'data-section': 'appearance' },
-    row(
-      'Theme',
-      // Light themes only: dark ones are picked below (a dark "Theme" in a light OS would silently fall back).
-      select('theme', names.filter((n) => !host.isDarkTheme(n) || n === s.theme).map((n) => [n, themeLabel(n)]), s.theme, (v) => set({ theme: v })),
-    ),
-    row(
-      'Appearance',
-      select('colorScheme', [['system', 'Match System'], ['light', 'Light'], ['dark', 'Dark']], s.colorScheme, (v) =>
-        set({ colorScheme: v as MarginSettings['colorScheme'] }),
-      ),
-    ),
-    row(
-      'Dark theme',
-      select('darkTheme', (darkNames.length ? darkNames : ['night']).map((n) => [n, themeLabel(n)]), s.darkTheme, (v) => set({ darkTheme: v })),
-      'Used in dark mode when the theme above is light',
-    ),
-    row('Font size', h('span.inline', null, fontSize, h('span.unit', { text: 'px' }))),
-    row(
+    kit.group(
       'Window Style',
-      select('windowStyle', [['seamless', 'Seamless'], ['unibody', 'Unibody'], ['native', 'Classic']], s.windowStyle, (v) =>
-        set({ windowStyle: v as MarginSettings['windowStyle'] }),
+      row(
+        'Window Style',
+        select('windowStyle', [['seamless', 'Seamless'], ['unibody', 'Unibody'], ['native', 'Classic']], s.windowStyle, (v) => set({ windowStyle: v as MarginSettings['windowStyle'] })),
+        '(applied after restart; desktop only)',
       ),
-      '(applied after restart; desktop only)',
     ),
-    row('Text Column Width', h('span.inline', null, columnWidth, h('span.unit', { text: 'px' })), 'Empty = theme default'),
-    h(
-      'div.pref-group',
-      { 'data-group': 'Left Panel' },
-      h('h3.pref-group-title', { text: 'Left Panel' }),
-      toggle('showOutlineByDefault', 'Show Outline Panel by Default'),
-      toggle('collapsibleOutline', 'Collapsible Outline on Left Panel'),
+    kit.group(
+      'Font Size',
+      row(
+        'Font Size',
+        kit.radios(
+          'useCustomFontSize',
+          [['auto', 'Auto ( Recommended )'], ['custom', 'Customized']],
+          s.useCustomFontSize ? 'custom' : 'auto',
+          (v) => set(v === 'custom' ? { useCustomFontSize: true, fontSize: s.customFontSize } : { useCustomFontSize: false, fontSize: 16 }),
+          { custom: h('span.inline', null, sizeBox, h('span.unit', { text: 'px' })) },
+        ),
+      ),
     ),
-    h('div.pref-block', null, h('div.pref-label', null, 'Custom CSS', h('span.pref-hint', { text: 'Applied on top of the theme' })), customCss),
-    h('div.pref-actions', null, h('button.btn', { type: 'button', text: 'Open Themes Folder', onclick: () => host.openThemesFolder() })),
+    kit.group(
+      'Word Count',
+      kit.toggle('alwaysShowWordCount', 'Always Show Word Count'),
+      row('Reading Speed', h('span.inline', null, wpmBox, h('span.unit', { text: 'words / min' }), wpmPreset, wpmReset)),
+      kit.toggle('statusBarVisible', 'Show status bar'),
+    ),
+    kit.group('Left Panel', kit.toggle('showOutlineByDefault', 'Show Outline Panel by Default'), kit.toggle('collapsibleOutline', 'Collapsible Outline on Left Panel')),
+    kit.group(
+      'Themes',
+      row(
+        'Theme',
+        // Light themes only: dark ones are picked below (a dark "Theme" in a light OS would silently fall back).
+        select('theme', names.filter((n) => !host.isDarkTheme(n) || n === s.theme).map((n) => [n, themeLabel(n)]), s.theme, (v) => set({ theme: v })),
+      ),
+      row('Appearance', select('colorScheme', [['system', 'Match System'], ['light', 'Light'], ['dark', 'Dark']], s.colorScheme, (v) => set({ colorScheme: v as MarginSettings['colorScheme'] }))),
+      row('Dark theme', select('darkTheme', (darkNames.length ? darkNames : ['night']).map((n) => [n, themeLabel(n)]), s.darkTheme, (v) => set({ darkTheme: v })), 'Used in dark mode when the theme above is light'),
+      row('Text Column Width', h('span.inline', null, columnWidth, h('span.unit', { text: 'px' })), 'Empty = theme default'),
+      h('div.pref-block', null, h('div.pref-label', null, 'Custom CSS', h('span.pref-hint', { text: 'Applied on top of the theme' })), customCss),
+      h('div.pref-actions', null, h('button.btn', { type: 'button', text: 'Open Themes Folder', onclick: () => host.openThemesFolder() })),
+    ),
   );
 
   // ---------------------------------------------------------------- export
@@ -142,7 +159,7 @@ export function openPreferences(host: PreferencesHost, initial: Section = 'gener
     : null;
   const exportPane = h(
     'section.pref-section',
-    { 'data-section': 'export-pandoc' },
+    { 'data-section': 'export-pandoc', 'data-pref-group': 'pandoc' },
     row('Pandoc Path', h('span.inline', null, pandocPath, pandocDetect), 'Used for Word, LaTeX and EPUB export'),
     h('div.pref-block', null, pandocStatus),
   );
@@ -178,23 +195,55 @@ export function openPreferences(host: PreferencesHost, initial: Section = 'gener
         }),
       ),
     ],
-  };
+};
   const nav = h('nav.pref-nav', { role: 'tablist' });
   const panel = h('div.pref-panel');
   const show = (id: Section): void => {
     panel.replaceChildren(sections[id][1]);
     for (const b of nav.querySelectorAll('button')) b.setAttribute('aria-selected', String(b.dataset.section === id));
+    runSearch(searchBox.value);
   };
   for (const [id, [label]] of Object.entries(sections) as [Section, [string, HTMLElement]][]) {
-    nav.appendChild(h('button.pref-tab', { type: 'button', role: 'tab', 'data-section': id, text: label, onclick: () => show(id) }));
+    nav.appendChild(h('button.pref-tab', { type: 'button', role: 'tab', 'data-section': id, onclick: () => show(id) }, h('span', { text: label }), h('span.pref-hits', { 'data-hits': '' })));
   }
+  // Search box (fe-preferences §1): case-insensitive substring match over each
+  // group's title, hints and extra keywords; nav tabs show per-pane hit counts.
+  const searchBox = h('input.pref-search', { type: 'search', placeholder: 'Search for…', 'aria-label': 'Search preferences' });
+  const runSearch = (q: string): void => {
+    const needle = q.trim().toLowerCase();
+    const counts: Partial<Record<Section, number>> = {};
+    for (const [id, [, pane]] of Object.entries(sections) as [Section, [string, HTMLElement]][]) {
+      let hits = 0;
+      for (const g of pane.querySelectorAll<HTMLElement>('.pref-group, [data-pref-group]')) {
+        const hay = `${g.dataset.group ?? ''} ${g.dataset.keywords ?? ''} ${g.textContent ?? ''}`.toLowerCase();
+        const hit = needle !== '' && hay.includes(needle);
+        g.classList.toggle('pref-hit', hit);
+        if (hit) hits++;
+      }
+      counts[id] = hits;
+    }
+    for (const b of nav.querySelectorAll<HTMLButtonElement>('button')) {
+      const n = counts[b.dataset.section as Section] ?? 0;
+      (b.querySelector('.pref-hits') as HTMLElement).dataset.hits = n ? String(n) : '';
+    }
+  };
+  searchBox.addEventListener('input', () => runSearch(searchBox.value));
+  /** Deep link (§1): blink the target group for 4 s, then clear. */
+  const highlightGroup = (pane: Section, sel: string): void => {
+    show(pane);
+    const g = sections[pane][1].querySelector<HTMLElement>(sel);
+    if (!g) return;
+    g.classList.add('pref-deeplink');
+    setTimeout(() => g.classList.remove('pref-deeplink'), 4000);
+  };
   const body = h(
     'div.preferences',
     null,
-    h('header.pref-header', null, h('h2', { text: 'Preferences' }), h('button.icon-btn.pref-close', { type: 'button', 'aria-label': 'Close', text: '×', onclick: () => close() })),
+    h('header.pref-header', null, h('h2', { text: 'Preferences' }), searchBox, h('button.icon-btn.pref-close', { type: 'button', 'aria-label': 'Close', text: '×', onclick: () => close() })),
     h('div.pref-body', null, nav, panel),
   );
   show(initial);
+  if (deepLink) highlightGroup(initial, deepLink);
   const modal = openModal(body, { className: 'pref-card', label: 'Preferences', onDismiss: () => (openHandle = null) });
   const close = (): void => {
     saveCss.flush();

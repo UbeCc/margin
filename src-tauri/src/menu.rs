@@ -111,6 +111,43 @@ const EDIT_JUMP: &[Item] = &[
     ("jump:bottom", "Jump to Bottom", None),
     ("jump:selection", "Jump to Selection", Some("CmdOrCtrl+J")),
 ];
+// #103 Edit › Substitutions / Spelling and Grammar / Speech (native-commands.md §5.3–5.5, appendix A)
+const EDIT_SUBST: &[Item] = &[
+    ("subst:input", "Convert on Input", None),
+    ("subst:render", "Convert on Rendering", None),
+    ("-", "", None),
+    ("subst:quotes", "Smart Quotes", None),
+    ("subst:dashes", "Smart Dashes", None),
+    ("subst:textReplacement", "Text Replacement", None),
+    ("-", "", None),
+    ("subst:remap", "Remap Unicode Punctuation on Parse", None),
+    ("subst:more", "More Options…", None),
+];
+const EDIT_SPELL: &[Item] = &[
+    ("spell:panel", "Show Spelling and Grammar", Some("CmdOrCtrl+Colon")),
+    ("spell:now", "Check Document Now", Some("CmdOrCtrl+Semicolon")),
+    ("spell:toggle", "Check Spelling While Typing", None),
+    ("spell:grammar", "Check Grammar With Spelling", None),
+    ("spell:autocorrect", "Correct Spelling Automatically", None),
+];
+const EDIT_SPEECH: &[Item] = &[("speech:start", "Start Speaking", None), ("speech:stop", "Stop Speaking", None)];
+/// Menu ids rendered as tickable check items (menu state sync, #103).
+const CHECK_IDS: &[&str] = &[
+    "toggleStatusBar",
+    "alwaysOnTop",
+    "toggleMagnification",
+    "spell:toggle",
+    "spell:grammar",
+    "spell:autocorrect",
+    "subst:input",
+    "subst:render",
+    "subst:quotes",
+    "subst:dashes",
+    "subst:textReplacement",
+    "subst:remap",
+];
+#[cfg(test)]
+const EDIT_AIDS: &[&[Item]] = &[EDIT_SUBST, EDIT_SPELL, EDIT_SPEECH];
 #[cfg(test)]
 const EDIT_EXTRA: &[&[Item]] = &[EDIT_COPY_AS, EDIT_PASTE_AS, EDIT_SELECTION, EDIT_DELETE, EDIT_JUMP];
 const PARAGRAPH: &[Item] = &[
@@ -262,9 +299,16 @@ const VIEW: &[Item] = &[
     ("toggleFocus", "Focus Mode", Some("F8")),
     ("toggleTypewriter", "Typewriter Mode", Some("F9")),
     ("-", "", None),
+    // #103 window chrome (Typora order: Allow Magnification, zoom, Always on Top)
+    ("toggleMagnification", "Allow Magnification", None),
+    ("toggleStatusBar", "Show Status Bar", None),
+    ("-", "", None),
     ("zoomReset", "Actual Size", Some("CmdOrCtrl+Shift+0")),
     ("zoomIn", "Zoom In", Some("CmdOrCtrl+Equal")),
     ("zoomOut", "Zoom Out", Some("CmdOrCtrl+Minus")),
+    ("-", "", None),
+    ("alwaysOnTop", "Always on Top", None),
+    ("toggleDevtools", "Toggle DevTools", None),
     ("-", "", None),
     ("toggleLineEnding", "Toggle Line Endings (LF / CRLF)", None),
 ];
@@ -274,13 +318,13 @@ const VIEW: &[Item] = &[
 pub fn all_actions() -> Vec<&'static str> {
     let mut v: Vec<&'static str> = [FILE_OPEN, FILE, EXPORT, EXPORT_MORE, EDIT_TOP, EDIT_FIND, PARAGRAPH, FORMAT, VIEW, WINDOW_TABS]
         .iter()
-        .chain(EDIT_EXTRA.iter())
-        .chain(IMAGE_ALL.iter())
         .chain(SUBMENUS.iter().map(|(_, items)| items))
+        .chain(IMAGE_ALL.iter())
+        .chain(EDIT_AIDS.iter())
         .flat_map(|g| g.iter().map(|i| i.0))
         .filter(|id| *id != "-" && !id.starts_with('@'))
         .collect();
-    v.extend(["pageSetup", "print", "close", "preferences", crate::recent::ID_CLEAR]);
+    v.extend(["pageSetup", "print", "close", "preferences", "emojiPicker", crate::recent::ID_CLEAR]);
     v
 }
 
@@ -294,6 +338,8 @@ fn add_items<'a, R: Runtime>(
             b.separator()
         } else if let Some((_, sub)) = SUBMENUS.iter().find(|(m, _)| m == id) {
             b.item(&add_items(app, SubmenuBuilder::new(app, *label), sub)?.build()?)
+        } else if CHECK_IDS.contains(id) {
+            b.item(&CheckMenuItem::with_id(app, *id, *label, true, false, *accel)?)
         } else {
             b.item(&MenuItem::with_id(app, *id, *label, true, *accel)?)
         };
@@ -390,8 +436,14 @@ pub fn build<R: Runtime>(
         .item(&add_items(app, SubmenuBuilder::new(app, "Selection"), EDIT_SELECTION)?.build()?)
         .item(&add_items(app, SubmenuBuilder::new(app, "Delete"), EDIT_DELETE)?.build()?)
         .item(&add_items(app, SubmenuBuilder::new(app, "Jump To"), EDIT_JUMP)?.build()?)
-        .separator();
-    let edit = add_items(app, edit, EDIT_FIND)?.build()?;
+        .separator()
+        .item(&add_items(app, SubmenuBuilder::new(app, "Substitutions"), EDIT_SUBST)?.build()?)
+        .item(&add_items(app, SubmenuBuilder::new(app, "Spelling and Grammar"), EDIT_SPELL)?.build()?);
+    let edit = add_items(app, edit, EDIT_FIND)?
+        .separator()
+        .item(&add_items(app, SubmenuBuilder::new(app, "Speech"), EDIT_SPEECH)?.build()?)
+        .item(&MenuItem::with_id(app, "emojiPicker", "Emoji and Symbols", true, Some("CmdOrCtrl+Alt+Space"))?)
+        .build()?;
     menu = menu.item(&edit);
 
     menu = menu.item(&add_items(app, SubmenuBuilder::new(app, "Paragraph"), PARAGRAPH)?.build()?);
@@ -460,6 +512,68 @@ pub fn check_theme<R: Runtime>(app: &AppHandle<R>, current: &str) {
     }
 }
 
+/// Tick / untick a check item anywhere in the menu tree (#103 menu state sync).
+/// Unknown ids (e.g. custom menus) are ignored.
+pub fn set_checked<R: Runtime>(app: &AppHandle<R>, id: &str, checked: bool) {
+    let Some(menu) = app.menu() else { return };
+    for item in menu.items().unwrap_or_default() {
+        if set_checked_item(&item, id, checked) {
+            return;
+        }
+    }
+}
+
+fn set_checked_item<R: Runtime>(item: &MenuItemKind<R>, id: &str, checked: bool) -> bool {
+    match item {
+        MenuItemKind::Check(c) => {
+            if c.id().as_ref() == id {
+                let _ = c.set_checked(checked);
+                true
+            } else {
+                false
+            }
+        }
+        MenuItemKind::Submenu(sub) => sub
+            .items()
+            .unwrap_or_default()
+            .iter()
+            .any(|it| set_checked_item(it, id, checked)),
+        _ => false,
+    }
+}
+/// Enable / disable a menu item anywhere in the tree (e.g. the forced-on
+/// Remap Unicode Punctuation item while smart input conversion is active).
+pub fn set_enabled<R: Runtime>(app: &AppHandle<R>, id: &str, enabled: bool) {
+    let Some(menu) = app.menu() else { return };
+    for item in menu.items().unwrap_or_default() {
+        if set_enabled_item(&item, id, enabled) {
+            return;
+        }
+    }
+}
+
+
+fn set_enabled_item<R: Runtime>(item: &MenuItemKind<R>, id: &str, enabled: bool) -> bool {
+    match item {
+        MenuItemKind::Check(c) => {
+            if c.id().as_ref() == id {
+                let _ = c.set_enabled(enabled);
+                return true;
+            }
+            false
+        }
+        MenuItemKind::MenuItem(m) => {
+            if m.id().as_ref() == id {
+                let _ = m.set_enabled(enabled);
+                return true;
+            }
+            false
+        }
+        MenuItemKind::Submenu(sub) => sub.items().unwrap_or_default().iter().any(|it| set_enabled_item(it, id, enabled)),
+        _ => false,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -470,6 +584,7 @@ mod tests {
         for g in [FILE_OPEN, FILE, EXPORT, EXPORT_MORE, EDIT_TOP, EDIT_FIND, PARAGRAPH, FORMAT, FORMAT_TAIL, VIEW, WINDOW_TABS]
             .iter()
             .chain(EDIT_EXTRA.iter())
+        .chain(EDIT_AIDS.iter())
             .chain(SUBMENUS.iter().map(|(_, items)| items))
         {
             for (_, _, a) in g.iter() {
@@ -499,6 +614,10 @@ mod tests {
                 "recoverDrafts",
             ]
             .contains(&a)
+                || a.starts_with("spell:")
+                || a.starts_with("subst:")
+                || a.starts_with("speech:")
+                || ["emojiPicker", "toggleStatusBar", "alwaysOnTop", "toggleDevtools", "toggleMagnification"].contains(&a)
                 || a.starts_with("heading:")
                 || a.starts_with("mark:")
                 || a.starts_with("block:")
@@ -534,6 +653,17 @@ mod tests {
         assert_eq!(markers, ["@table", "@codeTools", "@mathTools"]);
         for want in ["block:table", "table:moveRowUp", "table:resize", "table:copy", "code:indentAll", "math:copyMathML", "math:refresh"] {
             assert!(all_actions().contains(&want), "missing menu item {want}");
+        }
+    }
+
+    #[test]
+    fn chrome_check_items_are_check_menu_items() {
+        // The aids surfaces (#103) must be tickable so state sync can mark them.
+        for want in CHECK_IDS {
+            assert!(all_actions().contains(want), "{want} missing from the menu");
+        }
+        for aid in ["spell:panel", "spell:now", "subst:more", "speech:start", "speech:stop", "emojiPicker"] {
+            assert!(all_actions().contains(&aid), "{aid} missing from the menu");
         }
     }
 }

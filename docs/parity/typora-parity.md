@@ -9,14 +9,14 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 | | surfaces |
 |---|---|
 | total | 172 |
-| owned (implemented) | 149 (with a named passing test: 136) |
-| partial | 8 |
-| missing | 7 |
+| owned (implemented) | 154 (with a named passing test: 141) |
+| partial | 6 |
+| missing | 4 |
 | out of scope | 8 |
 
-REA ledger `rol_d96a5c7b5813ba68e8532bf8e9ffa716ae1776a65969518fc9b075cf9abcab06` (closure `eb52c32289f5a028…`): status **unknown**; unowned 7, implemented 157, out-of-scope 8, unknown 5.
+REA ledger `rol_b59784f01ada62ade82d561c290c941304f13b8ca8e9f364cc296ce33e6cce13` (closure `019b8994fa84cde5…`): status **unknown**; unowned 4, implemented 160, out-of-scope 8, unknown 5.
 
-REA coverage boundary `margin.typora-parity`: status **unknown**; 136/164 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 7, package-proof-missing 1, verifier-missing 23, verifier-unknown 5.
+REA coverage boundary `margin.typora-parity`: status **unknown**; 141/164 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 4, package-proof-missing 1, verifier-missing 18, verifier-unknown 5.
 
 Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): build exit 0, cargo-test exit 0, independence exit 0, playwright exit 0, vitest exit 0. See `rea/summary.json`.
 
@@ -42,7 +42,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `prefs` Preferences completeness (General, Editor, Image, Markdown, Export, Appearance panes) | P1 | 2 |
 | `sidebar` Sidebar & outline: list view, file search, sort, collapsible outline, filter | P1 | 0 |
 | `syntax` Markdown syntax options & whitespace/line-break settings | P2 | 1 |
-| `chrome` Window chrome & writing aids: status bar, always-on-top, spelling, substitutions, speech, emoji | P2 | 9 |
+| `chrome` Window chrome & writing aids: status bar, always-on-top, spelling, substitutions, speech, emoji | P2 | 4 |
 
 ## Application menu
 
@@ -138,12 +138,12 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `menu.view.source-mode` | View › Source Code Mode | owned |  | `src/app/app.ts` `case 'toggleSource'` | `tests/e2e/core-cases.ts` › source mode round-trip | 7 |
 | `menu.view.focus-typewriter` | View › Focus Mode / Typewriter Mode | owned |  | `src/app/app.ts` `case 'toggleFocus'` | `tests/e2e/app-navigation.spec.ts` › native menu actions route through one dispatcher | 6 |
 | `menu.view.sidebar` | View › Toggle Sidebar / Outline / File Tree | owned |  | `src/app/app.ts` `case 'toggleSidebar'` | `tests/e2e/app-navigation.spec.ts` › outline lists headings and jumps on click | 10 |
-| `menu.view.status-bar` | View › Show Status Bar (word count, toggle) — status bar always shown; no reading time / word-count popover | **partial** | P2 | `src/app/statusbar.ts` `cycle()` | none | 21 |
+| `menu.view.status-bar` | View › Show Status Bar (word count, toggle) — #103: toggle hides the bar; "Always Show Word Count" keeps a floating count; popover lists words / reading time / lines / characters (+ In Selection); unit choice persists | owned |  | `src/app/statusbar.ts` `export class StatusBar` | `tests/e2e/parity-chrome.spec.ts` › menu.view.status-bar: | 21 |
 | `menu.view.zoom` | View › Actual Size / Zoom In / Zoom Out | owned |  | `src/app/app.ts` `case 'zoomIn'` | none | 7 |
 | `menu.view.fullscreen` | View › Toggle Fullscreen | owned |  | `src-tauri/src/menu.rs` `PredefinedMenuItem::fullscreen` | none | 2 |
-| `menu.view.always-on-top` | View › Always on Top | **missing** | P2 | — | none | 1 |
-| `menu.view.devtools` | View › Toggle DevTools / Inspect Element (debug builds) | **missing** | P2 | — | none | 4 |
-| `menu.view.magnification` | View › Allow Magnification (trackpad pinch zoom) | **missing** | P2 | — | none | 1 |
+| `menu.view.always-on-top` | View › Always on Top — #103: per window, never persisted; check mark follows state | owned |  | `src/app/app.ts` `case 'alwaysOnTop'` | `tests/e2e/parity-chrome.spec.ts` › menu.view.always-on-top: | 1 |
+| `menu.view.devtools` | View › Toggle DevTools / Inspect Element (debug builds) | owned |  | `src/app/app.ts` `case 'toggleDevtools'` | `tests/e2e/parity-chrome.spec.ts` › menu.view.devtools: | 4 |
+| `menu.view.magnification` | View › Allow Magnification (trackpad pinch zoom) — #103/#134: preference-gated (Typora stores the inverse noMagnification) | owned |  | `src/app/settings.ts` `allowMagnification` | `tests/e2e/parity-chrome.spec.ts` › menu.view.magnification: | 1 |
 
 ## Themes menu
 
@@ -170,7 +170,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
-| `menu.state-sync` | Native menu state sync (enabled/checked items follow editor state) — only the Themes check marks are synced | **partial** | P2 | `src-tauri/src/commands.rs` `set_theme_menu` | none | 1 |
+| `menu.state-sync` | Native menu state sync (enabled/checked items follow editor state) — #103: generic set_checked path; status bar / always-on-top / magnification / focus / typewriter items sync from app state | owned |  | `src-tauri/src/menu.rs` `pub fn set_checked` | `tests/e2e/parity-chrome.spec.ts` › menu.state-sync: | 1 |
 
 ## Context menus
 
@@ -244,7 +244,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `pref.general.save` | General: Auto Save, save-on-switch, recover unsaved drafts | owned |  | `src/app/drafts.ts` `export class DraftStore` | `tests/e2e/parity-files.spec.ts` › pref.general.save: General: Auto Save, save-on-switch, recover unsaved drafts | 9 |
 | `pref.general.language` | General: UI language — only English strings ship | owned |  | `src/app/prefs/general.ts` `System Language` | `tests/e2e/parity-prefs.spec.ts` › pref.general.language: General: UI language | 1 |
 | `pref.appearance.theme` | Appearance: theme, separate dark theme, follow system | owned |  | `src/app/preferences.ts` `'darkTheme'` | `tests/e2e/app-themes.spec.ts` › preferences: Theme lists light themes, Dark theme lists dark ones | 10 |
-| `pref.appearance.font` | Appearance: font size, custom CSS | owned |  | `src/app/preferences.ts` `'Font size'` | `tests/e2e/app-themes.spec.ts` › command palette theme entry and custom CSS | 3 |
+| `pref.appearance.font` | Appearance: font size, custom CSS | owned |  | `src/app/preferences.ts` `'Font size in px'` | `tests/e2e/app-themes.spec.ts` › command palette theme entry and custom CSS | 3 |
 | `pref.appearance.window` | Appearance: window style (seamless/unibody/native), text column width, outline panel — text column width + outline-by-default (Margin extras) live, collapsible outline persisted; window style persisted only | **partial** | P2 | `src/app/settings.ts` `textColumnWidth` | `tests/e2e/parity-prefs.spec.ts` › pref.appearance.window: Appearance: window style (seamless/unibody/native), text column width, outline panel | 13 |
 | `pref.editor.general` | Editor: auto pair brackets/markdown, display source on focus, heading style, indent — auto pair (markdown pairing depends on bracket pairing) + display source on focus; Indent Size on Save / Pretty indentation and Heading Style pending (gap issue) | **partial** | P1 | `src/editor/core/input.ts` `const autoPair` | `tests/e2e/parity-prefs.spec.ts` › pref.editor.general: Editor: auto pair brackets/markdown, display source on focus, heading style, indent | 10 |
 | `pref.editor.shortcuts` | Custom shortcut keys — in-app JSON key map for the JS keymap (Typora macOS opens a help page); native menu accelerators unchanged | owned |  | `src/app/commands.ts` `export function setCustomKeys` | `tests/e2e/parity-prefs.spec.ts` › pref.editor.shortcuts: Custom shortcut keys | 2 |

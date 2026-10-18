@@ -1,6 +1,7 @@
 import { DEFAULT_MARKDOWN_OPTIONS, type AppSettings, type ImageRule, type MarkdownOptions } from '../contracts';
 import { DEFAULT_SORT, isSortOrder, type SortOrder } from './sidebar/sort';
 import { DEFAULT_EXPORT, migrateExportSettings, type ExportSettings } from './export-settings';
+import { DEFAULT_WPM, UNIT_CODES, type CountUnit } from './wordcount';
 
 /**
  * App-side settings: the `AppSettings` contract plus shell-only preferences.
@@ -18,6 +19,32 @@ export interface MarginSettings extends AppSettings {
   sidebarVisible: boolean;
   sidebarTab: 'files' | 'outline';
   sidebarWidth: number;
+  /** View › Show Status Bar (#103; Typora Win/Linux `showStatusBar`). */
+  statusBarVisible: boolean;
+  /** Keep a word count visible while the status bar is hidden (`always_show_wordcount`). */
+  alwaysShowWordCount: boolean;
+  /** Unit shown in the status bar (`wordCountDelimiter`). */
+  wordCountUnit: CountUnit;
+  /** Reading speed for the reading-time count (`wordsPerMinute`, 1–999). */
+  wordsPerMinute: number;
+  /** Substitutions › Text Replacement (system dictionary via the web view). */
+  smartTextReplacement: boolean;
+  /** Spelling and Grammar › Check Grammar With Spelling. */
+  spellGrammar: boolean;
+  /** Spelling and Grammar › Correct Spelling Automatically. */
+  spellAutocorrect: boolean;
+  /** View › Allow Magnification (Typora stores the inverse `noMagnification`). */
+  allowMagnification: boolean;
+  /** Appearance › Font Size: Auto (theme default) vs Customized (#134). */
+  useCustomFontSize: boolean;
+  /** Customized font size, 9–24 px (14 when first chosen). */
+  customFontSize: number;
+  /** Editor › Default Copy Behavior: ⌘C copies the Markdown source (`copy_markdown_by_default`). */
+  copyMarkdownByDefault: boolean;
+  /** Editor › Default Copy Behavior: copy/cut whole lines when nothing is selected (`lineWiseCopyCut`). */
+  lineWiseCopyCut: boolean;
+  /** Editor › Typewriter: always keep the caret centered (`no_mid_caret`, reversed). */
+  typewriterCaret: boolean;
   /** File tree ordering (#101; Typora `treeSortType`). */
   sidebarSort: SortOrder;
   /** Articles list ordering (Typora `listSortType`, kept separately). */
@@ -115,6 +142,19 @@ export const DEFAULT_SETTINGS: Readonly<MarginSettings> = Object.freeze({
   sidebarVisible: true,
   sidebarTab: 'files',
   sidebarWidth: 260,
+  statusBarVisible: true,
+  alwaysShowWordCount: false,
+  wordCountUnit: 'words',
+  wordsPerMinute: DEFAULT_WPM,
+  smartTextReplacement: false,
+  spellGrammar: false,
+  spellAutocorrect: false,
+  allowMagnification: true,
+  useCustomFontSize: false,
+  customFontSize: 14,
+  copyMarkdownByDefault: true,
+  lineWiseCopyCut: false,
+  typewriterCaret: true,
   sidebarSort: DEFAULT_SORT,
   listSort: DEFAULT_SORT,
   sidebarFileView: 'tree',
@@ -209,13 +249,18 @@ export function migrateSettings(input: unknown): MarginSettings {
   }
   const scheme = raw.colorScheme;
   const tab = raw.sidebarTab;
+  // #134: `fontSize` stays authoritative (Advanced JSON / legacy settings set it
+  // directly); Auto pins it to 16, the Customized box keeps the 9–24 clamp.
+  const explicitSize = typeof raw.fontSize === 'number' ? clampFontSize(raw.fontSize) : d.fontSize;
+  const useCustom = bool(raw.useCustomFontSize, false);
+  const customized = useCustom || explicitSize !== d.fontSize;
+  const customSize = customized ? (useCustom && typeof raw.customFontSize === 'number' ? clampFontSize(raw.customFontSize) : explicitSize) : Math.round(num(raw.customFontSize, d.customFontSize, 9, 24));
   return {
     ...raw,
     settingsVersion: SETTINGS_VERSION,
     theme: str(raw.theme, d.theme).replace(/\.css$/i, ''),
     darkTheme: str(raw.darkTheme, d.darkTheme).replace(/\.css$/i, ''),
     colorScheme: scheme === 'light' || scheme === 'dark' || scheme === 'system' ? scheme : d.colorScheme,
-    fontSize: Math.round(num(raw.fontSize, d.fontSize, 10, 32)),
     autoSave: bool(raw.autoSave, d.autoSave),
     autoSaveDelay: num(raw.autoSaveDelay, d.autoSaveDelay, 300, 60_000),
     imageRule: migrateImageRule(raw.imageRule),
@@ -230,6 +275,20 @@ export function migrateSettings(input: unknown): MarginSettings {
     sidebarVisible: bool(raw.sidebarVisible, d.sidebarVisible),
     sidebarTab: tab === 'files' || tab === 'outline' ? tab : d.sidebarTab,
     sidebarWidth: Math.round(num(raw.sidebarWidth, d.sidebarWidth, 180, 520)),
+    statusBarVisible: bool(raw.statusBarVisible, d.statusBarVisible),
+    alwaysShowWordCount: bool(raw.alwaysShowWordCount, d.alwaysShowWordCount),
+    wordCountUnit: UNIT_CODES.includes(raw.wordCountUnit as CountUnit) ? (raw.wordCountUnit as CountUnit) : d.wordCountUnit,
+    wordsPerMinute: Math.round(num(raw.wordsPerMinute, d.wordsPerMinute, 1, 999)),
+    smartTextReplacement: bool(raw.smartTextReplacement, d.smartTextReplacement),
+    spellGrammar: bool(raw.spellGrammar, d.spellGrammar),
+    spellAutocorrect: bool(raw.spellAutocorrect, d.spellAutocorrect),
+    allowMagnification: bool(raw.allowMagnification, d.allowMagnification),
+    useCustomFontSize: customized,
+    customFontSize: customSize,
+    fontSize: customized ? customSize : d.fontSize,
+    copyMarkdownByDefault: bool(raw.copyMarkdownByDefault, d.copyMarkdownByDefault),
+    lineWiseCopyCut: bool(raw.lineWiseCopyCut, d.lineWiseCopyCut),
+    typewriterCaret: bool(raw.typewriterCaret, d.typewriterCaret),
     sidebarSort: isSortOrder(raw.sidebarSort) ? raw.sidebarSort : d.sidebarSort,
     sidebarFileView: raw.sidebarFileView === 'list' ? 'list' : 'tree',
     listSort: isSortOrder(raw.listSort) ? raw.listSort : d.listSort,
@@ -328,6 +387,12 @@ export function imageRulePresetId(rule: ImageRule): string {
   if (rule.dir === './${filename}.assets') return 'filename';
   if (rule.dir === './assets') return 'assets';
   return 'custom';
+}
+
+
+/** Typora's Appearance › Font Size clamp: 9–24 px (#134). */
+function clampFontSize(v: number): number {
+  return Math.min(24, Math.max(9, Math.round(v)));
 }
 
 /** Move `item` to the front of a recent list (dedup, capped). */

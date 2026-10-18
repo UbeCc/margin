@@ -96,6 +96,9 @@ export function markdownPane(k: PrefKit): HTMLElement {
     const forced = m.smartPunctuation === 'input' && (m.smartQuote || m.smartDash);
     remapBox.disabled = forced;
     remapBox.checked = forced || m.remapPunctuation;
+    // §5.4: system input conversion produces Unicode punctuation — the parse
+    // remap must actually be on, not just displayed as checked.
+    if (forced && !m.remapPunctuation) k.setMd({ remapPunctuation: true });
   };
   smartSel.addEventListener('change', syncRemap);
   quoteRow.querySelector('input')!.addEventListener('change', syncRemap);

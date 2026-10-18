@@ -41,6 +41,7 @@ mod remote_images;
 pub mod recent;
 mod settings;
 mod watch;
+mod window_style;
 mod upload;
 mod watch_state;
 #[cfg(test)]
@@ -192,6 +193,12 @@ pub fn new_window<R: Runtime>(app: &AppHandle<R>, label: &str, path: Option<&str
         b = b.position(p.x + 28.0, p.y + 28.0);
     }
     let win = b.build()?;
+    // #103/#134: new windows start from the saved Window Style / magnification.
+    let saved = settings::typed(&settings::load(&commands::settings_path(app).unwrap_or_default()));
+    window_style::apply(&win, &saved.window_style);
+    if !saved.allow_magnification {
+        let _ = commands::apply_magnification(app, false);
+    }
     install_drop_hook(app, &win);
     Ok(())
 }
@@ -456,6 +463,12 @@ pub fn run() {
             export_cmds::open_exported_file,
             pandoc_import::pandoc_import,
             export_custom::run_export_command,
+            commands::set_menu_checked,
+            commands::set_menu_enabled,
+            commands::set_always_on_top,
+            commands::toggle_devtools,
+            commands::set_magnification,
+            commands::show_spelling_panel,
             upload::upload_images,
             upload::test_uploader,
             upload::cancel_upload,
@@ -489,6 +502,14 @@ pub fn run() {
             if let Ok(dir) = commands::image_fallback_dir(&handle) {
                 allow_assets(&handle, &dir, true);
             }
+            // #103/#134: Window Style (applied after restart) + Allow Magnification
+            // start from their saved values on the main window.
+            if let Some(w) = app.get_webview_window(crate::MAIN) {
+                window_style::apply(&w, &saved.window_style);
+                if !saved.allow_magnification {
+                    let _ = commands::apply_magnification(&handle, false);
+                }
+            }
             open_files(&handle, cli_paths());
             if let Some(w) = app.get_webview_window("main") {
                 install_drop_hook(&handle, &w);
@@ -506,9 +527,19 @@ pub fn run() {
                 }
             }
             WindowEvent::Destroyed => {
-                let state = window.app_handle().state::<AppState>();
+                let app = window.app_handle();
+                let state = app.state::<AppState>();
                 state.guarded.lock().unwrap().remove(window.label());
                 state.confirmed.lock().unwrap().remove(window.label());
+                // General › Quit Margin when last window is closed (#134). Off by
+                // default; the macOS convention is to keep running.
+                let others = app.webview_windows().into_iter().filter(|(l, _)| l != window.label()).count();
+                if others == 0
+                    && settings::typed(&settings::load(&commands::settings_path(app).unwrap_or_default()))
+                        .quit_on_last_window_close
+                {
+                    app.exit(0);
+                }
             }
             _ => {}
         })

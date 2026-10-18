@@ -38,6 +38,18 @@ export interface PlatformExtras {
   pandocAbort?(exportId: string): Promise<boolean>;
   /** Locate pandoc (configured path → PATH → common dirs) and check version ≥ 2. */
   pandocDetect?(pandocPath: string | null): Promise<{ path: string; version: string }>;
+  /** Float this window above others (#103; per window, not persisted). Resolves the new state. */
+  setAlwaysOnTop?(on: boolean): Promise<boolean>;
+  /** Tick / untick a native check menu item (#103 menu state sync). */
+  setMenuChecked?(id: string, checked: boolean): Promise<void>;
+  /** Open / close the web inspector (debug builds only). */
+  toggleDevtools?(): Promise<void>;
+  /** Trackpad pinch zoom of the web view (View › Allow Magnification). */
+  setMagnification?(allow: boolean): Promise<void>;
+  /** Enable / disable a native menu item (#103 menu state sync). */
+  setMenuEnabled?(id: string, enabled: boolean): Promise<void>;
+  /** Edit › Spelling and Grammar › Show Spelling and Grammar: system panel (desktop). */
+  showSpellingPanel?(): Promise<void>;
   /**
    * #99: copy (or move) an image file into `dir` (created when missing). Without
    * `name`, a clash gets Typora's `stem-<7 digits>.ext` suffix (identical bytes are

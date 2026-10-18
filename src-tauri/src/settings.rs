@@ -24,7 +24,15 @@ pub struct AppSettings {
     pub spellcheck: bool,
     pub recent_files: Vec<String>,
     pub recent_folders: Vec<String>,
-    pub last_folder: Option<String>,
+    /// View › Allow Magnification, global (#103; Typora stores the inverse `noMagnification`).
+    #[serde(default = "default_true")]
+    pub allow_magnification: bool,
+    /// Appearance › Window Style, applied after restart (#134).
+    #[serde(default = "default_style")]
+    pub window_style: String,
+    /// General › Quit Margin when last window is closed (#134; macOS stays alive by default).
+    #[serde(default)]
+    pub quit_on_last_window_close: bool,
 }
 
 impl Default for AppSettings {
@@ -38,9 +46,18 @@ impl Default for AppSettings {
             spellcheck: false,
             recent_files: vec![],
             recent_folders: vec![],
-            last_folder: None,
+            allow_magnification: default_true(),
+            window_style: default_style(),
+            quit_on_last_window_close: false,
         }
     }
+}
+fn default_true() -> bool {
+    true
+}
+
+fn default_style() -> String {
+    "seamless".into()
 }
 
 pub const MAX_RECENT: usize = 20;

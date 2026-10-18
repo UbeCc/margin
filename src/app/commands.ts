@@ -12,7 +12,8 @@ export type AppCommand =
   | 'openThemesFolder'
   | 'toggleLineEnding'
   | 'toggleFinalNewline'
-  | 'uploadAllImages';
+  | 'uploadAllImages'
+  | 'wordCount';
 
 export type CommandId = MenuAction | AppCommand;
 
@@ -191,6 +192,25 @@ export const COMMANDS: CommandSpec[] = [
   { id: 'zoomOut', label: 'Zoom Out', category: 'View', keys: ['Mod+-', 'Mod+Shift+-'] },
   { id: 'clearRecent', label: 'Clear Recent Files', category: 'File' },
   { id: 'zoomReset', label: 'Actual Size', category: 'View', keys: ['Mod+Shift+0'] },
+  { id: 'toggleStatusBar', label: 'Show Status Bar', category: 'View' },
+  { id: 'alwaysOnTop', label: 'Always on Top', category: 'View' },
+  { id: 'toggleMagnification', label: 'Allow Magnification', category: 'View' },
+  { id: 'toggleDevtools', label: 'Toggle DevTools', category: 'View' },
+  { id: 'spell:toggle', label: 'Check Spelling While Typing', category: 'Edit' },
+  { id: 'spell:panel', label: 'Show Spelling and Grammar', category: 'Edit' },
+  { id: 'spell:now', label: 'Check Document Now', category: 'Edit' },
+  { id: 'spell:grammar', label: 'Check Grammar With Spelling', category: 'Edit' },
+  { id: 'spell:autocorrect', label: 'Correct Spelling Automatically', category: 'Edit' },
+  { id: 'subst:input', label: 'Substitutions: Convert on Input', category: 'Edit' },
+  { id: 'subst:render', label: 'Substitutions: Convert on Rendering', category: 'Edit' },
+  { id: 'subst:quotes', label: 'Smart Quotes', category: 'Edit' },
+  { id: 'subst:dashes', label: 'Smart Dashes', category: 'Edit' },
+  { id: 'subst:textReplacement', label: 'Text Replacement', category: 'Edit' },
+  { id: 'subst:remap', label: 'Remap Unicode Punctuation on Parse', category: 'Edit' },
+  { id: 'emojiPicker', label: 'Emoji and Symbols', category: 'Edit' },
+  { id: 'speech:start', label: 'Start Speaking', category: 'Edit' },
+  { id: 'speech:stop', label: 'Stop Speaking', category: 'Edit' },
+  { id: 'wordCount', label: 'Word Count', category: 'View' },
   { id: 'toggleLineEnding', label: 'Toggle Line Endings (LF / CRLF)', category: 'View' },
   { id: 'toggleFinalNewline', label: 'Insert Final New Line On Save', category: 'Edit' },
   { id: 'openThemesFolder', label: 'Open Themes Folder', category: 'Theme' },
