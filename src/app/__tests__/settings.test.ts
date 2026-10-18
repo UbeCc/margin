@@ -109,6 +109,19 @@ describe('preferences completeness (#100, #102)', () => {
     expect(m.strict).toBe(true);
   });
 
+  it('#133: top-level remapPunctuation migrates into markdown; new keys validate', () => {
+    expect(migrateSettings({ remapPunctuation: true }).markdown.remapPunctuation).toBe(true);
+    // an explicit markdown value wins over the legacy top-level key
+    expect(migrateSettings({ remapPunctuation: true, markdown: { remapPunctuation: false } }).markdown.remapPunctuation).toBe(false);
+    expect(migrateSettings({ markdown: { smartPunctuation: 'rendering', smartQuote: true, smartDash: true, indentSize: 4, prettyIndent: true, headingStyle: 'setext' } }).markdown).toMatchObject({
+      smartPunctuation: 'rendering', smartQuote: true, smartDash: true, indentSize: 4, prettyIndent: true, headingStyle: 'setext',
+    });
+    const bad = migrateSettings({ markdown: { smartPunctuation: 'both', indentSize: 7, headingStyle: 'wow' } }).markdown;
+    expect(bad.smartPunctuation).toBe('input');
+    expect(bad.indentSize).toBe(0);
+    expect(bad.headingStyle).toBe('atx');
+  });
+
   it('text column width is 0 (theme default) or 400–3000', () => {
     expect(migrateSettings({ textColumnWidth: 120 }).textColumnWidth).toBe(0);
     expect(migrateSettings({ textColumnWidth: 900 }).textColumnWidth).toBe(900);
