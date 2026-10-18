@@ -10,6 +10,7 @@ export const S = (id, title, status, owner, verifier, opts = {}) => ({ id, title
 export const T = {
   nav: 'tests/e2e/app-navigation.spec.ts::',
   files: 'tests/e2e/app-files.spec.ts::',
+  pf: 'tests/e2e/parity-files.spec.ts::',
   themes: 'tests/e2e/app-themes.spec.ts::',
   core: 'tests/e2e/core-cases.ts::',
   qa: 'tests/e2e/core-qa.spec.ts::',
