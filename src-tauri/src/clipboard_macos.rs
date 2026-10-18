@@ -134,6 +134,9 @@ pub async fn clipboard_write_payload(data: NativeClipboardData) -> Result<bool, 
     #[cfg(not(target_os = "macos"))]
     {
         let _ = data;
+        Ok(false)
+    }
+}
 /// #136 `clipboard.writeImage`: put a local image file on the pasteboard as
 /// PNG + TIFF (Typora writes `addTypes:@[PNG,TIFF]` + `writeObjects:@[image]`).
 #[tauri::command]
