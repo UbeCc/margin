@@ -170,6 +170,8 @@ export class App {
       return ok;
     });
     window.addEventListener('blur', () => void this.doc.flushAutoSave());
+    // The native menu is shared by all windows: the focused one decides (#94).
+    window.addEventListener('focus', () => this.syncFileItems(!!this.doc.path, true));
 
     // Initial content
     // General › On Launch (native-commands §2.2): new file / last folders / last files and
@@ -499,6 +501,14 @@ export class App {
 
   // ======================================================== documents
 
+  private fileItemsEnabled: boolean | null = null;
+  /** Untitled documents grey out Rename/Move/Revert/Versions/Reveal/Copy Path/Properties (#94). */
+  private syncFileItems(enabled: boolean, force = false): void {
+    if (!force && enabled === this.fileItemsEnabled) return;
+    this.fileItemsEnabled = enabled;
+    void extras(this.platform).setFileItemsEnabled?.call(this.platform, enabled).catch(() => undefined);
+  }
+
   private onDocState(s: DocState): void {
     const title = `${s.dirty ? '• ' : ''}${s.name}`;
     this.titleEl.textContent = s.path ? stripExt(s.name) : s.name;
@@ -506,6 +516,7 @@ export class App {
     this.root.classList.toggle('doc-dirty', s.dirty);
     void this.platform.setTitle(s.path && this.folder ? `${title} — ${basename(this.folder)}` : title);
     void this.platform.setDocumentEdited(s.dirty);
+    this.syncFileItems(!!s.path);
     this.status.setEol(s.eol);
     if (s.missing) this.status.setSaveState('Deleted on disk', 'missing');
     else if (s.dirty) this.status.setSaveState(this.settings.autoSave && s.path ? 'Saving…' : 'Edited', 'dirty');

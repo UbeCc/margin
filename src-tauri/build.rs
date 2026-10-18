@@ -41,6 +41,8 @@ const COMMANDS: &[&str] = &[
     "open_window",
     "read_file_bytes",
     "clipboard_read",
+    "set_file_items_enabled",
+    "show_file_info",
 ];
 
 fn main() {

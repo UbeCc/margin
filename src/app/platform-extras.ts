@@ -17,6 +17,10 @@ export interface PlatformExtras {
   openWindow?(opts?: { path?: string; folder?: string }): Promise<void>;
   /** Raw file bytes, for decoding with a chosen / detected encoding (#94). */
   readFileBytes?(path: string): Promise<Uint8Array>;
+  /** File › Get Info through the OS (Finder info window on macOS); reject to use Margin's panel. */
+  showFileInfo?(path: string): Promise<void>;
+  /** Enable/disable native File-menu items that need a saved file (untitled docs grey them out). */
+  setFileItemsEnabled?(enabled: boolean): Promise<void>;
   /** Write text to the system clipboard (Copy File Path). */
   writeClipboardText?(text: string): Promise<void>;
   /** Export markdown with Pandoc (#81). Resolves to pandoc's warnings ('' if none). */

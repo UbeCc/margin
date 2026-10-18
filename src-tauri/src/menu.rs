@@ -43,7 +43,7 @@ const FILE: &[Item] = &[
     ("-", "", None),
     ("revealInFinder", REVEAL, None),
     ("copyFilePath", "Copy File Path", None),
-    ("properties", "Properties…", None),
+    ("properties", if cfg!(target_os = "macos") { "Get Info…" } else { "Properties…" }, None),
 ];
 /// Window menu: document tabs (#94).
 const WINDOW_TABS: &[Item] = &[
@@ -162,6 +162,27 @@ const VIEW: &[Item] = &[
     ("-", "", None),
     ("toggleLineEnding", "Toggle Line Endings (LF / CRLF)", None),
 ];
+
+/// File-menu items that act on the current document's file (disabled for untitled docs).
+pub const FILE_ONLY: &[&str] = &["renameFile", "moveTo", "reloadFromDisk", "browseVersions", "revealInFinder", "copyFilePath", "properties"];
+
+fn set_enabled_in<R: Runtime>(items: &[MenuItemKind<R>], ids: &[&str], enabled: bool) -> tauri::Result<()> {
+    for it in items {
+        match it {
+            MenuItemKind::MenuItem(m) if ids.contains(&m.id().as_ref()) => m.set_enabled(enabled)?,
+            MenuItemKind::Submenu(s) => set_enabled_in(&s.items()?, ids, enabled)?,
+            _ => {}
+        }
+    }
+    Ok(())
+}
+
+pub fn set_file_items_enabled<R: Runtime>(app: &AppHandle<R>, enabled: bool) -> tauri::Result<()> {
+    match app.menu() {
+        Some(m) => set_enabled_in(&m.items()?, FILE_ONLY, enabled),
+        None => Ok(()),
+    }
+}
 
 /// Every action the menu can emit (used by tests to keep Rust and TS in sync).
 #[cfg(test)]
@@ -344,6 +365,14 @@ pub fn check_theme<R: Runtime>(app: &AppHandle<R>, current: &str) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn file_only_items_exist() {
+        let all = all_actions();
+        for id in FILE_ONLY {
+            assert!(all.contains(id), "{id} is not a menu item");
+        }
+    }
 
     #[test]
     fn accelerators_are_unique() {

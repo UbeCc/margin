@@ -129,6 +129,9 @@ export class FileOps {
   /** File › Properties: name, location, size, dates, counts, encoding, line endings. */
   async properties(): Promise<boolean> {
     const t = this.host.docs.active;
+    // macOS Typora: Get Info is Finder's own info window (native-commands §2.4).
+    const info = extras(this.host.platform).showFileInfo;
+    if (t.doc.path && info && (await info.call(this.host.platform, t.doc.path).then(() => true, () => false))) return true;
     const st = t.doc.path ? await this.host.platform.stat(t.doc.path).catch(() => null) : null;
     const s = t.editor.getStats();
     const rows: [string, string][] = [

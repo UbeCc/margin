@@ -13,6 +13,8 @@ mod pandoc;
 #[cfg(target_os = "macos")]
 mod drop_macos;
 #[cfg(target_os = "macos")]
+mod finder_macos;
+#[cfg(target_os = "macos")]
 mod pdf_macos;
 mod quick_open;
 mod remote_images;
@@ -402,6 +404,8 @@ pub fn run() {
             commands::take_pending_open_files,
             commands::open_window,
             commands::read_file_bytes,
+            commands::set_file_items_enabled,
+            commands::show_file_info,
             commands::allow_asset_dir,
             commands::set_theme_menu,
             commands::relocate_images,

@@ -233,6 +233,16 @@ export class TauriPlatform implements Platform {
     return call('open_window', { path: opts.path ?? null, folder: opts.folder ?? null });
   }
 
+  /** File › Get Info: Finder's info window (macOS; rejects elsewhere). */
+  showFileInfo(path: string): Promise<void> {
+    return call('show_file_info', { path });
+  }
+
+  /** Grey out File-menu items that need a saved file (#94, native-commands §2.4). */
+  setFileItemsEnabled(enabled: boolean): Promise<void> {
+    return call('set_file_items_enabled', { enabled });
+  }
+
   /** Raw bytes for Reopen with Encoding (#94). */
   async readFileBytes(path: string): Promise<Uint8Array> {
     const buf = await call<ArrayBuffer | number[]>('read_file_bytes', { path });

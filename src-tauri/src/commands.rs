@@ -534,6 +534,35 @@ pub async fn open_window<Rt: Runtime>(app: AppHandle<Rt>, state: State<'_, AppSt
     crate::new_window(&app, &format!("{}{n}", crate::WINDOW_PREFIX), path.as_deref(), folder.as_deref()).map_err(err)
 }
 
+/// File › Get Info on macOS: Finder's info window (native-commands §2.4). Elsewhere an
+/// error, and the app shows its own Properties panel.
+#[tauri::command]
+pub async fn show_file_info<Rt: Runtime>(app: AppHandle<Rt>, path: String) -> R<()> {
+    let p = abs(&path)?;
+    #[cfg(target_os = "macos")]
+    {
+        let (tx, rx) = std::sync::mpsc::channel();
+        let s = p.to_string_lossy().into_owned();
+        app.run_on_main_thread(move || {
+            let _ = tx.send(crate::finder_macos::show_info(&s));
+        })
+        .map_err(err)?;
+        rx.recv().map_err(err)?
+    }
+    #[cfg(not(target_os = "macos"))]
+    {
+        let _ = (app, p);
+        Err("unsupported".into())
+    }
+}
+
+/// Grey out the File-menu items that need a saved file while the focused window shows an
+/// untitled document (Typora `-[Document validateMenuItem:]`, native-commands §2.4).
+#[tauri::command]
+pub async fn set_file_items_enabled<Rt: Runtime>(app: AppHandle<Rt>, enabled: bool) -> R<()> {
+    crate::menu::set_file_items_enabled(&app, enabled).map_err(err)
+}
+
 /// Raw bytes of a file, for decoding with a chosen / detected encoding (#94).
 #[tauri::command]
 pub async fn read_file_bytes(path: String) -> R<tauri::ipc::Response> {
