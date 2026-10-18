@@ -10,6 +10,7 @@ mod pdf_macos;
 mod quick_open;
 mod settings;
 mod watch;
+mod upload;
 
 use serde::Serialize;
 use std::collections::HashMap;
@@ -233,6 +234,7 @@ pub fn run() {
             commands::trash_path,
             commands::create_dir,
             commands::reveal_path,
+            upload::upload_images,
         ])
         .setup(|app| {
             let handle = app.handle().clone();

@@ -33,6 +33,7 @@ const COMMANDS: &[&str] = &[
     "trash_path",
     "create_dir",
     "reveal_path",
+    "upload_images",
 ];
 
 fn main() {
