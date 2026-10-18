@@ -34,6 +34,8 @@ const COMMANDS: &[&str] = &[
     "trash_path",
     "create_dir",
     "reveal_path",
+    "export_binary",
+    "open_exported_file",
 ];
 
 fn main() {

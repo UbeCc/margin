@@ -164,6 +164,7 @@ export interface AppSettings {
 export type MenuAction =
   | 'new' | 'open' | 'openFolder' | 'save' | 'saveAs' | 'close'
   | 'exportHtml' | 'exportPdf' | 'print'
+  | 'exportHtmlPlain' | 'exportImage' | 'exportPrevious' | 'exportOverwrite' | 'exportSettings' | 'pageSetup'
   | 'undo' | 'redo' | 'find' | 'replace'
   | 'toggleSidebar' | 'toggleSource' | 'toggleFocus' | 'toggleTypewriter' | 'quickOpen'
   | 'zoomIn' | 'zoomOut' | 'zoomReset'
@@ -173,6 +174,20 @@ export type MenuAction =
   | `block:${'quote' | 'ul' | 'ol' | 'task' | 'code' | 'math' | 'table' | 'hr' | 'toc'}`
   | `theme:${string}`
   | 'preferences';
+
+/** PDF export options (#18 baseDir; #95 page geometry, header/footer, bookmarks, metadata). All optional. */
+export interface PdfExportOptions {
+  baseDir?: string;
+  /** Paper size and margins in points. */
+  paper?: { width: number; height: number; margins: { top: number; right: number; bottom: number; left: number } };
+  /** Running header / footer text; `${pageNo}` and `${totalPages}` are replaced per page. */
+  header?: string;
+  footer?: string;
+  /** Headings in document order: PDF bookmarks + targets for internal `#id` links. */
+  outline?: { level: number; text: string; id: string }[];
+  /** Document info dictionary. */
+  meta?: { title: string; author: string; subject: string; keywords: string };
+}
 
 export interface Platform {
   readonly kind: 'tauri' | 'web';
@@ -196,7 +211,7 @@ export interface Platform {
   /** Write HTML, or print given HTML to PDF at outPath. */
   exportHtml(html: string, outPath: string): Promise<void>;
   /** baseDir: directory relative srcs resolve against (default: outPath's directory). */
-  exportPdf(html: string, outPath: string, opts?: { baseDir?: string }): Promise<void>;
+  exportPdf(html: string, outPath: string, opts?: PdfExportOptions): Promise<void>;
   /** Print the current window (system print dialog). */
   print(): Promise<void>;
   /** Allow the webview to load assets from dir (non-recursive), e.g. images outside the opened folder. */

@@ -2,7 +2,10 @@ import type { EditorHandle, EditorSettings, MenuAction, Platform } from '../cont
 import type { Wiring } from './wiring';
 import { COMMANDS, commandForKey, commandSpec, isCommandId, type CommandId } from './commands';
 import { DocumentController, type DocState } from './document';
-import { buildExportHtml, documentTitle, loadKatexCss, needsKatex } from './export';
+import { loadKatexCss, needsKatex } from './export';
+import { ExportController } from './export-actions';
+import { pageCss } from './export-settings';
+import { confirmOverwriteDialog, openPageSetup } from './export-ui';
 import { FindBar } from './findbar';
 import { extras } from './platform-extras';
 import { openPreferences } from './preferences';
@@ -34,6 +37,7 @@ export class App {
   readonly platform: Platform;
   editor!: EditorHandle;
   doc!: DocumentController;
+  exports!: ExportController;
   settings: MarginSettings = { ...DEFAULT_SETTINGS };
   themes: ThemeManager;
   folder: string | null = null;
@@ -99,6 +103,7 @@ export class App {
       onOpened: (p) => this.onOpened(p),
       defaultDir: () => this.folder,
     });
+    this.exports = this.createExports();
     this.editor.onChange(() => {
       this.refreshFindSoon();
       this.refreshOutlineSoon();
@@ -556,8 +561,25 @@ export class App {
         return true;
       case 'exportHtml':
       case 'exportPdf':
-        return this.export(id === 'exportHtml' ? 'html' : 'pdf');
+        return this.exports.export(id === 'exportHtml' ? 'html' : 'pdf');
+      case 'exportHtmlPlain':
+        return this.exports.export('html-plain');
+      case 'exportImage':
+        return this.exports.export('image');
+      case 'exportPrevious':
+        return this.exports.export(null, 'previous');
+      case 'exportOverwrite':
+        return this.exports.export(null, 'overwrite');
+      case 'exportSettings':
+        this.preferences('export');
+        return true;
+      case 'pageSetup': {
+        const page = await openPageSetup(this.settings.export.pdf.page);
+        if (page) this.updateSettings({ export: { ...this.settings.export, pdf: { ...this.settings.export.pdf, page } } });
+        return !!page;
+      }
       case 'print':
+        this.applyPrintPageCss();
         await this.platform.print();
         return true;
       case 'undo':
@@ -633,7 +655,7 @@ export class App {
     return false;
   }
 
-  private preferences(): void {
+  private preferences(section?: 'export'): void {
     openPreferences({
       settings: () => this.settings,
       update: (p) => this.updateSettings(p),
@@ -641,7 +663,7 @@ export class App {
       isDarkTheme: (n) => this.themes.isDark(n),
       openThemesFolder: () => void this.openThemesFolder(),
       pickFolder: () => this.platform.openFileDialog({ directory: true }),
-    });
+    }, section);
   }
 
   private async openThemesFolder(): Promise<void> {
@@ -742,39 +764,40 @@ export class App {
 
   // ======================================================== export
 
-  private async export(kind: 'html' | 'pdf'): Promise<boolean> {
-    const md = this.editor.getMarkdown();
-    const name = this.doc.path ? stripExt(basename(this.doc.path)) : documentTitle(md, null);
-    const base = this.doc.dir ?? this.folder;
-    const target = await this.platform.saveFileDialog({
-      defaultPath: base ? `${base}/${name}.${kind}` : `${name}.${kind}`,
-      filters: [kind === 'html' ? { name: 'HTML', extensions: ['html'] } : { name: 'PDF', extensions: ['pdf'] }],
+  private createExports(): ExportController {
+    return new ExportController({
+      platform: this.platform,
+      exportSettings: () => this.settings.export,
+      updateExportSettings: (next) => this.updateSettings({ export: next }),
+      markdown: () => this.editor.getMarkdown(),
+      docPath: () => this.doc.path,
+      folder: () => this.folder,
+      renderBody: (relativeTo) => {
+        // HTML: local images as paths relative to the exported file (webview asset URLs don't
+        // work outside the app). PDF/image keep asset URLs, which the renderer loads (#27).
+        this.exportDir = relativeTo;
+        try {
+          return this.editor.renderHTML();
+        } finally {
+          this.exportDir = null;
+        }
+      },
+      themeCss: (theme) => this.themes.exportCss(theme),
+      extraCss: async (body) => `${await this.wiring.loadBlocksCss()}\n${needsKatex(body) ? await loadKatexCss() : ''}`,
+      notify: (m, kind, action) => void toast(m, { kind, action }),
+      confirmOverwrite: (p) => confirmOverwriteDialog(p),
     });
-    if (!target) return false;
-    // HTML: local images as paths relative to the exported file (webview asset URLs don't
-    // work outside the app). PDF keeps asset URLs, which the native renderer loads (#27).
-    if (kind === 'html') this.exportDir = dirname(target);
-    let body: string;
-    try {
-      body = this.editor.renderHTML();
-    } finally {
-      this.exportDir = null;
+  }
+
+  /** Page Setup applies to File › Print: keep an @page rule in the live document. */
+  private applyPrintPageCss(): void {
+    let el = document.getElementById('margin-print-page') as HTMLStyleElement | null;
+    if (!el) {
+      el = document.createElement('style');
+      el.id = 'margin-print-page';
+      document.head.appendChild(el);
     }
-    const katex = needsKatex(body) ? await loadKatexCss() : '';
-    const html = buildExportHtml({ title: documentTitle(md, this.doc.path ? basename(this.doc.path) : null), body, themeCss: this.themes.exportCss(), extraCss: `${await this.wiring.loadBlocksCss()}\n${katex}` });
-    try {
-      if (kind === 'html') await this.platform.exportHtml(html, target);
-      else await this.platform.exportPdf(html, target, { baseDir: this.doc.dir ?? undefined });
-    } catch (e) {
-      toast(`Export failed: ${e instanceof Error ? e.message : e}`, { kind: 'error' });
-      return false;
-    }
-    const reveal = extras(this.platform).revealInFolder;
-    toast(`Exported ${basename(target)}`, {
-      kind: 'success',
-      action: reveal ? { label: 'Show', run: () => void reveal.call(this.platform, target) } : undefined,
-    });
-    return true;
+    el.textContent = pageCss(this.settings.export.pdf.page, this.settings.export.pdf.pageBreaks);
   }
 
   /** For tests / devtools. */

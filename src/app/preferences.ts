@@ -3,6 +3,7 @@ import { themeLabel } from '../themes';
 import { IMAGE_RULE_PRESETS, imageRulePresetId, type MarginSettings } from './settings';
 import { h, debounce } from './util/dom';
 import { openModal } from './ui/modal';
+import { exportPrefsSection } from './preferences-export';
 
 export interface PreferencesHost {
   settings(): MarginSettings;
@@ -13,7 +14,7 @@ export interface PreferencesHost {
   pickFolder(): Promise<string | null>;
 }
 
-type Section = 'appearance' | 'editor' | 'files' | 'images';
+type Section = 'appearance' | 'editor' | 'files' | 'images' | 'export';
 
 let openHandle: { close(): void } | null = null;
 
@@ -182,6 +183,15 @@ export function openPreferences(host: PreferencesHost, initial: Section = 'appea
     editor: ['Editor', editor],
     files: ['Files', files],
     images: ['Images', images],
+    export: [
+      'Export',
+      exportPrefsSection({
+        get: () => host.settings().export,
+        set: (next) => set({ export: next }),
+        themeNames: () => host.themeNames(),
+        pickFolder: () => host.pickFolder(),
+      }),
+    ],
   };
   const nav = h('nav.pref-nav', { role: 'tablist' });
   const panel = h('div.pref-panel');
