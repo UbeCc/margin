@@ -79,8 +79,9 @@ else
   res close_veto fail "exited with unsaved changes"
 fi
 
-# 5. PDF export fallback: Ctrl+Alt+E → GTK save dialog (output path) → Enter →
-#    native PDF is macOS-only, so the app falls back to the print dialog (#30).
+# 5. PDF export: Ctrl+Alt+E → GTK save dialog (output path) → Enter →
+#    native WebKitPrintOperation writes the PDF straight to the chosen path (#14).
+#    If the native path is unavailable the app falls back to the print dialog (#30).
 others() { xdotool search --onlyvisible --name "${1:-.}" 2>/dev/null | grep -vx "$(win)" | head -1; }
 if [ "$(nproc_margin)" = 1 ]; then
   xdotool windowactivate --sync "$(win)" 2>/dev/null
@@ -94,34 +95,46 @@ if [ "$(nproc_margin)" = 1 ]; then
       eval "$(xdotool getwindowgeometry --shell "$save")"   # WIDTH/HEIGHT/X/Y
       xdotool mousemove --window "$save" $((WIDTH - 45)) $((HEIGHT - 20)) click 1; sleep 1
     fi
-    sleep 3
+    # The doc is notes/a.md, so the default output path is notes/a.pdf; native export
+    # needs a few seconds for load + print. Poll for the file instead of sleeping once.
+    pdf=""
+    for _ in $(seq 1 20); do
+      pdf=$(find "$H" /tmp/nqa-print "$PWD" -maxdepth 3 -name '*.pdf' -newer "$OUT/qa-app.log" 2>/dev/null | head -1)
+      [ -n "$pdf" ] && break
+      sleep 1
+    done
     import -window root "$OUT/qa-pdf.png" 2>/dev/null
     prn=$(others 'Print')
-    if [ -n "$prn" ]; then
+    if [ -n "$pdf" ] && [ -z "$prn" ]; then
+      res pdf_export_native pass "$(basename "$pdf") written directly, no print dialog"
+    elif [ -n "$prn" ]; then
       res pdf_print_fallback pass "'$(xdotool getwindowname "$prn")'"
       # #30: print to file (GTK's "Print to File" is the only printer without CUPS)
       # and check the PDF holds the exported document, not the editor chrome.
       xdotool windowfocus --sync "$prn" 2>/dev/null; xdotool key --clearmodifiers Return; sleep 6
-      pdf=$(find "$H" /tmp/nqa-print "$PWD" -maxdepth 2 -name '*.pdf' -newer "$OUT/qa-app.log" 2>/dev/null | grep -v '/notes/a.pdf$' | head -1)
+      pdf=$(find "$H" /tmp/nqa-print "$PWD" -maxdepth 3 -name '*.pdf' -newer "$OUT/qa-app.log" 2>/dev/null | grep -v '/notes/a.pdf$' | head -1)
       if [ -z "$pdf" ] && xdotool search --onlyvisible --name 'Print' >/dev/null 2>&1; then
         res print_to_file skip "print dialog did not accept Return (no printer?)"; xdotool key Escape; sleep 1
       elif [ -z "$pdf" ]; then
         res print_to_file fail "no PDF written by Print to File"
-      elif command -v pdftotext >/dev/null; then
-        txt=$(pdftotext "$pdf" - 2>/dev/null)
-        pages=$(pdfinfo "$pdf" 2>/dev/null | awk '/^Pages:/{print $2}')
-        echo "$txt" | head -5 > "$OUT/qa-print.txt"
-        if echo "$txt" | grep -q 'Doc a' && ! echo "$txt" | grep -qE '^(Files|Outline|NOTES)$'; then
-          res print_to_file pass "$(basename "$pdf"): $pages page(s), document text only"
-        else
-          res print_to_file fail "PDF text is not the exported doc: $(echo "$txt" | tr '\n' ' ' | cut -c1-80)"
-        fi
       else
-        res print_to_file skip "no pdftotext ($pdf written)"
+        res print_to_file skip "fallback wrote $(basename "$pdf") (native path expected)"
       fi
     else
-      res pdf_print_fallback fail "no print dialog after choosing the output path (see qa-pdf.png)"
+      res pdf_export_native fail "no PDF at the chosen path and no print dialog (see qa-pdf.png)"
       xdotool search --onlyvisible --name . 2>/dev/null | while read -r w; do echo "  window: $(xdotool getwindowname "$w")"; done | head -8
+    fi
+    if [ -n "$pdf" ] && command -v pdftotext >/dev/null; then
+      txt=$(pdftotext "$pdf" - 2>/dev/null)
+      pages=$(pdfinfo "$pdf" 2>/dev/null | awk '/^Pages:/{print $2}')
+      echo "$txt" | head -5 > "$OUT/qa-print.txt"
+      if echo "$txt" | grep -q 'Doc a' && ! echo "$txt" | grep -qE '^(Files|Outline|NOTES)$'; then
+        res pdf_content pass "$(basename "$pdf"): $pages page(s), document text only"
+      else
+        res pdf_content fail "PDF text is not the exported doc: $(echo "$txt" | tr '\n' ' ' | cut -c1-80)"
+      fi
+    elif [ -n "$pdf" ]; then
+      res pdf_content skip "no pdftotext ($pdf written)"
     fi
   else
     import -window root "$OUT/qa-pdf.png" 2>/dev/null
