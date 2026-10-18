@@ -164,7 +164,7 @@ test.describe('parity: context menus (#97)', () => {
     await expect.poll(() => editorValue(page)).toContain('E=mc^2');
   });
 
-  test('ctx.emoji: Emoji/inline-math context entries (copy emoji, copy inline math)', async ({ page }) => {
+  test('ctx.emoji: Emoji/inline-math context entries (copy emoji, copy inline math)', async ({ page, browserName }) => {
     await boot(page);
     // inline math is off on a fresh install (Typora default, #102) — switch it on first
     await page.evaluate(() => { const a = window.__margin! as unknown as { settings: { markdown: object }; updateSettings(p: object): void }; a.updateSettings({ markdown: { ...a.settings.markdown, inlineMath: true } }); });
@@ -172,8 +172,12 @@ test.describe('parity: context menus (#97)', () => {
     await page.locator('.md-editor .md-math .md-math-render').click({ button: 'right', force: true });
     expect(await labels(page)).toEqual(['Copy Math', 'Cut', 'Copy', 'Paste', 'Copy / Paste As…']);
     await item(page, 'Copy Math').hover();
-    await item(page, 'Copy as Image').click();
-    // #138: rasterized KaTeX PNG lands on the clipboard (89 50 4E 47 magic)
+    const img = item(page, 'Copy as Image');
+    await expect(img).toBeEnabled();
+    await img.click();
+    // #138: rasterized KaTeX PNG lands on the clipboard (89 50 4E 47 magic).
+    // WebKit denies navigator.clipboard.read() without a user gesture — probe only on Chromium.
+    if (browserName === 'chromium')
     await expect
       .poll(() =>
         page.evaluate(async () => {

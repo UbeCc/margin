@@ -109,8 +109,23 @@ export class ImageFeature {
    * Editor right-clicks on images are handled by the editor context menu
    * (`EditorContextMenu` + `ctxOps`); kept as a no-op detach for callers.
    */
-  attach(_root: HTMLElement): () => void {
-    return () => {};
+  attach(page: HTMLElement): () => void {
+    // Right-clicks are owned by the editor context menu; this hook only marks
+    // failed-load images so they keep a clickable placeholder box (any tab host).
+    const mark = () =>
+      page.querySelectorAll<HTMLImageElement>('.md-image img.md-img').forEach((img) => {
+        const m = () => img.classList.toggle('md-img-loaded', img.complete && img.naturalWidth > 0);
+        if (!img.dataset.loadHook) {
+          img.dataset.loadHook = '1';
+          img.addEventListener('load', m);
+          img.addEventListener('error', m);
+        }
+        m();
+      });
+    mark();
+    const mo = new MutationObserver(mark);
+    mo.observe(page, { subtree: true, childList: true });
+    return () => mo.disconnect();
   }
 
   /** Editor-context-menu ops for one right-clicked image (#141): builds on the same tools as the image menu. */
