@@ -130,9 +130,13 @@ export class TauriPlatform implements Platform {
   pandocExport(
     markdown: string,
     outPath: string,
-    opts: { format: string; docDir: string | null; title: string | null; pandocPath: string | null; timeoutMs: number },
+    opts: { format: string; docDir: string | null; title: string | null; pandocPath: string | null; timeoutMs: number; options?: object; exportId?: string },
   ): Promise<string> {
-    return call('pandoc_export', { markdown, outPath, ...opts });
+    return call('pandoc_export', { markdown, outPath, ...opts, options: opts.options ?? null, exportId: opts.exportId ?? null });
+  }
+
+  pandocAbort(exportId: string): Promise<boolean> {
+    return call('pandoc_abort', { exportId });
   }
 
   pandocDetect(pandocPath: string | null): Promise<{ path: string; version: string }> {

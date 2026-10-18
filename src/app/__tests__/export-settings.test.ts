@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { Platform } from '../../contracts';
 import { ExportController, keepBothPath, type ExportHost } from '../export-actions';
 import { checkImageSize, imageDimensions, imageFormatForPath, ImageTooLargeError, qualitySettings } from '../export-image';
-import { DEFAULT_EXPORT, expandVars, frontMatter, migrateExportSettings, pageCss, paperSizeMm, resolveMeta, type ExportSettings } from '../export-settings';
+import { DEFAULT_EXPORT, expandVars, frontMatter, migrateExportSettings, pageCss, pandocArgsPreview, PANDOC_FORMAT_FIELDS, PANDOC_FORMAT_IDS, paperSizeMm, resolveMeta, type ExportSettings } from '../export-settings';
 import { printPageCss, withPrintPageCss } from '../../platform/common';
 import { buildPlainHtml } from '../export';
 import { migrateSettings } from '../settings';
@@ -206,5 +206,60 @@ describe('Pandoc exporters in the shared pipeline', () => {
     });
     expect(await c.export(null, 'overwrite')).toBe(false);
     expect(f.notes[f.notes.length - 1]).toMatch(/boom/);
+  });
+});
+
+describe('pandoc options (#90)', () => {
+  it('default to unset for every format and are validated', () => {
+    const d = migrateExportSettings({});
+    expect(Object.keys(d.pandoc).sort()).toEqual([...PANDOC_FORMAT_IDS].sort());
+    expect(d.pandoc.docx).toEqual({ referenceDoc: '', template: '', css: '', epubChapterLevel: 0, extraArguments: '' });
+    const m = migrateExportSettings({ pandoc: { epub: { css: 'a.css', epubChapterLevel: '9' }, docx: { referenceDoc: 5 }, bogus: {} } });
+    expect(m.pandoc.epub.css).toBe('a.css');
+    expect(m.pandoc.epub.epubChapterLevel).toBe(6);
+    expect(m.pandoc.docx.referenceDoc).toBe('');
+    expect('bogus' in m.pandoc).toBe(false);
+  });
+
+  it('fields follow Typora per-format table', () => {
+    expect(PANDOC_FORMAT_FIELDS.docx).toEqual(['referenceDoc']);
+    expect(PANDOC_FORMAT_FIELDS.odt).toEqual(['template']);
+    expect(PANDOC_FORMAT_FIELDS.epub).toEqual(['css', 'epubChapterLevel']);
+    for (const f of ['rtf', 'latex', 'mediawiki', 'rst', 'textile', 'opml'] as const) expect(PANDOC_FORMAT_FIELDS[f]).toEqual(['extraArguments']);
+  });
+
+  it('arguments preview mirrors the native argv', () => {
+    const o = { referenceDoc: 'my ref.docx', template: '', css: '', epubChapterLevel: 0, extraArguments: '' };
+    expect(pandocArgsPreview('docx', o)).toBe('-f markdown -t docx -o ${outputPath} --reference-doc "my ref.docx"');
+    expect(pandocArgsPreview('epub', { ...o, referenceDoc: '', css: 'e.css', epubChapterLevel: 2 })).toBe('-f markdown -t epub -o ${outputPath} --css e.css --epub-chapter-level=2');
+    expect(pandocArgsPreview('latex', { ...o, referenceDoc: '', extraArguments: '--toc' })).toBe('-f markdown -t latex -s -o ${outputPath} --toc');
+  });
+});
+
+describe('Pandoc Abort in the shared pipeline (#90)', () => {
+  it('aborted export: no error notice, settings options forwarded, not recorded as previous', async () => {
+    const { registerPandocExporters } = await import('../export-actions');
+    const f = fakeHost();
+    f.host.updateExportSettings(migrateExportSettings({ pandoc: { docx: { referenceDoc: '/t/ref.docx' } } }));
+    const c = new ExportController(f.host);
+    let abort: (() => void) | undefined;
+    registerPandocExporters(c, { pandocPath: () => '', title: () => 'Doc', progress: (_m, a) => ((abort = a), () => undefined) });
+    let reject: (e: Error) => void = () => {};
+    const seen: unknown[] = [];
+    Object.assign(f.platform, {
+      pandocExport: vi.fn((_md: string, _out: string, o: unknown) => {
+        seen.push(o);
+        return new Promise<string>((_, r) => (reject = r));
+      }),
+      pandocAbort: vi.fn(async () => (reject(new Error('Export aborted')), true)),
+    });
+    f.dialogs.push('/out/Doc.docx');
+    const p = c.export('pandoc:docx');
+    for (let i = 0; i < 10 && !abort; i++) await new Promise((r) => setTimeout(r, 0));
+    abort!();
+    expect(await p).toBe(false);
+    expect(f.notes).toEqual([]);
+    expect((seen[0] as { options: { referenceDoc: string } }).options.referenceDoc).toBe('/t/ref.docx');
+    expect(c.last).toBeNull();
   });
 });

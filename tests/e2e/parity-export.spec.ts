@@ -271,6 +271,47 @@ test('export.pandoc: Export via Pandoc: docx/odt/rtf/epub/latex/mediawiki/rst/te
   expect(last).toMatchObject({ out: `${ROOT}/Out/Welcome.opml`, format: 'opml' });
 });
 
+test('export.pandoc-options (#90): per-format Pandoc options in Preferences, Abort button', async ({ page }) => {
+  await boot(page);
+  await run(page, 'exportSettings');
+  const pane = page.locator('.pref-section[data-section=export]');
+  const ref = pane.locator('input[data-export="pandoc.docx.referenceDoc"]');
+  await ref.fill('/Users/demo/ref.docx');
+  await ref.blur();
+  await expect(pane.locator('input[data-export="pandoc.docx.args"]')).toHaveValue('-f markdown -t docx -o ${outputPath} --reference-doc /Users/demo/ref.docx');
+  await pane.locator('select[data-export="pandoc.epub.epubChapterLevel"]').selectOption('2');
+  await expect(pane.locator('[data-format=odt] input[data-export="pandoc.odt.template"]')).toBeVisible();
+  await expect(pane.locator('[data-format=docx] input[data-export="pandoc.docx.extraArguments"]')).toHaveCount(0);
+  await expect.poll(() => page.evaluate(() => window.__margin!.settings.export.pandoc.epub.epubChapterLevel)).toBe(2);
+  await page.keyboard.press('Escape');
+
+  // The export receives the options and shows Typora's progress text with an Abort button.
+  await page.evaluate(() => {
+    const w = window.__MARGIN_WEB__! as unknown as Stubbed & { pandocAbort?: unknown; __reject?: (e: Error) => void };
+    w.__calls = [];
+    w.pandocExport = (_md: string, out: string, o: unknown) => {
+      w.__calls!.push({ out, o });
+      return new Promise((_, reject) => (w.__reject = reject));
+    };
+    w.pandocAbort = async (id: string) => {
+      w.__calls!.push({ abort: id });
+      w.__reject!(new Error('Export aborted'));
+      return true;
+    };
+  });
+  await queueDialog(page, `${ROOT}/Out/Welcome.docx`);
+  const done = run(page, 'exportDocx');
+  const notice = page.locator('.toast', { hasText: 'Exporting file using Pandoc. This may take some time.' });
+  await expect(notice).toBeVisible();
+  await notice.locator('button.toast-action', { hasText: 'Abort' }).click();
+  expect(await done).toBe(false);
+  await expect(notice).toHaveCount(0);
+  await expect(page.locator('.toast[data-kind=error]')).toHaveCount(0);
+  const calls = await page.evaluate(() => (window.__MARGIN_WEB__! as unknown as Stubbed).__calls as { o?: { options: { referenceDoc: string }; exportId: string }; abort?: string }[]);
+  expect(calls[0].o!.options.referenceDoc).toBe('/Users/demo/ref.docx');
+  expect(calls[1].abort).toBe(calls[0].o!.exportId);
+});
+
 test('export.custom: Custom export commands and "run command after export"', async ({ page }) => {
   await boot(page);
   await run(page, 'exportCustom');

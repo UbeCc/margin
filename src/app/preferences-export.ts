@@ -3,7 +3,17 @@
  * plus per-format options (PDF, HTML, HTML without styles, Image).
  */
 import { themeLabel } from '../themes';
-import { CUSTOM_EXPORT_TEMPLATES, migrateExportSettings, type CustomExport, type ExportSettings } from './export-settings';
+import {
+  CUSTOM_EXPORT_TEMPLATES,
+  migrateExportSettings,
+  pandocArgsPreview,
+  PANDOC_FORMAT_FIELDS,
+  PANDOC_FORMAT_IDS,
+  type CustomExport,
+  type ExportSettings,
+  type PandocFormatId,
+  type PandocFormatOptions,
+} from './export-settings';
 import { confirmDialog } from './ui/modal';
 import { pageSetupFields } from './export-ui';
 import { h, debounce } from './util/dom';
@@ -111,9 +121,82 @@ export function exportPrefsSection(host: ExportPrefsHost): HTMLElement {
     row('Image Width', num('image', 'width', 200, 4000, 'px')),
     row('Font Size', num('image', 'fontSize', 8, 48, 'px')),
     row('Theme', sel('image', 'theme', themes)),
+    heading('Pandoc'),
+    pandocOptionsEditor(host),
     heading('Custom Export Commands'),
     customExportsEditor(host),
   );
+}
+
+/** Menu labels of the Pandoc exports (File › Export). */
+const PANDOC_LABELS: Record<PandocFormatId, string> = {
+  docx: 'Word (.docx)',
+  odt: 'OpenOffice',
+  rtf: 'RTF',
+  epub: 'Epub',
+  latex: 'LaTeX',
+  mediawiki: 'Media Wiki',
+  rst: 'reStructuredText',
+  textile: 'Textile',
+  opml: 'OPML',
+};
+
+const FIELD_LABELS: Record<keyof PandocFormatOptions, [string, string]> = {
+  referenceDoc: ['Style Reference', 'path/to/reference.docx'],
+  template: ['Template', 'path/to/template'],
+  css: ['Style Reference', 'path/to/epub.css'],
+  epubChapterLevel: ['Chapter Level', ''],
+  extraArguments: ['Extra Arguments', '--toc --number-sections'],
+};
+
+/** Per-format Pandoc options (#90) with a read-only preview of the resulting arguments. */
+function pandocOptionsEditor(host: ExportPrefsHost): HTMLElement {
+  const box = h('div.pandoc-options', { 'data-export': 'pandoc' });
+  for (const f of PANDOC_FORMAT_IDS) {
+    const cur = (): PandocFormatOptions => host.get().pandoc[f];
+    const preview = h('input.text-input.args-preview', { type: 'text', readonly: 'true', disabled: 'true', 'data-export': `pandoc.${f}.args` }) as HTMLInputElement;
+    const refresh = (): void => {
+      preview.value = pandocArgsPreview(f, cur());
+    };
+    const save = (key: keyof PandocFormatOptions, value: string | number): void => {
+      const all = host.get();
+      host.set(migrateExportSettings({ ...all, pandoc: { ...all.pandoc, [f]: { ...all.pandoc[f], [key]: value } } }));
+      refresh();
+    };
+    const fields = PANDOC_FORMAT_FIELDS[f].map((key) => {
+      const [label, placeholder] = FIELD_LABELS[key];
+      let el: HTMLInputElement | HTMLSelectElement;
+      if (key === 'epubChapterLevel') {
+        el = h('select.select', { 'data-export': `pandoc.${f}.${key}` }, h('option', { value: '0', text: 'Default' }), ...[1, 2, 3, 4, 5, 6].map((n) => h('option', { value: String(n), text: String(n) })));
+        el.value = String(cur()[key]);
+        el.addEventListener('change', () => save(key, Number(el.value)));
+      } else {
+        el = h('input.text-input', { type: 'text', spellcheck: 'false', placeholder, 'data-export': `pandoc.${f}.${key}` }) as HTMLInputElement;
+        el.value = String(cur()[key]);
+        const input = el;
+        const commit = debounce(() => save(key, input.value), 300);
+        el.addEventListener('input', () => {
+          commit();
+          preview.value = pandocArgsPreview(f, { ...cur(), [key]: input.value });
+        });
+        el.addEventListener('change', () => commit.flush());
+        el.addEventListener('blur', () => commit.flush());
+      }
+      const hint = key === 'extraArguments' ? 'Quoted like a shell; ${outputPath} ${outputFolder} ${currentFolder} ${title}' : undefined;
+      return h('label.pref-row', null, h('span.pref-label', null, label, hint ? h('span.pref-hint', { text: hint }) : null), h('span.pref-control', null, el));
+    });
+    refresh();
+    box.appendChild(
+      h(
+        'div.pandoc-format',
+        { 'data-format': f },
+        h('h4.pref-subsubhead', { text: PANDOC_LABELS[f] }),
+        ...fields,
+        h('label.pref-row', null, h('span.pref-label', null, 'Arguments'), h('span.pref-control', null, preview)),
+      ),
+    );
+  }
+  return box;
 }
 
 /** Add / edit / delete custom export commands (File › Export › Custom…). */

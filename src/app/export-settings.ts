@@ -48,7 +48,42 @@ export interface ExportSettings {
   html: { theme: string; appendHead: string; appendBody: string };
   htmlPlain: { appendHead: string; appendBody: string };
   image: { width: number; quality: ImageQuality; format: ImageFormat; theme: string; fontSize: number };
+  pandoc: Record<PandocFormatId, PandocFormatOptions>;
 }
+
+/** Pandoc writers offered under File › Export (#81/#95). */
+export const PANDOC_FORMAT_IDS = ['docx', 'odt', 'rtf', 'epub', 'latex', 'mediawiki', 'rst', 'textile', 'opml'] as const;
+export type PandocFormatId = (typeof PANDOC_FORMAT_IDS)[number];
+
+/**
+ * Per-format Pandoc options (#90). Typora's settings page offers: docx `reference-doc`,
+ * odt `template`, epub `css` + `epub-chapter-level`, and extra arguments for the
+ * text formats; every field maps to one pandoc flag (`''`/0 = not passed).
+ */
+export interface PandocFormatOptions {
+  referenceDoc: string;
+  template: string;
+  css: string;
+  /** 0 = pandoc's default. */
+  epubChapterLevel: number;
+  /** Shell-style quoting; `${outputPath}` `${outputFolder}` `${currentFolder}` `${title}` expanded per token. */
+  extraArguments: string;
+}
+
+/** Which option fields each format shows (Typora's per-type field table). */
+export const PANDOC_FORMAT_FIELDS: Record<PandocFormatId, (keyof PandocFormatOptions)[]> = {
+  docx: ['referenceDoc'],
+  odt: ['template'],
+  epub: ['css', 'epubChapterLevel'],
+  rtf: ['extraArguments'],
+  latex: ['extraArguments'],
+  mediawiki: ['extraArguments'],
+  rst: ['extraArguments'],
+  textile: ['extraArguments'],
+  opml: ['extraArguments'],
+};
+
+export const DEFAULT_PANDOC_OPTIONS: Readonly<PandocFormatOptions> = Object.freeze({ referenceDoc: '', template: '', css: '', epubChapterLevel: 0, extraArguments: '' });
 
 export interface CustomExport {
   id: string;
@@ -106,6 +141,7 @@ export const DEFAULT_EXPORT: Readonly<ExportSettings> = Object.freeze({
   html: { theme: '', appendHead: '', appendBody: '' },
   htmlPlain: { appendHead: '', appendBody: '' },
   image: { width: 800, quality: 'high', format: 'png', theme: '', fontSize: 16 },
+  pandoc: Object.fromEntries(PANDOC_FORMAT_IDS.map((f) => [f, DEFAULT_PANDOC_OPTIONS])) as Record<PandocFormatId, PandocFormatOptions>,
 }) as ExportSettings;
 
 type Raw = Record<string, unknown>;
@@ -134,6 +170,22 @@ export function migratePageSetup(input: unknown): PageSetup {
       left: n(m.left, d.margins.left, 0, 100),
     },
   };
+}
+
+export function migratePandocOptions(input: unknown): Record<PandocFormatId, PandocFormatOptions> {
+  const r = obj(input);
+  const out = {} as Record<PandocFormatId, PandocFormatOptions>;
+  for (const f of PANDOC_FORMAT_IDS) {
+    const o = obj(r[f]);
+    out[f] = {
+      referenceDoc: s(o.referenceDoc, ''),
+      template: s(o.template, ''),
+      css: s(o.css, ''),
+      epubChapterLevel: Math.round(n(o.epubChapterLevel, 0, 0, 6)),
+      extraArguments: s(o.extraArguments, ''),
+    };
+  }
+  return out;
 }
 
 export function migrateCustomExports(v: unknown): CustomExport[] {
@@ -194,7 +246,29 @@ export function migrateExportSettings(input: unknown): ExportSettings {
       theme: s(im.theme, ''),
       fontSize: Math.round(n(im.fontSize, d.image.fontSize, 8, 48)),
     },
+    pandoc: migratePandocOptions(r.pandoc),
   };
+}
+
+/** Quote one argv element for the read-only "Arguments" preview. */
+function q(a: string): string {
+  return /^[\w@%+=:,./${}-]+$/.test(a) ? a : `"${a.replace(/(["\\$`])/g, '\\$1')}"`;
+}
+
+/**
+ * Read-only preview of the pandoc command line for one format (Typora shows the same
+ * kind of disabled "Arguments" string). Mirrors `export_args` + `option_args` in
+ * src-tauri/src/pandoc.rs; the real argv is rebuilt natively.
+ */
+export function pandocArgsPreview(format: PandocFormatId, o: PandocFormatOptions): string {
+  const writer: Record<PandocFormatId, string> = { docx: 'docx', odt: 'odt', rtf: 'rtf -s', epub: 'epub', latex: 'latex -s', mediawiki: 'mediawiki', rst: 'rst -s', textile: 'textile', opml: 'opml -s' };
+  const a = [`-f markdown -t ${writer[format]} -o \${outputPath}`];
+  if (o.css.trim()) a.push(`--css ${q(o.css.trim())}`);
+  if (o.referenceDoc.trim()) a.push(`--reference-doc ${q(o.referenceDoc.trim())}`);
+  if (o.template.trim()) a.push(`--template ${q(o.template.trim())}`);
+  if (o.epubChapterLevel > 0) a.push(`--epub-chapter-level=${o.epubChapterLevel}`);
+  if (o.extraArguments.trim()) a.push(o.extraArguments.trim());
+  return a.join(' ');
 }
 
 /** Paper size in mm after applying orientation. */

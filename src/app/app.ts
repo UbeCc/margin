@@ -893,7 +893,7 @@ export class App {
     registerPandocExporters(c, {
       pandocPath: () => this.settings.pandocPath,
       title: () => documentTitle(this.editor.getMarkdown(), this.doc.path ? basename(this.doc.path) : null),
-      progress: (m) => toast(m, { kind: 'info', timeout: 0 }),
+      progress: (m, abort) => toast(m, { kind: 'info', timeout: 0, action: abort ? { label: 'Abort', run: abort } : undefined }),
     });
     return c;
   }

@@ -43,6 +43,14 @@ export interface Exporter {
   noTarget?: boolean;
 }
 
+/** Thrown by an exporter the user stopped (Abort): no error notice, no "previous" update. */
+export class ExportAbortedError extends Error {
+  constructor() {
+    super('Export aborted');
+    this.name = 'ExportAbortedError';
+  }
+}
+
 export interface LastExport {
   kind: string;
   path: string;
@@ -297,6 +305,7 @@ export class ExportController {
     try {
       await ex.run(target);
     } catch (e) {
+      if (e instanceof ExportAbortedError) return false;
       const msg = e instanceof ImageTooLargeError ? e.message : `Export failed: ${e instanceof Error ? e.message : String(e)}`;
       this.host.notify(msg, 'error');
       return false;
@@ -337,7 +346,10 @@ export class ExportController {
  * kinds, so they get the default folder, Export with Previous / Overwrite and the
  * after-export action. `exportWithPandoc` keeps its own progress/watchdog logic.
  */
-export function registerPandocExporters(c: ExportController, opts: { pandocPath: () => string; title: () => string; progress: (m: string) => () => void }): void {
+export function registerPandocExporters(
+  c: ExportController,
+  opts: { pandocPath: () => string; title: () => string; progress: (m: string, abort?: () => void) => () => void },
+): void {
   for (const format of Object.keys(PANDOC_FORMATS) as PandocFormat[]) {
     const spec = PANDOC_FORMATS[format];
     c.register(`pandoc:${format}`, (h) => ({
@@ -347,11 +359,17 @@ export function registerPandocExporters(c: ExportController, opts: { pandocPath:
       run: async (target) => {
         const x = extras(h.platform);
         let error = '';
+        let aborted = false;
         const doc = h.docPath();
         const ok = await exportWithPandoc(format, {
           platform: {
             saveFileDialog: async () => target,
             pandocExport: x.pandocExport ? (md, out, o) => x.pandocExport!.call(h.platform, md, out, o) : undefined,
+            pandocAbort: x.pandocAbort ? (id) => x.pandocAbort!.call(h.platform, id) : undefined,
+          },
+          options: migrateExportSettings(h.exportSettings()).pandoc[format],
+          onAborted: () => {
+            aborted = true;
           },
           markdown: h.markdown(),
           name: stripExt(basename(target)),
@@ -365,6 +383,7 @@ export function registerPandocExporters(c: ExportController, opts: { pandocPath:
             else if (kind === 'warning') h.notify(m, 'warning');
           },
         });
+        if (!ok && aborted) throw new ExportAbortedError();
         if (!ok) throw new Error(error.replace(/^Export failed: /, '') || `${spec.label} export failed`);
       },
     }));
