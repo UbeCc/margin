@@ -8,6 +8,9 @@ const host = process.env.TAURI_DEV_HOST;
 
 // https://vite.dev/config/
 export default defineConfig(() => ({
+  // Per-worktree dep cache: symlinked node_modules would otherwise share node_modules/.vite
+  // across worktrees and one dev server's re-optimize reloads another's e2e pages.
+  cacheDir: process.env.VITE_CACHE_DIR || '.vite-cache',
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //
