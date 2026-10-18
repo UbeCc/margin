@@ -283,7 +283,7 @@
    ],
    "disposition": "active",
    "review_evidence_ids": [
-    "ev_e7390611173f00993bf347caf6bffbd32926247ef5bea0cbff339163ea90e35c"
+    "ev_3c0855fd39565d4264201a1d588a02aa4c4d16f198e296ca90f373834f471390"
    ]
   },
   {
@@ -922,7 +922,7 @@
    ],
    "disposition": "active",
    "review_evidence_ids": [
-    "ev_bc06d84531b88fcd1b9404abb7f6781e00646fe2a355ef01c9b24bd05304281e"
+    "ev_8442e41bd296dea9274f686d0e95f2565c0df21eb1b28ecd34aea83586f60767"
    ]
   },
   {
@@ -3984,7 +3984,7 @@
    ],
    "disposition": "active",
    "review_evidence_ids": [
-    "ev_e218f212319fb30de650901ae72a4847d9f10ead06536a74d519e9905f484d3e"
+    "ev_33eb56f7576ff3b0d97061ca4dc934a714eac41b2c695f825e2342c1f6e7ff0e"
    ]
   },
   {
@@ -4015,7 +4015,7 @@
    ],
    "disposition": "active",
    "review_evidence_ids": [
-    "ev_b7b33e93dfb6bc6e73cd17e0c9e0f13d697089a4fd88d7eb32493e53db003453"
+    "ev_9a69d753f08286af0ef87ca3fe39ec70b7c1ced3183aca26a553d6186b9a8d50"
    ]
   },
   {
@@ -4077,7 +4077,7 @@
    ],
    "disposition": "active",
    "review_evidence_ids": [
-    "ev_5788f24ce3b96d401eac2310faf3cf5b92335f7345adcc4850c84000dbd62a2c"
+    "ev_33b76ef1fdd479611e75a3a4de00c856390096c877aea48ee8f9165508e091d5"
    ]
   },
   {
@@ -5468,7 +5468,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'preferences'",
-     "owner_sha256": "915db6d17bff07b935432fcfd81512f0c06f18c5ed7b1bd8631692f37ba1810b"
+     "owner_sha256": "0b952646c4cf242b2f794c0632f93fcc7b6a17bcec7eb73455b48d6752d3235f"
     },
     "parser_type": null,
     "original_cases": [
@@ -5527,7 +5527,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'new'",
-     "owner_sha256": "915db6d17bff07b935432fcfd81512f0c06f18c5ed7b1bd8631692f37ba1810b"
+     "owner_sha256": "0b952646c4cf242b2f794c0632f93fcc7b6a17bcec7eb73455b48d6752d3235f"
     },
     "parser_type": null,
     "original_cases": [
@@ -5568,7 +5568,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'open'",
-     "owner_sha256": "915db6d17bff07b935432fcfd81512f0c06f18c5ed7b1bd8631692f37ba1810b"
+     "owner_sha256": "0b952646c4cf242b2f794c0632f93fcc7b6a17bcec7eb73455b48d6752d3235f"
     },
     "parser_type": null,
     "original_cases": [
@@ -5609,7 +5609,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'openFolder'",
-     "owner_sha256": "915db6d17bff07b935432fcfd81512f0c06f18c5ed7b1bd8631692f37ba1810b"
+     "owner_sha256": "0b952646c4cf242b2f794c0632f93fcc7b6a17bcec7eb73455b48d6752d3235f"
     },
     "parser_type": null,
     "original_cases": [
@@ -5650,13 +5650,13 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "quickOpen(): void",
-     "owner_sha256": "915db6d17bff07b935432fcfd81512f0c06f18c5ed7b1bd8631692f37ba1810b"
+     "owner_sha256": "0b952646c4cf242b2f794c0632f93fcc7b6a17bcec7eb73455b48d6752d3235f"
     },
     "parser_type": null,
     "original_cases": [
      {
       "kind": "positive",
-      "evidence_id": "ev_e7390611173f00993bf347caf6bffbd32926247ef5bea0cbff339163ea90e35c",
+      "evidence_id": "ev_3c0855fd39565d4264201a1d588a02aa4c4d16f198e296ca90f373834f471390",
       "location": "files-windows-settings §10"
      }
     ],
@@ -5732,7 +5732,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'save'",
-     "owner_sha256": "915db6d17bff07b935432fcfd81512f0c06f18c5ed7b1bd8631692f37ba1810b"
+     "owner_sha256": "0b952646c4cf242b2f794c0632f93fcc7b6a17bcec7eb73455b48d6752d3235f"
     },
     "parser_type": null,
     "original_cases": [
@@ -5773,7 +5773,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'saveAs'",
-     "owner_sha256": "915db6d17bff07b935432fcfd81512f0c06f18c5ed7b1bd8631692f37ba1810b"
+     "owner_sha256": "0b952646c4cf242b2f794c0632f93fcc7b6a17bcec7eb73455b48d6752d3235f"
     },
     "parser_type": null,
     "original_cases": [
@@ -5814,7 +5814,7 @@
     "owner": {
      "module_path": "src/app/sidebar/filetree.ts",
      "symbol": "'Rename…'",
-     "owner_sha256": "954cb8920b34033891c5a935fdf9721cf84e6c6d67e973b11668033642934d00"
+     "owner_sha256": "c409d1f0bade53c3f05642741cf65c470326a92457a55062656915465aabb3d8"
     },
     "parser_type": null,
     "original_cases": [
@@ -5832,7 +5832,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'reloadFromDisk'",
-     "owner_sha256": "915db6d17bff07b935432fcfd81512f0c06f18c5ed7b1bd8631692f37ba1810b"
+     "owner_sha256": "0b952646c4cf242b2f794c0632f93fcc7b6a17bcec7eb73455b48d6752d3235f"
     },
     "parser_type": null,
     "original_cases": [
@@ -5850,7 +5850,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'toggleLineEnding'",
-     "owner_sha256": "915db6d17bff07b935432fcfd81512f0c06f18c5ed7b1bd8631692f37ba1810b"
+     "owner_sha256": "0b952646c4cf242b2f794c0632f93fcc7b6a17bcec7eb73455b48d6752d3235f"
     },
     "parser_type": null,
     "original_cases": [
@@ -5891,7 +5891,7 @@
     "owner": {
      "module_path": "src/app/sidebar/filetree.ts",
      "symbol": "'Reveal in Finder'",
-     "owner_sha256": "954cb8920b34033891c5a935fdf9721cf84e6c6d67e973b11668033642934d00"
+     "owner_sha256": "c409d1f0bade53c3f05642741cf65c470326a92457a55062656915465aabb3d8"
     },
     "parser_type": null,
     "original_cases": [
@@ -5909,7 +5909,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'print'",
-     "owner_sha256": "915db6d17bff07b935432fcfd81512f0c06f18c5ed7b1bd8631692f37ba1810b"
+     "owner_sha256": "0b952646c4cf242b2f794c0632f93fcc7b6a17bcec7eb73455b48d6752d3235f"
     },
     "parser_type": null,
     "original_cases": [
@@ -5927,7 +5927,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'close'",
-     "owner_sha256": "915db6d17bff07b935432fcfd81512f0c06f18c5ed7b1bd8631692f37ba1810b"
+     "owner_sha256": "0b952646c4cf242b2f794c0632f93fcc7b6a17bcec7eb73455b48d6752d3235f"
     },
     "parser_type": null,
     "original_cases": [
@@ -5986,7 +5986,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'undo'",
-     "owner_sha256": "915db6d17bff07b935432fcfd81512f0c06f18c5ed7b1bd8631692f37ba1810b"
+     "owner_sha256": "0b952646c4cf242b2f794c0632f93fcc7b6a17bcec7eb73455b48d6752d3235f"
     },
     "parser_type": null,
     "original_cases": [
@@ -6109,13 +6109,13 @@
     "owner": {
      "module_path": "src/app/findbar.ts",
      "symbol": "caseSensitive",
-     "owner_sha256": "26262c991b67b1ef821208ac9ee948cc249670c99474e8ed766bdf0b2e6d4944"
+     "owner_sha256": "e6fe557209abe88833bd07aa1ab8bb8df3cc3a5311600599fc4165fa38c40dae"
     },
     "parser_type": null,
     "original_cases": [
      {
       "kind": "positive",
-      "evidence_id": "ev_bc06d84531b88fcd1b9404abb7f6781e00646fe2a355ef01c9b24bd05304281e",
+      "evidence_id": "ev_8442e41bd296dea9274f686d0e95f2565c0df21eb1b28ecd34aea83586f60767",
       "location": "typora-re/parity-spec.md"
      }
     ],
@@ -7288,7 +7288,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'toggleSource'",
-     "owner_sha256": "915db6d17bff07b935432fcfd81512f0c06f18c5ed7b1bd8631692f37ba1810b"
+     "owner_sha256": "0b952646c4cf242b2f794c0632f93fcc7b6a17bcec7eb73455b48d6752d3235f"
     },
     "parser_type": null,
     "original_cases": [
@@ -7329,7 +7329,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'toggleFocus'",
-     "owner_sha256": "915db6d17bff07b935432fcfd81512f0c06f18c5ed7b1bd8631692f37ba1810b"
+     "owner_sha256": "0b952646c4cf242b2f794c0632f93fcc7b6a17bcec7eb73455b48d6752d3235f"
     },
     "parser_type": null,
     "original_cases": [
@@ -7370,7 +7370,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'toggleSidebar'",
-     "owner_sha256": "915db6d17bff07b935432fcfd81512f0c06f18c5ed7b1bd8631692f37ba1810b"
+     "owner_sha256": "0b952646c4cf242b2f794c0632f93fcc7b6a17bcec7eb73455b48d6752d3235f"
     },
     "parser_type": null,
     "original_cases": [
@@ -7429,7 +7429,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'zoomIn'",
-     "owner_sha256": "915db6d17bff07b935432fcfd81512f0c06f18c5ed7b1bd8631692f37ba1810b"
+     "owner_sha256": "0b952646c4cf242b2f794c0632f93fcc7b6a17bcec7eb73455b48d6752d3235f"
     },
     "parser_type": null,
     "original_cases": [
@@ -7506,7 +7506,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'openThemesFolder'",
-     "owner_sha256": "915db6d17bff07b935432fcfd81512f0c06f18c5ed7b1bd8631692f37ba1810b"
+     "owner_sha256": "0b952646c4cf242b2f794c0632f93fcc7b6a17bcec7eb73455b48d6752d3235f"
     },
     "parser_type": null,
     "original_cases": [
@@ -7796,7 +7796,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "private async storeImage(",
-     "owner_sha256": "915db6d17bff07b935432fcfd81512f0c06f18c5ed7b1bd8631692f37ba1810b"
+     "owner_sha256": "0b952646c4cf242b2f794c0632f93fcc7b6a17bcec7eb73455b48d6752d3235f"
     },
     "parser_type": null,
     "original_cases": [
@@ -7837,7 +7837,7 @@
     "owner": {
      "module_path": "src/app/settings.ts",
      "symbol": "migrateImageRule",
-     "owner_sha256": "0ee56da5cb6f49ed3dc97dfea5f63cc422307428bb7fd454e1c3595be3370e37"
+     "owner_sha256": "644ae529637c14a16c27897e3935e044bfb30bf24ae544a9caaf6d0f59374202"
     },
     "parser_type": null,
     "original_cases": [
@@ -7873,7 +7873,7 @@
     "owner": {
      "module_path": "src/app/settings.ts",
      "symbol": "DEFAULT_SETTINGS",
-     "owner_sha256": "0ee56da5cb6f49ed3dc97dfea5f63cc422307428bb7fd454e1c3595be3370e37"
+     "owner_sha256": "644ae529637c14a16c27897e3935e044bfb30bf24ae544a9caaf6d0f59374202"
     },
     "parser_type": null,
     "original_cases": [
@@ -8050,7 +8050,7 @@
     "owner": {
      "module_path": "src/app/settings.ts",
      "symbol": "DEFAULT_SETTINGS",
-     "owner_sha256": "0ee56da5cb6f49ed3dc97dfea5f63cc422307428bb7fd454e1c3595be3370e37"
+     "owner_sha256": "644ae529637c14a16c27897e3935e044bfb30bf24ae544a9caaf6d0f59374202"
     },
     "parser_type": null,
     "original_cases": [
@@ -8068,7 +8068,7 @@
     "owner": {
      "module_path": "src/app/sidebar/filetree.ts",
      "symbol": "'New File…'",
-     "owner_sha256": "954cb8920b34033891c5a935fdf9721cf84e6c6d67e973b11668033642934d00"
+     "owner_sha256": "c409d1f0bade53c3f05642741cf65c470326a92457a55062656915465aabb3d8"
     },
     "parser_type": null,
     "original_cases": [
@@ -8109,7 +8109,7 @@
     "owner": {
      "module_path": "src/app/sidebar/filelist.ts",
      "symbol": "export class FileList",
-     "owner_sha256": "01257cfcf09d2f1da095bfcf1e3216c76a2d17e38c7bbc454c9913bfaba13988"
+     "owner_sha256": "204066d3194206c15e87bee2855599e11ad7233a97433ae70f6013591e54a701"
     },
     "parser_type": null,
     "original_cases": [
@@ -8150,14 +8150,14 @@
     "owner": {
      "module_path": "src/app/sidebar/search.ts",
      "symbol": "export class SidebarSearch",
-     "owner_sha256": "9de1db707ba64dc89a4466905a91b942a83e5030fd8456e0fef9909ccdeec137"
+     "owner_sha256": "594a9a3173c0a84cbab2f671125bdeccc6aeb8210d2ca9a3acbaa17e025d3bad"
     },
     "parser_type": null,
     "original_cases": [
      {
       "kind": "positive",
-      "evidence_id": "ev_e218f212319fb30de650901ae72a4847d9f10ead06536a74d519e9905f484d3e",
-      "location": "typora-re/parity-spec.md"
+      "evidence_id": "ev_33eb56f7576ff3b0d97061ca4dc934a714eac41b2c695f825e2342c1f6e7ff0e",
+      "location": "fe-sidebar-statusbar-find §7"
      }
     ],
     "fixtures": [
@@ -8191,14 +8191,14 @@
     "owner": {
      "module_path": "src/app/sidebar/sort.ts",
      "symbol": "export const SORT_OPTIONS",
-     "owner_sha256": "5f108bfe7240024c08bd9ea196104ee7a49993699d960b9897cab30f3fdad2b2"
+     "owner_sha256": "0f7a3646c754591dd3fbffca036c4f9393831dd612fa807b75ac0595e155d3b1"
     },
     "parser_type": null,
     "original_cases": [
      {
       "kind": "positive",
-      "evidence_id": "ev_b7b33e93dfb6bc6e73cd17e0c9e0f13d697089a4fd88d7eb32493e53db003453",
-      "location": "typora-re/parity-spec.md"
+      "evidence_id": "ev_9a69d753f08286af0ef87ca3fe39ec70b7c1ced3183aca26a553d6186b9a8d50",
+      "location": "fe-sidebar-statusbar-find §3"
      }
     ],
     "fixtures": [
@@ -8232,7 +8232,7 @@
     "owner": {
      "module_path": "src/app/sidebar/outline.ts",
      "symbol": "activeId",
-     "owner_sha256": "f371948e48ec8af7ab50f05cb686d49e4dcc44ec8a3e18d059ec49cf9d733d59"
+     "owner_sha256": "bb2d978c384f9d6c972ae7c457bfe374531b71a4e034d62ccbfecc889b24bd8c"
     },
     "parser_type": null,
     "original_cases": [
@@ -8273,14 +8273,14 @@
     "owner": {
      "module_path": "src/app/sidebar/outline.ts",
      "symbol": "export function filterHeadings",
-     "owner_sha256": "f371948e48ec8af7ab50f05cb686d49e4dcc44ec8a3e18d059ec49cf9d733d59"
+     "owner_sha256": "bb2d978c384f9d6c972ae7c457bfe374531b71a4e034d62ccbfecc889b24bd8c"
     },
     "parser_type": null,
     "original_cases": [
      {
       "kind": "positive",
-      "evidence_id": "ev_5788f24ce3b96d401eac2310faf3cf5b92335f7345adcc4850c84000dbd62a2c",
-      "location": "typora-re/parity-spec.md"
+      "evidence_id": "ev_33b76ef1fdd479611e75a3a4de00c856390096c877aea48ee8f9165508e091d5",
+      "location": "fe-contextmenus-tools §2"
      }
     ],
     "fixtures": [
@@ -8355,7 +8355,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "private async export(",
-     "owner_sha256": "915db6d17bff07b935432fcfd81512f0c06f18c5ed7b1bd8631692f37ba1810b"
+     "owner_sha256": "0b952646c4cf242b2f794c0632f93fcc7b6a17bcec7eb73455b48d6752d3235f"
     },
     "parser_type": null,
     "original_cases": [
@@ -8865,7 +8865,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "setDocumentEdited",
-     "owner_sha256": "915db6d17bff07b935432fcfd81512f0c06f18c5ed7b1bd8631692f37ba1810b"
+     "owner_sha256": "0b952646c4cf242b2f794c0632f93fcc7b6a17bcec7eb73455b48d6752d3235f"
     },
     "parser_type": null,
     "original_cases": [
@@ -8919,7 +8919,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "applyAppearance",
-     "owner_sha256": "915db6d17bff07b935432fcfd81512f0c06f18c5ed7b1bd8631692f37ba1810b"
+     "owner_sha256": "0b952646c4cf242b2f794c0632f93fcc7b6a17bcec7eb73455b48d6752d3235f"
     },
     "parser_type": null,
     "original_cases": [
