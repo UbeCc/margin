@@ -95,7 +95,7 @@ test.describe('parity: context menus (#97)', () => {
     await expect(page.locator('.context-menu')).toHaveCount(0);
   });
 
-  test('ctx.text: Text context menu: cut/copy/paste, copy-as, insert, format, paragraph submenus, search with…', async ({ page }) => {
+  test('ctx.text: Text context menu: cut/copy/paste, copy-as, insert, format, paragraph submenus, search with…', async ({ page, browserName }) => {
     await load(page, 'Some **bold** words\n');
     await selectText(page, 'bold');
     await rightClickSelection(page);
@@ -112,6 +112,12 @@ test.describe('parity: context menus (#97)', () => {
     const box = (await page.locator('.md-editor .md-paragraph').boundingBox())!;
     await page.mouse.click(box.x + box.width - 2, box.y + box.height / 2, { button: 'right' });
     await expect(item(page, 'Cut')).toBeDisabled();
+    if (browserName === 'webkit') {
+      // the browser build cannot read the clipboard from a menu click in WebKit; emulate the desktop native read
+      await page.evaluate(() => {
+        (window.__MARGIN_WEB__ as unknown as { readClipboard: unknown }).readClipboard = async () => ({ plain: 'bold', html: null, rtfHtml: null });
+      });
+    }
     await item(page, 'Paste').click();
     await expect.poll(() => editorValue(page)).toMatch(/bold[\s\S]*bold/);
   });
@@ -149,7 +155,7 @@ test.describe('parity: context menus (#97)', () => {
 
   test('ctx.emoji: Emoji/inline-math context entries (copy emoji, copy inline math)', async ({ page }) => {
     await load(page, 'Area $a^2+b^2$ here\n');
-    await page.locator('.md-editor .md-math .md-math-render').click({ button: 'right' });
+    await page.locator('.md-editor .md-math .md-math-render').click({ button: 'right', force: true });
     expect(await labels(page)).toEqual(['Copy Math', 'Cut', 'Copy', 'Paste', 'Copy / Paste As…']);
     await item(page, 'Copy Math').hover();
     await item(page, 'Copy as Tex').click();

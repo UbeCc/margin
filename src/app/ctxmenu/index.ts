@@ -88,7 +88,8 @@ export class EditorContextMenu {
   private range: Range | null = null;
   private focusEl: HTMLElement | null = null;
   private target: CtxTarget | null = null;
-  private pressed: Range | null = null;
+  /** Selection when the right button went down (null = none); undefined = no press seen (keyboard menu). */
+  private pressed: Range | null | undefined = undefined;
 
   constructor(private host: CtxHost, private editorHost: HTMLElement) {}
 
@@ -121,7 +122,7 @@ export class EditorContextMenu {
     if (e.defaultPrevented) return;
     const ed = this.host.editor();
     const source = ed.isSourceMode() ? this.editorHost.querySelector<HTMLElement>('.md-source-host') : null;
-    const t = contextTarget(e.target, ed.isSourceMode() ? null : this.root(), source);
+    const t = contextTarget(e.target, ed.isSourceMode() ? null : this.root(), source, { x: e.clientX, y: e.clientY });
     if (t.kind === 'none') return;
     e.preventDefault();
     this.target = t;
@@ -140,22 +141,25 @@ export class EditorContextMenu {
   /** Move the selection onto the clicked object unless the click is inside the current selection. */
   private placeSelection(t: CtxTarget, e: MouseEvent): void {
     const sel = getSelection();
-    let cur = sel && sel.rangeCount ? sel.getRangeAt(0) : null;
+    // Judge by the selection before the button went down: engines differ in what a
+    // right-press does (WebKit selects the word under the pointer, Chromium may collapse).
     const pre = this.pressed;
-    this.pressed = null;
-    if (sel && pre && !pre.collapsed && (!cur || cur.collapsed)) {
+    this.pressed = undefined;
+    const cur = pre !== undefined ? pre : sel && sel.rangeCount ? sel.getRangeAt(0) : null;
+    if (sel && pre !== undefined) {
       sel.removeAllRanges();
-      sel.addRange(pre);
-      cur = pre;
+      if (pre) sel.addRange(pre);
     }
     const inside = (n: Node | null) => !!(n && cur && !cur.collapsed && cur.intersectsNode(n));
     let r: Range | null = null;
     const wrap = t.imageWrap ?? t.math;
     if (wrap) {
       if (inside(wrap)) return;
+      // caret inside the object's source (Typora acts on the clicked element, not a selection)
+      const src = wrap.querySelector('.md-src')?.firstChild;
       r = document.createRange();
-      r.setStartBefore(wrap);
-      r.setEndAfter(wrap);
+      if (src) r.setStart(src, Math.min(1, src.textContent?.length ?? 0));
+      else r.setStartBefore(wrap);
     } else if (t.kind === 'text' || t.kind === 'link') {
       const hit = rangeAtPoint(e.clientX, e.clientY);
       const inRects = (rg: Range) => [...rg.getClientRects()].some((b) => e.clientX >= b.left - 1 && e.clientX <= b.right + 1 && e.clientY >= b.top - 1 && e.clientY <= b.bottom + 1);
@@ -252,6 +256,14 @@ export class EditorContextMenu {
       if (!ok) return;
     }
     this.restore();
+    const wrap = this.target?.imageWrap;
+    if (wrap?.isConnected) {
+      const r = document.createRange();
+      r.setStartBefore(wrap);
+      r.setEndAfter(wrap);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(r);
+    }
     if (!this.exec({ kind: 'delete', scope: 'range' })) return;
     if (path) {
       try {

@@ -78,7 +78,12 @@ function isField(el: Element): boolean {
  * root (`.md-editor`); `sourceHost` the source-mode host when source mode is on.
  * Returns kind 'none' (no in-app menu) for targets outside the editor.
  */
-export function contextTarget(target: EventTarget | null, root: HTMLElement | null, sourceHost: HTMLElement | null = null): CtxTarget {
+export function contextTarget(
+  target: EventTarget | null,
+  root: HTMLElement | null,
+  sourceHost: HTMLElement | null = null,
+  point?: { x: number; y: number },
+): CtxTarget {
   const none: CtxTarget = { kind: 'none', keys: [], block: null, blockType: null };
   if (!(target instanceof Element)) return none;
   if (sourceHost?.contains(target)) return { ...none, kind: 'input', keys: ['input'] };
@@ -101,7 +106,11 @@ export function contextTarget(target: EventTarget | null, root: HTMLElement | nu
     return t;
   }
 
-  const img = target.closest('img');
+  // Rendered inline objects may not be hit-testable (pointer-events: none): fall back to geometry.
+  let el: Element = target;
+  if (point && block && !el.closest('.md-wrap')) el = wrapAt(block, point.x, point.y) ?? el;
+
+  const img = el.closest('img');
   const imageWrap = img?.closest<HTMLElement>('.md-image') ?? undefined;
   if (img && imageWrap) {
     const src = imageMarkdownSrc(imageWrap.querySelector('.md-src')?.textContent ?? '') ?? img.getAttribute('src') ?? '';
@@ -128,10 +137,10 @@ export function contextTarget(target: EventTarget | null, root: HTMLElement | nu
     };
   }
 
-  const link = target.closest<HTMLElement>('.md-link');
+  const link = el.closest<HTMLElement>('.md-link');
   if (link && link.dataset.href !== undefined) return { ...base, kind: 'link', href: link.dataset.href, keys: ['openLink', 'copyLink', '|', 'normal'] };
 
-  const math = target.closest<HTMLElement>('.md-math');
+  const math = el.closest<HTMLElement>('.md-math');
   if (math) return { ...base, kind: 'mathInline', math, keys: ['copyMathInline', '|', 'normal'] };
 
   return base;
@@ -143,4 +152,15 @@ export function imageMarkdownSrc(raw: string): string | null {
   if (md) return md[1].replace(/^<|>$/g, '');
   const html = /<img\b[^>]*?\bsrc\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/i.exec(raw);
   return html ? (html[1] ?? html[2] ?? html[3]) : null;
+}
+
+/** Innermost inline image / math / link wrap of `block` whose box contains (x, y). */
+function wrapAt(block: HTMLElement, x: number, y: number): Element | null {
+  let best: Element | null = null;
+  for (const w of block.querySelectorAll('.md-image, .md-math, .md-link')) {
+    const boxes = [...w.getClientRects(), ...[...w.querySelectorAll('.md-math-render, img, .katex')].map((c) => c.getBoundingClientRect())];
+    const hit = boxes.some((b) => x >= b.left - 1 && x <= b.right + 1 && y >= b.top - 3 && y <= b.bottom + 3);
+    if (hit && (!best || best.contains(w))) best = w;
+  }
+  return best?.classList.contains('md-image') ? (best.querySelector('img') ?? best) : best;
 }
