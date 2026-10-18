@@ -36,6 +36,7 @@ import { closeContextMenu } from './ui/contextmenu';
 import { EditorContextMenu } from './ctxmenu';
 import { ImageUploader } from './upload-actions';
 import { ImageFeature } from './images/feature';
+import { takePicture } from './images/take-picture';
 import { debounce, h } from './util/dom';
 import { fuzzyFilter, fuzzyMatch } from './util/fuzzy';
 import { formatShortcut, isMac } from './util/keymap';
@@ -170,6 +171,7 @@ export class App {
       saveAs: () => void this.doc.saveAs(),
       openImagePreferences: () => this.preferences('images'),
       resolveAsset: (src) => this.resolveAsset(src),
+      assetsChanged: () => this.assetsChanged(),
     });
     this.images.attach(this.page); // tab hosts live in the page (#94)
     this.docs.newTab();
@@ -364,6 +366,7 @@ export class App {
   private editorSettings(tab?: DocTab): EditorSettings {
     return {
       baseDir: null,
+      assetKey: this.assetKey,
       resolveAsset: (src) => this.resolveAsset(src, tab),
       storeImage: (input) => this.storeImage(input),
       openLink: (href) => void this.openLink(href),
@@ -686,6 +689,14 @@ export class App {
   private exportDir: string | null = null;
   /** File › Page Setup (session only, like Typora's shared print info). */
   private printSetup: PrintSetup = { ...DEFAULT_PRINT_SETUP };
+
+  /** Bumped whenever image asset resolution changes (#136: typora-root-url). */
+  private assetKey = '0';
+
+  private assetsChanged(): void {
+    this.assetKey = String(Number(this.assetKey) + 1);
+    for (const e of this.docs.editors()) e.updateSettings({ assetKey: this.assetKey });
+  }
 
   private resolveAsset(src: string, tab?: DocTab): string {
     const doc = tab?.doc ?? this.docs?.active?.doc;
@@ -1015,6 +1026,12 @@ export class App {
       case 'openThemesFolder':
         await this.openThemesFolder();
         return true;
+      case 'takePicture':
+        return takePicture({
+          editor: () => this.editor,
+          store: (input) => this.images.store(input),
+          notify: (m, k) => void toast(m, { kind: k }),
+        });
       case 'uploadAllImages':
         return (await this.uploader.uploadAll()).ok;
     }

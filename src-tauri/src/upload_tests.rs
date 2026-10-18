@@ -288,3 +288,67 @@ fn picgo_failure_and_unreachable() {
     let e = upload(&paths, &UploadConfig::Picgo { port: Some(port), timeout_secs: Some(2) }).unwrap_err();
     assert!(e.contains("127.0.0.1"), "{e}");
 }
+
+// #137: PicGo.app flow — launch by bundle id, POST, one retry only when the
+// server did not answer at all (still starting up).
+#[test]
+fn picgo_app_success_first_post_launches_once() {
+    let (mut launches, mut posts) = (0, 0);
+    let mut launch = || {
+        launches += 1;
+        Ok(())
+    };
+    let mut post = || {
+        posts += 1;
+        PicgoOutcome::Ok(s(&["https://img.example/1.png"]))
+    };
+    let urls = picgo_app_upload_with(&mut launch, &mut post, std::time::Duration::ZERO).unwrap();
+    assert_eq!(urls, s(&["https://img.example/1.png"]));
+    assert_eq!((launches, posts), (1, 1));
+}
+
+#[test]
+fn picgo_app_retries_once_when_no_response() {
+    let (mut launches, mut posts) = (0, 0);
+    let mut launch = || {
+        launches += 1;
+        Ok(())
+    };
+    let mut post = || {
+        posts += 1;
+        if posts == 1 {
+            PicgoOutcome::NoResponse("PicGo server on 127.0.0.1:36677: connection refused".into())
+        } else {
+            PicgoOutcome::Ok(s(&["https://img.example/1.png"]))
+        }
+    };
+    let urls = picgo_app_upload_with(&mut launch, &mut post, std::time::Duration::ZERO).unwrap();
+    assert_eq!(urls, s(&["https://img.example/1.png"]));
+    assert_eq!((launches, posts), (1, 2)); // never re-launches, posts exactly twice
+}
+
+#[test]
+fn picgo_app_http_error_is_not_retried() {
+    let mut posts = 0;
+    let mut launch = || Ok(());
+    let mut post = || {
+        posts += 1;
+        PicgoOutcome::Answered("PicGo server answered HTTP 500: boom".into())
+    };
+    let e = picgo_app_upload_with(&mut launch, &mut post, std::time::Duration::ZERO).unwrap_err();
+    assert_eq!(posts, 1);
+    assert!(e.contains("HTTP 500"), "{e}");
+}
+
+#[test]
+fn picgo_app_launch_failure_reports_and_never_posts() {
+    let mut posts = 0;
+    let mut launch = || Err("PicGo app not found (bundle id com.molunerfinn.picgo): nope".into());
+    let mut post = || {
+        posts += 1;
+        PicgoOutcome::Ok(Vec::new())
+    };
+    let e = picgo_app_upload_with(&mut launch, &mut post, std::time::Duration::ZERO).unwrap_err();
+    assert_eq!(posts, 0);
+    assert!(e.contains("com.molunerfinn.picgo"), "{e}");
+}

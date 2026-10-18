@@ -47,7 +47,11 @@ export function refForImage(img: HTMLImageElement, root: HTMLElement, md: string
   return cands[Math.max(0, k)] ?? cands[0] ?? null;
 }
 
-export async function copyImageContent(img: HTMLImageElement): Promise<boolean> {
+export async function copyImageContent(img: HTMLImageElement, abs?: string | null, native?: (path: string) => Promise<boolean>): Promise<boolean> {
+  // #136: Typora writes the image natively (clipboard.writeImage → PNG+TIFF);
+  // WKWebView fetch() of a file asset URL can fail, so try native first when the
+  // platform offers it and the src is a local file.
+  if (abs && native && (await native(abs).catch(() => false))) return true;
   try {
     const blob = await (await fetch(img.src)).blob();
     let png = blob;

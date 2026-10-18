@@ -37,6 +37,8 @@ export interface EditorSettings {
   storeImage?(input: { bytes?: Uint8Array; mime?: string; path?: string; name?: string }): Promise<string | null>;
   /** Open an external link. */
   openLink?(href: string): void;
+  /** Changes whenever the shell's asset resolution changes (typora-root-url); image-bearing widgets re-render. */
+  assetKey?: string;
   /** Optional (#79): add native rich flavours (RTF) after a copy; see `RichClipboardData`. */
   writeClipboardRich?(data: RichClipboardData): Promise<boolean>;
   /** Optional (#96): read the system clipboard outside a paste event (native menu Paste as Plain Text). */
@@ -364,6 +366,8 @@ export type MenuAction =
   | `code:${CodeOp}`
   | `math:${MathOp}`
   // #99 (additive): Format › Image submenu
+  // #136 (additive): Format › Take Picture (camera dialog)
+  | 'takePicture'
   | `image:${ImageMenuAction}`;
 
 /** Format › Image entries (#99), in Typora's menu order; per-image ones act on the image at the caret. */
@@ -441,6 +445,13 @@ export interface Platform {
    * `command` is tokenized into argv and run without a shell; PicGo is contacted on 127.0.0.1 only.
    */
   uploadImages?(paths: string[], config: UploadConfig): Promise<string[]>;
+  /** Optional (#137): cancel a running upload (native side terminates the child / aborts). */
+  cancelUpload?(): void;
+  /**
+   * Optional (#137/#136, macOS): write an image file (PNG + TIFF flavours, Typora's
+   * `clipboard.writeImage`) to the system clipboard. Absent → the web fallback is used.
+   */
+  writeClipboardImage?(path: string): Promise<boolean>;
   /** Optional (#79, macOS): add public.rtf to the pasteboard after WebKit wrote `marker`'s copy. */
   writeClipboardRich?(data: RichClipboardData): Promise<boolean>;
   /** Optional (#96, macOS): plain/HTML of the general pasteboard, plus HTML converted from RTF/RTFD. */
@@ -471,4 +482,5 @@ export interface RichClipboardData {
 /** #80 image uploader config passed to `Platform.uploadImages`. timeoutSecs is per image. */
 export type UploadConfig =
   | { kind: 'command'; command: string; timeoutSecs?: number }
-  | { kind: 'picgo'; port?: number; timeoutSecs?: number };
+  | { kind: 'picgo'; port?: number; timeoutSecs?: number }
+  | { kind: 'picgo-app'; port?: number; timeoutSecs?: number };

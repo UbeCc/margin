@@ -209,8 +209,9 @@ const FORMAT: &[Item] = &[
     ("-", "", None),
     ("mark:link", "Hyperlink", Some("CmdOrCtrl+K")),
     ("-", "", None),
-    ("clearFormat", "Clear Format", None),
 ];
+// #136: Typora order — Image submenu, Take Picture, Clear Format.
+const FORMAT_TAIL: &[Item] = &[("takePicture", "Take Picture", None), ("clearFormat", "Clear Format", None)];
 // Format › Image (#99): Typora's menu order; per-image entries act on the image at the caret.
 const IMAGE_TOP: &[Item] = &[
     ("image:insert", "Insert Image", None),
@@ -400,7 +401,7 @@ pub fn build<R: Runtime>(
     let image = add_items(app, image.separator(), IMAGE_FILE)?
         .item(&add_items(app, SubmenuBuilder::new(app, "When Insert Local Image"), IMAGE_WHEN_INSERT)?.build()?);
     let image = add_items(app, image, IMAGE_BOTTOM)?.build()?;
-    let format = add_items(app, SubmenuBuilder::new(app, "Format"), FORMAT)?.separator().item(&image);
+    let format = add_items(app, add_items(app, SubmenuBuilder::new(app, "Format"), FORMAT)?.separator().item(&image), FORMAT_TAIL)?;
     menu = menu.item(&format.build()?);
     let view = add_items(app, SubmenuBuilder::new(app, "View"), VIEW)?
         .separator()
@@ -466,7 +467,7 @@ mod tests {
     #[test]
     fn accelerators_are_unique() {
         let mut seen = std::collections::HashSet::new();
-        for g in [FILE_OPEN, FILE, EXPORT, EXPORT_MORE, EDIT_TOP, EDIT_FIND, PARAGRAPH, FORMAT, VIEW, WINDOW_TABS]
+        for g in [FILE_OPEN, FILE, EXPORT, EXPORT_MORE, EDIT_TOP, EDIT_FIND, PARAGRAPH, FORMAT, FORMAT_TAIL, VIEW, WINDOW_TABS]
             .iter()
             .chain(EDIT_EXTRA.iter())
             .chain(SUBMENUS.iter().map(|(_, items)| items))
@@ -491,7 +492,7 @@ mod tests {
                 "exportPrevious", "exportOverwrite", "exportSettings", "pageSetup",
                 "exportDocx", "exportLatex",
                 "exportEpub", "clearFormat", "exportOdt", "exportRtf", "exportMediawiki", "exportRst", "exportTextile", "exportOpml",
-                "exportCustom", "import",
+                "exportCustom", "import", "takePicture",
                 // #94 file lifecycle
                 "newTab", "newWindow", "nextTab", "prevTab", "reopenClosed", "saveAll", "duplicate", "renameFile",
                 "moveTo", "revealInFinder", "copyFilePath", "browseVersions", "reopenWithEncoding", "properties",
@@ -517,7 +518,7 @@ mod tests {
 
     #[test]
     fn paragraph_and_format_menus_cover_parity_commands() {
-        let ids: Vec<&str> = PARAGRAPH.iter().chain(FORMAT.iter()).map(|i| i.0).collect();
+        let ids: Vec<&str> = PARAGRAPH.iter().chain(FORMAT.iter()).chain(FORMAT_TAIL.iter()).map(|i| i.0).collect();
         for want in [
             "para:headingUp", "para:headingDown", "para:insertBefore", "para:insertAfter", "block:html", "block:linkRef",
             "block:footnote", "block:front_matter", "task:toggle", "task:complete", "task:incomplete", "mark:underline",
