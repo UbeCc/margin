@@ -125,6 +125,19 @@ export class TauriPlatform implements Platform {
     }
   }
 
+  // ---- optional Pandoc export (PlatformExtras, #81)
+  pandocExport(
+    markdown: string,
+    outPath: string,
+    opts: { format: string; docDir: string | null; title: string | null; pandocPath: string | null; timeoutMs: number },
+  ): Promise<string> {
+    return call('pandoc_export', { markdown, outPath, ...opts });
+  }
+
+  pandocDetect(pandocPath: string | null): Promise<{ path: string; version: string }> {
+    return call('pandoc_detect', { pandocPath });
+  }
+
   // ---- optional file-tree operations (PlatformExtras, #21)
   rename(from: string, to: string): Promise<void> {
     return call('rename_path', { from, to });

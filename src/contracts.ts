@@ -164,6 +164,7 @@ export interface AppSettings {
 export type MenuAction =
   | 'new' | 'open' | 'openFolder' | 'save' | 'saveAs' | 'close'
   | 'exportHtml' | 'exportPdf' | 'print'
+  | 'exportDocx' | 'exportLatex' | 'exportEpub'
   | 'undo' | 'redo' | 'find' | 'replace'
   | 'toggleSidebar' | 'toggleSource' | 'toggleFocus' | 'toggleTypewriter' | 'quickOpen'
   | 'zoomIn' | 'zoomOut' | 'zoomReset'
