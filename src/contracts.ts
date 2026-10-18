@@ -37,10 +37,24 @@ export interface EditorSettings {
   colorScheme: 'light' | 'dark';
 }
 
+/** Inline formats toggled by Format menu commands (`underline`/`sub`/`sup` = `<u>`/`<sub>`/`<sup>`, `math` = `$…$`, `comment` = `<!-- … -->`). */
+export type InlineMark = 'strong' | 'em' | 'code' | 'strike' | 'highlight' | 'link' | 'underline' | 'sub' | 'sup' | 'math' | 'comment';
+/** Blocks inserted / toggled by Paragraph menu commands (`linkRef` = `[id]: url` definition, `footnote` = `[^n]` + definition). */
+export type BlockKind =
+  | 'quote' | 'ul' | 'ol' | 'task' | 'code' | 'math' | 'table' | 'hr' | 'toc' | 'front_matter' | 'html' | 'linkRef' | 'footnote';
+
 export type EditorCommand =
   | { kind: 'heading'; level: 0 | 1 | 2 | 3 | 4 | 5 | 6 } // 0 = paragraph
-  | { kind: 'mark'; mark: 'strong' | 'em' | 'code' | 'strike' | 'highlight' | 'link' }
-  | { kind: 'block'; block: 'quote' | 'ul' | 'ol' | 'task' | 'code' | 'math' | 'table' | 'hr' | 'toc' | 'front_matter' }
+  /** +1 = Increase Heading Level (H2 → H1, paragraph → H6), -1 = Decrease (H1 → H2, H6 → paragraph). */
+  | { kind: 'headingLevel'; delta: 1 | -1 }
+  | { kind: 'mark'; mark: InlineMark }
+  | { kind: 'block'; block: BlockKind }
+  /** Insert an empty paragraph before / after the block containing the caret. */
+  | { kind: 'insertParagraph'; where: 'before' | 'after' }
+  /** Task items in the selection: toggle / check / uncheck. */
+  | { kind: 'task'; op: 'toggle' | 'complete' | 'incomplete' }
+  /** Remove inline formatting markers in the selection (whole block when collapsed). */
+  | { kind: 'clearFormat' }
   | { kind: 'insertText'; text: string }
   | { kind: 'insertImage'; src: string; alt?: string }
   | { kind: 'undo' }
@@ -174,8 +188,10 @@ export type MenuAction =
   | 'zoomIn' | 'zoomOut' | 'zoomReset'
   | 'clearRecent' | 'commandPalette' | 'showOutline' | 'showFiles' | 'revealActiveFile' | 'reloadFromDisk' | 'toggleLineEnding'
   | `heading:${0 | 1 | 2 | 3 | 4 | 5 | 6}`
-  | `mark:${'strong' | 'em' | 'code' | 'strike' | 'highlight' | 'link'}`
-  | `block:${'quote' | 'ul' | 'ol' | 'task' | 'code' | 'math' | 'table' | 'hr' | 'toc'}`
+  | `mark:${InlineMark}`
+  | `block:${BlockKind}`
+  | 'para:headingUp' | 'para:headingDown' | 'para:insertBefore' | 'para:insertAfter'
+  | 'task:toggle' | 'task:complete' | 'task:incomplete' | 'clearFormat'
   | `theme:${string}`
   | 'preferences';
 

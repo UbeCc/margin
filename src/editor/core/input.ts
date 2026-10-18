@@ -10,6 +10,8 @@ import { leafContent } from './model';
 import * as E from './edit';
 import { onCopy, onPaste, onDrop } from './clipboard';
 import { undo, redo } from './commands';
+import { footnoteDef, footnoteRef } from './para-cmds';
+import { parseInline, inlinePlain } from './parser/inline';
 import { splitBlockMeta } from './render-inline';
 import type { Leaf } from './types';
 
@@ -273,6 +275,24 @@ export function attachInput(ed: EditorCore): () => void {
       });
       return;
     }
+    // footnotes: Cmd/Ctrl+click a reference jumps to its definition, its label jumps back
+    const fn = t.closest?.('.md-fnref') as HTMLElement | null;
+    if (fn && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      const d = footnoteDef(ed.doc, (fn.dataset.href ?? '').slice(4));
+      if (d) ed.setSel({ pos: ed.doc.docPos(d.i, d.off) });
+      return;
+    }
+    if ((e.metaKey || e.ctrlKey) && t.classList?.contains('md-bmeta')) {
+      const b = ed.view.blockOf(t);
+      const l = b && ed.doc.get(b.id);
+      if (l?.type === 'footnote') {
+        e.preventDefault();
+        const r = footnoteRef(ed.doc, t.textContent!.trim().slice(2, -2));
+        if (r) ed.setSel({ pos: ed.doc.docPos(r.i, r.off) });
+        return;
+      }
+    }
     const link = t.closest?.('.md-link') as HTMLElement | null;
     if (link && (e.metaKey || e.ctrlKey) && link.dataset.href !== undefined) {
       e.preventDefault();
@@ -287,6 +307,16 @@ export function attachInput(ed: EditorCore): () => void {
         else ed.setSel({ pos: ed.doc.text().length });
       }
     }
+  };
+
+  /** Footnote hover preview: the reference's tooltip shows its definition text. */
+  const onMouseOver = (e: MouseEvent) => {
+    const fn = (e.target as HTMLElement).closest?.('.md-fnref') as HTMLElement | null;
+    if (!fn) return;
+    const label = (fn.dataset.href ?? '').slice(4);
+    const d = footnoteDef(ed.doc, label);
+    fn.title = d ? inlinePlain(parseInline(d.text, ed.doc.refs())).trim() || '(empty footnote)' : `Footnote [^${label}] is not defined`;
+    fn.classList.toggle('md-fn-missing', !d);
   };
 
   const onSelChange = () => {
@@ -315,6 +345,7 @@ export function attachInput(ed: EditorCore): () => void {
     [root, 'keydown', onKeyDownCapture as EventListener, true],
     [root, 'mousedown', onMouseDown as EventListener],
     [root, 'click', onClick as EventListener],
+    [root, 'mouseover', onMouseOver as EventListener],
     [root, 'copy', ((e: ClipboardEvent) => !inWidget(e.target) && onCopy(ed, e, false)) as EventListener],
     [root, 'cut', ((e: ClipboardEvent) => !inWidget(e.target) && onCopy(ed, e, true)) as EventListener],
     [root, 'paste', ((e: ClipboardEvent) => !inWidget(e.target) && onPaste(ed, e)) as EventListener],
