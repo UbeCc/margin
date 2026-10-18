@@ -127,27 +127,24 @@ impl QuickOpen {
         let fuzzy = query.chars().any(|c| !c.is_whitespace());
         let race = fuzzy && self.is_stale(root, watched) && self.wants_spotlight(root);
         if let Some(rx) = race.then(|| spotlight_spawn(root, query)).flatten() {
-            {
-                // Race Spotlight against a background re-walk; take whichever
-                // answers first. Never slower than walking, faster on huge or
-                // cold trees.
-                self.refresh_in_background(root);
-                loop {
-                    match rx.recv_timeout(Duration::from_millis(5)) {
-                        Ok(Some(hits)) => {
-                            let cached = self.indexes.lock().unwrap().get(root).map(|ix| ix.files.clone());
-                            return rank(&merge(&cached.unwrap_or_default(), hits), query, limit)
-                                .into_iter()
-                                .map(|rel| root.join(rel).to_string_lossy().into_owned())
-                                .collect();
-                        }
-                        Err(mpsc::RecvTimeoutError::Timeout) if self.walking(root) => {}
-                        _ => break, // Spotlight declined/failed, or the walk finished first
+            // Race Spotlight against a background re-walk; take whichever
+            // answers first (only for roots whose walks are slow).
+            self.refresh_in_background(root);
+            loop {
+                match rx.recv_timeout(Duration::from_millis(5)) {
+                    Ok(Some(hits)) => {
+                        let cached = self.indexes.lock().unwrap().get(root).map(|ix| ix.files.clone());
+                        return rank(&merge(&cached.unwrap_or_default(), hits), query, limit)
+                            .into_iter()
+                            .map(|rel| root.join(rel).to_string_lossy().into_owned())
+                            .collect();
                     }
+                    Err(mpsc::RecvTimeoutError::Timeout) if self.walking(root) => {}
+                    _ => break, // Spotlight declined/failed, or the walk finished first
                 }
-                while self.walking(root) {
-                    std::thread::sleep(Duration::from_millis(5));
-                }
+            }
+            while self.walking(root) {
+                std::thread::sleep(Duration::from_millis(5));
             }
         }
         let mut map = self.indexes.lock().unwrap();
