@@ -2,11 +2,11 @@
  "generated_from": {
   "spec": "typora-re/parity-spec.md",
   "prose": "typora-re/sections/*.md",
-  "margin_head": "4b27764af8b90c7f642aa9cf7fe567ab681da021"
+  "margin_head": "536e4f53d963e94c1a8f796b197d72d36b70bb70"
  },
  "summary": {
-  "head": "4b27764af8b90c7f642aa9cf7fe567ab681da021",
-  "artifact_sha256": "c3025c7acba4b0c08fdc461fc3f17cc210f18ccb1711d44ab0b2b73d54e0b36f",
+  "head": "536e4f53d963e94c1a8f796b197d72d36b70bb70",
+  "artifact_sha256": "f063f0a858c8c8368a65fa0481d797fbb44b6356f93aed657e0d7614a8063a6f",
   "inventory": {
    "total": 172,
    "owned": 145,
@@ -16,8 +16,8 @@
    "verified_by_test": 132
   },
   "ledger": {
-   "ledger_id": "rol_b53a85d8633d2df3539b45ed910480e1fc50b8309193c619dda80e2753bdff0a",
-   "closure_digest": "d7770d97eefb9a99fb74de35e0a5a68d9f5dd6aad84d6bebb25071e1f933df8c",
+   "ledger_id": "rol_5d031fe1d91746066380cb520b0594bf4bf5302baa712251f3e4b0c69c99eb05",
+   "closure_digest": "d5259de8bb1abe081e8942ee0303eae55fb923f3799c5727a5956d2637bb1ff5",
    "status": "unknown",
    "summary": {
     "total": 177,
@@ -119,7 +119,7 @@
      }
     ]
    },
-   "evidence_id": "ev_b6ecd56c03038cf8d8d3b8e6d2b6fdd96616cfe3596cb0f0dd9f665775dfe458"
+   "evidence_id": "ev_febfee4ebed07a200306b448a790a4f2616e721d38b48b64d978719af263098d"
   },
   "coverage": {
    "status": "unknown",
@@ -3163,7 +3163,7 @@
    "owner": {
     "path": "src-tauri/src/commands.rs",
     "anchor": "set_theme_menu",
-    "sha256": "142e87c9cb8c10d7ac460a6298ca1500dcc1291adb568939dc7c8ba110e05a83"
+    "sha256": "3d242e50b622d22e1ef55a6a066314c70ede19a5b86c62a3caf4d10df0f6979a"
    },
    "verifier": null,
    "spec": {
@@ -5176,7 +5176,7 @@
    "owner": {
     "path": "src/app/sidebar/filetree.ts",
     "anchor": "'New File…'",
-    "sha256": "90dcfd7b4785d50da3d5c72435990ca145be3222595506a50bf3c82e34f18777"
+    "sha256": "0b44566df99eb1a0b991ef38c9838f879b6004a11cd4e582260ef68d706b0a15"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -5237,7 +5237,7 @@
    "owner": {
     "path": "src/app/sidebar/filelist.ts",
     "anchor": "export class FileList",
-    "sha256": "204066d3194206c15e87bee2855599e11ad7233a97433ae70f6013591e54a701"
+    "sha256": "1830ba51250f4ca3e0db006c56dab594f8429caaef83acc1a21ebe3563735511"
    },
    "verifier": {
     "file": "tests/e2e/parity-sidebar.spec.ts",
@@ -5456,7 +5456,7 @@
    "owner": {
     "path": "src/app/sidebar/drag.ts",
     "anchor": "export function dropMarkdown",
-    "sha256": "ed280d2af33458d82b7ed63fc8d05652c87901c59c788c230447ae8525f0a958"
+    "sha256": "fa335e1534f6c86b587adc05084b97dcc83674acbd966bae80fa6a9a2547bd88"
    },
    "verifier": {
     "file": "tests/e2e/parity-sidebar.spec.ts",
@@ -5471,7 +5471,7 @@
     ],
     "prose": []
    },
-   "note": "#23",
+   "note": "#23 #129; native drag-out via Platform.startFileDrag (start_drag_macos/linux/windows.rs)",
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -5589,7 +5589,7 @@
      "export-print §4.2"
     ]
    },
-   "note": "macOS native; #14 for Windows/Linux",
+   "note": "native on all platforms: pdf_macos.rs (WKWebView), pdf_windows.rs (WebView2 PrintToPdf), pdf_linux.rs (WebKitPrintOperation); #14",
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6662,7 +6662,7 @@
    "owner": {
     "path": "src-tauri/src/lib.rs",
     "anchor": "on_second_instance",
-    "sha256": "40e3fe0359c164f0b637c4f8ba65055c397b75689b805cce025127371b7a2071"
+    "sha256": "d93d8a5f9bb5f3a16b2a8d86e940d12b9d6961b0e160e4a9084128d0d968edd3"
    },
    "verifier": {
     "file": "tests/e2e/parity-files.spec.ts",
@@ -6713,7 +6713,7 @@
      "files-windows-settings §2.1"
     ]
    },
-   "note": "#23; macOS native paths via src-tauri/src/drop_macos.rs; Linux/Windows drops not intercepted yet",
+   "note": "#23 #129; native paths on all platforms (src-tauri/src/drop_macos.rs, drop_linux.rs, drop_windows.rs); source mode inserts at the drop point (source-mode.ts insertAt)",
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6806,7 +6806,7 @@
    "owner": {
     "path": "src-tauri/src/commands.rs",
     "anchor": "allow_asset_dir",
-    "sha256": "142e87c9cb8c10d7ac460a6298ca1500dcc1291adb568939dc7c8ba110e05a83"
+    "sha256": "3d242e50b622d22e1ef55a6a066314c70ede19a5b86c62a3caf4d10df0f6979a"
    },
    "verifier": null,
    "spec": {

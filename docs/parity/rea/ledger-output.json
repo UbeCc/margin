@@ -1,5 +1,5 @@
 {
- "evidence_id": "ev_b6ecd56c03038cf8d8d3b8e6d2b6fdd96616cfe3596cb0f0dd9f665775dfe458",
+ "evidence_id": "ev_febfee4ebed07a200306b448a790a4f2616e721d38b48b64d978719af263098d",
  "subject": null,
  "provider": {
   "id": "rea-javascript-application-workflows",
@@ -10,14 +10,14 @@
  "predicate_type": "rea.reconstruction-obligation-ledger",
  "operation": "build_reconstruction_obligation_ledger",
  "parameters": {
-  "ledger_id": "rol_b53a85d8633d2df3539b45ed910480e1fc50b8309193c619dda80e2753bdff0a",
-  "closure_digest": "d7770d97eefb9a99fb74de35e0a5a68d9f5dd6aad84d6bebb25071e1f933df8c"
+  "ledger_id": "rol_5d031fe1d91746066380cb520b0594bf4bf5302baa712251f3e4b0c69c99eb05",
+  "closure_digest": "d5259de8bb1abe081e8942ee0303eae55fb923f3799c5727a5956d2637bb1ff5"
  },
  "raw_result": null,
  "normalized_result": {
   "schema": "ReconstructionObligationLedger",
-  "ledger_id": "rol_b53a85d8633d2df3539b45ed910480e1fc50b8309193c619dda80e2753bdff0a",
-  "closure_digest": "d7770d97eefb9a99fb74de35e0a5a68d9f5dd6aad84d6bebb25071e1f933df8c",
+  "ledger_id": "rol_5d031fe1d91746066380cb520b0594bf4bf5302baa712251f3e4b0c69c99eb05",
+  "closure_digest": "d5259de8bb1abe081e8942ee0303eae55fb923f3799c5727a5956d2637bb1ff5",
   "status": "unknown",
   "coverage": {
    "status": "complete"
@@ -2848,7 +2848,7 @@
      "owner": {
       "module_path": "src-tauri/src/commands.rs",
       "symbol": "allow_asset_dir",
-      "owner_sha256": "142e87c9cb8c10d7ac460a6298ca1500dcc1291adb568939dc7c8ba110e05a83"
+      "owner_sha256": "3d242e50b622d22e1ef55a6a066314c70ede19a5b86c62a3caf4d10df0f6979a"
      },
      "parser_type": null,
      "original_cases": [
@@ -3401,7 +3401,7 @@
      "owner": {
       "module_path": "src-tauri/src/lib.rs",
       "symbol": "on_second_instance",
-      "owner_sha256": "40e3fe0359c164f0b637c4f8ba65055c397b75689b805cce025127371b7a2071"
+      "owner_sha256": "d93d8a5f9bb5f3a16b2a8d86e940d12b9d6961b0e160e4a9084128d0d968edd3"
      },
      "parser_type": null,
      "original_cases": [
@@ -12776,7 +12776,7 @@
      "owner": {
       "module_path": "src-tauri/src/commands.rs",
       "symbol": "set_theme_menu",
-      "owner_sha256": "142e87c9cb8c10d7ac460a6298ca1500dcc1291adb568939dc7c8ba110e05a83"
+      "owner_sha256": "3d242e50b622d22e1ef55a6a066314c70ede19a5b86c62a3caf4d10df0f6979a"
      },
      "parser_type": null,
      "original_cases": [
@@ -15370,7 +15370,7 @@
      "owner": {
       "module_path": "src/app/sidebar/drag.ts",
       "symbol": "export function dropMarkdown",
-      "owner_sha256": "ed280d2af33458d82b7ed63fc8d05652c87901c59c788c230447ae8525f0a958"
+      "owner_sha256": "fa335e1534f6c86b587adc05084b97dcc83674acbd966bae80fa6a9a2547bd88"
      },
      "parser_type": null,
      "original_cases": [
@@ -15474,7 +15474,7 @@
      "owner": {
       "module_path": "src/app/sidebar/filelist.ts",
       "symbol": "export class FileList",
-      "owner_sha256": "204066d3194206c15e87bee2855599e11ad7233a97433ae70f6013591e54a701"
+      "owner_sha256": "1830ba51250f4ca3e0db006c56dab594f8429caaef83acc1a21ebe3563735511"
      },
      "parser_type": null,
      "original_cases": [
@@ -15994,7 +15994,7 @@
      "owner": {
       "module_path": "src/app/sidebar/filetree.ts",
       "symbol": "'New File…'",
-      "owner_sha256": "90dcfd7b4785d50da3d5c72435990ca145be3222595506a50bf3c82e34f18777"
+      "owner_sha256": "0b44566df99eb1a0b991ef38c9838f879b6004a11cd4e582260ef68d706b0a15"
      },
      "parser_type": null,
      "original_cases": [
