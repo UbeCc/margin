@@ -224,6 +224,11 @@ export class TauriPlatform implements Platform {
     return call('reveal_path', { path });
   }
 
+  /** Quick Look a file (`window.previewFile` → QLPreviewPanel, #131). */
+  quickLook(path: string): Promise<void> {
+    return call('quick_look_file', { path });
+  }
+
   /** #80: custom command (argv, no shell) or PicGo on 127.0.0.1; one URL per path. */
   uploadImages(paths: string[], config: UploadConfig): Promise<string[]> {
     return call('upload_images', { paths, config });

@@ -24,6 +24,10 @@ export interface FileTreeHost {
   extraActions?(): (HTMLElement | null)[];
   /** Refresh button outside tree mode (list / search). */
   refreshMode?(): void;
+  /** True while the sidebar drag-move confirmation is enabled (#131). */
+  moveConfirm?(): boolean;
+  /** User ticked "Do not ask again" on the move confirmation (#131). */
+  onMoveConfirmSuppressed?(): void;
 }
 
 interface DirNode {
@@ -50,8 +54,9 @@ export class FileTree {
   private rows = new Map<string, HTMLElement>();
   private active: string | null = null;
   private order: SortOrder = DEFAULT_SORT;
-  private groupFolders = true;
   mode: FilesMode = 'tree';
+  private undoOp: { label: string; undo: () => Promise<void> } | null = null;
+  private groupFolders = true;
 
   constructor(private host: FileTreeHost) {
     this.header = h('div.tree-header');
@@ -391,6 +396,24 @@ export class FileTree {
     }
     this.relocated(entry.path, to);
     await this.refreshDir(dirname(entry.path));
+    // "Undo Rename %@" (fe-sidebar §6).
+    const from = to;
+    const back = entry.path;
+    const label = `Rename ${name}`;
+    this.undoOp = {
+      label,
+      undo: async () => {
+        if (await this.host.platform.stat(back)) return; // don't clobber a recreated original
+        try {
+          await rename.call(this.host.platform, from, back);
+        } catch (e) {
+          this.host.notify(`Couldn't undo rename: ${errMsg(e)}`, 'error');
+          return;
+        }
+        this.relocated(from, back);
+        await this.refreshDir(dirname(back));
+      },
+    };
   }
 
   /** Bookkeeping after `from` became `to` (keeps expansion state of moved folders). */
@@ -411,7 +434,10 @@ export class FileTree {
   async move(src: string, destDir: string): Promise<boolean> {
     const rename = extras(this.host.platform).rename;
     if (!rename || !canMoveInto(src, destDir)) return false;
+    // Typora asks "Are you sure you want to move %@?" first (suppressible).
+    if (!(await this.confirmMove(basename(src)))) return false;
     let to = join(destDir, basename(src));
+    let keptName: string | null = null;
     if (await this.host.platform.stat(to)) {
       const choice = await ask({
         title: 'File/directory already exists at target path.',
@@ -423,9 +449,10 @@ export class FileTree {
         ],
         cancelId: 'cancel',
       });
-      if (choice === 'cancel') return false;
-      if (choice === 'keep') {
+      if (choice.id === 'cancel') return false;
+      if (choice.id === 'keep') {
         while (await this.host.platform.stat(to)) to = join(destDir, copyName(basename(to)));
+        keptName = basename(to);
       } else {
         const remove = extras(this.host.platform).remove;
         if (!remove) return false;
@@ -447,7 +474,44 @@ export class FileTree {
     await this.refreshDir(dirname(src));
     await this.toggle(destDir, true);
     await this.refreshDir(destDir);
+    // "Undo Move %@" — reverse the rename (a Keep Both move also gets its
+    // original name back; a Replace can't resurrect the replaced file).
+    const from = to;
+    const back = src;
+    const label = `Move ${keptName ?? basename(src)}`;
+    this.undoOp = {
+      label,
+      undo: async () => {
+        let dest = back;
+        if (await this.host.platform.stat(dest)) dest = join(dirname(back), copyName(basename(back)));
+        try {
+          await rename.call(this.host.platform, from, dest);
+        } catch (e) {
+          this.host.notify(`Couldn't undo move: ${errMsg(e)}`, 'error');
+          return;
+        }
+        this.relocated(from, dest);
+        await this.refreshDir(dirname(from));
+        await this.refreshDir(dirname(dest));
+      },
+    };
     return true;
+  }
+
+  /** Suppressible "Are you sure you want to move %@?" (fe-sidebar §5). */
+  private async confirmMove(name: string): Promise<boolean> {
+    if (!this.host.moveConfirm?.()) return true;
+    const r = await ask({
+      title: `Are you sure you want to move ${name}?`,
+      buttons: [
+        { id: 'cancel', label: 'Cancel' },
+        { id: 'move', label: 'Move', primary: true },
+      ],
+      cancelId: 'cancel',
+      checkbox: { label: 'Do not ask again' },
+    });
+    if (r.checked) this.host.onMoveConfirmSuppressed?.();
+    return r.id === 'move';
   }
 
   private dropTarget(el: HTMLElement, dir: string): void {
@@ -509,6 +573,8 @@ export class FileTree {
       const md = isMarkdownPath(entry.name);
       if (md && this.host.openInNewTab) items.push({ label: 'Open in New Tab', run: () => this.host.openInNewTab!(entry.path) });
       if (md && this.host.openInNewWindow) items.push({ label: 'Open in New Window', run: () => this.host.openInNewWindow!(entry.path) });
+      // Quick Look (window.previewFile → QLPreviewPanel, #131).
+      items.push({ label: 'Quick Look', run: () => void p.quickLook?.(entry.path), disabled: !p.quickLook });
       items.push({ separator: true });
     }
     items.push(
@@ -528,7 +594,26 @@ export class FileTree {
       { label: 'Reveal in Finder', run: () => void p.revealInFolder?.(entry?.path ?? this.root!), disabled: !p.revealInFolder },
       { label: 'Refresh', run: () => void (entry?.isDir ? this.refreshDir(entry.path) : this.refreshAll()) },
     );
+    // "Undo %@" sits before the first separator, followed by its own (fe-sidebar §6).
+    const lead = this.leadingMenuItems();
+    if (lead.length) {
+      const i = items.findIndex((it) => 'separator' in it);
+      items.splice(i < 0 ? items.length : i, 0, ...lead);
+    }
     showContextMenu(x, y, items);
+  }
+
+  /** The "Undo %@" entry (+ its separator) for tree and Articles menus (#131). */
+  leadingMenuItems(): MenuItem[] {
+    const op = this.undoOp;
+    if (!op) return [];
+    return [{ label: `Undo ${op.label}`, run: () => void this.runUndo() }, { separator: true }];
+  }
+
+  private async runUndo(): Promise<void> {
+    const op = this.undoOp;
+    this.undoOp = null;
+    await op?.undo();
   }
 
   // ------------------------------------------------------- keyboard
@@ -560,6 +645,9 @@ export class FileTree {
         break;
       case 'Enter':
         cur?.click();
+        break;
+      case ' ': // Finder-style Quick Look on the focused row (#131).
+        if (path && !isDir) void extras(this.host.platform).quickLook?.(path);
         break;
       default:
         return;
