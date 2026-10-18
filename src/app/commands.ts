@@ -11,6 +11,7 @@ export type AppCommand =
   | 'reloadFromDisk'
   | 'openThemesFolder'
   | 'toggleLineEnding'
+  | 'toggleFinalNewline'
   | 'uploadAllImages';
 
 export type CommandId = MenuAction | AppCommand;
@@ -130,6 +131,7 @@ export const COMMANDS: CommandSpec[] = [
   { id: 'clearRecent', label: 'Clear Recent Files', category: 'File' },
   { id: 'zoomReset', label: 'Actual Size', category: 'View', keys: ['Mod+Shift+0'] },
   { id: 'toggleLineEnding', label: 'Toggle Line Endings (LF / CRLF)', category: 'View' },
+  { id: 'toggleFinalNewline', label: 'Insert Final New Line On Save', category: 'Edit' },
   { id: 'openThemesFolder', label: 'Open Themes Folder', category: 'Theme' },
   { id: 'uploadAllImages', label: 'Upload All Local Images', category: 'Format' },
 ];

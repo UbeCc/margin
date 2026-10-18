@@ -74,7 +74,8 @@ export function attachInput(ed: EditorCore): () => void {
   /** Editor › Auto Pair (#100): insert the closing bracket/quote/marker, or step over an existing one. */
   const autoPair = (pos: number, ch: string, key: string): boolean => {
     const o = ed.md();
-    const md = o.autoPairMarkdown && MD_PAIRS.includes(ch);
+    // Markdown pairing only works together with bracket pairing (Typora disables the box otherwise).
+    const md = o.autoPairBrackets && o.autoPairMarkdown && MD_PAIRS.includes(ch);
     if (!o.autoPairBrackets && !md) return false;
     const loc = ed.doc.locate(pos);
     const l = ed.doc.leaves[loc.i];
@@ -82,7 +83,7 @@ export function attachInput(ed: EditorCore): () => void {
     const c = leafContent(l);
     const prev = c[loc.off - 1] ?? '';
     const next = c[loc.off] ?? '';
-    const close = o.autoPairBrackets ? BRACKETS[ch] : md ? ch : undefined;
+    const close = md ? ch : o.autoPairBrackets ? BRACKETS[ch] : undefined;
     let k = loc.off;
     while (k > 0 && c[k - 1] === ch) k--;
     const emptyPair = prev === ch && !/[\p{L}\p{N}]/u.test(c[k - 1] ?? '');

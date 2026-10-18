@@ -134,7 +134,7 @@ export function parseInline(s: string, refs: RefMap = new Map()): INode[] {
     const c = s[i];
     const rest = s.slice(i);
     if (c === '\\') {
-      if (s[i + 1] === '\n' && OPT.backslashBreak) { put({ k: 'br', v: '\\' }); buf += '\n'; i += 2; continue; }
+      if (s[i + 1] === '\n') { put({ k: 'br', v: '\\' }); buf += '\n'; i += 2; continue; }
       if (i + 1 < s.length && ASCII_PUNCT.test(s[i + 1])) { put(meta('\\')); buf += s[i + 1]; i += 2; continue; }
     } else if (c === '`') {
       const run = /^`+/.exec(rest)![0];

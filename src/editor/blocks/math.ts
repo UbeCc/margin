@@ -60,6 +60,15 @@ export function autoNumbered(body: string, mode: 'all' | 'ams' | 'none'): boolea
   return mode === 'all' || (mode === 'ams' && AMS_ENV.test(body));
 }
 
+/**
+ * "Apply Line Break at \\ and \newline" off: top-level line breaks in a display equation are
+ * ignored (rendered as a space); breaks inside environments (aligned, cases, …) are kept.
+ */
+export function withoutLineBreaks(tex: string): string {
+  if (/\\begin\{/.test(tex)) return tex;
+  return tex.replace(/\\\\(?:\[[^\]]*\])?|\\newline(?![a-zA-Z])/g, ' ');
+}
+
 const mathPrefs = (s: EditorSettings) => ({ ...DEFAULT_MARKDOWN_OPTIONS, ...s.markdown });
 
 export function renderTex(tex: string, displayMode: boolean, macros: Record<string, string> = sharedMacros): string {
@@ -99,7 +108,7 @@ export function createMathBlockWidget(opts: MathOptions = {}): BlockWidget {
     placeholder: 'Enter a TeX formula',
     debounceMs: 60,
     editorPosition: 'above',
-    settingsKey: (s) => `${mathPrefs(s).mathNumbering}|${mathPrefs(s).mathPhysics}`,
+    settingsKey: (s) => `${mathPrefs(s).mathNumbering}|${mathPrefs(s).mathPhysics}|${mathPrefs(s).mathLineBreaks}`,
     render(preview, p, settings) {
       const m = mathPrefs(settings);
       setMathPhysics(m.mathPhysics);
@@ -107,7 +116,8 @@ export function createMathBlockWidget(opts: MathOptions = {}): BlockWidget {
       registerEquation(preview, p.body, numbered);
       preview.classList.toggle('mb-numbered', numbered);
       const paint = () => {
-        const { html, error } = renderTexSafe(prepareTex(p.body), true, macros);
+        const tex = m.mathLineBreaks ? prepareTex(p.body) : withoutLineBreaks(prepareTex(p.body));
+        const { html, error } = renderTexSafe(tex, true, macros);
         if (error) preview.replaceChildren(h('div', { class: 'mb-math-src' }, p.body), h('div', { class: 'mb-error' }, error));
         else preview.innerHTML = html;
       };

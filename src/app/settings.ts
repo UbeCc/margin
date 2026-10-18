@@ -32,8 +32,6 @@ export interface MarginSettings extends AppSettings {
   language: string;
   /** Files › Default Line Ending for new files. */
   defaultLineEnding: 'auto' | 'lf' | 'crlf';
-  /** Insert a final newline when saving (#102). */
-  insertFinalNewline: boolean;
   /** Remap Unicode punctuation on parse (#102; persisted, see PR notes). */
   remapPunctuation: boolean;
   /** Appearance › Window Style (desktop, applied after restart). */
@@ -51,7 +49,25 @@ export interface MarginSettings extends AppSettings {
 export type OnLaunch = 'newFile' | 'restoreAll' | 'restoreFolders' | 'customFolder';
 export const ON_LAUNCH: readonly OnLaunch[] = ['restoreAll', 'restoreFolders', 'newFile', 'customFolder'];
 
-export const SETTINGS_VERSION = 2;
+export const SETTINGS_VERSION = 3;
+
+/**
+ * Typora's fresh-install Markdown / Editor defaults (typora-re fe-preferences §2, §5, §7):
+ * inline math / sub / sup / highlight off, strict mode on, display-source-on-focus off,
+ * no automatic equation numbering. Emoji shortcodes are always on in Typora.
+ * Installs that predate #102 keep `DEFAULT_MARKDOWN_OPTIONS` (what Margin rendered before).
+ */
+export const TYPORA_MARKDOWN_DEFAULTS: Readonly<MarkdownOptions> = Object.freeze({
+  ...DEFAULT_MARKDOWN_OPTIONS,
+  highlight: false,
+  inlineMath: false,
+  subscript: false,
+  superscript: false,
+  emoji: true,
+  strict: true,
+  expandSimpleBlock: false,
+  mathNumbering: 'none',
+});
 
 export const DEFAULT_SETTINGS: Readonly<MarginSettings> = Object.freeze({
   settingsVersion: SETTINGS_VERSION,
@@ -80,14 +96,13 @@ export const DEFAULT_SETTINGS: Readonly<MarginSettings> = Object.freeze({
   quitOnLastWindowClose: false,
   language: 'auto',
   defaultLineEnding: 'auto',
-  insertFinalNewline: false,
   remapPunctuation: false,
   windowStyle: 'seamless',
   textColumnWidth: 0,
   showOutlineByDefault: false,
   collapsibleOutline: false,
   keyBinding: {},
-  markdown: { ...DEFAULT_MARKDOWN_OPTIONS },
+  markdown: { ...TYPORA_MARKDOWN_DEFAULTS },
 });
 
 export const MAX_RECENT = 15;
@@ -174,14 +189,14 @@ export function migrateSettings(input: unknown): MarginSettings {
     quitOnLastWindowClose: bool(raw.quitOnLastWindowClose, d.quitOnLastWindowClose),
     language: str(raw.language, d.language),
     defaultLineEnding: oneOf(raw.defaultLineEnding, ['auto', 'lf', 'crlf'] as const, d.defaultLineEnding),
-    insertFinalNewline: bool(raw.insertFinalNewline, d.insertFinalNewline),
     remapPunctuation: bool(raw.remapPunctuation, d.remapPunctuation),
     windowStyle: oneOf(raw.windowStyle, ['seamless', 'unibody', 'native'] as const, d.windowStyle),
     textColumnWidth: columnWidth(raw.textColumnWidth),
     showOutlineByDefault: bool(raw.showOutlineByDefault, d.showOutlineByDefault),
     collapsibleOutline: bool(raw.collapsibleOutline, d.collapsibleOutline),
     keyBinding: keyBinding(raw.keyBinding),
-    markdown: migrateMarkdown(raw.markdown),
+    // An existing (pre-#102) install has a settingsVersion but no markdown block: keep its rendering.
+    markdown: migrateMarkdown(raw.markdown, raw.markdown === undefined && typeof input === 'object' && input !== null && 'settingsVersion' in input ? DEFAULT_MARKDOWN_OPTIONS : TYPORA_MARKDOWN_DEFAULTS),
   };
 }
 
@@ -217,16 +232,15 @@ function keyBinding(v: unknown): Record<string, string> {
 }
 
 /** Validate the nested Markdown options; unknown / malformed fields fall back to defaults. */
-export function migrateMarkdown(v: unknown): MarkdownOptions {
+export function migrateMarkdown(v: unknown, d: Readonly<MarkdownOptions> = TYPORA_MARKDOWN_DEFAULTS): MarkdownOptions {
   const raw: Raw = isObj(v) ? v : {};
-  const d = DEFAULT_MARKDOWN_OPTIONS;
   const out = { ...d } as MarkdownOptions;
   for (const k of Object.keys(d) as (keyof MarkdownOptions)[]) {
     const dv = d[k];
     if (typeof dv === 'boolean') (out as unknown as Raw)[k] = bool(raw[k], dv);
   }
   out.ulStyle = oneOf(raw.ulStyle, ['-', '*', '+'] as const, d.ulStyle);
-  out.olStyle = oneOf(raw.olStyle, ['.', ')'] as const, d.olStyle);
+  out.olStyle = oneOf(raw.olStyle, ['increment', 'ones'] as const, d.olStyle);
   const ci = Number(raw.codeIndentSize);
   out.codeIndentSize = ci === 0 || ci === 2 || ci === 3 || ci === 4 ? ci : d.codeIndentSize;
   out.mathNumbering = oneOf(raw.mathNumbering, ['all', 'ams', 'none'] as const, d.mathNumbering);

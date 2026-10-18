@@ -27,7 +27,7 @@ export function resetSyntaxOptions(): void {
 
 /** Options that change parse trees (block or inline). */
 export const PARSER_KEYS: ReadonlySet<keyof MarkdownOptions> = new Set<keyof MarkdownOptions>([
-  'highlight', 'subscript', 'superscript', 'inlineMath', 'emoji', 'strict', 'backslashBreak',
+  'highlight', 'subscript', 'superscript', 'inlineMath', 'emoji', 'strict',
 ]);
 
 /** Common GitHub-style emoji shortcodes (rendered only; the `:code:` source stays). */

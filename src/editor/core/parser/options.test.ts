@@ -16,8 +16,8 @@ const CASES = [
 const ALL: Partial<MarkdownOptions>[] = [
   {},
   { subscript: true, superscript: true, emoji: true },
-  { highlight: false, inlineMath: false, backslashBreak: false, strict: false },
-  { subscript: true, superscript: true, emoji: true, highlight: false, inlineMath: false, strict: false, backslashBreak: false },
+  { highlight: false, inlineMath: false, strict: false },
+  { subscript: true, superscript: true, emoji: true, highlight: false, inlineMath: false, strict: false },
 ];
 
 afterEach(() => resetSyntaxOptions());
@@ -51,12 +51,6 @@ describe('syntax options (#102)', () => {
     expect(tags(parseInline(':smile:'))).toEqual([]);
     setSyntaxOptions({ emoji: true });
     expect(tags(parseInline(':smile: :unknown_code:'))).toEqual(['entity:😄']);
-  });
-
-  it('backslash line break is option-gated', () => {
-    expect(tags(parseInline('a\\\nb'))).toEqual(['br']);
-    setSyntaxOptions({ backslashBreak: false });
-    expect(tags(parseInline('a\\\nb'))).toEqual([]);
   });
 
   it('strict mode requires a space after #', () => {

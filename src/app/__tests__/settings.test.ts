@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_SETTINGS, imageRulePresetId, launchPlan, migrateImageRule, migrateSettings, newFileEol, pushRecent, SETTINGS_VERSION } from '../settings';
+import { DEFAULT_SETTINGS, imageRulePresetId, launchPlan, migrateImageRule, TYPORA_MARKDOWN_DEFAULTS, migrateSettings, newFileEol, pushRecent, SETTINGS_VERSION } from '../settings';
 import { DEFAULT_MARKDOWN_OPTIONS } from '../../contracts';
 import { effectiveTheme, isDarkThemeCss } from '../themes';
 // Vitest stubs `?raw` CSS imports to '' — read the theme files directly.
@@ -82,8 +82,14 @@ describe('preferences completeness (#100, #102)', () => {
     const s = migrateSettings({});
     expect(s.onLaunch).toBe('newFile');
     expect(s.defaultLineEnding).toBe('auto');
-    expect(s.markdown).toEqual(DEFAULT_MARKDOWN_OPTIONS);
-    expect(s.keyBinding).toEqual({});
+    expect(s.markdown).toEqual(TYPORA_MARKDOWN_DEFAULTS);
+    expect(s.markdown).toMatchObject({ inlineMath: false, highlight: false, subscript: false, superscript: false, strict: true, emoji: true, expandSimpleBlock: false, mathNumbering: 'none', visibleBr: true, codeLineWrap: true, autoPairBrackets: true, autoPairMarkdown: false });
+  });
+
+  it('an install that predates #102 keeps its rendering (no markdown block yet)', () => {
+    expect(migrateSettings({ settingsVersion: 2, theme: 'paper' }).markdown).toEqual(DEFAULT_MARKDOWN_OPTIONS);
+    expect(migrateSettings({ settingsVersion: 3, markdown: {} }).markdown).toEqual(TYPORA_MARKDOWN_DEFAULTS);
+    expect(migrateSettings({}).keyBinding).toEqual({});
   });
 
   it('migrates restoreLastFolder → onLaunch restoreFolders', () => {
@@ -97,7 +103,7 @@ describe('preferences completeness (#100, #102)', () => {
     const m = migrateSettings({ markdown: { emoji: true, ulStyle: '*', olStyle: 'x', codeIndentSize: 7, mathNumbering: 'all', strict: 'nope' } }).markdown;
     expect(m.emoji).toBe(true);
     expect(m.ulStyle).toBe('*');
-    expect(m.olStyle).toBe('.');
+    expect(m.olStyle).toBe('increment');
     expect(m.codeIndentSize).toBe(4);
     expect(m.mathNumbering).toBe('all');
     expect(m.strict).toBe(true);

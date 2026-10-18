@@ -23,7 +23,7 @@ test('tools.code.line-numbers: Code fences: line numbers, line wrap, indent size
   const fence = page.locator('.mb-code').first();
   await expect(fence.locator('.mb-line-numbers')).toHaveCount(0);
   await expect(fence).toHaveClass(/mb-wrap/); // Auto wrap long lines: on by default
-  const ed = await pane(page, 'editor');
+  const ed = await pane(page, 'markdown');
   await ed.locator('[data-pref="markdown.codeLineNumbers"]').check();
   await ed.locator('[data-pref="markdown.codeLineWrap"]').uncheck();
   await ed.locator('select[data-pref="markdown.codeIndentSize"]').selectOption('2');
@@ -37,17 +37,23 @@ test('tools.code.line-numbers: Code fences: line numbers, line wrap, indent size
 
 test('pref.general.launch: General: On Launch (restore files/folders, open new file, default folder)', async ({ page }) => {
   const g = await pane(page, 'general');
-  const labels = await g.locator('[data-pref=onLaunch] label').allTextContents();
-  expect(labels.map((l) => l.trim().split('\n')[0])).toEqual([
-    'Restore last closed files and folders',
-    'Restore last closed folders',
+  const sel = g.locator('select[data-pref=onLaunch]');
+  expect(await sel.locator('option').allTextContents()).toEqual([
     'Open new file',
-    'Open custom folderChoose Default Folder',
+    'Restore last closed folders',
+    'Restore last closed files and folders',
+    'Open custom folder',
   ]);
-  await expect(g.locator('input[name=onLaunch][value=newFile]')).toBeChecked(); // Typora default
+  await expect(sel).toHaveValue('newFile'); // Typora default
+  await expect(g.locator('[data-pref-row=defaultFolder]')).toBeHidden();
+  // custom folder without a stored folder asks for one; cancelling keeps the old choice
+  await queueDialog(page, null);
+  await sel.selectOption('customFolder');
+  await expect(sel).toHaveValue('newFile');
+  await expect(g.locator('[data-pref-row=defaultFolder]')).toBeHidden();
   await queueDialog(page, `${ROOT}/Ideas`);
-  await g.getByRole('button', { name: 'Choose Default Folder' }).click();
-  await expect(g.locator('input[name=onLaunch][value=customFolder]')).toBeChecked();
+  await sel.selectOption('customFolder');
+  await expect(g.locator('[data-pref-row=defaultFolder]')).toBeVisible();
   await expect(g.locator('input[data-pref=defaultFolder]')).toHaveValue(`${ROOT}/Ideas`);
   await g.locator('[data-pref=quitOnLastWindowClose]').check();
   await close(page);
@@ -56,7 +62,7 @@ test('pref.general.launch: General: On Launch (restore files/folders, open new f
   // custom folder wins over the demo folder on launch
   await expect.poll(() => page.evaluate(() => (window.__margin as unknown as { folder: string | null }).folder)).toBe(`${ROOT}/Ideas`);
   const g2 = await pane(page, 'general');
-  await expect(g2.locator('input[name=onLaunch][value=customFolder]')).toBeChecked();
+  await expect(g2.locator('select[data-pref=onLaunch]')).toHaveValue('customFolder');
   await expect(g2.locator('[data-pref=quitOnLastWindowClose]')).toBeChecked();
 });
 
@@ -69,24 +75,35 @@ test('pref.editor.general: Editor: auto pair brackets/markdown, display source o
   expect(await editorValue(page)).toBe('# Title\n\ntext (a)\n');
   await page.keyboard.type(" don't *");
   expect(await editorValue(page)).toBe("# Title\n\ntext (a) don't *\n"); // no pair inside words / for markdown by default
-  const ed = await pane(page, 'editor');
-  await ed.locator('[data-pref="markdown.autoPairBrackets"]').uncheck();
-  await ed.locator('[data-pref="markdown.autoPairMarkdown"]').check();
-  await ed.locator('[data-pref="markdown.expandSimpleBlock"]').uncheck();
-  await close(page);
-  await caretAtText(page, "don't *", 7);
-  await page.keyboard.type(' [ _');
-  expect(await editorValue(page)).toBe("# Title\n\ntext (a) don't * [ __\n");
-  // Display source on focus off: the heading marker stays hidden while the caret is in it
+  // Display source on focus is off by default: the heading marker stays hidden while the caret is in it
   await caretAtText(page, 'Title', 2);
   const marker = page.locator('.md-heading .md-bmeta').first();
   await expect(marker).toBeHidden();
+  const ed = await pane(page, 'editor');
+  const mdPair = ed.locator('[data-pref="markdown.autoPairMarkdown"]');
+  await mdPair.check();
+  await ed.locator('[data-pref="markdown.expandSimpleBlock"]').check();
+  await close(page);
+  await caretAtText(page, "don't *", 7);
+  await page.keyboard.type(' _');
+  expect(await editorValue(page)).toBe("# Title\n\ntext (a) don't * __\n");
+  await caretAtText(page, 'Title', 2);
+  await expect(marker).toBeVisible();
+  // Markdown pairing depends on bracket pairing: unchecking brackets disables (and clears) it
+  const ed2 = await pane(page, 'editor');
+  await ed2.locator('[data-pref="markdown.autoPairBrackets"]').uncheck();
+  await expect(ed2.locator('[data-pref="markdown.autoPairMarkdown"]')).toBeDisabled();
+  await expect(ed2.locator('[data-pref="markdown.autoPairMarkdown"]')).not.toBeChecked();
+  await close(page);
+  await caretAtText(page, "* __", 4);
+  await page.keyboard.type(' [');
+  expect(await editorValue(page)).toBe("# Title\n\ntext (a) don't * __ [\n");
 });
 
 test('pref.files.defaults: Files: default line ending, default folder, file extensions', async ({ page }) => {
   const ed = await pane(page, 'editor');
   const opts = await ed.locator('select[data-pref=defaultLineEnding] option').allTextContents();
-  expect(opts[0]).toBe('Auto ( Recommended )');
+  expect(opts).toEqual(['Auto', 'LF (Unix Style)', 'CRLF (Windows Style)']);
   await ed.locator('select[data-pref=defaultLineEnding]').selectOption('crlf');
   await close(page);
   await page.keyboard.press(`${MOD}+n`);
@@ -126,7 +143,7 @@ test('pref.advanced: Advanced settings: open/reset config file, reset dialog war
 test('pref.general.language: General: UI language', async ({ page }) => {
   const g = await pane(page, 'general');
   const sel = g.locator('select[data-pref=language]');
-  expect(await sel.locator('option').allTextContents()).toEqual(['Auto (based on current OS)', 'English']);
+  expect(await sel.locator('option').allTextContents()).toEqual(['System Language', 'English']);
   await sel.selectOption('en');
   await close(page);
   await page.reload();
@@ -136,7 +153,7 @@ test('pref.general.language: General: UI language', async ({ page }) => {
 
 test('pref.appearance.window: Appearance: window style (seamless/unibody/native), text column width, outline panel', async ({ page }) => {
   const a = await pane(page, 'appearance');
-  expect(await a.locator('select[data-pref=windowStyle] option').allTextContents()).toEqual(['Seamless', 'Unibody', 'System Native']);
+  expect(await a.locator('select[data-pref=windowStyle] option').allTextContents()).toEqual(['Seamless', 'Unibody', 'Classic']);
   await a.locator('select[data-pref=windowStyle]').selectOption('unibody');
   await a.locator('input[data-pref=textColumnWidth]').fill('900');
   await a.locator('input[data-pref=textColumnWidth]').blur();
@@ -156,7 +173,7 @@ test('pref.appearance.window: Appearance: window style (seamless/unibody/native)
 });
 
 test('pref.editor.shortcuts: Custom shortcut keys', async ({ page }) => {
-  const ed = await pane(page, 'editor');
+  const ed = await pane(page, 'general');
   const keys = ed.locator('textarea[data-pref=keyBinding]');
   await keys.fill('{ "Toggle Sidebar": "Mod+Shift+K" }');
   await keys.blur();
@@ -166,7 +183,7 @@ test('pref.editor.shortcuts: Custom shortcut keys', async ({ page }) => {
   await page.locator('.md-editor').click();
   await page.keyboard.press(`${MOD}+Shift+K`);
   await expect(page.locator('.app')).toHaveClass(/sidebar-hidden/);
-  const ed2 = await pane(page, 'editor');
+  const ed2 = await pane(page, 'general');
   await ed2.locator('textarea[data-pref=keyBinding]').fill('{ broken');
   await ed2.locator('textarea[data-pref=keyBinding]').blur();
   await expect(ed2.locator('[data-pref-status=keyBinding]')).toContainText('Invalid JSON');

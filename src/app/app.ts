@@ -106,7 +106,6 @@ export class App {
       imageRule: () => this.settings.imageRule,
       willLoad: (p) => this.editor.updateSettings({ baseDir: p ? dirname(p) : null }),
       defaultEol: () => newFileEol(this.settings.defaultLineEnding),
-      finalNewline: () => this.settings.insertFinalNewline,
       onState: (s) => this.onDocState(s),
       onOpened: (p) => this.onOpened(p),
       defaultDir: () => this.folder,
@@ -677,6 +676,10 @@ export class App {
         toast(`Zoom ${Math.round(next * 100)}%`, { timeout: 1200 });
         return true;
       }
+      case 'toggleFinalNewline':
+        this.doc.setFinalNewline(!this.doc.finalNewline);
+        toast(`Insert Final New Line On Save: ${this.doc.finalNewline ? 'on' : 'off'}`, { timeout: 1500 });
+        return true;
       case 'toggleLineEnding':
         this.doc.setEol(this.doc.eol === '\n' ? '\r\n' : '\n');
         return true;

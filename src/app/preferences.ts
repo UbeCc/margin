@@ -96,7 +96,7 @@ export function openPreferences(host: PreferencesHost, initial: Section = 'gener
     row('Font size', h('span.inline', null, fontSize, h('span.unit', { text: 'px' }))),
     row(
       'Window Style',
-      select('windowStyle', [['seamless', 'Seamless'], ['unibody', 'Unibody'], ['native', 'System Native']], s.windowStyle, (v) =>
+      select('windowStyle', [['seamless', 'Seamless'], ['unibody', 'Unibody'], ['native', 'Classic']], s.windowStyle, (v) =>
         set({ windowStyle: v as MarginSettings['windowStyle'] }),
       ),
       '(applied after restart; desktop only)',
