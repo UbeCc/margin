@@ -42,6 +42,8 @@ export type EditorCommand =
   | { kind: 'mark'; mark: 'strong' | 'em' | 'code' | 'strike' | 'highlight' | 'link' }
   | { kind: 'block'; block: 'quote' | 'ul' | 'ol' | 'task' | 'code' | 'math' | 'table' | 'hr' | 'toc' | 'front_matter' }
   | { kind: 'insertText'; text: string }
+  /** Replace the whole document as ONE undoable edit (reload from disk / restore a version). */
+  | { kind: 'replaceDocument'; markdown: string }
   | { kind: 'insertImage'; src: string; alt?: string }
   | { kind: 'undo' }
   | { kind: 'redo' }
@@ -170,6 +172,10 @@ export type MenuAction =
   | 'toggleSidebar' | 'toggleSource' | 'toggleFocus' | 'toggleTypewriter' | 'quickOpen'
   | 'zoomIn' | 'zoomOut' | 'zoomReset'
   | 'clearRecent' | 'commandPalette' | 'showOutline' | 'showFiles' | 'revealActiveFile' | 'reloadFromDisk' | 'toggleLineEnding'
+  // File lifecycle (#94): tabs / windows / file operations on the current document
+  | 'newTab' | 'newWindow' | 'nextTab' | 'prevTab' | 'reopenClosed' | 'saveAll' | 'duplicate'
+  | 'renameFile' | 'moveTo' | 'revealInFinder' | 'copyFilePath' | 'browseVersions' | 'reopenWithEncoding'
+  | 'properties' | 'recoverDrafts'
   | `heading:${0 | 1 | 2 | 3 | 4 | 5 | 6}`
   | `mark:${'strong' | 'em' | 'code' | 'strike' | 'highlight' | 'link'}`
   | `block:${'quote' | 'ul' | 'ol' | 'task' | 'code' | 'math' | 'table' | 'hr' | 'toc'}`
