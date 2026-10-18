@@ -434,6 +434,18 @@ button { cursor: default; }
 .pref-block { padding: 12px 0; }
 .pref-actions { padding-top: 14px; display: flex; gap: 8px; }
 .pref-note { font-size: 11.5px; color: var(--margin-fg-muted); line-height: 1.5; }
+.pref-subhead { margin: 18px 0 2px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--margin-fg-muted); }
+.pref-subhead:first-child { margin-top: 0; }
+.pref-section[data-section='export'] .text-input { width: 240px; }
+.pref-section[data-section='export'] .css-input { width: 240px; }
+.page-custom { margin-left: 6px; }
+.custom-export { display: flex; flex-direction: column; gap: 6px; padding: 10px 0; border-bottom: 1px solid color-mix(in srgb, var(--margin-border) 60%, transparent); }
+.custom-export .text-input[data-custom='command'] { width: 100%; box-sizing: border-box; font-family: var(--margin-mono, ui-monospace, monospace); font-size: 12px; }
+.custom-export .text-input[data-custom='extension'] { width: 64px; }
+.page-custom .number { width: 64px; }
+.page-size { margin-left: 8px; }
+.dialog-check { display: flex; align-items: center; gap: 8px; margin: -6px 0 16px; font-size: 13px; color: var(--margin-fg-muted); }
+.dialog.page-setup .pref-row { padding: 6px 0; }
 .inline { display: inline-flex; align-items: center; gap: 6px; }
 .unit { color: var(--margin-fg-muted); }
 .radio-group { display: flex; flex-direction: column; gap: 4px; padding: 8px 0; }

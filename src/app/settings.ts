@@ -1,4 +1,5 @@
 import type { AppSettings, ImageRule } from '../contracts';
+import { DEFAULT_EXPORT, migrateExportSettings, type ExportSettings } from './export-settings';
 
 /**
  * App-side settings: the `AppSettings` contract plus shell-only preferences.
@@ -26,6 +27,8 @@ export interface MarginSettings extends AppSettings {
   pinFolder: string | null;
   /** Files open in the main window at its last clean close, for `restoreFilesAndFolders`. */
   lastOpenFiles: string[];
+  /** Export / print settings (#95). */
+  export: ExportSettings;
   /** Pandoc binary (or its folder) for docx/latex/epub export; '' = auto-detect (#81). */
   pandocPath: string;
   /** Save a modified file without asking when switching documents from the sidebar (#94). */
@@ -68,6 +71,7 @@ export const DEFAULT_SETTINGS: Readonly<MarginSettings> = Object.freeze({
   onLaunch: 'restoreFolders' as OnLaunch,
   pinFolder: null,
   lastOpenFiles: [],
+  export: DEFAULT_EXPORT,
   pandocPath: '',
   saveOnSwitch: false,
   largeFileBytes: 2_000_000,
@@ -155,6 +159,7 @@ export function migrateSettings(input: unknown): MarginSettings {
         : 'newFile',
     pinFolder: typeof raw.pinFolder === 'string' && raw.pinFolder ? raw.pinFolder : null,
     lastOpenFiles: strList(raw.lastOpenFiles),
+    export: migrateExportSettings(raw.export),
     pandocPath: typeof raw.pandocPath === 'string' ? raw.pandocPath.trim() : '',
     saveOnSwitch: bool(raw.saveOnSwitch, d.saveOnSwitch),
     largeFileBytes: Math.round(num(raw.largeFileBytes, d.largeFileBytes, 1_000, 1_000_000_000)),

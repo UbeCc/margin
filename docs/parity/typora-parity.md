@@ -9,14 +9,14 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 | | surfaces |
 |---|---|
 | total | 172 |
-| owned (implemented) | 99 (with a named passing test: 86) |
-| partial | 14 |
-| missing | 51 |
+| owned (implemented) | 109 (with a named passing test: 96) |
+| partial | 13 |
+| missing | 42 |
 | out of scope | 8 |
 
-REA ledger `rol_50e09a840ab2489df9feed4a2b7a4485d69803357ffe95e1cb6b07195f70012a` (closure `f911b46e0ee693be…`): status **unknown**; unowned 51, implemented 113, out-of-scope 8, unknown 5.
+REA ledger `rol_bc73f2cdddb1a836b199f052fa03327d6dc82d5d6166f41e33afd3a4647df8b4` (closure `1ffe5c3ea4e4cf93…`): status **unknown**; unowned 42, implemented 122, out-of-scope 8, unknown 5.
 
-REA coverage boundary `margin.typora-parity`: status **unknown**; 86/164 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 51, package-proof-missing 1, verifier-missing 72, verifier-unknown 6.
+REA coverage boundary `margin.typora-parity`: status **unknown**; 96/164 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 42, package-proof-missing 1, verifier-missing 62, verifier-unknown 6.
 
 Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): build exit 0, cargo-test exit 0, independence exit 0, playwright exit 0, vitest exit 0. See `rea/summary.json`.
 
@@ -34,12 +34,12 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 |---|---|---|
 | `core-cmds` Paragraph & Format menu commands (headings, inline styles, insert/convert blocks) | P0 | 0 |
 | `files` File lifecycle: tabs/windows, recent, duplicate/move/rename, encoding, versions, recovery | P0 | 0 |
-| `export` Export, import & print: image/Pandoc/custom formats, export settings, export-with-previous | P0 | 9 |
+| `export` Export, import & print: image/Pandoc/custom formats, export settings, export-with-previous | P0 | 0 |
 | `clipboard` Clipboard & selection: copy-as / paste-as, selection & delete scopes, jump-to | P0 | 2 |
 | `ctx` Editor & sidebar context menus (text, link, table, image, code, math, diagram, outline, files) | P1 | 7 |
 | `tools` Table, code-fence and math tools | P1 | 9 |
 | `images` Image pipeline: insert-local, copy/move/upload, zoom, syntax switch, image root path | P1 | 10 |
-| `prefs` Preferences completeness (General, Editor, Image, Markdown, Export, Appearance panes) | P1 | 8 |
+| `prefs` Preferences completeness (General, Editor, Image, Markdown, Export, Appearance panes) | P1 | 7 |
 | `sidebar` Sidebar & outline: list view, file search, sort, collapsible outline, filter | P1 | 6 |
 | `syntax` Markdown syntax options & whitespace/line-break settings | P2 | 5 |
 | `chrome` Window chrome & writing aids: status bar, always-on-top, spelling, substitutions, speech, emoji | P2 | 9 |
@@ -62,7 +62,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `menu.file.open` | File › Open… (file dialog) | owned |  | `src/app/app.ts` `case 'open'` | `tests/e2e/app-files.spec.ts` › file tree lazily expands folders and opens files | 10 |
 | `menu.file.open-folder` | File › Open Folder… | owned |  | `src/app/app.ts` `case 'openFolder'` | `tests/e2e/app-files.spec.ts` › file tree lazily expands folders and opens files | 10 |
 | `menu.file.quick-open` | File › Open Quickly (fuzzy file finder) | owned |  | `src/app/app.ts` `quickOpen(): void` | `tests/e2e/app-navigation.spec.ts` › quick open fuzzy-finds files with highlights | 8 |
-| `menu.file.recent` | File › Open Recent (files + folders, clear) | owned |  | `src-tauri/src/recent.rs` `No Recent Items` | `src/app/__tests__/settings.test.ts` › dedupes and caps recent lists | 8 |
+| `menu.file.recent` | File › Open Recent (files + folders, clear) | owned |  | `src-tauri/src/recent.rs` `"Clear Items"` | `src/app/__tests__/settings.test.ts` › dedupes and caps recent lists | 8 |
 | `menu.file.reopen-closed` | File › Reopen Closed File | owned |  | `src/app/doctabs.ts` `async reopenClosed()` | `tests/e2e/parity-files.spec.ts` › menu.file.reopen-closed: File › Reopen Closed File | 1 |
 | `menu.file.save` | File › Save (dirty tracking, atomic write) | owned |  | `src/app/app.ts` `case 'save'` | `tests/e2e/app-files.spec.ts` › editing marks dirty, Cmd+S saves to disk | 8 |
 | `menu.file.save-as` | File › Save As… | owned |  | `src/app/app.ts` `case 'saveAs'` | `tests/e2e/app-files.spec.ts` › new untitled document → Save As writes file | 4 |
@@ -74,7 +74,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `menu.file.line-endings` | File › Line Endings (LF / CRLF), preserved on save | owned |  | `src/app/app.ts` `case 'toggleLineEnding'` | `src/app/__tests__/document.test.ts` › toggling EOL marks dirty and toggling back cleans | 3 |
 | `menu.file.properties` | File › Properties / Get Info (word count, size, dates) | owned |  | `src/app/fileops.ts` `async properties()` | `tests/e2e/parity-files.spec.ts` › menu.file.properties: File › Properties / Get Info (word count, size, dates) | 3 |
 | `menu.file.reveal` | File › Reveal in Finder / Open File Location / Copy File Path (current doc) | owned |  | `src/app/fileops.ts` `async copyPath()` | `tests/e2e/parity-files.spec.ts` › menu.file.reveal: File › Reveal in Finder / Open File Location / Copy File Path (current doc) | 8 |
-| `menu.file.page-setup` | File › Page Setup (paper size for print/PDF) | **missing** | P1 | — | none | 1 |
+| `menu.file.page-setup` | File › Page Setup (paper size for print/PDF) | owned |  | `src/app/export-ui.ts` `export function openPageSetup` | `tests/e2e/parity-export.spec.ts` › menu.file.page-setup: File › Page Setup | 1 |
 | `menu.file.print` | File › Print | owned |  | `src/app/app.ts` `case 'print'` | none | 2 |
 | `menu.file.close` | File › Close (asks to save dirty docs) | owned |  | `src/app/app.ts` `case 'close'` | `tests/e2e/app-files.spec.ts` › close request with unsaved changes can be cancelled | 4 |
 | `menu.file.errors` | Open/save error reporting (missing file, open failed, create prompt) | owned |  | `src/app/document.ts` `askCreateMissing` | `tests/e2e/parity-files.spec.ts` › menu.file.errors: Open/save error reporting (missing file, open failed, create prompt) | 17 |
@@ -240,7 +240,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 |---|---|---|---|---|---|---|
 | `pref.storage` | Settings storage: defaults, validation, migration, unknown keys kept | owned |  | `src/app/settings.ts` `DEFAULT_SETTINGS` | `src/app/__tests__/settings.test.ts` › keeps unknown keys for forward compatibility | 5 |
 | `pref.advanced` | Advanced settings: open/reset config file, reset dialog warnings — #63 corrupt settings handling | **missing** | P2 | — | none | 14 |
-| `pref.general.launch` | General: On Launch (restore files/folders, open new file, default folder) — only "Reopen last folder" | **partial** | P1 | `src/app/preferences.ts` `'restoreLastFolder'` | none | 8 |
+| `pref.general.launch` | General: On Launch (restore files/folders, open new file, default folder) — native-commands §2.2; restores the main window tabs (not every window); Quit-after-last-window not applicable | owned |  | `src/app/preferences.ts` `const onLaunchRow` | `tests/e2e/parity-files.spec.ts` › pref.general.launch: General: On Launch (restore files/folders, open new file, default folder) | 8 |
 | `pref.general.save` | General: Auto Save, save-on-switch, recover unsaved drafts | owned |  | `src/app/drafts.ts` `export class DraftStore` | `tests/e2e/parity-files.spec.ts` › pref.general.save: General: Auto Save, save-on-switch, recover unsaved drafts | 9 |
 | `pref.general.language` | General: UI language | **missing** | P2 | — | none | 1 |
 | `pref.appearance.theme` | Appearance: theme, separate dark theme, follow system | owned |  | `src/app/preferences.ts` `'darkTheme'` | `tests/e2e/app-themes.spec.ts` › preferences: Theme lists light themes, Dark theme lists dark ones | 10 |
@@ -267,16 +267,16 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
-| `export.html` | Export › HTML (theme inlined, local images relative) | owned |  | `src/app/app.ts` `private async export(` | `tests/e2e/app-themes.spec.ts` › export HTML inlines the theme | 8 |
-| `export.html-plain` | Export › HTML (without Styles) | **missing** | P1 | — | none | 1 |
+| `export.html` | Export › HTML (theme inlined, local images relative) | owned |  | `src/app/app.ts` `private createExports(` | `tests/e2e/app-themes.spec.ts` › export HTML inlines the theme | 8 |
+| `export.html-plain` | Export › HTML (without Styles) | owned |  | `src/app/export.ts` `export function buildPlainHtml` | `tests/e2e/parity-export.spec.ts` › export.html-plain: Export › HTML (without Styles) | 1 |
 | `export.pdf` | Export › PDF — macOS native; #14 for Windows/Linux | owned |  | `src-tauri/src/pdf_macos.rs` `pub async fn export_pdf` | none | 2 |
-| `export.pdf-options` | PDF options: paper size/margins, header/footer, page breaks, bookmarks, internal links — #15 | **missing** | P0 | — | none | 14 |
-| `export.image` | Export › Image (PNG/JPEG of the whole document) | **missing** | P1 | — | none | 8 |
-| `export.pandoc` | Export via Pandoc: docx/odt/rtf/epub/latex/mediawiki/rst/textile/opml — #81; feed pandoc JSON/native AST from the editor model, argv only | **missing** | P1 | — | none | 32 |
-| `export.custom` | Custom export commands and "run command after export" | **missing** | P2 | — | none | 18 |
-| `export.settings` | Export settings pane: per-format options, theme, default folder, after-export action, YAML overrides | **missing** | P0 | — | none | 23 |
-| `export.previous` | Export with Previous / Export and Overwrite with Previous | **missing** | P0 | — | none | 8 |
-| `export.import` | File › Import (docx/html/… via Pandoc) | **missing** | P2 | — | none | 8 |
+| `export.pdf-options` | PDF options: paper size/margins, header/footer, page breaks, bookmarks, internal links — #15 | owned |  | `src-tauri/src/pdf_post_macos.rs` `pub fn post_process` | `tests/e2e/parity-export.spec.ts` › export.pdf-options: PDF options | 14 |
+| `export.image` | Export › Image (PNG/JPEG of the whole document) | owned |  | `src/app/export-image.ts` `export async function rasterizeHtml` | `tests/e2e/parity-export.spec.ts` › export.image: Export › Image | 8 |
+| `export.pandoc` | Export via Pandoc: docx/odt/rtf/epub/latex/mediawiki/rst/textile/opml — #81; feed pandoc JSON/native AST from the editor model, argv only | owned |  | `src/app/export-pandoc.ts` `export async function exportWithPandoc` | `tests/e2e/parity-export.spec.ts` › export.pandoc: Export via Pandoc | 32 |
+| `export.custom` | Custom export commands and "run command after export" | owned |  | `src-tauri/src/export_custom.rs` `pub fn run_command` | `tests/e2e/parity-export.spec.ts` › export.custom: Custom export commands | 18 |
+| `export.settings` | Export settings pane: per-format options, theme, default folder, after-export action, YAML overrides | owned |  | `src/app/preferences-export.ts` `export function exportPrefsSection` | `tests/e2e/parity-export.spec.ts` › export.settings: Export settings pane | 23 |
+| `export.previous` | Export with Previous / Export and Overwrite with Previous | owned |  | `src/app/export-actions.ts` `async export(kind` | `tests/e2e/parity-export.spec.ts` › export.previous: Export with Previous | 8 |
+| `export.import` | File › Import (docx/html/… via Pandoc) | owned |  | `src/app/import.ts` `export async function runImport` | `tests/e2e/parity-export.spec.ts` › export.import: File › Import | 8 |
 
 ## Markdown syntax options
 

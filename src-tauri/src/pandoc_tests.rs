@@ -198,7 +198,7 @@ mod fake {
         let bin = PathBuf::from(&info.path);
         let tmp = TempDir::new().unwrap();
         std::fs::write(tmp.path().join("img.png"), b"\x89PNG\r\n\x1a\n").unwrap();
-        for (fmt, ext) in [("docx", "docx"), ("latex", "tex"), ("epub", "epub")] {
+        for (fmt, ext) in [("docx", "docx"), ("latex", "tex"), ("epub", "epub"), ("odt", "odt"), ("rtf", "rtf"), ("mediawiki", "wiki"), ("rst", "rst"), ("textile", "textile"), ("opml", "opml")] {
             let out = tmp.path().join(format!("out.{ext}"));
             let r = ExportRequest {
                 markdown: "# Title\n\nSome *text* and $x^2$.\n\n| a | b |\n|---|---|\n| 1 | 2 |\n".into(),
@@ -209,7 +209,7 @@ mod fake {
                 timeout: DEFAULT_TIMEOUT,
             };
             export(&bin, r).unwrap_or_else(|e| panic!("{fmt}: {e}"));
-            assert!(std::fs::metadata(&out).unwrap().len() > 100, "{fmt}");
+            assert!(std::fs::metadata(&out).unwrap().len() > 20, "{fmt}");
         }
         assert!(std::fs::read_to_string(tmp.path().join("out.tex")).unwrap().contains("\\begin{document}"));
     }

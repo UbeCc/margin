@@ -8,15 +8,32 @@
 import type { Platform } from '../contracts';
 import type { PandocExportOptions, PlatformExtras } from './platform-extras';
 
-export type PandocFormat = 'docx' | 'latex' | 'epub';
+export type PandocFormat = 'docx' | 'latex' | 'epub' | 'odt' | 'rtf' | 'mediawiki' | 'rst' | 'textile' | 'opml';
 
 export const PANDOC_FORMATS: Readonly<Record<PandocFormat, { label: string; ext: string; filterName: string }>> = {
   docx: { label: 'Word', ext: 'docx', filterName: 'Word Document' },
   latex: { label: 'LaTeX', ext: 'tex', filterName: 'LaTeX' },
   epub: { label: 'EPUB', ext: 'epub', filterName: 'EPUB' },
+  // #95: the rest of the classic Pandoc export list.
+  odt: { label: 'OpenOffice', ext: 'odt', filterName: 'OpenDocument Text' },
+  rtf: { label: 'RTF', ext: 'rtf', filterName: 'Rich Text Format' },
+  mediawiki: { label: 'MediaWiki', ext: 'wiki', filterName: 'MediaWiki' },
+  rst: { label: 'reStructuredText', ext: 'rst', filterName: 'reStructuredText' },
+  textile: { label: 'Textile', ext: 'textile', filterName: 'Textile' },
+  opml: { label: 'OPML', ext: 'opml', filterName: 'OPML' },
 };
 
-export const PANDOC_ACTIONS = { exportDocx: 'docx', exportLatex: 'latex', exportEpub: 'epub' } as const satisfies Record<string, PandocFormat>;
+export const PANDOC_ACTIONS = {
+  exportDocx: 'docx',
+  exportLatex: 'latex',
+  exportEpub: 'epub',
+  exportOdt: 'odt',
+  exportRtf: 'rtf',
+  exportMediawiki: 'mediawiki',
+  exportRst: 'rst',
+  exportTextile: 'textile',
+  exportOpml: 'opml',
+} as const satisfies Record<string, PandocFormat>;
 
 export function pandocFormatForAction(id: string): PandocFormat | null {
   return (PANDOC_ACTIONS as Record<string, PandocFormat>)[id] ?? null;

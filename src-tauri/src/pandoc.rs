@@ -37,6 +37,13 @@ pub fn writer_for(format: &str) -> Option<(&'static str, &'static [&'static str]
         "docx" => Some(("docx", &[])),
         "latex" => Some(("latex", &["--standalone"])),
         "epub" => Some(("epub", &[])),
+        // #95: the rest of the classic export list.
+        "odt" => Some(("odt", &[])),
+        "rtf" => Some(("rtf", &["--standalone"])),
+        "mediawiki" => Some(("mediawiki", &[])),
+        "rst" => Some(("rst", &["--standalone"])),
+        "textile" => Some(("textile", &[])),
+        "opml" => Some(("opml", &["--standalone"])),
         _ => None,
     }
 }
