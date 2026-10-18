@@ -78,6 +78,11 @@ export function markdownPane(k: PrefKit): HTMLElement {
       'Code Fences',
       k.mdToggle('codeLineNumbers', 'Display line numbers for code fences'),
       k.mdToggle('codeLineWrap', 'Auto wrap long lines'),
+      k.mdToggle(
+        'shiftTabAutoIndent',
+        'Use Shift+Tab to auto indent selected code',
+        'When disabled, Shift+Tab will outdent selected code or current line. When enabled, Shift+Tab will auto apply indentation for selected code or current line in code blocks.',
+      ),
       k.row(
         'Indent Size for Code',
         k.select(
@@ -99,6 +104,15 @@ export function markdownPane(k: PrefKit): HTMLElement {
           [['none', 'No Automatic Equation Numbering'], ['ams', 'Use AMS Numbering Rules'], ['all', 'Auto Numbering for All Math Equations']],
           md.mathNumbering,
           (v) => k.setMd({ mathNumbering: v as MarkdownOptions['mathNumbering'] }),
+        ),
+      ),
+      k.row(
+        'When copy / export as HTML (without style)',
+        k.select(
+          'markdown.mathCopyFormat',
+          [['svg', 'Use Rendered SVG'], ['latex', 'Use LaTeX Source']],
+          md.mathCopyFormat,
+          (v) => k.setMd({ mathCopyFormat: v as MarkdownOptions['mathCopyFormat'] }),
         ),
       ),
     ),

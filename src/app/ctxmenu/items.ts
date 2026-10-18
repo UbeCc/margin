@@ -133,10 +133,11 @@ function codeTools(a: CtxActions): MenuItem {
   };
 }
 
+/** Copy Math ▸ (#127): Copy as Tex / MathML / Image — block and inline variants share the
+ * caret-based MathOp commands; Copy as Image rasterizes through the app (KaTeX → PNG). */
 function copyMath(a: CtxActions, inline: boolean): MenuItem {
   const c = (id: CommandId, label: string): MenuItem => ({ id, label, run: () => (a.restore(), a.run(id)) });
-  const items = [c('copyAs:tex', 'Copy as Tex'), c('copyAs:mathml', 'Copy as MathML')];
-  if (inline) items.push({ id: 'copyAsImageInline', label: 'Copy as Image', disabled: true, run: () => {} });
+  const items = [c('copyAs:tex', 'Copy as Tex'), c('copyAs:mathml', 'Copy as MathML'), c('math:copyImage', 'Copy as Image')];
   return { id: inline ? 'copyMathInline' : 'copyMathBlock', label: 'Copy Math', submenu: items };
 }
 

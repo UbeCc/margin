@@ -151,6 +151,7 @@ export const COMMANDS: CommandSpec[] = [
     ['code:indentSelected', 'Code Tools: Auto Indent Selected Code'],
     ['math:copyTex', 'Math Tools: Copy as Tex'],
     ['math:copyMathML', 'Math Tools: Copy as MathML'],
+    ['math:copyImage', 'Math Tools: Copy as Image'],
     ['math:delete', 'Math Tools: Delete Math'],
     ['math:refresh', 'Math Tools: Refresh All Math Expressions'],
   ] as const).map(([id, label]): CommandSpec => ({ id, label, category: 'Paragraph', scope: 'editor' })),

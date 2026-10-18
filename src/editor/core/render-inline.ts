@@ -12,6 +12,8 @@ export interface InlineCtx {
   refs: RefMap;
   resolveAsset(src: string): string;
   inlineMath: RenderInlineMath | null;
+  /** #127 "Use LaTeX Source": render inline math as its `$…$` source instead of KaTeX HTML. */
+  mathSource?: boolean;
 }
 
 /** Split a leaf content into [leading block meta, inline body, trailing block meta]. */

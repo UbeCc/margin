@@ -41,6 +41,8 @@ export interface EditorSettings {
   writeClipboardRich?(data: RichClipboardData): Promise<boolean>;
   /** Optional (#96): read the system clipboard outside a paste event (native menu Paste as Plain Text). */
   readClipboard?(): Promise<ClipboardSnapshot | null>;
+  /** Optional (#127): rasterize TeX and write it to the clipboard as a PNG (Copy Math ▸ Copy as Image). */
+  copyMathImage?(tex: string, display: boolean): Promise<boolean>;
   spellcheck: boolean;
   /** Visual modes. */
   focusMode: boolean;
@@ -80,10 +82,14 @@ export interface MarkdownOptions {
   codeLineWrap: boolean;
   /** Spaces per tab in code fences; 0 = Preserve tabs. */
   codeIndentSize: 0 | 2 | 3 | 4;
+  /** "Use Shift+Tab to auto indent selected code" (Typora `shiftTabAutoIndent`): on = Shift+Tab auto-indents, off = outdents. */
+  shiftTabAutoIndent: boolean;
   /** Math: equation numbering, physics macros, "Apply Line Break at \\ and \newline" in display math. */
   mathNumbering: 'all' | 'ams' | 'none';
   mathPhysics: boolean;
   mathLineBreaks: boolean;
+  /** Math: "When copy / export as HTML (without style)" (Typora `mathFormatOnCopy`): rendered HTML vs `$$…$$`/`$…$` source. */
+  mathCopyFormat: 'svg' | 'latex';
 }
 
 /**
@@ -109,9 +115,11 @@ export const DEFAULT_MARKDOWN_OPTIONS: Readonly<MarkdownOptions> = Object.freeze
   codeLineNumbers: false,
   codeLineWrap: true,
   codeIndentSize: 4,
+  shiftTabAutoIndent: false,
   mathNumbering: 'ams',
   mathPhysics: false,
   mathLineBreaks: true,
+  mathCopyFormat: 'svg',
 });
 
 /** Inline formats toggled by Format menu commands (`underline`/`sub`/`sup` = `<u>`/`<sub>`/`<sup>`, `math` = `$…$`, `comment` = `<!-- … -->`). */
@@ -170,7 +178,7 @@ export type TableOp =
 /** Code Tools (#98): copy the fence body; re-indent the whole body / the selected lines. */
 export type CodeOp = 'copy' | 'indentAll' | 'indentSelected';
 /** Math Tools (#98): copy the math at the caret as TeX / MathML, delete it, re-render all math. */
-export type MathOp = 'copyTex' | 'copyMathML' | 'delete' | 'refresh';
+export type MathOp = 'copyTex' | 'copyMathML' | 'copyImage' | 'delete' | 'refresh';
 
 /**
  * Edit › Copy as (#96). markdown = source only; html = the rendered HTML *source*
@@ -203,6 +211,8 @@ export interface EditorHandle {
   getStats(): EditorStats;
   setSourceMode(on: boolean): void;
   isSourceMode(): boolean;
+  /** Widget block type holding the caret (else the last caret, else the focused block); null = text/no block (#127 menu states). */
+  caretBlockType(): WidgetBlockType | null;
   updateSettings(patch: Partial<EditorSettings>): void;
   /** Rendered HTML for export (no editing chrome, md-meta removed). */
   renderHTML(): string;
