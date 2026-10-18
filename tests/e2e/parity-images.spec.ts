@@ -37,19 +37,16 @@ const menu = (page: Page, a: string) => page.evaluate((x) => (window as unknown 
 const settings = (page: Page, p: object) => page.evaluate((x) => (window as unknown as Win).__margin.updateSettings(x), p);
 const exists = (page: Page, p: string) => page.evaluate(async (x) => !!(await (window as unknown as Win).__MARGIN_WEB__.stat(x)), p);
 /**
- * Right-click the i-th rendered image. Guards first (#152): a sub-2px hit box
- * passes Playwright's visibility check, but Linux WebKit snaps it to a zero-width
- * hit area — the click then retries on "<div class=\"md-content\"> intercepts
- * pointer events" until the whole 30s test budget is gone. Fail fast instead,
- * and bound the click so any future interception surfaces quickly.
+ * Right-click the i-th rendered image. Bounded to 10s (#152): when an image's
+ * hit box degenerates (a failed-load image before #141's 24×24 placeholder box),
+ * Linux WebKit never delivers the point to the img and Playwright retries
+ * "<div class=\"md-content\"> intercepts pointer events" until the whole 30s
+ * test budget — both attempts — is spent. A 10s bound keeps the click fully
+ * real but turns any recurrence into a fast, explicit failure. (1×1 images are
+ * legitimately clickable; no size threshold.)
  */
-const rightClickImage = async (page: Page, i = 0): Promise<void> => {
-  const img = page.locator('.md-editor .md-image img.md-img, .md-editor .mb-html-block img').nth(i);
-  await expect(img).toBeVisible();
-  const box = await img.boundingBox();
-  expect(box && Math.min(box.width, box.height), 'image hit box too small to right-click (#152)').toBeGreaterThanOrEqual(2);
-  await img.click({ button: 'right', timeout: 10_000 });
-};
+const rightClickImage = (page: Page, i = 0) =>
+  page.locator('.md-editor .md-image img.md-img, .md-editor .mb-html-block img').nth(i).click({ button: 'right', timeout: 10_000 });
 const ctxItem = (page: Page, label: string | RegExp) => page.locator('.context-item', { hasText: label });
 
 test.beforeEach(async ({ page }) => {
