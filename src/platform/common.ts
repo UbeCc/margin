@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-import type { AppSettings, ImageRule } from '../contracts';
+import type { AppSettings, ImageRule, PdfExportOptions } from '../contracts';
 
 /** Built-in theme CSS bundled from `src/themes/*.css` (owned by app). */
 const builtinModules = import.meta.glob('../themes/*.css', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
@@ -162,4 +162,37 @@ export function printHtmlInIframe(html: string, loadTimeoutMs = 10_000): Promise
     frame.srcdoc = html;
     document.body.appendChild(frame);
   });
+}
+
+const cssString = (s: string): string => `"${s.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, ' ')}"`;
+
+/** Header/footer template → CSS `content` value (`${pageNo}`/`${totalPages}` → page counters). */
+function marginBoxContent(text: string): string {
+  const plain = text.replace(/<[^>]*>/g, '');
+  const parts = plain.split(/(\$\{pageNo\}|\$\{totalPages\})/).filter(Boolean);
+  return parts.map((p) => (p === '${pageNo}' ? 'counter(page)' : p === '${totalPages}' ? 'counter(pages)' : cssString(p))).join(' ');
+}
+
+/**
+ * `@page` rules for print-dialog based PDF export (web build, non-macOS desktop):
+ * paper size + margins, and header/footer as page-margin boxes (Chromium ≥ 131;
+ * other engines ignore them). Native macOS export applies these itself (#95).
+ */
+export function printPageCss(opts?: PdfExportOptions): string {
+  if (!opts?.paper && !opts?.header && !opts?.footer) return '';
+  const p = opts.paper;
+  const boxes = [
+    opts.header ? `@top-center { content: ${marginBoxContent(opts.header)}; font: 9pt -apple-system, system-ui, sans-serif; color: #777; }` : '',
+    opts.footer ? `@bottom-center { content: ${marginBoxContent(opts.footer)}; font: 9pt -apple-system, system-ui, sans-serif; color: #777; }` : '',
+  ].join(' ');
+  const geometry = p ? `size: ${p.width}pt ${p.height}pt; margin: ${p.margins.top}pt ${p.margins.right}pt ${p.margins.bottom}pt ${p.margins.left}pt;` : '';
+  return `@page { ${geometry} ${boxes} }`;
+}
+
+/** Insert print page CSS into an export document's <head>. */
+export function withPrintPageCss(html: string, opts?: PdfExportOptions): string {
+  const css = printPageCss(opts);
+  if (!css) return html;
+  const tag = `<style data-margin-page>${css}</style>`;
+  return html.includes('</head>') ? html.replace('</head>', `${tag}\n</head>`) : tag + html;
 }

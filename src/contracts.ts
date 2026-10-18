@@ -199,7 +199,9 @@ export interface AppSettings {
 export type MenuAction =
   | 'new' | 'open' | 'openFolder' | 'save' | 'saveAs' | 'close'
   | 'exportHtml' | 'exportPdf' | 'print'
+  | 'exportHtmlPlain' | 'exportImage' | 'exportPrevious' | 'exportOverwrite' | 'exportSettings' | 'pageSetup'
   | 'exportDocx' | 'exportLatex' | 'exportEpub'
+  | 'exportOdt' | 'exportRtf' | 'exportMediawiki' | 'exportRst' | 'exportTextile' | 'exportOpml' | 'exportCustom' | 'import'
   | 'undo' | 'redo' | 'find' | 'replace'
   | 'toggleSidebar' | 'toggleSource' | 'toggleFocus' | 'toggleTypewriter' | 'quickOpen'
   | 'zoomIn' | 'zoomOut' | 'zoomReset'
@@ -222,6 +224,20 @@ export type MenuAction =
   | `delete:${'word' | 'line' | 'block' | 'styled' | 'range'}`
   | `jump:${'top' | 'bottom' | 'selection'}`;
 
+/** PDF export options (#18 baseDir; #95 page geometry, header/footer, bookmarks, metadata). All optional. */
+export interface PdfExportOptions {
+  baseDir?: string;
+  /** Paper size and margins in points. */
+  paper?: { width: number; height: number; margins: { top: number; right: number; bottom: number; left: number } };
+  /** Running header / footer text; `${pageNo}` and `${totalPages}` are replaced per page. */
+  header?: string;
+  footer?: string;
+  /** Headings in document order: PDF bookmarks + targets for internal `#id` links. */
+  outline?: { level: number; text: string; id: string }[];
+  /** Document info dictionary. */
+  meta?: { title: string; author: string; subject: string; keywords: string };
+}
+
 export interface Platform {
   readonly kind: 'tauri' | 'web';
   readTextFile(path: string): Promise<string>;
@@ -239,12 +255,13 @@ export interface Platform {
     rule: ImageRule,
     input: { bytes?: Uint8Array; mime?: string; path?: string; name?: string },
   ): Promise<string>;
-  openFileDialog(opts?: { directory?: boolean }): Promise<string | null>;
+  /** `filters` (#95, optional): file-type filters for the open panel (default: Markdown). */
+  openFileDialog(opts?: { directory?: boolean; filters?: { name: string; extensions: string[] }[] }): Promise<string | null>;
   saveFileDialog(opts?: { defaultPath?: string; filters?: { name: string; extensions: string[] }[] }): Promise<string | null>;
   /** Write HTML, or print given HTML to PDF at outPath. */
   exportHtml(html: string, outPath: string): Promise<void>;
   /** baseDir: directory relative srcs resolve against (default: outPath's directory). */
-  exportPdf(html: string, outPath: string, opts?: { baseDir?: string }): Promise<void>;
+  exportPdf(html: string, outPath: string, opts?: PdfExportOptions): Promise<void>;
   /** Print the current window (system print dialog). */
   print(): Promise<void>;
   /** Allow the webview to load assets from dir (non-recursive), e.g. images outside the opened folder. */
