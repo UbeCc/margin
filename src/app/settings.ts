@@ -17,12 +17,20 @@ export interface MarginSettings extends AppSettings {
   sidebarVisible: boolean;
   sidebarTab: 'files' | 'outline';
   sidebarWidth: number;
-  /** File tree / Articles ordering (#101). */
+  /** File tree ordering (#101; Typora `treeSortType`). */
   sidebarSort: SortOrder;
+  /** Articles list ordering (Typora `listSortType`, kept separately). */
+  listSort: SortOrder;
   /** Files panel layout: lazy tree or flat Articles list (#101). */
   sidebarFileView: 'tree' | 'list';
-  /** Articles list: "Group By Folder". */
+  /** Tree "Group By Folder": folders first (default on). */
   sidebarGroupByFolder: boolean;
+  /** Articles "Group By Folder": bucket articles by folder (default on). */
+  listGroupByFolder: boolean;
+  /** Sidebar folder search options (Typora `fileSearch*`). */
+  fileSearchCaseSensitive: boolean;
+  fileSearchWholeWord: boolean;
+  fileSearchUseRegexp: boolean;
   /** Outline: "Collapsible Outline" vs "Flat Outline". */
   outlineCollapsible: boolean;
   /** Auto-save delay in ms after the last edit. */
@@ -55,8 +63,13 @@ export const DEFAULT_SETTINGS: Readonly<MarginSettings> = Object.freeze({
   sidebarTab: 'files',
   sidebarWidth: 260,
   sidebarSort: DEFAULT_SORT,
+  listSort: DEFAULT_SORT,
   sidebarFileView: 'tree',
-  sidebarGroupByFolder: false,
+  sidebarGroupByFolder: true,
+  listGroupByFolder: true,
+  fileSearchCaseSensitive: false,
+  fileSearchWholeWord: false,
+  fileSearchUseRegexp: false,
   outlineCollapsible: false,
   restoreLastFolder: true,
   pandocPath: '',
@@ -138,7 +151,12 @@ export function migrateSettings(input: unknown): MarginSettings {
     sidebarWidth: Math.round(num(raw.sidebarWidth, d.sidebarWidth, 180, 520)),
     sidebarSort: isSortOrder(raw.sidebarSort) ? raw.sidebarSort : d.sidebarSort,
     sidebarFileView: raw.sidebarFileView === 'list' ? 'list' : 'tree',
+    listSort: isSortOrder(raw.listSort) ? raw.listSort : d.listSort,
     sidebarGroupByFolder: bool(raw.sidebarGroupByFolder, d.sidebarGroupByFolder),
+    listGroupByFolder: bool(raw.listGroupByFolder, d.listGroupByFolder),
+    fileSearchCaseSensitive: bool(raw.fileSearchCaseSensitive, d.fileSearchCaseSensitive),
+    fileSearchWholeWord: bool(raw.fileSearchWholeWord, d.fileSearchWholeWord),
+    fileSearchUseRegexp: bool(raw.fileSearchUseRegexp, d.fileSearchUseRegexp),
     outlineCollapsible: bool(raw.outlineCollapsible, d.outlineCollapsible),
     restoreLastFolder: bool(raw.restoreLastFolder, d.restoreLastFolder),
     pandocPath: typeof raw.pandocPath === 'string' ? raw.pandocPath.trim() : '',

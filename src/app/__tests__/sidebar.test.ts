@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import type { DirEntry } from '../../contracts';
 import { sortEntries, SORT_OPTIONS, isSortOrder, nameCompare } from '../sidebar/sort';
-import { summarize, collectDocs } from '../sidebar/walk';
-import { findLines } from '../sidebar/search';
+import { summarize, collectDocs, dateLabel, isListedDoc } from '../sidebar/walk';
+import { findLines, makeMatcher, groupTitle } from '../sidebar/search';
+import { copyName } from '../sidebar/filetree';
 import { filterHeadings, headingParents } from '../sidebar/outline';
 import { WebPlatform } from '../../platform/web';
 import { migrateSettings } from '../settings';
@@ -28,6 +29,10 @@ describe('sidebar sort', () => {
   });
   it('name vs natural ordering, folders first, dotfiles hidden', () => {
     expect(names(sortEntries(xs, 'name-asc'))).toEqual(['dir', 'A.md', 'b10.md', 'b2.md']);
+    // base name (before the first dot) compares first: "a.md" < "a-b.md"
+    expect(names(sortEntries([e('a-b.md', false, 1), e('a.md', false, 1)], 'name-asc'))).toEqual(['a.md', 'a-b.md']);
+    // Group By Folder off: folders interleave with files
+    expect(names(sortEntries(xs, 'name-asc', false))).toEqual(['A.md', 'b10.md', 'b2.md', 'dir']);
     expect(names(sortEntries(xs, 'natural-asc'))).toEqual(['dir', 'A.md', 'b2.md', 'b10.md']);
     expect(names(sortEntries(xs, 'natural-desc'))).toEqual(['dir', 'b10.md', 'b2.md', 'A.md']);
     expect(nameCompare('a', 'B')).toBeLessThan(0);
@@ -49,9 +54,10 @@ describe('sidebar sort', () => {
 });
 
 describe('articles list', () => {
-  it('summary strips front matter and markdown syntax', () => {
-    const t = '---\ntitle: x\n---\n# Hello *world*\n\n- [ ] task with [link](http://a)\n> quote `code`\n';
-    expect(summarize(t)).toBe('Hello world task with link quote code');
+  it('summary: front matter title/description first, then stripped body lines', () => {
+    const t = '---\ntitle: "My Post"\ndescription: about it\nlayout: x\n---\n# Hello *world*\n\n- [ ] task with [link](http://a)\n> quote `code`\n';
+    expect(summarize(t)).toBe('My Post\nabout it\nHello world\ntask with link\nquote code');
+    expect(summarize('---\ntitle: a\nsubtitle: b\nsummary: c\n---\nbody')).toBe('a\nb\nc');
     expect(summarize('a'.repeat(500), 10)).toBe('aaaaaaaaaa…');
   });
   it('collects documents breadth-first, skips node_modules/dot dirs, caps at the limit', async () => {
@@ -67,20 +73,52 @@ describe('articles list', () => {
 });
 
 describe('sidebar search', () => {
+  const lit = { caseSensitive: false, wholeWord: false, regex: false };
   it('finds literal matches per line, case-insensitive by default', () => {
-    const r = findLines('Alpha beta\nnothing\n  ALPHA and alpha', 'alpha', false);
+    const r = findLines('Alpha beta\nnothing\n  ALPHA and alpha', makeMatcher('alpha', lit)!);
     expect(r.total).toBe(3);
     expect(r.hits.map((h) => h.line)).toEqual([1, 3]);
-    expect(r.hits[1].text).toBe('ALPHA and alpha');
-    expect(r.hits[1].ranges).toEqual([[0, 5], [10, 15]]);
-    expect(findLines('Alpha', 'alpha', true).total).toBe(0);
+    expect(r.hits[1].ranges).toEqual([[2, 7], [12, 17]]);
+    expect(r.hits[1].before).toBe(1);
+    expect(findLines('Alpha', makeMatcher('alpha', { ...lit, caseSensitive: true })!).total).toBe(0);
   });
-  it('windows long lines around the first match', () => {
-    const line = 'x'.repeat(100) + 'needle' + 'y'.repeat(10);
-    const [hit] = findLines(line, 'needle', false).hits;
-    expect(hit.text.startsWith('…')).toBe(true);
-    const [a, b] = hit.ranges[0];
-    expect(hit.text.slice(a, b)).toBe('needle');
+  it('whole word, regex, invalid regex', () => {
+    expect(findLines('cat catalog', makeMatcher('cat', { ...lit, wholeWord: true })!).total).toBe(1);
+    expect(findLines('a1 b22', makeMatcher('\\d+', { ...lit, regex: true })!).total).toBe(2);
+    expect(makeMatcher('(', { ...lit, regex: true })).toBeNull();
+  });
+  it('cuts text before the first match to "..." + 20 chars; caps at 21 lines', () => {
+    const line = 'x'.repeat(100) + 'needle';
+    const [hit] = findLines(line, makeMatcher('needle', lit)!).hits;
+    expect(hit.text).toBe('...' + 'x'.repeat(20) + 'needle');
+    expect(hit.text.slice(...hit.ranges[0])).toBe('needle');
+    expect(findLines('n\n'.repeat(40), makeMatcher('n', lit)!).hits.length).toBe(21);
+  });
+  it('block title is the parent path joined with " / "', () => {
+    expect(groupTitle('/r/Notes', '/r/Notes/a/b/x.md')).toBe('Notes / a / b');
+    expect(groupTitle('/r/Notes', '/r/Notes/x.md')).toBe('Notes');
+  });
+});
+
+describe('sidebar file rules', () => {
+  it('lists Typora extensions + extension-less files only', () => {
+    expect(['a.md', 'b.MDX', 'c.qmd', 'README', 'd.apib'].every(isListedDoc)).toBe(true);
+    expect(['x.png', '.hidden.md', 'y.rs'].some(isListedDoc)).toBe(false);
+  });
+  it('Keep Both inserts " (copy)" before the first dot', () => {
+    expect(copyName('a.b.md')).toBe('a (copy).b.md');
+    expect(copyName('README')).toBe('README (copy)');
+  });
+  it('Articles date labels', () => {
+    const now = new Date(2026, 9, 18, 15, 0).getTime();
+    expect(dateLabel(now - 10_000, now)).toBe('just now');
+    expect(dateLabel(now - 45_000, now)).toBe('1 minutes ago');
+    expect(dateLabel(now - 5 * 60_000, now)).toBe('5 minutes ago');
+    expect(dateLabel(new Date(2026, 9, 18, 12, 5).getTime(), now)).toBe('12:05');
+    expect(dateLabel(new Date(2026, 9, 17, 9, 0).getTime(), now)).toBe('Yesterday');
+    expect(dateLabel(new Date(2026, 9, 14, 9, 0).getTime(), now)).toBe('4 days ago');
+    expect(dateLabel(new Date(2026, 2, 3).getTime(), now)).toBe('Mar 03');
+    expect(dateLabel(new Date(2025, 2, 3).getTime(), now)).toBe('2025-03-03');
   });
 });
 
@@ -95,8 +133,8 @@ describe('outline tree', () => {
   it('parents follow heading levels', () => {
     expect(headingParents(hs)).toEqual([-1, 0, 1, 0, -1]);
   });
-  it('filter keeps matches and their ancestors', () => {
-    expect([...filterHeadings(hs, 'inst')].sort()).toEqual([0, 1, 2]);
+  it('filter keeps only matching rows (no ancestors)', () => {
+    expect([...filterHeadings(hs, 'inst')]).toEqual([2]);
     expect(filterHeadings(hs, 'zzz').size).toBe(0);
     expect(filterHeadings(hs, ' ').size).toBe(5);
   });

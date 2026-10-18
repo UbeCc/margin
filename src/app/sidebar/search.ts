@@ -1,12 +1,21 @@
 import type { DirEntry, Platform } from '../../contracts';
-import { h, clearChildren, debounce, icon } from '../util/dom';
-import { dirname, relative, stripExt } from '../util/path';
+import { h, clearChildren, icon } from '../util/dom';
+import { basename, dirname, relative } from '../util/path';
 import { collectDocs } from './walk';
+import { queryRegExp } from '../findmatches';
+
+export interface SearchOptions {
+  caseSensitive: boolean;
+  wholeWord: boolean;
+  regex: boolean;
+}
 
 export interface SearchHost {
   platform: Platform;
-  /** Open a file and (optionally) find `query` in it. */
-  openAt(path: string, query: string | null, caseSensitive: boolean): void;
+  options(): SearchOptions;
+  setOptions(o: SearchOptions): void;
+  /** Open a file; with a query, select its `occurrence`-th match (0-based) and highlight all. */
+  openAt(path: string, query: string | null, opts: SearchOptions, occurrence: number): void;
 }
 
 export interface LineHit {
@@ -14,82 +23,111 @@ export interface LineHit {
   text: string;
   /** match offsets inside `text` */
   ranges: [number, number][];
+  /** number of matches in the file before this line */
+  before: number;
 }
 
-/** Max documents scanned per search and line hits shown per file. */
+/** Folder search limits (fe-sidebar-statusbar-find §7). */
+export const MAX_LINES_PER_FILE = 21;
+export const VISIBLE_LINES = 5;
+export const SEARCH_MAX_BYTES = 2 * 1024 * 1024;
 export const SEARCH_MAX_FILES = 5000;
-export const LINES_PER_FILE = 8;
-const SNIPPET = 120;
 
-/** Literal, optionally case-sensitive match of `q` in each line of `text`. */
-export function findLines(text: string, q: string, caseSensitive: boolean, max = LINES_PER_FILE): { total: number; hits: LineHit[] } {
-  const needle = caseSensitive ? q : q.toLowerCase();
+/** Same matcher as the in-document find bar; null for an invalid regular expression. */
+export function makeMatcher(q: string, o: SearchOptions): RegExp | null {
+  return queryRegExp(q, o);
+}
+
+/**
+ * Line-based matches (no multi-line), at most 21 matching lines per file. Text
+ * before the first match is cut to "..." + the last 20 characters.
+ */
+export function findLines(text: string, re: RegExp, max = MAX_LINES_PER_FILE): { total: number; hits: LineHit[] } {
   const hits: LineHit[] = [];
   let total = 0;
   const lines = text.split(/\r?\n/);
-  for (let i = 0; i < lines.length; i++) {
+  for (let i = 0; i < lines.length && hits.length < max; i++) {
     const raw = lines[i];
-    const hay = caseSensitive ? raw : raw.toLowerCase();
-    let at = hay.indexOf(needle);
-    if (at < 0) continue;
     const ranges: [number, number][] = [];
-    while (at >= 0) {
-      ranges.push([at, at + needle.length]);
-      total++;
-      at = hay.indexOf(needle, at + Math.max(1, needle.length));
+    re.lastIndex = 0;
+    for (let m = re.exec(raw); m; m = re.exec(raw)) {
+      if (!m[0].length) {
+        re.lastIndex++;
+        continue;
+      }
+      ranges.push([m.index, m.index + m[0].length]);
     }
-    if (hits.length >= max) continue;
-    // Window the line around the first match.
-    const lead = raw.length - raw.trimStart().length;
-    const start = Math.max(lead, ranges[0][0] - 30);
-    const prefix = start > lead ? '…' : '';
-    const text = prefix + raw.slice(start, start + SNIPPET).trimEnd();
-    const shift = prefix.length - start;
-    hits.push({ line: i + 1, text, ranges: ranges.map(([a, b]) => [a + shift, b + shift] as [number, number]).filter(([a, b]) => a >= prefix.length && b <= text.length) });
+    if (!ranges.length) continue;
+    const first = ranges[0][0];
+    const cut = first > 20 ? first - 20 : 0;
+    const prefix = cut ? '...' : '';
+    const shift = prefix.length - cut;
+    hits.push({ line: i + 1, text: prefix + raw.slice(cut), ranges: ranges.map(([a, b]) => [a + shift, b + shift] as [number, number]), before: total });
+    total += ranges.length;
   }
   return { total, hits };
 }
 
+/** Header of a result block: the file's parent path (relative to the root) joined with " / ". */
+export function groupTitle(root: string, path: string): string {
+  const rel = relative(root, dirname(path));
+  return [basename(root), ...rel.split(/[\\/]/).filter((p) => p && p !== '.')].join(' / ');
+}
+
 /**
- * Sidebar full-text search (#101, `typora.sidebar.search`): file-name matches
- * ("File Results") and per-file content matches with line snippets. Results
- * stream in while documents are read ("Gathering more results").
+ * Sidebar folder search (#101, `typora.sidebar.search`; fe-sidebar-statusbar-find §7):
+ * runs on Enter, Match Case / Whole Word / Regular Expression toggles (persisted),
+ * one block per file with a "20+" badge, 5 lines shown and "show N more matches".
  */
 export class SidebarSearch {
   readonly el: HTMLElement;
   readonly input: HTMLInputElement;
-  private caseBtn: HTMLButtonElement;
+  private toggles: Record<keyof SearchOptions, HTMLButtonElement>;
   private status: HTMLElement;
   private results: HTMLElement;
   private root: string | null = null;
-  private caseSensitive = false;
   private gen = 0;
-  private runSoon = debounce(() => void this.run(), 250);
 
   constructor(private host: SearchHost) {
     this.input = h('input.sidebar-search-input', { type: 'search', placeholder: 'Search', 'aria-label': 'Search', spellcheck: 'false' });
-    this.input.addEventListener('input', () => this.runSoon());
     this.input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
-        this.runSoon.cancel();
         void this.run();
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        this.results.querySelector<HTMLElement>('.search-file, .search-line')?.focus();
       }
     });
-    this.caseBtn = h('button.icon-btn.search-case', {
-      type: 'button',
-      title: 'Match Case',
-      'aria-label': 'Match Case',
-      'aria-pressed': 'false',
-      onclick: () => {
-        this.caseSensitive = !this.caseSensitive;
-        this.caseBtn.setAttribute('aria-pressed', String(this.caseSensitive));
-        void this.run();
-      },
-    }, h('span', { text: 'Aa' }));
+    const toggle = (k: keyof SearchOptions, title: string, ico: 'caseSensitive' | 'wholeWord' | 'regex'): HTMLButtonElement =>
+      h('button.icon-btn.search-opt', {
+        type: 'button',
+        title,
+        'aria-label': title,
+        'aria-pressed': String(host.options()[k]),
+        'data-opt': k,
+        onclick: () => {
+          const o = { ...this.host.options(), [k]: !this.host.options()[k] };
+          this.host.setOptions(o);
+          this.toggles[k].setAttribute('aria-pressed', String(o[k]));
+          if (this.input.value) void this.run();
+        },
+      }, icon(ico));
+    this.toggles = {
+      caseSensitive: toggle('caseSensitive', 'Match Case', 'caseSensitive'),
+      wholeWord: toggle('wholeWord', 'Whole Word', 'wholeWord'),
+      regex: toggle('regex', 'Regular Expression', 'regex'),
+    };
     this.status = h('div.search-status', { role: 'status', 'aria-live': 'polite' });
     this.results = h('div.search-results', { role: 'list' });
-    this.el = h('div.sidebar-search', null, h('div.search-bar', null, icon('search', 'search-icon'), this.input, this.caseBtn), this.status, this.results);
+    this.results.addEventListener('keydown', (e) => this.onKey(e));
+    this.el = h(
+      'div.sidebar-search',
+      null,
+      h('div.search-bar', null, icon('search', 'search-icon'), this.input, this.toggles.caseSensitive, this.toggles.wholeWord, this.toggles.regex),
+      this.status,
+      this.results,
+    );
   }
 
   setRoot(root: string | null): void {
@@ -97,41 +135,35 @@ export class SidebarSearch {
     this.gen++;
     clearChildren(this.results);
     this.status.textContent = '';
-    if (this.input.value) this.runSoon();
   }
 
+  /** Focus the field; a selection's first line pre-fills it. */
   focus(seed?: string): void {
-    if (seed && !seed.includes('\n')) {
-      this.input.value = seed;
-      void this.run();
-    }
+    const first = seed?.split(/\r?\n/)[0].trim();
+    if (first) this.input.value = first;
     this.input.focus();
     this.input.select();
   }
 
+  /** Cancel a running search and start a new one (Enter). */
   async run(): Promise<void> {
     const gen = ++this.gen;
     const q = this.input.value;
     clearChildren(this.results);
-    if (!q.trim() || !this.root) {
-      this.status.textContent = '';
+    this.status.textContent = '';
+    if (!q || !this.root) return;
+    const o = this.host.options();
+    const re = makeMatcher(q, o);
+    if (!re) {
+      this.status.textContent = 'Invalid regular expression';
       return;
     }
     const root = this.root;
-    const cs = this.caseSensitive;
-    this.status.textContent = 'Searching';
     this.el.setAttribute('aria-busy', 'true');
-    const { docs } = await collectDocs(this.host.platform, root, { limit: SEARCH_MAX_FILES, cancelled: () => gen !== this.gen });
+    const { docs } = await collectDocs(this.host.platform, root, { limit: SEARCH_MAX_FILES, maxBytes: SEARCH_MAX_BYTES, cancelled: () => gen !== this.gen });
     if (gen !== this.gen) return;
-    const lq = cs ? q : q.toLowerCase();
-    const named = docs.filter((d) => (cs ? d.name : d.name.toLowerCase()).includes(lq));
-    let fileSection: HTMLElement | null = null;
-    if (named.length) {
-      fileSection = h('div.search-section', null, h('div.search-section-title', { text: 'File Results' }), ...named.map((d) => this.fileRow(d, root, null)));
-      this.results.appendChild(fileSection);
-    }
-    let found = named.length;
-    let done = 0;
+    const lq = o.caseSensitive ? q : q.toLowerCase();
+    let found = 0;
     const queue = [...docs];
     const worker = async (): Promise<void> => {
       for (let d = queue.shift(); d && gen === this.gen; d = queue.shift()) {
@@ -141,37 +173,33 @@ export class SidebarSearch {
         } catch {
           /* skip unreadable */
         }
-        done++;
         if (gen !== this.gen) return;
-        const { total, hits } = findLines(text, q, cs);
-        if (total) {
+        const { total, hits } = findLines(text, re);
+        // File-name matches count too (literal mode only), with no lines.
+        const named = !o.regex && (o.caseSensitive ? d.name : d.name.toLowerCase()).includes(lq);
+        if (total || named) {
           found++;
-          this.results.appendChild(this.contentGroup(d, root, q, total, hits));
+          this.results.appendChild(this.block(d, root, q, o, total, hits));
         }
-        this.status.textContent = done < docs.length ? (found ? 'Gathering more results' : 'Searching') : '';
       }
     };
     await Promise.all(Array.from({ length: 6 }, worker));
     if (gen !== this.gen) return;
     this.el.removeAttribute('aria-busy');
-    this.status.textContent = found ? '' : 'No Results';
+    if (!found) this.status.textContent = 'No result found.';
   }
 
-  private fileRow(d: DirEntry, root: string, q: string | null): HTMLElement {
-    const dir = dirname(d.path);
-    return h(
+  private block(d: DirEntry, root: string, q: string, o: SearchOptions, total: number, hits: LineHit[]): HTMLElement {
+    const head = h(
       'button.search-file',
-      { type: 'button', role: 'listitem', 'data-path': d.path, title: d.path, onclick: () => this.host.openAt(d.path, q, this.caseSensitive) },
-      h('span.search-file-name', { text: stripExt(d.name) }),
-      dir !== root ? h('span.search-file-dir', { text: relative(root, dir) }) : null,
+      { type: 'button', role: 'listitem', 'data-path': d.path, title: d.path, onclick: () => this.host.openAt(d.path, total ? q : null, o, 0) },
+      h('span.search-file-name', { text: d.name }),
+      h('span.search-file-dir', { text: groupTitle(root, d.path) }),
+      total ? h('span.search-count', { text: total > 20 ? '20+' : String(total) }) : null,
     );
-  }
-
-  private contentGroup(d: DirEntry, root: string, q: string, total: number, hits: LineHit[]): HTMLElement {
-    const head = this.fileRow(d, root, q);
-    head.appendChild(h('span.search-count', { text: String(total) }));
-    const lines = hits.map((hit) => {
-      const el = h('button.search-line', { type: 'button', 'data-line': hit.line, onclick: () => this.host.openAt(d.path, q, this.caseSensitive) });
+    const lines = hits.map((hit, i) => {
+      const el = h('button.search-line', { type: 'button', 'data-line': hit.line, onclick: () => this.host.openAt(d.path, q, o, hit.before) });
+      el.hidden = i >= VISIBLE_LINES;
       let at = 0;
       for (const [a, b] of hit.ranges) {
         if (a < at) continue;
@@ -181,6 +209,27 @@ export class SidebarSearch {
       el.append(hit.text.slice(at));
       return el;
     });
-    return h('div.search-group', { 'data-path': d.path }, head, ...lines);
+    const extra = hits.length - VISIBLE_LINES;
+    const more =
+      extra > 0
+        ? h('button.search-more', {
+            type: 'button',
+            text: `show ${extra} more matches`,
+            onclick: (e: Event) => {
+              lines.forEach((l) => (l.hidden = false));
+              (e.currentTarget as HTMLElement).remove();
+            },
+          })
+        : null;
+    return h('div.search-group', { 'data-path': d.path }, head, ...lines, more);
+  }
+
+  private onKey(e: KeyboardEvent): void {
+    const items = [...this.results.querySelectorAll<HTMLElement>('.search-file, .search-line:not([hidden]), .search-more')];
+    const i = items.indexOf(document.activeElement as HTMLElement);
+    if (e.key === 'ArrowDown') items[Math.min(items.length - 1, i + 1)]?.focus();
+    else if (e.key === 'ArrowUp') (i <= 0 ? this.input : items[i - 1]).focus();
+    else return;
+    e.preventDefault();
   }
 }

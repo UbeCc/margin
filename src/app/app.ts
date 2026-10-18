@@ -5,6 +5,7 @@ import { COMMANDS, commandForKey, commandSpec, isCommandId, type CommandId } fro
 import { DocumentController, type DocState } from './document';
 import { buildExportHtml, documentTitle, loadKatexCss, needsKatex } from './export';
 import { FindBar } from './findbar';
+import type { FindOpts } from './findmatches';
 import { extras } from './platform-extras';
 import { openPreferences } from './preferences';
 import { DEFAULT_SETTINGS, migrateSettings, pushRecent, type MarginSettings } from './settings';
@@ -176,7 +177,7 @@ export class App {
     this.files = new FilesPanel({
       settings: () => this.settings,
       updateSettings: (p) => this.updateSettings(p),
-      openAt: (p, q, cs) => void this.openAt(p, q, cs),
+      openAt: (p, q, o, n) => void this.openAt(p, q, o, n),
       platform: this.platform,
       openFile: (p) => void this.doc.open(p),
       onRenamed: (from, to) => {
@@ -360,9 +361,9 @@ export class App {
   }
 
   /** Sidebar search result: open the file, then find the query in it. */
-  private async openAt(path: string, query: string | null, caseSensitive: boolean): Promise<void> {
+  private async openAt(path: string, query: string | null, opts: FindOpts, occurrence: number): Promise<void> {
     if (path !== this.doc.path && !(await this.doc.open(path))) return;
-    if (query) this.findbar.searchFor(query, caseSensitive);
+    if (query) this.findbar.searchFor(query, opts, occurrence);
   }
 
   async openFolder(path: string, opts: { implicit?: boolean; quiet?: boolean } = {}): Promise<void> {

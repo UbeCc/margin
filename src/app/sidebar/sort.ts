@@ -3,8 +3,9 @@ import { naturalCompare } from '../util/path';
 
 /**
  * File tree / Articles list ordering (#101, `typora.sidebar.sort`). Labels follow
- * Typora's "Sort" submenu. Folders always stay above files in the tree; the
- * direction flips only the order inside each group.
+ * Typora's sort buttons. Typora's code −3 is shared by "natural descending" and
+ * "creation date descending" (natural descending is unreachable there); Margin
+ * keeps all eight orders distinct on purpose.
  */
 export type SortKey = 'name' | 'natural' | 'created' | 'modified';
 export type SortOrder = `${SortKey}-${'asc' | 'desc'}`;
@@ -26,11 +27,25 @@ export function isSortOrder(v: unknown): v is SortOrder {
   return SORT_OPTIONS.some((o) => o.id === v);
 }
 
-/** Plain (non-numeric) name order: "a10" < "a2". Case-insensitive, then case-sensitive tiebreak. */
+const base = (n: string): string => {
+  const i = n.indexOf('.');
+  return i < 0 ? n : n.slice(0, i);
+};
+const cmpStr = (x: string, y: string): number => (x < y ? -1 : x > y ? 1 : 0);
+
+/**
+ * Typora's name order (fe-sidebar-statusbar-find §3): lower-cased, the part before
+ * the first "." first, the full name only breaks ties. No numeric collation ("a10" < "a2").
+ */
 export function nameCompare(a: string, b: string): number {
   const x = a.toLowerCase();
   const y = b.toLowerCase();
-  return x < y ? -1 : x > y ? 1 : a < b ? -1 : a > b ? 1 : 0;
+  return cmpStr(base(x), base(y)) || cmpStr(x, y) || cmpStr(a, b);
+}
+
+/** Natural order: same base-name-first rule, embedded numbers compared numerically. */
+export function naturalNameCompare(a: string, b: string): number {
+  return naturalCompare(base(a), base(b)) || naturalCompare(a, b);
 }
 
 interface Sortable {
@@ -45,12 +60,12 @@ function keyCompare(key: SortKey, a: Sortable, b: Sortable): number {
     case 'name':
       return nameCompare(a.name, b.name);
     case 'natural':
-      return naturalCompare(a.name, b.name);
+      return naturalNameCompare(a.name, b.name);
     case 'created':
       // No birth time from the platform → creation order is unknown; use mtime.
-      return (a.ctime ?? a.mtime) - (b.ctime ?? b.mtime) || naturalCompare(a.name, b.name);
+      return (a.ctime ?? a.mtime) - (b.ctime ?? b.mtime) || naturalNameCompare(a.name, b.name);
     case 'modified':
-      return a.mtime - b.mtime || naturalCompare(a.name, b.name);
+      return a.mtime - b.mtime || naturalNameCompare(a.name, b.name);
   }
 }
 
@@ -60,10 +75,13 @@ export function compareBy<T extends Sortable>(order: SortOrder): (a: T, b: T) =>
   return (a, b) => sign * keyCompare(key, a, b);
 }
 
-/** Tree order: hide dotfiles, folders first, then `order` inside each group. */
-export function sortEntries(entries: DirEntry[], order: SortOrder = DEFAULT_SORT): DirEntry[] {
+/**
+ * Tree order: hide dotfiles; with "Group By Folder" (default) folders come first
+ * and each group is sorted on its own, otherwise folders and files interleave.
+ */
+export function sortEntries(entries: DirEntry[], order: SortOrder = DEFAULT_SORT, groupFolders = true): DirEntry[] {
   const cmp = compareBy<DirEntry>(order);
   return entries
     .filter((e) => !e.name.startsWith('.'))
-    .sort((a, b) => (a.isDir === b.isDir ? cmp(a, b) : a.isDir ? -1 : 1));
+    .sort((a, b) => (!groupFolders || a.isDir === b.isDir ? cmp(a, b) : a.isDir ? -1 : 1));
 }

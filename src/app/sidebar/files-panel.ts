@@ -4,14 +4,14 @@ import { showContextMenu, type MenuItem } from '../ui/contextmenu';
 import type { MarginSettings } from '../settings';
 import { FileTree, type FileTreeHost, type FilesMode } from './filetree';
 import { FileList } from './filelist';
-import { SidebarSearch } from './search';
+import { SidebarSearch, type SearchOptions } from './search';
 import { SORT_OPTIONS, type SortOrder } from './sort';
 
 export interface FilesPanelHost extends FileTreeHost {
   settings(): MarginSettings;
   updateSettings(patch: Partial<MarginSettings>): void;
-  /** Open `path` and run a find for `query` once it is loaded. */
-  openAt(path: string, query: string | null, caseSensitive: boolean): void;
+  /** Open `path`; with a query, highlight it and select its `occurrence`-th match. */
+  openAt(path: string, query: string | null, opts: SearchOptions, occurrence: number): void;
 }
 
 /**
@@ -23,16 +23,25 @@ export class FilesPanel {
   readonly list: FileList;
   readonly search: SidebarSearch;
   private listDirty = true;
-  private reloadListSoon = debounce(() => void this.reloadList(), 400);
+  private reloadListSoon = debounce(() => void this.reloadList(), 200);
 
   constructor(private host: FilesPanelHost) {
     this.tree = new FileTree({ ...host, extraActions: () => this.actions(), refreshMode: () => this.refreshMode() });
     this.list = new FileList({ platform: host.platform, openFile: (p) => host.openFile(p) });
-    this.search = new SidebarSearch({ platform: host.platform, openAt: (p, q, cs) => host.openAt(p, q, cs) });
+    this.search = new SidebarSearch({
+      platform: host.platform,
+      openAt: (p, q, o, n) => host.openAt(p, q, o, n),
+      options: () => {
+        const s = host.settings();
+        return { caseSensitive: s.fileSearchCaseSensitive, wholeWord: s.fileSearchWholeWord, regex: s.fileSearchUseRegexp };
+      },
+      setOptions: (o) => host.updateSettings({ fileSearchCaseSensitive: o.caseSensitive, fileSearchWholeWord: o.wholeWord, fileSearchUseRegexp: o.regex }),
+    });
     const s = host.settings();
     this.tree.setSort(s.sidebarSort);
-    this.list.setSort(s.sidebarSort);
-    this.list.setGrouped(s.sidebarGroupByFolder);
+    this.tree.setGrouped(s.sidebarGroupByFolder);
+    this.list.setSort(s.listSort);
+    this.list.setGrouped(s.listGroupByFolder);
     this.tree.mountPanel(this.list.el);
     this.tree.mountPanel(this.search.el);
     this.tree.setMode(s.sidebarFileView);
@@ -92,15 +101,25 @@ export class FilesPanel {
     void this.setMode(this.host.settings().sidebarFileView);
   }
 
+  /** Tree and Articles keep separate sort orders and grouping (Typora treeSortType / listSortType). */
   setSort(order: SortOrder): void {
-    this.host.updateSettings({ sidebarSort: order });
-    this.tree.setSort(order);
-    this.list.setSort(order);
+    if (this.mode === 'list') {
+      this.host.updateSettings({ listSort: order });
+      this.list.setSort(order);
+    } else {
+      this.host.updateSettings({ sidebarSort: order });
+      this.tree.setSort(order);
+    }
   }
 
   setGrouped(on: boolean): void {
-    this.host.updateSettings({ sidebarGroupByFolder: on });
-    this.list.setGrouped(on);
+    if (this.mode === 'list') {
+      this.host.updateSettings({ listGroupByFolder: on });
+      this.list.setGrouped(on);
+    } else {
+      this.host.updateSettings({ sidebarGroupByFolder: on });
+      this.tree.setGrouped(on);
+    }
   }
 
   private refreshMode(): void {
@@ -109,12 +128,12 @@ export class FilesPanel {
   }
 
   showSortMenu(x: number, y: number): void {
-    const cur = this.host.settings().sidebarSort;
+    const s = this.host.settings();
+    const list = this.mode === 'list';
+    const cur = list ? s.listSort : s.sidebarSort;
+    const grouped = list ? s.listGroupByFolder : s.sidebarGroupByFolder;
     const items: MenuItem[] = SORT_OPTIONS.map((o) => ({ label: o.label, checked: o.id === cur, run: () => this.setSort(o.id) }));
-    if (this.mode === 'list') {
-      const grouped = this.host.settings().sidebarGroupByFolder;
-      items.push({ separator: true }, { label: 'Group By Folder', checked: grouped, run: () => this.setGrouped(!grouped) });
-    }
+    items.push({ separator: true }, { label: 'Group By Folder', checked: grouped, run: () => this.setGrouped(!grouped) });
     showContextMenu(x, y, items);
   }
 

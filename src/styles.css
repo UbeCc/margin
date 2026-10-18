@@ -588,3 +588,12 @@ button { cursor: default; }
 .outline[data-collapsible='true'] .outline-item { display: flex; align-items: center; }
 .outline-item[hidden] { display: none !important; }
 .outline-nomatch { list-style: none; color: var(--margin-fg-muted); padding: 16px 12px; text-align: center; font-size: 12px; }
+.list-ext { opacity: 0.5; font-weight: 400; }
+.list-summary { white-space: pre-line; }
+.outline-header[hidden] { display: none; }
+.outline-item.flash { animation: flash 0.7s var(--ease) 3; }
+.outline-text mark { background: color-mix(in srgb, var(--margin-accent) 25%, transparent); color: inherit; border-radius: 2px; }
+.search-more { border: 0; background: none; color: var(--margin-accent); font-size: 11.5px; padding: 2px 18px; }
+.search-opt[aria-pressed='true'] { color: var(--margin-accent); }
+.search-opt svg { width: 14px; height: 14px; }
+.tree-row.drop-target { box-shadow: inset 0 0 0 1.5px var(--margin-accent); background: color-mix(in srgb, var(--margin-accent) 12%, transparent); }

@@ -1,10 +1,10 @@
 import type { DirEntry, Platform } from '../../contracts';
 import { h, clearChildren } from '../util/dom';
-import { basename, dirname, relative, stripExt } from '../util/path';
+import { basename, dirname, extname, relative, stripExt } from '../util/path';
 import { showContextMenu } from '../ui/contextmenu';
 import { extras } from '../platform-extras';
 import { compareBy, DEFAULT_SORT, type SortOrder } from './sort';
-import { collectDocs, LIST_LIMIT, summarize } from './walk';
+import { collectDocs, dateLabel, LIST_LIMIT, summarize } from './walk';
 import { makeDraggable } from './drag';
 
 export interface FileListHost {
@@ -21,7 +21,7 @@ export class FileList {
   readonly el: HTMLElement;
   private root: string | null = null;
   private order: SortOrder = DEFAULT_SORT;
-  private grouped = false;
+  private grouped = true;
   private docs: DirEntry[] = [];
   private oversize = false;
   private summaries = new Map<string, string>();
@@ -100,7 +100,8 @@ export class FileList {
       return;
     }
     const sorted = [...this.docs].sort(compareBy<DirEntry>(this.order));
-    if (this.grouped) {
+    // Folder headers only when some article lives outside the root folder itself.
+    if (this.grouped && sorted.some((d) => dirname(d.path) !== this.root)) {
       const groups = new Map<string, DirEntry[]>();
       for (const d of sorted) {
         const dir = dirname(d.path);
@@ -110,23 +111,22 @@ export class FileList {
       for (const dir of dirs) {
         const label = dir === this.root ? basename(this.root!) : relative(this.root!, dir);
         this.el.appendChild(h('div.list-group', { role: 'presentation', 'data-dir': dir, text: label }));
-        for (const d of groups.get(dir)!) this.el.appendChild(this.row(d, false));
+        for (const d of groups.get(dir)!) this.el.appendChild(this.row(d));
       }
     } else {
-      for (const d of sorted) this.el.appendChild(this.row(d, true));
+      for (const d of sorted) this.el.appendChild(this.row(d));
     }
     if (this.oversize) this.el.appendChild(h('div.list-oversize', { text: `Showing the first ${LIST_LIMIT} documents` }));
   }
 
-  private row(d: DirEntry, showFolder: boolean): HTMLElement {
-    const folder = dirname(d.path);
-    const meta = [new Date(d.mtime).toLocaleDateString(), showFolder && folder !== this.root ? relative(this.root!, folder) : ''].filter(Boolean).join(' · ');
+  private row(d: DirEntry): HTMLElement {
+    const ext = extname(d.name);
     const row = h(
       'div.list-item',
       { role: 'option', tabindex: '-1', 'data-path': d.path, title: d.path, 'aria-selected': String(d.path === this.active) },
-      h('div.list-title', { text: stripExt(d.name) }),
+      h('div.list-title', null, h('span.list-name', { text: ext ? stripExt(d.name) : d.name }), ext ? h('span.list-ext', { text: ext }) : null),
+      h('div.list-meta', { text: dateLabel(d.mtime) }),
       h('div.list-summary', { text: this.summaries.get(d.path) ?? '' }),
-      h('div.list-meta', { text: meta }),
     );
     if (d.path === this.active) row.classList.add('active');
     makeDraggable(row, d.path);
