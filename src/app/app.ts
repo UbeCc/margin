@@ -16,6 +16,7 @@ import { ask } from './ui/modal';
 import { closePalette, isPaletteOpen, openPalette, type PaletteItem } from './ui/palette';
 import { toast } from './ui/toast';
 import { closeContextMenu } from './ui/contextmenu';
+import { ImageUploader } from './upload-actions';
 import { debounce, h } from './util/dom';
 import { fuzzyFilter, fuzzyMatch } from './util/fuzzy';
 import { formatShortcut, isMac } from './util/keymap';
@@ -45,6 +46,7 @@ export class App {
   private titleEl!: HTMLElement;
   private sidebar!: HTMLElement;
   private editorHost!: HTMLElement;
+  private uploader!: ImageUploader;
   private scroller!: HTMLElement;
   private tree!: FileTree;
   private outline!: OutlineView;
@@ -98,6 +100,15 @@ export class App {
       onOpened: (p) => this.onOpened(p),
       defaultDir: () => this.folder,
     });
+    // #80: "Upload Image" context menu + "Upload All Local Images" command.
+    this.uploader = new ImageUploader({
+      platform: this.platform,
+      editor: () => this.editor,
+      baseDir: () => this.doc.dir,
+      settings: () => this.settings,
+      notify: (m, k) => void toast(m, { kind: k }),
+    });
+    this.uploader.attachContextMenu(this.editorHost);
     this.editor.onChange(() => {
       this.refreshFindSoon();
       this.refreshOutlineSoon();
@@ -625,6 +636,8 @@ export class App {
       case 'openThemesFolder':
         await this.openThemesFolder();
         return true;
+      case 'uploadAllImages':
+        return (await this.uploader.uploadAll()).ok;
     }
     return false;
   }

@@ -216,4 +216,14 @@ export interface Platform {
   onOpenFiles(cb: (paths: string[]) => void): () => void;
   /** Return false from cb to cancel closing (e.g. unsaved changes). */
   onCloseRequested(cb: () => Promise<boolean>): () => void;
+  /**
+   * Optional (#80): upload local images (absolute paths) and return one URL per path, in order.
+   * `command` is tokenized into argv and run without a shell; PicGo is contacted on 127.0.0.1 only.
+   */
+  uploadImages?(paths: string[], config: UploadConfig): Promise<string[]>;
 }
+
+/** #80 image uploader config passed to `Platform.uploadImages`. timeoutSecs is per image. */
+export type UploadConfig =
+  | { kind: 'command'; command: string; timeoutSecs?: number }
+  | { kind: 'picgo'; port?: number; timeoutSecs?: number };

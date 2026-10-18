@@ -3,6 +3,7 @@ import { themeLabel } from '../themes';
 import { IMAGE_RULE_PRESETS, imageRulePresetId, type MarginSettings } from './settings';
 import { h, debounce } from './util/dom';
 import { openModal } from './ui/modal';
+import { uploadPrefsSection } from './upload-prefs';
 
 export interface PreferencesHost {
   settings(): MarginSettings;
@@ -172,6 +173,7 @@ export function openPreferences(host: PreferencesHost, initial: Section = 'appea
       }),
     ),
     h('p.pref-note', { text: '${filename} is replaced with the document name. Unsaved documents keep images where they are until saved.' }),
+    uploadPrefsSection(s, (p) => set(p as Partial<MarginSettings>)),
   );
   absDir.addEventListener('change', applyRule);
   relDir.addEventListener('change', applyRule);
