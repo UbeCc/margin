@@ -171,6 +171,21 @@ fn spawn_reader(mut r: impl Read + Send + 'static) -> mpsc::Receiver<Vec<u8>> {
     rx
 }
 
+/// `spawn`, retrying briefly on ETXTBSY: on Linux a script that was just written can
+/// still be open for writing in a concurrently forked (not yet exec'd) process.
+fn spawn_retrying(cmd: &mut Command) -> std::io::Result<std::process::Child> {
+    let mut tries = 0;
+    loop {
+        match cmd.spawn() {
+            Err(e) if cfg!(unix) && e.raw_os_error() == Some(26) && tries < 50 => {
+                tries += 1;
+                std::thread::sleep(Duration::from_millis(20));
+            }
+            r => return r,
+        }
+    }
+}
+
 /// Run `argv + paths` directly (no shell) and return one URL per path.
 pub fn run_command(argv: &[String], paths: &[String], timeout: Duration) -> Result<Vec<String>, String> {
     let (prog, args) = argv.split_first().ok_or("upload command is empty")?;
@@ -182,7 +197,7 @@ pub fn run_command(argv: &[String], paths: &[String], timeout: Duration) -> Resu
         let path = std::env::var("PATH").unwrap_or_default();
         cmd.env("PATH", format!("/opt/homebrew/bin:/usr/local/bin:{path}"));
     }
-    let mut child = cmd.spawn().map_err(|e| format!("cannot start uploader `{prog}`: {e}"))?;
+    let mut child = spawn_retrying(&mut cmd).map_err(|e| format!("cannot start uploader `{prog}`: {e}"))?;
     let out_rx = spawn_reader(child.stdout.take().expect("piped stdout"));
     let err_rx = spawn_reader(child.stderr.take().expect("piped stderr"));
     let deadline = Instant::now() + timeout;
