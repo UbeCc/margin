@@ -75,6 +75,11 @@ export function fileMenu(o: { ops: SideFileOps; entry: DirEntry | null; view: 't
   if (entry) {
     if (!entry.isDir) items.push({ label: 'Open', run: () => ops.open(entry) });
     if (ops.openInNewWindow) items.push({ label: 'Open in New Window', run: () => ops.openInNewWindow!(entry.path) });
+    // Quick Look after Open (#131): tree + Articles, files only.
+    if (entry && !entry.isDir) {
+      const ql = extras(ops.platform).quickLook;
+      items.push({ label: 'Quick Look', run: () => void ql?.call(ops.platform, entry.path), disabled: !ql });
+    }
     items.push(...undoItems(ops, dir));
   }
   if (view === 'list') {

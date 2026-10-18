@@ -179,7 +179,7 @@ test('ctx-files: sidebar context menus in Typora order (#142)', async ({ page })
   // Tree file: Open, Open in New Window | New File, New Folder | Search | Articles, File Tree | Duplicate, Rename… | tail
   await welcome.click({ button: 'right' });
   expect(await menuLabels(page)).toEqual([
-    'Open', 'Open in New Window', '|', 'New File', 'New Folder', '|', 'Search', '|',
+    'Open', 'Open in New Window', 'Quick Look', '|', 'New File', 'New Folder', '|', 'Search', '|',
     'Articles (List View)', 'File Tree (Tree View)', '|', 'Duplicate', 'Rename…', ...fileTail,
   ]);
   await expect(ctxItem(page, 'File Tree (Tree View)')).toHaveAttribute('aria-checked', 'true');
@@ -200,10 +200,10 @@ test('ctx-files: sidebar context menus in Typora order (#142)', async ({ page })
   await expect(hola).toBeVisible();
   await hola.click({ button: 'right' });
   expect(await menuLabels(page)).toEqual([
-    'Open', 'Open in New Window', 'Undo Rename Welcome.md', '|', 'New File', 'New Folder', '|', 'Search', '|',
+    'Open', 'Open in New Window', 'Quick Look', 'Undo Rename Hola.md', '|', 'New File', 'New Folder', '|', 'Search', '|',
     'Articles (List View)', 'File Tree (Tree View)', '|', 'Duplicate', 'Rename…', ...fileTail,
   ]);
-  await ctxItem(page, 'Undo Rename Welcome.md').click();
+  await ctxItem(page, 'Undo Rename Hola.md').click();
   await expect(welcome).toBeVisible();
 
   // Get Info… opens a small sheet about the file.
@@ -227,7 +227,7 @@ test('ctx-files: sidebar context menus in Typora order (#142)', async ({ page })
   await page.locator('.list-item', { hasText: 'Roadmap' }).click({ button: 'right' });
   await expect(ctxItem(page, 'Articles')).toHaveAttribute('aria-checked', 'true');
   expect(await menuLabels(page)).toEqual([
-    'Open', 'Open in New Window', '|', 'New File', '|', 'Search', '|',
+    'Open', 'Open in New Window', 'Quick Look', '|', 'New File', '|', 'Search', '|',
     'Articles', 'File Tree', '|', 'Get Info…', 'Rename…', 'Duplicate',
     '|', 'Delete…', '|', 'Copy File Path', 'Reveal in Finder',
   ]);
