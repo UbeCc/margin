@@ -8,7 +8,11 @@ import { TabBar } from './tabs';
 import { FileOps } from './fileops';
 import { VersionStore } from './versions';
 import { DraftStore, type Draft } from './drafts';
-import { buildExportHtml, documentTitle, loadKatexCss, needsKatex } from './export';
+import { documentTitle, loadKatexCss, needsKatex } from './export';
+import { ExportController, registerPandocExporters } from './export-actions';
+import { pageCss } from './export-settings';
+import { confirmOverwriteDialog, openPageSetup } from './export-ui';
+import { runImport, type ImportHost } from './import';
 import { FindBar } from './findbar';
 import { extras } from './platform-extras';
 import { openPreferences } from './preferences';
@@ -22,7 +26,7 @@ import { ask } from './ui/modal';
 import { closePalette, isPaletteOpen, openPalette, type PaletteItem } from './ui/palette';
 import { toast } from './ui/toast';
 import { handleFileDrop } from './filedrop';
-import { exportWithPandoc, PANDOC_ACTIONS, type PandocFormat } from './export-pandoc';
+import { PANDOC_ACTIONS, type PandocFormat } from './export-pandoc';
 import { closeContextMenu } from './ui/contextmenu';
 import { ImageUploader } from './upload-actions';
 import { debounce, h } from './util/dom';
@@ -51,6 +55,7 @@ export class App {
   get doc(): DocumentController {
     return this.docs.active.doc;
   }
+  exports!: ExportController;
   settings: MarginSettings = { ...DEFAULT_SETTINGS };
   themes: ThemeManager;
   folder: string | null = null;
@@ -131,6 +136,7 @@ export class App {
       drafts: this.drafts,
       renamed: (from, to) => this.fileRenamed(from, to),
     });
+    this.exports = this.createExports();
     // #80: "Upload Image" context menu + "Upload All Local Images" command.
     this.uploader = new ImageUploader({
       platform: this.platform,
@@ -803,12 +809,40 @@ export class App {
         return true;
       case 'exportHtml':
       case 'exportPdf':
-        return this.export(id === 'exportHtml' ? 'html' : 'pdf');
+        return this.exports.export(id === 'exportHtml' ? 'html' : 'pdf');
+      case 'exportHtmlPlain':
+        return this.exports.export('html-plain');
+      case 'exportImage':
+        return this.exports.export('image');
+      case 'exportPrevious':
+        return this.exports.export(null, 'previous');
+      case 'exportOverwrite':
+        return this.exports.export(null, 'overwrite');
+      case 'exportSettings':
+        this.preferences('export');
+        return true;
+      case 'pageSetup': {
+        const page = await openPageSetup(this.settings.export.pdf.page);
+        if (page) this.updateSettings({ export: { ...this.settings.export, pdf: { ...this.settings.export.pdf, page } } });
+        return !!page;
+      }
       case 'exportDocx':
       case 'exportLatex':
       case 'exportEpub':
+      case 'exportOdt':
+      case 'exportRtf':
+      case 'exportMediawiki':
+      case 'exportRst':
+      case 'exportTextile':
+      case 'exportOpml':
         return this.exportPandoc(PANDOC_ACTIONS[id]);
+      case 'exportCustom':
+        this.customExportPalette();
+        return true;
+      case 'import':
+        return runImport(this.importHost());
       case 'print':
+        this.applyPrintPageCss();
         await this.platform.print();
         return true;
       case 'undo':
@@ -903,7 +937,7 @@ export class App {
     }
   }
 
-  private preferences(): void {
+  private preferences(section?: 'export' | 'files'): void {
     openPreferences({
       settings: () => this.settings,
       update: (p) => this.updateSettings(p),
@@ -922,7 +956,7 @@ export class App {
           return e instanceof Error ? e.message : String(e);
         }
       },
-    });
+    }, section);
   }
 
   private async openThemesFolder(): Promise<void> {
@@ -995,6 +1029,9 @@ export class App {
       const active = this.themes.current === n;
       items.push({ id: `theme:${n}`, text: `Theme: ${themeLabel(n)}`, label: `Theme: ${themeLabel(n)}`, detail: active ? 'current' : '' });
     }
+    for (const c of this.settings.export.custom) {
+      items.push({ id: `custom:${c.id}`, text: `File: Export as ${c.name}`, label: `File: Export as ${c.name}`, detail: 'custom export' });
+    }
     for (const p of this.settings.recentFiles) {
       items.push({ id: `recent:${p}`, text: `Open Recent: ${basename(p)}`, label: `Open Recent: ${basename(p)}`, detail: displayPath(dirname(p)) });
     }
@@ -1014,7 +1051,8 @@ export class App {
           kind: 'command',
         })),
       pick: (it) => {
-        if (it.id.startsWith('recent:')) void this.docs.openPath(it.id.slice(7), 'tab');
+        if (it.id.startsWith('custom:')) void this.exports.export(it.id);
+        else if (it.id.startsWith('recent:')) void this.docs.openPath(it.id.slice(7), 'tab');
         else if (it.id.startsWith('folder:')) void this.openFolder(it.id.slice(7));
         else if (isCommandId(it.id)) {
           // the palette took the DOM selection: put the editor's caret/selection back first
@@ -1027,57 +1065,81 @@ export class App {
 
   // ======================================================== export
 
-  private async export(kind: 'html' | 'pdf'): Promise<boolean> {
-    const md = this.editor.getMarkdown();
-    const name = this.doc.path ? stripExt(basename(this.doc.path)) : documentTitle(md, null);
-    const base = this.doc.dir ?? this.folder;
-    const target = await this.platform.saveFileDialog({
-      defaultPath: base ? `${base}/${name}.${kind}` : `${name}.${kind}`,
-      filters: [kind === 'html' ? { name: 'HTML', extensions: ['html'] } : { name: 'PDF', extensions: ['pdf'] }],
-    });
-    if (!target) return false;
-    // HTML: local images as paths relative to the exported file (webview asset URLs don't
-    // work outside the app). PDF keeps asset URLs, which the native renderer loads (#27).
-    if (kind === 'html') this.exportDir = dirname(target);
-    let body: string;
-    try {
-      body = this.editor.renderHTML();
-    } finally {
-      this.exportDir = null;
+  /** File › Export › Custom…: pick one of the user's export commands. */
+  private customExportPalette(): void {
+    const list = this.settings.export.custom;
+    if (!list.length) {
+      toast('No custom export commands yet — add one in Export Settings.', { kind: 'info', action: { label: 'Export Settings', run: () => this.preferences('export') } });
+      return;
     }
-    const katex = needsKatex(body) ? await loadKatexCss() : '';
-    const html = buildExportHtml({ title: documentTitle(md, this.doc.path ? basename(this.doc.path) : null), body, themeCss: this.themes.exportCss(), extraCss: `${await this.wiring.loadBlocksCss()}\n${katex}` });
-    try {
-      if (kind === 'html') await this.platform.exportHtml(html, target);
-      else await this.platform.exportPdf(html, target, { baseDir: this.doc.dir ?? undefined });
-    } catch (e) {
-      toast(`Export failed: ${e instanceof Error ? e.message : e}`, { kind: 'error' });
-      return false;
-    }
-    const reveal = extras(this.platform).revealInFolder;
-    toast(`Exported ${basename(target)}`, {
-      kind: 'success',
-      action: reveal ? { label: 'Show', run: () => void reveal.call(this.platform, target) } : undefined,
+    if (isPaletteOpen()) closePalette();
+    openPalette({
+      className: 'command-palette',
+      placeholder: 'Export with…',
+      provide: (q) =>
+        fuzzyFilter(q, list, (c) => c.name, 50).map(({ item, match }) => ({ id: `custom:${item.id}`, label: item.name, labelHits: match.indices, detail: item.command, kind: 'command' })),
+      pick: (it) => void this.exports.export(it.id),
     });
-    return true;
+  }
+
+  private importHost(): ImportHost {
+    return {
+      platform: this.platform,
+      pandocPath: () => this.settings.pandocPath,
+      openAsNew: (md) => this.doc.newDocument(md),
+      progress: (m) => toast(m, { kind: 'info', timeout: 0 }),
+      notify: (m, kind, action) => void toast(m, { kind, action }),
+      htmlToMarkdown: async (html) => (await import('../editor/core/paste')).htmlToMarkdown(html),
+      openPandocSettings: () => this.preferences('files'),
+    };
+  }
+
+  private createExports(): ExportController {
+    const c = new ExportController({
+      platform: this.platform,
+      exportSettings: () => this.settings.export,
+      updateExportSettings: (next) => this.updateSettings({ export: next }),
+      markdown: () => this.editor.getMarkdown(),
+      docPath: () => this.doc.path,
+      folder: () => this.folder,
+      renderBody: (relativeTo) => {
+        // HTML: local images as paths relative to the exported file (webview asset URLs don't
+        // work outside the app). PDF/image keep asset URLs, which the renderer loads (#27).
+        this.exportDir = relativeTo;
+        try {
+          return this.editor.renderHTML();
+        } finally {
+          this.exportDir = null;
+        }
+      },
+      themeCss: (theme) => this.themes.exportCss(theme),
+      extraCss: async (body) => `${await this.wiring.loadBlocksCss()}\n${needsKatex(body) ? await loadKatexCss() : ''}`,
+      notify: (m, kind, action) => void toast(m, { kind, action }),
+      confirmOverwrite: (p) => confirmOverwriteDialog(p),
+    });
+    registerPandocExporters(c, {
+      pandocPath: () => this.settings.pandocPath,
+      title: () => documentTitle(this.editor.getMarkdown(), this.doc.path ? basename(this.doc.path) : null),
+      progress: (m) => toast(m, { kind: 'info', timeout: 0 }),
+    });
+    return c;
+  }
+
+  /** Page Setup applies to File › Print: keep an @page rule in the live document. */
+  private applyPrintPageCss(): void {
+    let el = document.getElementById('margin-print-page') as HTMLStyleElement | null;
+    if (!el) {
+      el = document.createElement('style');
+      el.id = 'margin-print-page';
+      document.head.appendChild(el);
+    }
+    el.textContent = pageCss(this.settings.export.pdf.page, this.settings.export.pdf.pageBreaks);
   }
 
   private exportPandoc(format: PandocFormat): Promise<boolean> {
-    const md = this.editor.getMarkdown();
-    const reveal = extras(this.platform).revealInFolder;
-    return exportWithPandoc(format, {
-      platform: this.platform,
-      markdown: md,
-      name: this.doc.path ? stripExt(basename(this.doc.path)) : documentTitle(md, null),
-      docDir: this.doc.dir ?? null,
-      fallbackDir: this.folder,
-      title: documentTitle(md, this.doc.path ? basename(this.doc.path) : null),
-      pandocPath: this.settings.pandocPath,
-      progress: (m) => toast(m, { kind: 'info', timeout: 0 }),
-      notify: (m, kind, action) => void toast(m, { kind, action }),
-      reveal: reveal ? (p) => void reveal.call(this.platform, p).catch(() => {}) : undefined,
-    });
+    return this.exports.export(`pandoc:${format}`);
   }
+
 
   /** For tests / devtools. */
   get commandSpec(): typeof commandSpec {
