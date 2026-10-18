@@ -5,14 +5,14 @@ import { applyUrls, findImageRefs, localImages, uploadConfig, uploadSettingsOf, 
 describe('upload settings', () => {
   it('defaults and validation', () => {
     expect(uploadSettingsOf({})).toEqual(UPLOAD_DEFAULTS);
-    expect(uploadSettingsOf({ uploader: 'picgo', picgoPort: '8080', uploadTimeout: 999 })).toMatchObject({ uploader: 'picgo', picgoPort: 8080, uploadTimeout: 30 });
+    expect(uploadSettingsOf({ uploader: 'picgo', picgoPort: '8080', uploadTimeout: 999 })).toMatchObject({ uploader: 'picgo', picgoPort: 8080, uploadTimeout: 20 });
     expect(uploadSettingsOf({ uploader: 'bogus', picgoPort: 0 })).toMatchObject({ uploader: 'none', picgoPort: 36677 });
   });
   it('native config or an actionable message', () => {
     expect(typeof uploadConfig(uploadSettingsOf({}))).toBe('string');
     expect(typeof uploadConfig(uploadSettingsOf({ uploader: 'command', uploadCommand: '  ' }))).toBe('string');
     expect(uploadConfig(uploadSettingsOf({ uploader: 'command', uploadCommand: ' picgo upload ', uploadTimeout: 5 }))).toEqual({ kind: 'command', command: 'picgo upload', timeoutSecs: 5 });
-    expect(uploadConfig(uploadSettingsOf({ uploader: 'picgo', picgoPort: 1234 }))).toEqual({ kind: 'picgo', port: 1234, timeoutSecs: 30 });
+    expect(uploadConfig(uploadSettingsOf({ uploader: 'picgo', picgoPort: 1234 }))).toEqual({ kind: 'picgo', port: 1234, timeoutSecs: 20 });
   });
 });
 

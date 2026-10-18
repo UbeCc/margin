@@ -173,19 +173,15 @@ export interface SrcContext {
 export function formatImageSrc(absPath: string, ctx: SrcContext): string {
   const abs = normalize(absPath);
   const o = ctx.options;
-  const outside = (r: string): boolean => r === '..' || r.startsWith('../');
-  let explicit = !!ctx.rootDir;
-  let root = ctx.rootDir ?? (o.imageUseRelative ? ctx.docDir : null);
-  // An image outside the root url cannot be written root-relative: fall back to the normal rule.
-  if (explicit && root && outside(relative(root, abs))) {
-    explicit = false;
-    root = o.imageUseRelative ? ctx.docDir : null;
-  }
+  const explicit = !!ctx.rootDir;
+  const root = ctx.rootDir ?? (o.imageUseRelative ? ctx.docDir : null);
   let out = abs;
   if (root) {
     let rel = relative(root, abs);
     if (o.imageDotPrefix && !rel.startsWith('.')) rel = './' + rel;
-    if (explicit && !rel.startsWith('./')) rel = '/' + rel;
+    // Root-url mode writes site-root paths; images outside the root stay `../`-relative
+    // to the root (relative srcs resolve against the root when rendering).
+    if (explicit && !rel.startsWith('.')) rel = '/' + rel;
     out = rel;
   }
   if (/^[a-zA-Z]:[\\/]/.test(abs)) out = out.replace(/\\/g, '/');

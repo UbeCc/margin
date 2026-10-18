@@ -2,6 +2,9 @@ import type { EditorHandle, Platform } from '../contracts';
 import { showContextMenu } from './ui/contextmenu';
 import { applyUrls, findImageRefs, localImages, uploadConfig, uploadSettingsOf, type LocalImage, type UploadPlatform } from './upload';
 
+/** URLs accepted from an uploader (Typora: http(s), ftp, file). */
+const UPLOADED_URL = /^(?:https?|ftp):\/\/\S+$|^file:\/\S+$/i;
+
 /** What the uploader needs from the shell (kept small so it is easy to fake in tests). */
 export interface UploadHost {
   platform: Platform & UploadPlatform;
@@ -40,6 +43,31 @@ export class ImageUploader {
     return this.run(localImages(refs, this.host.baseDir()), 'Only local images can be uploaded.');
   }
 
+  /**
+   * Upload files without touching the document (#92 upload-on-insert). Resolves to one
+   * URL per path; rejects with a readable message.
+   */
+  async uploadFiles(paths: string[]): Promise<string[]> {
+    const upload = this.host.platform.uploadImages;
+    if (!upload) throw new Error('Image upload is only available in the desktop app.');
+    const config = uploadConfig(uploadSettingsOf(this.host.settings()));
+    if (typeof config === 'string') throw new Error('Please set an image uploader in Preferences panel before using this function.');
+    this.busy = true;
+    try {
+      const urls = await upload.call(this.host.platform, paths, config);
+      if (!Array.isArray(urls) || urls.length !== paths.length || urls.some((u) => typeof u !== 'string' || !UPLOADED_URL.test(u)))
+        throw new Error('Failed to fetch uploaded image from command output.');
+      return urls;
+    } finally {
+      this.busy = false;
+    }
+  }
+
+  /** Abort in-flight uploads (desktop). */
+  async cancel(): Promise<void> {
+    await (this.host.platform as { cancelUpload?: () => Promise<void> }).cancelUpload?.();
+  }
+
   private fail(error: string): UploadOutcome {
     this.host.notify(error, 'error');
     return { ok: false, error };
@@ -61,7 +89,7 @@ export class ImageUploader {
       } catch (e) {
         return this.fail(`Upload failed: ${e instanceof Error ? e.message : String(e)}`);
       }
-      if (!Array.isArray(urls) || urls.length !== images.length || urls.some((u) => typeof u !== 'string' || !/^https?:\/\/\S+$/.test(u))) {
+      if (!Array.isArray(urls) || urls.length !== images.length || urls.some((u) => typeof u !== 'string' || !UPLOADED_URL.test(u))) {
         return this.fail('Upload failed: the uploader did not return one URL per image.');
       }
       const map = new Map(images.map((img, i) => [img.src, urls[i]]));

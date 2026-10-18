@@ -81,7 +81,7 @@ describe('formatImageSrc (resolveImagePath)', () => {
   it('typora-root-url writes site-root paths, falls back outside the root', () => {
     expect(formatImageSrc('/u/site/assets/a.png', { docDir: '/u/site/posts', rootDir: '/u/site', options: O() })).toBe('/assets/a.png');
     expect(formatImageSrc('/u/site/assets/a.png', { docDir: '/u/site/posts', rootDir: '/u/site', options: O({ imageDotPrefix: true }) })).toBe('./assets/a.png');
-    expect(formatImageSrc('/other/a.png', { docDir: '/u/site/posts', rootDir: '/u/site', options: O() })).toBe('../../../other/a.png');
+    expect(formatImageSrc('/other/a.png', { docDir: '/u/site/posts', rootDir: '/u/site', options: O() })).toBe('../../other/a.png');
   });
 
   it('escapes characters that break destinations', () => {

@@ -30,6 +30,7 @@ describe('image syntax', () => {
     expect(zoomChoices(3)[0]).toBe('33%');
     expect(zoomChoices(1.5)[0]).toBe('67%');
     expect(zoomChoices(4)[0]).toBe('25%');
-    expect(zoomChoices(null)).toEqual(['33%', '50%', '67%', '80%', '100%', '150%', '200%']);
+    expect(zoomChoices(null)).toEqual(['25%', '33%', '50%', '67%', '80%', '100%', '150%', '200%']);
+    expect(zoomChoices(1.25)[0]).toBe('80%');
   });
 });

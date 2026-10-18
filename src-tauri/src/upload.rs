@@ -29,7 +29,9 @@ fn cancel_gen() -> u64 {
 pub fn cancel_all() {
     CANCEL_GEN.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
 }
-pub const DEFAULT_PER_IMAGE_SECS: u64 = 30;
+/// Typora: 20 s per image, a batch capped at 60 s (a stuck uploader is killed then).
+pub const DEFAULT_PER_IMAGE_SECS: u64 = 20;
+pub const BATCH_CAP_SECS: u64 = 60;
 pub const MAX_TIMEOUT_SECS: u64 = 300;
 const OUTPUT_LIMIT: usize = 4 << 20;
 
@@ -50,10 +52,11 @@ pub enum UploadConfig {
     },
 }
 
-/// Total budget for a batch: `per_image * n`, clamped to `[per_image, MAX_TIMEOUT_SECS]`.
+/// Total budget for a batch: `per_image * n`, capped at Typora's 60 s — or at the
+/// per-image value when the user configured more than that for slow uploaders.
 pub fn batch_timeout(per_image_secs: Option<u64>, n: usize) -> Duration {
     let per = per_image_secs.unwrap_or(DEFAULT_PER_IMAGE_SECS).clamp(1, MAX_TIMEOUT_SECS);
-    Duration::from_secs(per.saturating_mul(n.max(1) as u64).min(MAX_TIMEOUT_SECS.max(per)))
+    Duration::from_secs(per.saturating_mul(n.max(1) as u64).min(BATCH_CAP_SECS.max(per)))
 }
 
 /// Split a command line into argv like a POSIX shell would *tokenize* it, without

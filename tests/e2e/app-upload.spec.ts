@@ -33,7 +33,7 @@ test('upload image from the context menu replaces its src with the URL', async (
   await page.locator('.context-item', { hasText: 'Upload Image' }).click();
   await expect.poll(() => editorValue(page)).toBe('# Pics\n\n![shot](https://cdn.example/0.png)\n');
   const calls = await page.evaluate(() => window.__uploads);
-  expect(calls).toEqual([{ paths: [`${ROOT}/assets/shot 1.png`], config: { kind: 'command', command: "'/opt/up loader' -u", timeoutSecs: 30 } }]);
+  expect(calls).toEqual([{ paths: [`${ROOT}/assets/shot 1.png`], config: { kind: 'command', command: "'/opt/up loader' -u", timeoutSecs: 20 } }]);
   await expect.poll(() => page.evaluate(() => localStorage.getItem('margin.web.settings.v1') ?? '')).toContain('"uploader":"command"');
 });
 

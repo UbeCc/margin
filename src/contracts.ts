@@ -223,8 +223,13 @@ export type MenuAction =
   // #99 (additive): Format › Image submenu
   | `image:${ImageMenuAction}`;
 
-/** Format › Image entries (#99). */
-export type ImageMenuAction = 'insert' | 'insertLocal' | 'uploadAll' | 'rootPath' | 'copyAll' | 'moveAll' | 'reloadAll' | 'settings';
+/** Format › Image entries (#99), in Typora's menu order; per-image ones act on the image at the caret. */
+export type ImageMenuAction =
+  | 'insert' | 'insertLocal' | 'openLocation' | 'copyContent'
+  | `zoom-${25 | 33 | 50 | 67 | 80 | 100 | 150 | 200}`
+  | 'syntaxMarkdown' | 'syntaxHtml' | 'deleteFile' | 'copyTo' | 'moveTo' | 'upload'
+  | 'copyAll' | 'moveAll' | 'uploadAll' | 'reloadAll'
+  | 'insertCopyToFolder' | 'insertUpload' | 'rootPath' | 'settings';
 
 export interface Platform {
   readonly kind: 'tauri' | 'web';

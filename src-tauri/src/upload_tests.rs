@@ -56,8 +56,12 @@ fn url_lines_follow_typora_rules() {
 #[test]
 fn timeout_scales_and_caps() {
     assert_eq!(batch_timeout(None, 1), Duration::from_secs(DEFAULT_PER_IMAGE_SECS));
+    assert_eq!(batch_timeout(None, 1), Duration::from_secs(20));
+    assert_eq!(batch_timeout(None, 2), Duration::from_secs(40));
+    assert_eq!(batch_timeout(None, 5), Duration::from_secs(60), "Typora caps a batch at 60 s");
     assert_eq!(batch_timeout(Some(10), 3), Duration::from_secs(30));
-    assert_eq!(batch_timeout(Some(100), 50), Duration::from_secs(MAX_TIMEOUT_SECS));
+    assert_eq!(batch_timeout(Some(100), 50), Duration::from_secs(100));
+    assert_eq!(batch_timeout(Some(1000), 2), Duration::from_secs(MAX_TIMEOUT_SECS));
     assert_eq!(batch_timeout(Some(0), 0), Duration::from_secs(1));
 }
 

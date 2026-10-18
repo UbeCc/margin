@@ -95,9 +95,12 @@ export function setZoom(raw: string, value: string): string {
   return renderHtml({ ...p, attrs });
 }
 
-/** Zoom menu entries: presets plus 1/scale (Retina screenshots → "50%"). */
+/** Typora's Format › Image › Zoom Image presets. */
+export const ZOOM_PRESETS = ['25%', '33%', '50%', '67%', '80%', '100%', '150%', '200%'];
+
+/** Zoom menu entries: 1/scale first (Retina screenshots → "50%"), then the presets. */
 export function zoomChoices(scale: number | null): string[] {
-  const presets = ['33%', '50%', '67%', '80%', '100%', '150%', '200%'];
+  const presets = ZOOM_PRESETS;
   if (!scale || !Number.isFinite(scale) || scale <= 0 || Math.abs(scale - 1) < 1e-3) return presets;
   const fit = `${Math.round(100 / scale)}%`;
   return [fit, ...presets.filter((x) => x !== fit)];

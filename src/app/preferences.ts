@@ -1,4 +1,5 @@
-import type { ImageRule } from '../contracts';
+import type { ImageRule, UploadConfig } from '../contracts';
+import type { UploaderTestReport } from './platform-extras';
 import { themeLabel } from '../themes';
 import { IMAGE_RULE_PRESETS, imageRulePresetId, type MarginSettings } from './settings';
 import { h, debounce } from './util/dom';
@@ -14,6 +15,8 @@ export interface PreferencesHost {
   pickFolder(): Promise<string | null>;
   /** Locate pandoc for the given path ('' = auto); resolves to a status line, never rejects. */
   detectPandoc?(path: string): Promise<string>;
+  /** #92: Preferences › Images › Test Uploader (desktop). */
+  testUploader?(config: UploadConfig): Promise<UploaderTestReport>;
 }
 
 type Section = 'appearance' | 'editor' | 'files' | 'images';
