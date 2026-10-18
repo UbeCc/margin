@@ -35,6 +35,7 @@ const COMMANDS: &[&str] = &[
     "create_dir",
     "reveal_path",
     "clipboard_write_rich",
+    "clipboard_read",
 ];
 
 fn main() {

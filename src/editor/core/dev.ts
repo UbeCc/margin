@@ -3,7 +3,7 @@
  * Used by tests/e2e/core-*.spec.ts through `window.__core`.
  * `?blocks=0` skips the real block widgets (fallback <pre> widgets).
  */
-import type { EditorHandle, EditorSettings, RichClipboardData } from '../../contracts';
+import type { ClipboardSnapshot, EditorHandle, EditorSettings, RichClipboardData } from '../../contracts';
 import { createEditor, registerWidget, registerInlineMath, registerSourceMode, OUTLINE_EVENT } from './index';
 
 const SAMPLE = `# Margin core
@@ -47,6 +47,8 @@ declare global {
       ready: boolean;
       /** `?rich`: payloads sent to EditorSettings.writeClipboardRich (#79). */
       rich: RichClipboardData[];
+      /** `?clipread`: what EditorSettings.readClipboard (native pasteboard, #96) returns. */
+      clip: ClipboardSnapshot | null;
     };
   }
 }
@@ -70,11 +72,12 @@ async function main() {
   };
   const rich: RichClipboardData[] = [];
   if (params.has('rich')) settings.writeClipboardRich = async (d) => (rich.push(d), true);
+  if (params.has('clipread')) settings.readClipboard = async () => window.__core.clip;
   const host = document.getElementById('host')!;
   const ed = createEditor(host, settings);
   const md = params.has('empty') ? '' : (params.get('md') ?? SAMPLE);
   ed.setMarkdown(md);
-  const state = { ed, md: () => ed.getMarkdown(), changes: 0, outlineEvents: 0, opened, ready: true, rich };
+  const state = { ed, md: () => ed.getMarkdown(), changes: 0, outlineEvents: 0, opened, ready: true, rich, clip: null as ClipboardSnapshot | null };
   window.__core = state;
   ed.onChange(() => state.changes++);
   document.addEventListener(OUTLINE_EVENT, () => state.outlineEvents++);

@@ -6,6 +6,8 @@ import * as E from './edit';
 import { splitBlockMeta } from './render-inline';
 import { find, replace } from './find';
 import { insertMarkdown } from './clipboard';
+import { selectScope, deleteScope, jumpTo } from './scopes';
+import { copyAs, pastePlain } from './copy-as';
 
 export function undo(ed: EditorCore): boolean {
   const e = ed.hist.popUndo();
@@ -225,8 +227,18 @@ export function execCommand(ed: EditorCore, cmd: EditorCommand): boolean {
       return true;
     }
     case 'find':
-      return find(ed, cmd.query, cmd.caseSensitive, cmd.backwards);
+      return find(ed, cmd.query, { caseSensitive: cmd.caseSensitive, wholeWord: cmd.wholeWord, regex: cmd.regex }, cmd.backwards);
     case 'replace':
-      return replace(ed, cmd.query, cmd.replacement, cmd.all);
+      return replace(ed, cmd.query, cmd.replacement, cmd.all, { caseSensitive: cmd.caseSensitive, wholeWord: cmd.wholeWord, regex: cmd.regex });
+    case 'select':
+      return selectScope(ed, cmd.scope);
+    case 'delete':
+      return deleteScope(ed, cmd.scope);
+    case 'jump':
+      return jumpTo(ed, cmd.to);
+    case 'copyAs':
+      return copyAs(ed, cmd.format);
+    case 'pastePlain':
+      return pastePlain(ed);
   }
 }

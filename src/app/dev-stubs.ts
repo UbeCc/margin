@@ -277,6 +277,8 @@ export const createStubEditor: CreateEditor = (host: HTMLElement, initial: Edito
         }
         return exec({ kind: 'find', query: cmd.query, caseSensitive: true });
       }
+      default:
+        return false; // #96 commands (scopes, copy-as…) are not emulated by the stub
     }
   };
 

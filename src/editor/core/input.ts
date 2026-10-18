@@ -4,6 +4,7 @@
  * positions); IME composition is left to the browser and read back on
  * compositionend; structural keys go through edit.ts.
  */
+import { armPlainPaste, plainPasteArmed } from './copy-as';
 import { EditorCore } from './editor';
 import { EMPTY_ID } from './view';
 import { leafContent } from './model';
@@ -153,6 +154,8 @@ export function attachInput(ed: EditorCore): () => void {
       else undo(ed);
       return;
     }
+    // ⇧⌘V / ⌥⇧⌘V / Ctrl+Shift+V: the engine's own "paste and match style" follows; take it as plain text (#96)
+    if (mod && e.shiftKey && e.code === 'KeyV') armPlainPaste(ed);
     if (e.key === 'Enter' && !mod && !e.altKey) {
       e.preventDefault();
       enter(e.shiftKey);
@@ -317,7 +320,7 @@ export function attachInput(ed: EditorCore): () => void {
     [root, 'click', onClick as EventListener],
     [root, 'copy', ((e: ClipboardEvent) => !inWidget(e.target) && onCopy(ed, e, false)) as EventListener],
     [root, 'cut', ((e: ClipboardEvent) => !inWidget(e.target) && onCopy(ed, e, true)) as EventListener],
-    [root, 'paste', ((e: ClipboardEvent) => !inWidget(e.target) && onPaste(ed, e)) as EventListener],
+    [root, 'paste', ((e: ClipboardEvent) => !inWidget(e.target) && onPaste(ed, e, plainPasteArmed(ed))) as EventListener],
     [root, 'drop', ((e: DragEvent) => !inWidget(e.target) && onDrop(ed, e)) as EventListener],
     [document, 'selectionchange', onSelChange],
   ];

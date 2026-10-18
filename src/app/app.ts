@@ -140,6 +140,7 @@ export class App {
       storeImage: (input) => this.storeImage(input),
       openLink: (href) => void this.openLink(href),
       ...(this.platform.writeClipboardRich ? { writeClipboardRich: (d) => this.platform.writeClipboardRich!(d) } : {}),
+      ...(this.platform.readClipboard ? { readClipboard: () => this.platform.readClipboard!() } : {}),
       spellcheck: this.settings.spellcheck,
       focusMode: this.settings.focusMode,
       typewriterMode: this.settings.typewriterMode,
@@ -495,6 +496,17 @@ export class App {
     );
   }
 
+  /** Paste as Plain Text (#96): the editor's own path, or plain text into a focused text field. */
+  private async pastePlain(): Promise<boolean> {
+    const a = document.activeElement;
+    if (a instanceof HTMLInputElement || a instanceof HTMLTextAreaElement) {
+      const t = await navigator.clipboard?.readText?.().catch(() => '');
+      if (t) document.execCommand('insertText', false, t);
+      return !!t;
+    }
+    return this.editor.exec({ kind: 'pastePlain' });
+  }
+
   private focusInEditor(): boolean {
     const a = document.activeElement;
     return !a || a === document.body || this.editorHost.contains(a);
@@ -525,6 +537,11 @@ export class App {
     if (id.startsWith('heading:')) return ed.exec({ kind: 'heading', level: Number(id.slice(8)) as 0 });
     if (id.startsWith('mark:')) return ed.exec({ kind: 'mark', mark: id.slice(5) as 'strong' });
     if (id.startsWith('block:')) return ed.exec({ kind: 'block', block: id.slice(6) as 'quote' });
+    if (id.startsWith('copyAs:')) return ed.exec({ kind: 'copyAs', format: id.slice(7) as 'markdown' });
+    if (id.startsWith('select:')) return ed.exec({ kind: 'select', scope: id.slice(7) as 'word' });
+    if (id.startsWith('delete:')) return ed.exec({ kind: 'delete', scope: id.slice(7) as 'word' });
+    if (id.startsWith('jump:')) return ed.exec({ kind: 'jump', to: id.slice(5) as 'top' });
+    if (id === 'pastePlain') return this.pastePlain();
     if (id.startsWith('theme:')) {
       const name = id.slice(6);
       if (!(name in this.themes.themes)) return false;
