@@ -2,10 +2,10 @@
  "generated_from": {
   "spec": "typora-re/parity-spec.md",
   "prose": "typora-re/sections/*.md",
-  "margin_head": "3c6812b3700a944875d4140ce8a3ffd0aeaef079"
+  "margin_head": "a75f1935cb0e7bb93149b51e775f972ce8bec926"
  },
  "summary": {
-  "head": "3c6812b3700a944875d4140ce8a3ffd0aeaef079",
+  "head": "a75f1935cb0e7bb93149b51e775f972ce8bec926",
   "artifact_sha256": "f438716ac808fa7706d73b251a75f1628ee0382fce7b2236e71ed4ec85526cfb",
   "inventory": {
    "total": 174,
@@ -16,8 +16,8 @@
    "verified_by_test": 153
   },
   "ledger": {
-   "ledger_id": "rol_77c5b170f60e4aa814a4bd29f5e048e887cbf3ac0bef4381b8e16ed5bb5db28c",
-   "closure_digest": "c2dcacedf913c260110e2725c3aff3e5fb43c965381f40c9b6fec56182974024",
+   "ledger_id": "rol_fcda7790a6144b81ab9f442ddd6bdf8b039d72048539f22a1b2dba61f650ba09",
+   "closure_digest": "5192553bdf2aa73b71dd7341bac5821a01e11868f22a455efc83f7c95d01d6ca",
    "status": "unknown",
    "summary": {
     "total": 179,
@@ -119,7 +119,7 @@
      }
     ]
    },
-   "evidence_id": "ev_8378def81671ac6af948bec9e7faf01d72577bfb864bc9587393979b85530b81"
+   "evidence_id": "ev_0d8843391a4481b1e6f79167930eff3c9d108864c7b30e5f9da960123cf4732f"
   },
   "coverage": {
    "status": "partial",
@@ -170,7 +170,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "About Margin",
-    "sha256": "290c08df1bd89851af8d3e77f9eb44df9f5d74d8129c7f3e0fd20283c10fcf75"
+    "sha256": "59008d8a159028e5944a42084bc7ba71bc3af6957ba59448b0dc0e29bf4fec04"
    },
    "verifier": null,
    "spec": {
@@ -242,7 +242,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "PredefinedMenuItem::hide_others",
-    "sha256": "290c08df1bd89851af8d3e77f9eb44df9f5d74d8129c7f3e0fd20283c10fcf75"
+    "sha256": "59008d8a159028e5944a42084bc7ba71bc3af6957ba59448b0dc0e29bf4fec04"
    },
    "verifier": null,
    "spec": {
@@ -480,7 +480,7 @@
     ],
     "prose": []
    },
-   "note": null,
+   "note": "no accelerator: Typora lists none for opening a folder (native-commands.md §menus L235-259); the item is kept for the sidebar flow, former ⇧⌘O handed to Open Quickly (#161)",
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -529,7 +529,7 @@
      "native-commands §3"
     ]
    },
-   "note": "deliberate deviations from Typora (native-commands §3, #119): every file type is searchable (Markdown ranked first), extension and name matching are case-insensitive, query text is escaped, an empty/unindexed/stale Spotlight answer falls back to the walker, deleted entries are pruned",
+   "note": "label \"Open Quickly…\" and accelerator ⇧⌘O match Typora (native-commands.md §menus L245, #161); Print took ⌘P and Page Setup ⇧⌘P (L258-259); deliberate search deviations from Typora (native-commands §3, #119): every file type is searchable (Markdown ranked first), extension and name matching are case-insensitive, query text is escaped, an empty/unindexed/stale Spotlight answer falls back to the walker, deleted entries are pruned",
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -1067,7 +1067,7 @@
      "export-print §11"
     ]
    },
-   "note": null,
+   "note": "accelerator ⇧⌘P matches Typora (native-commands.md §menus L258, #161)",
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -1103,7 +1103,7 @@
      "export-print §4.2"
     ]
    },
-   "note": null,
+   "note": "accelerator ⌘P matches Typora (native-commands.md §menus L259, #161); freed from Quick Open",
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -1646,7 +1646,7 @@
    "owner": {
     "path": "src/app/commands.ts",
     "anchor": "spell:toggle",
-    "sha256": "190d7fcff28d6b8d9347545cf5ad2bb3f42bbca6a3d8a795a9760bf88ddc03e0"
+    "sha256": "f62dbb98a8119805ea8a833d5f1430841ed33c991a319c3a4b1407f55a630d36"
    },
    "verifier": {
     "file": "tests/e2e/parity-chrome.spec.ts",
@@ -2976,7 +2976,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "PredefinedMenuItem::fullscreen",
-    "sha256": "290c08df1bd89851af8d3e77f9eb44df9f5d74d8129c7f3e0fd20283c10fcf75"
+    "sha256": "59008d8a159028e5944a42084bc7ba71bc3af6957ba59448b0dc0e29bf4fec04"
    },
    "verifier": null,
    "spec": {
@@ -3123,7 +3123,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "THEMES_SUBMENU_ID",
-    "sha256": "290c08df1bd89851af8d3e77f9eb44df9f5d74d8129c7f3e0fd20283c10fcf75"
+    "sha256": "59008d8a159028e5944a42084bc7ba71bc3af6957ba59448b0dc0e29bf4fec04"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -3225,7 +3225,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "pub fn set_checked",
-    "sha256": "290c08df1bd89851af8d3e77f9eb44df9f5d74d8129c7f3e0fd20283c10fcf75"
+    "sha256": "59008d8a159028e5944a42084bc7ba71bc3af6957ba59448b0dc0e29bf4fec04"
    },
    "verifier": {
     "file": "tests/e2e/parity-chrome.spec.ts",
@@ -3261,7 +3261,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "PredefinedMenuItem::minimize",
-    "sha256": "290c08df1bd89851af8d3e77f9eb44df9f5d74d8129c7f3e0fd20283c10fcf75"
+    "sha256": "59008d8a159028e5944a42084bc7ba71bc3af6957ba59448b0dc0e29bf4fec04"
    },
    "verifier": null,
    "spec": {
@@ -3295,7 +3295,7 @@
    "owner": {
     "path": "src-tauri/src/menu.rs",
     "anchor": "ID_HELP_MARKDOWN",
-    "sha256": "290c08df1bd89851af8d3e77f9eb44df9f5d74d8129c7f3e0fd20283c10fcf75"
+    "sha256": "59008d8a159028e5944a42084bc7ba71bc3af6957ba59448b0dc0e29bf4fec04"
    },
    "verifier": null,
    "spec": {
@@ -5185,7 +5185,7 @@
    "owner": {
     "path": "src/app/commands.ts",
     "anchor": "export function setCustomKeys",
-    "sha256": "190d7fcff28d6b8d9347545cf5ad2bb3f42bbca6a3d8a795a9760bf88ddc03e0"
+    "sha256": "f62dbb98a8119805ea8a833d5f1430841ed33c991a319c3a4b1407f55a630d36"
    },
    "verifier": {
     "file": "tests/e2e/parity-prefs.spec.ts",

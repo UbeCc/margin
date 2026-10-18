@@ -43,8 +43,8 @@ const H = (n: 0 | 1 | 2 | 3 | 4 | 5 | 6): CommandSpec => ({
 export const COMMANDS: CommandSpec[] = [
   { id: 'new', label: 'New File', category: 'File', keys: ['Mod+N'] },
   { id: 'open', label: 'Open…', category: 'File', keys: ['Mod+O'] },
-  { id: 'openFolder', label: 'Open Folder…', category: 'File', keys: ['Mod+Shift+O'] },
-  { id: 'quickOpen', label: 'Quick Open…', category: 'File', keys: ['Mod+P'] },
+  { id: 'openFolder', label: 'Open Folder…', category: 'File' },
+  { id: 'quickOpen', label: 'Open Quickly…', category: 'File', keys: ['Mod+Shift+O'] },
   { id: 'save', label: 'Save', category: 'File', keys: ['Mod+S'] },
   { id: 'saveAs', label: 'Save As…', category: 'File', keys: ['Mod+Shift+S'] },
   { id: 'close', label: 'Close File', category: 'File', keys: ['Mod+W'] },
@@ -72,7 +72,7 @@ export const COMMANDS: CommandSpec[] = [
   { id: 'exportPrevious', label: 'Export with Previous', category: 'File' },
   { id: 'exportOverwrite', label: 'Export and Overwrite with Previous', category: 'File' },
   { id: 'exportSettings', label: 'Export Settings…', category: 'File' },
-  { id: 'pageSetup', label: 'Page Setup…', category: 'File' },
+  { id: 'pageSetup', label: 'Page Setup…', category: 'File', keys: ['Mod+Shift+P'] },
   { id: 'exportDocx', label: 'Export as Word (.docx)…', category: 'File' },
   { id: 'exportLatex', label: 'Export as LaTeX…', category: 'File' },
   { id: 'exportEpub', label: 'Export as EPUB…', category: 'File' },
@@ -84,7 +84,7 @@ export const COMMANDS: CommandSpec[] = [
   { id: 'exportOpml', label: 'Export as OPML…', category: 'File' },
   { id: 'exportCustom', label: 'Export with Custom Command…', category: 'File' },
   { id: 'import', label: 'Import…', category: 'File' },
-  { id: 'print', label: 'Print…', category: 'File', keys: ['Mod+Shift+P'] },
+  { id: 'print', label: 'Print…', category: 'File', keys: ['Mod+P'] },
   { id: 'preferences', label: 'Preferences…', category: 'App', keys: ['Mod+,'] },
   { id: 'commandPalette', label: 'Command Palette…', category: 'App', keys: ['Mod+Shift+A'] },
 
