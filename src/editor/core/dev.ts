@@ -72,6 +72,7 @@ async function main() {
   };
   const rich: RichClipboardData[] = [];
   if (params.has('rich')) settings.writeClipboardRich = async (d) => (rich.push(d), true);
+  if (params.has('docurl')) settings.docUrl = params.get('docurl') ?? 'untitled.md';
   if (params.has('clipread')) settings.readClipboard = async () => window.__core.clip;
   const host = document.getElementById('host')!;
   const ed = createEditor(host, settings);

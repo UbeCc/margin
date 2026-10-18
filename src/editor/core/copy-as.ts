@@ -7,8 +7,9 @@
  * engine grants the command: user gesture, permission or embedder setting).
  * When the engine refuses, the async Clipboard API is used instead.
  */
-import type { CopyAsFormat } from '../../contracts';
+import type { CopyAsFormat, NativeClipboardData } from '../../contracts';
 import type { EditorCore } from './editor';
+import type { SourceModeLike } from './registry';
 import { isTextLeaf } from './edit';
 import { leafContent, widgetRaw } from './model';
 import { selectionMarkdown, selectionHTML, insertMarkdown, MARGIN_MIME } from './clipboard';
@@ -200,8 +201,14 @@ export function copyPayload(ed: EditorCore, format: Exclude<CopyAsFormat, 'image
 /** Last payload written by copy-as (tests / native fallbacks read it). */
 export const lastCopyAs = new WeakMap<EditorCore, Payload>();
 
+/** Settings slice for the #116 native fallback (`EditorSettings` satisfies it). */
+interface NativeClipboard {
+  writeClipboardNative?(data: NativeClipboardData): Promise<boolean>;
+  docUrl?: string | null;
+}
+
 /** Write `p` to the system clipboard. Resolves false when every path was refused. */
-export async function writePayload(p: Payload): Promise<boolean> {
+export async function writePayload(p: Payload, native?: NativeClipboard): Promise<boolean> {
   let done = false;
   const h = (e: Event) => {
     const dt = (e as ClipboardEvent).clipboardData;
@@ -241,7 +248,21 @@ export async function writePayload(p: Payload): Promise<boolean> {
   } catch {
     /* refused */
   }
-  return false;
+  // #116: WKWebView refuses execCommand('copy') without user activation (native
+  // menu item / palette); overwrite the pasteboard directly (Typora clipboard.write).
+  const w = native?.writeClipboardNative;
+  if (!w) return false;
+  try {
+    return await w({
+      plain: p['text/plain'] ?? '',
+      ...(p['text/html'] ? { html: p['text/html'] } : {}),
+      ...(p['text/rtf'] ? { rtf: p['text/rtf'] } : {}),
+      ...(p[MARGIN_MIME] ? { markdown: p[MARGIN_MIME] } : {}),
+      ...(native.docUrl ? { baseUrl: native.docUrl } : {}),
+    });
+  } catch {
+    return false;
+  }
 }
 
 async function imagePng(url: string): Promise<Blob> {
@@ -264,7 +285,7 @@ async function copyImage(ed: EditorCore, img: { src: string; url: string; alt: s
     await navigator.clipboard.write([new ClipboardItem({ 'image/png': png, 'text/plain': new Blob([img.src], { type: 'text/plain' }) })]);
     return true;
   } catch {
-    return writePayload({ 'text/plain': img.src });
+    return writePayload({ 'text/plain': img.src }, ed.settings);
   }
 }
 
@@ -283,10 +304,10 @@ export function copyAs(ed: EditorCore, format: CopyAsFormat): boolean {
   if (rich && p['text/html'] && p['text/rtf']) {
     const nonce = `w${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
     p['text/html'] = p['text/html'].replace('<body ', `<body data-margin-copy="${nonce}" `);
-    void writePayload(p).then(() => rich({ plain: p['text/plain'], html: p['text/html'], rtf: p['text/rtf'], markdown: '', marker: nonce }).catch(() => false));
+    void writePayload(p, ed.settings).then(() => rich({ plain: p['text/plain'], html: p['text/html'], rtf: p['text/rtf'], markdown: '', marker: nonce }).catch(() => false));
     return true;
   }
-  void writePayload(p);
+  void writePayload(p, ed.settings);
   return true;
 }
 
@@ -369,3 +390,49 @@ async function readClipboardPlain(ed: EditorCore): Promise<string> {
   }
 }
 
+
+// ------------------------------------------------------------- source mode (#116)
+
+/**
+ * Copy as … in source mode: every variant copies the selected source text
+ * (fe-contextmenus §1.5); the native payload write covers WKWebView's refusal
+ * of execCommand('copy') behind a native menu item.
+ */
+export function copyAsInSourceMode(ed: EditorCore, s: SourceModeLike): boolean {
+  const sel = s.getSelection?.() ?? s.view?.state.selection.main;
+  if (!sel || sel.anchor === sel.head) return false;
+  const md = s.getMarkdown();
+  const text = md.slice(Math.min(sel.anchor, sel.head), Math.max(sel.anchor, sel.head));
+  if (!text) return false;
+  const p: Payload = { 'text/plain': text };
+  lastCopyAs.set(ed, p);
+  void writePayload(p, ed.settings);
+  return true;
+}
+
+/**
+ * Paste as Plain Text in source mode: the system plain paste — Typora hands it
+ * to WebKit's `pasteAsPlainText:` (clipboard-contextmenu §4.2); Margin reads
+ * the pasteboard's plain flavour and replaces the selection.
+ */
+export function pastePlainInSourceMode(ed: EditorCore, s: SourceModeLike): boolean {
+  const replace = s.replaceSelection;
+  if (!replace) return false;
+  void (async () => {
+    let text = '';
+    try {
+      text = (await ed.settings.readClipboard?.())?.plain ?? '';
+    } catch {
+      /* fall back to the web clipboard */
+    }
+    if (!text) {
+      try {
+        text = (await navigator.clipboard?.readText?.()) ?? '';
+      } catch {
+        return;
+      }
+    }
+    if (text) replace(text.replace(/\r\n?/g, '\n'));
+  })();
+  return true;
+}

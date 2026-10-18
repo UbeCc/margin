@@ -10,6 +10,7 @@ import type { EditorHandle, EditorSettings } from '../../contracts';
 import { EditorCore, OUTLINE_EVENT } from './editor';
 import { attachInput } from './input';
 import { execCommand } from './commands';
+import { copyAsInSourceMode, pastePlainInSourceMode } from './copy-as';
 import { docHTML } from './html';
 import { countStats, plainText } from './query';
 import { registry, type SourceModeLike } from './registry';
@@ -34,6 +35,11 @@ function textareaSource(host: HTMLElement, opts: { markdown: string; onChange(md
     setMarkdown: (md) => void (ta.value = md),
     getSelection: () => (ta.selectionDirection === 'backward' ? { anchor: ta.selectionEnd, head: ta.selectionStart } : { anchor: ta.selectionStart, head: ta.selectionEnd }),
     setSelection: (a, h) => ta.setSelectionRange(Math.min(a, h), Math.max(a, h), h < a ? 'backward' : 'forward'),
+    replaceSelection: (text) => {
+      // setRangeText does not fire input; dispatch it so onChange runs (#116)
+      ta.setRangeText(text, ta.selectionStart, ta.selectionEnd, 'end');
+      ta.dispatchEvent(new Event('input', { bubbles: true }));
+    },
     getTopLine: () => Math.floor(ta.scrollTop / lh()),
     scrollToLine: (line) => void (ta.scrollTop = line * lh()),
     focus: () => ta.focus(),
@@ -196,6 +202,10 @@ export function createEditor(host: HTMLElement, settings: EditorSettings): Edito
           ed.emitChange();
           return true;
         }
+        if (cmd.kind === 'copyAs')
+          // #116: every Copy-as variant copies the selected source text (fe-contextmenus §1.5)
+          return copyAsInSourceMode(ed, s);
+        if (cmd.kind === 'pastePlain') return pastePlainInSourceMode(ed, s);
         return false;
       }
       try {

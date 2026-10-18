@@ -1,5 +1,5 @@
 {
- "evidence_id": "ev_b6ecd56c03038cf8d8d3b8e6d2b6fdd96616cfe3596cb0f0dd9f665775dfe458",
+ "evidence_id": "ev_97aedb318e155220006093fe21f1908697fca104210623525a00f04245476357",
  "subject": null,
  "provider": {
   "id": "rea-javascript-application-workflows",
@@ -10,14 +10,14 @@
  "predicate_type": "rea.reconstruction-obligation-ledger",
  "operation": "build_reconstruction_obligation_ledger",
  "parameters": {
-  "ledger_id": "rol_b53a85d8633d2df3539b45ed910480e1fc50b8309193c619dda80e2753bdff0a",
-  "closure_digest": "d7770d97eefb9a99fb74de35e0a5a68d9f5dd6aad84d6bebb25071e1f933df8c"
+  "ledger_id": "rol_89459f52199da740b0ceade93948afdb4eacff8c2d14b15ff7165a5cb5f0c118",
+  "closure_digest": "44e534bee801b1c4452a0186f1e3a21b4b453daf4f97a35b5f4ce7c4be8ce235"
  },
  "raw_result": null,
  "normalized_result": {
   "schema": "ReconstructionObligationLedger",
-  "ledger_id": "rol_b53a85d8633d2df3539b45ed910480e1fc50b8309193c619dda80e2753bdff0a",
-  "closure_digest": "d7770d97eefb9a99fb74de35e0a5a68d9f5dd6aad84d6bebb25071e1f933df8c",
+  "ledger_id": "rol_89459f52199da740b0ceade93948afdb4eacff8c2d14b15ff7165a5cb5f0c118",
+  "closure_digest": "44e534bee801b1c4452a0186f1e3a21b4b453daf4f97a35b5f4ce7c4be8ce235",
   "status": "unknown",
   "coverage": {
    "status": "complete"
@@ -148,7 +148,6 @@
     "typora.tools.diagram.copy-image"
    ],
    "missing_verifier_obligation_ids": [
-    "typora.beh.clip.rtf-paste",
     "typora.beh.files.asset-scope",
     "typora.beh.files.title-dirty",
     "typora.ctx.emoji",
@@ -1576,7 +1575,7 @@
    {
     "obligation_id": "typora.beh.clip.rich-copy",
     "obligation_version": 1,
-    "title": "Rich copy writes plain + HTML + RTF + private format",
+    "title": "Rich copy writes plain + HTML + RTF + RTFD + WebArchive (doc URL base) + private format",
     "origin": "reviewed",
     "application_layer": "runtime",
     "family": "beh.clip",
@@ -1584,21 +1583,21 @@
      "artifact_sha256": null,
      "application_node_id": null,
      "semantic_node_id": null,
-     "location": "Rich copy writes plain + HTML + RTF + private format"
+     "location": "Rich copy writes plain + HTML + RTF + RTFD + WebArchive (doc URL base) + private format"
     },
     "authority_references": [
      {
-      "evidence_id": "ev_22691ae9e3d81803ca3993a3d3739118156b51e9dab896e5d77de3d7a136cc0e",
+      "evidence_id": "ev_a09d785543035d5f2caf35adc11719504775791c3226564380657d10b75daf91",
       "authority": "analyst-inference",
       "state": "reviewed",
-      "location": "/evidence/ev_22691ae9e3d81803ca3993a3d3739118156b51e9dab896e5d77de3d7a136cc0e"
+      "location": "/evidence/ev_a09d785543035d5f2caf35adc11719504775791c3226564380657d10b75daf91"
      }
     ],
     "source_state": "reviewed",
     "observed_cases": [
      {
       "kind": "positive",
-      "evidence_id": "ev_22691ae9e3d81803ca3993a3d3739118156b51e9dab896e5d77de3d7a136cc0e",
+      "evidence_id": "ev_a09d785543035d5f2caf35adc11719504775791c3226564380657d10b75daf91",
       "location": "clipboard-contextmenu §3.3"
      }
     ],
@@ -1621,13 +1620,13 @@
      "owner": {
       "module_path": "src/editor/core/clipboard.ts",
       "symbol": "export function onCopy",
-      "owner_sha256": "3823a29547fe150ca5e59ad76cd7a258a436003c9732ae0080ce308aaa391c63"
+      "owner_sha256": "36a2dc39f309a0e2f2c27331ff72415308195f73378fc764db8582c4d2784876"
      },
      "parser_type": null,
      "original_cases": [
       {
        "kind": "positive",
-       "evidence_id": "ev_22691ae9e3d81803ca3993a3d3739118156b51e9dab896e5d77de3d7a136cc0e",
+       "evidence_id": "ev_a09d785543035d5f2caf35adc11719504775791c3226564380657d10b75daf91",
        "location": "clipboard-contextmenu §3.3"
       }
      ],
@@ -1692,17 +1691,17 @@
     },
     "authority_references": [
      {
-      "evidence_id": "ev_96c6bcfb9bc2e3243ba76b1914aa49ecd9770781a359993911865ee5b48ac2ec",
+      "evidence_id": "ev_eca825f63f715790f4f8c6d9c5554457f8a5b412d8556fbf8d4f7db36aa02eaa",
       "authority": "analyst-inference",
       "state": "reviewed",
-      "location": "/evidence/ev_96c6bcfb9bc2e3243ba76b1914aa49ecd9770781a359993911865ee5b48ac2ec"
+      "location": "/evidence/ev_eca825f63f715790f4f8c6d9c5554457f8a5b412d8556fbf8d4f7db36aa02eaa"
      }
     ],
     "source_state": "reviewed",
     "observed_cases": [
      {
       "kind": "positive",
-      "evidence_id": "ev_96c6bcfb9bc2e3243ba76b1914aa49ecd9770781a359993911865ee5b48ac2ec",
+      "evidence_id": "ev_eca825f63f715790f4f8c6d9c5554457f8a5b412d8556fbf8d4f7db36aa02eaa",
       "location": "clipboard-contextmenu §3.2"
      }
     ],
@@ -1718,44 +1717,66 @@
     "residual_unknown_ids": [],
     "unavailable_authority": [],
     "required_next_evidence": [
-     "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules.",
-     "Implement: RTF/RTFD text+formatting converted natively (NSAttributedString, macOS); RTFD image attachments not materialized"
+     "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules."
     ],
     "binding": {
      "obligation_id": "typora.beh.clip.rtf-paste",
      "owner": {
       "module_path": "src-tauri/src/clipboard_read.rs",
       "symbol": "pub fn rtf_to_html",
-      "owner_sha256": "88d1e56a773345d9d4e88d43d7f07fe82508514e030e8ba8a25cde698bbe74cf"
+      "owner_sha256": "8efaf3b232f64b0f6b3c8edfdd962dbba7239e726b17e3a21ddeaa1296e2bbec"
      },
      "parser_type": null,
      "original_cases": [
       {
        "kind": "positive",
-       "evidence_id": "ev_96c6bcfb9bc2e3243ba76b1914aa49ecd9770781a359993911865ee5b48ac2ec",
+       "evidence_id": "ev_eca825f63f715790f4f8c6d9c5554457f8a5b412d8556fbf8d4f7db36aa02eaa",
        "location": "clipboard-contextmenu §3.2"
       }
      ],
-     "fixtures": [],
-     "verifier": null
+     "fixtures": [
+      {
+       "fixture_id": "beh.clip.rtf-paste.positive",
+       "case_kind": "positive",
+       "authority": "renderer",
+       "evidence_ids": [
+        "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       ]
+      }
+     ],
+     "verifier": {
+      "verifier_id": "margin.playwright.beh.clip.rtf-paste",
+      "claim_id": "claim.beh.clip.rtf-paste",
+      "command": "npx playwright test tests/e2e/parity-clipboard.spec.ts -g \"beh.clip.rtf-paste: Paste RTF/RTFD from rich apps\"",
+      "authority": "renderer",
+      "status": "pass",
+      "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+      "enumerated_obligation_ids": [
+       "typora.beh.clip.rtf-paste"
+      ],
+      "nondeterminism": {
+       "mode": "total-order",
+       "specification": "Single deterministic suite run; pass = suite exited 0 with the named test not skipped."
+      }
+     }
     },
     "status": "implemented",
     "diagnostics": [
-     {
-      "code": "missing-case",
-      "detail": "Required positive fixture is missing."
-     },
-     {
-      "code": "missing-verifier",
-      "detail": "No verifier claim is bound to this obligation."
-     },
      {
       "code": "static-only",
       "detail": "No static authority characterizes the original finite behavior."
      },
      {
+      "code": "weak-fixture-authority",
+      "detail": "positive fixture lacks renderer authority or authenticated Evidence."
+     },
+     {
       "code": "weak-original-case-authority",
       "detail": "Original positive behavior lacks static Evidence."
+     },
+     {
+      "code": "weak-verifier-authority",
+      "detail": "Verifier authority does not satisfy renderer."
      }
     ]
    },
@@ -2327,7 +2348,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "private degradeLarge(",
-      "owner_sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+      "owner_sha256": "f15c42161042d0c6221b6348b1e8a5ce4e5632840eadbaf09d0ada6ac32c6481"
      },
      "parser_type": null,
      "original_cases": [
@@ -3401,7 +3422,7 @@
      "owner": {
       "module_path": "src-tauri/src/lib.rs",
       "symbol": "on_second_instance",
-      "owner_sha256": "40e3fe0359c164f0b637c4f8ba65055c397b75689b805cce025127371b7a2071"
+      "owner_sha256": "1f4d91e843af9e14c1a675c956f096ed7857196f9e3524c20503653c793c953d"
      },
      "parser_type": null,
      "original_cases": [
@@ -3610,7 +3631,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "setDocumentEdited",
-      "owner_sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+      "owner_sha256": "f15c42161042d0c6221b6348b1e8a5ce4e5632840eadbaf09d0ada6ac32c6481"
      },
      "parser_type": null,
      "original_cases": [
@@ -3691,7 +3712,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "applyAppearance",
-      "owner_sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+      "owner_sha256": "f15c42161042d0c6221b6348b1e8a5ce4e5632840eadbaf09d0ada6ac32c6481"
      },
      "parser_type": null,
      "original_cases": [
@@ -4431,7 +4452,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "private createExports(",
-      "owner_sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+      "owner_sha256": "f15c42161042d0c6221b6348b1e8a5ce4e5632840eadbaf09d0ada6ac32c6481"
      },
      "parser_type": null,
      "original_cases": [
@@ -6523,7 +6544,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'preferences'",
-      "owner_sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+      "owner_sha256": "f15c42161042d0c6221b6348b1e8a5ce4e5632840eadbaf09d0ada6ac32c6481"
      },
      "parser_type": null,
      "original_cases": [
@@ -6709,7 +6730,7 @@
      "owner": {
       "module_path": "src/editor/core/copy-as.ts",
       "symbol": "export function copyAs",
-      "owner_sha256": "6ff9a5571006fdb7564ae9250deccc7c23274660b9d7c3ca94fbdab85a847f7f"
+      "owner_sha256": "2e6b305699c5c6c31f26754a2afcf05feaccdff51abe9776798cb0614f8a2620"
      },
      "parser_type": null,
      "original_cases": [
@@ -6813,7 +6834,7 @@
      "owner": {
       "module_path": "src/editor/core/clipboard.ts",
       "symbol": "export function onPaste",
-      "owner_sha256": "3823a29547fe150ca5e59ad76cd7a258a436003c9732ae0080ce308aaa391c63"
+      "owner_sha256": "36a2dc39f309a0e2f2c27331ff72415308195f73378fc764db8582c4d2784876"
      },
      "parser_type": null,
      "original_cases": [
@@ -7471,7 +7492,7 @@
      "owner": {
       "module_path": "src/editor/core/copy-as.ts",
       "symbol": "export function pastePlain",
-      "owner_sha256": "6ff9a5571006fdb7564ae9250deccc7c23274660b9d7c3ca94fbdab85a847f7f"
+      "owner_sha256": "2e6b305699c5c6c31f26754a2afcf05feaccdff51abe9776798cb0614f8a2620"
      },
      "parser_type": null,
      "original_cases": [
@@ -7874,7 +7895,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'undo'",
-      "owner_sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+      "owner_sha256": "f15c42161042d0c6221b6348b1e8a5ce4e5632840eadbaf09d0ada6ac32c6481"
      },
      "parser_type": null,
      "original_cases": [
@@ -7978,7 +7999,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'close'",
-      "owner_sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+      "owner_sha256": "f15c42161042d0c6221b6348b1e8a5ce4e5632840eadbaf09d0ada6ac32c6481"
      },
      "parser_type": null,
      "original_cases": [
@@ -8394,7 +8415,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'toggleLineEnding'",
-      "owner_sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+      "owner_sha256": "f15c42161042d0c6221b6348b1e8a5ce4e5632840eadbaf09d0ada6ac32c6481"
      },
      "parser_type": null,
      "original_cases": [
@@ -8498,7 +8519,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'new'",
-      "owner_sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+      "owner_sha256": "f15c42161042d0c6221b6348b1e8a5ce4e5632840eadbaf09d0ada6ac32c6481"
      },
      "parser_type": null,
      "original_cases": [
@@ -8602,7 +8623,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "private async newWindow(",
-      "owner_sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+      "owner_sha256": "f15c42161042d0c6221b6348b1e8a5ce4e5632840eadbaf09d0ada6ac32c6481"
      },
      "parser_type": null,
      "original_cases": [
@@ -8706,7 +8727,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'open'",
-      "owner_sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+      "owner_sha256": "f15c42161042d0c6221b6348b1e8a5ce4e5632840eadbaf09d0ada6ac32c6481"
      },
      "parser_type": null,
      "original_cases": [
@@ -8810,7 +8831,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'openFolder'",
-      "owner_sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+      "owner_sha256": "f15c42161042d0c6221b6348b1e8a5ce4e5632840eadbaf09d0ada6ac32c6481"
      },
      "parser_type": null,
      "original_cases": [
@@ -9019,7 +9040,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'print'",
-      "owner_sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+      "owner_sha256": "f15c42161042d0c6221b6348b1e8a5ce4e5632840eadbaf09d0ada6ac32c6481"
      },
      "parser_type": null,
      "original_cases": [
@@ -9204,7 +9225,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "quickOpen(): void",
-      "owner_sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+      "owner_sha256": "f15c42161042d0c6221b6348b1e8a5ce4e5632840eadbaf09d0ada6ac32c6481"
      },
      "parser_type": null,
      "original_cases": [
@@ -9828,7 +9849,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'save'",
-      "owner_sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+      "owner_sha256": "f15c42161042d0c6221b6348b1e8a5ce4e5632840eadbaf09d0ada6ac32c6481"
      },
      "parser_type": null,
      "original_cases": [
@@ -10036,7 +10057,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'saveAs'",
-      "owner_sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+      "owner_sha256": "f15c42161042d0c6221b6348b1e8a5ce4e5632840eadbaf09d0ada6ac32c6481"
      },
      "parser_type": null,
      "original_cases": [
@@ -12962,7 +12983,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'openThemesFolder'",
-      "owner_sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+      "owner_sha256": "f15c42161042d0c6221b6348b1e8a5ce4e5632840eadbaf09d0ada6ac32c6481"
      },
      "parser_type": null,
      "original_cases": [
@@ -13211,7 +13232,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'toggleFocus'",
-      "owner_sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+      "owner_sha256": "f15c42161042d0c6221b6348b1e8a5ce4e5632840eadbaf09d0ada6ac32c6481"
      },
      "parser_type": null,
      "original_cases": [
@@ -13453,7 +13474,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'toggleSidebar'",
-      "owner_sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+      "owner_sha256": "f15c42161042d0c6221b6348b1e8a5ce4e5632840eadbaf09d0ada6ac32c6481"
      },
      "parser_type": null,
      "original_cases": [
@@ -13557,7 +13578,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'toggleSource'",
-      "owner_sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+      "owner_sha256": "f15c42161042d0c6221b6348b1e8a5ce4e5632840eadbaf09d0ada6ac32c6481"
      },
      "parser_type": null,
      "original_cases": [
@@ -13745,7 +13766,7 @@
      "owner": {
       "module_path": "src/app/app.ts",
       "symbol": "case 'zoomIn'",
-      "owner_sha256": "de16509236435c0bdaad3f97f1fa064df8b8eb9908b235898c130129a15f8b63"
+      "owner_sha256": "f15c42161042d0c6221b6348b1e8a5ce4e5632840eadbaf09d0ada6ac32c6481"
      },
      "parser_type": null,
      "original_cases": [
@@ -18066,7 +18087,6 @@
    "ev_1fff77de0927975cf6c8e1ae1f4f756642727a508cab1ec65759d425f7ebbded",
    "ev_210b496b7a2ca2b6eac0606fe3a5ed74764fe4084ee04c8729b0bcf59ab89760",
    "ev_21751fb712fd68c7c9d1256ac941429bce6c4996aec755f8f2ba57dc94040a27",
-   "ev_22691ae9e3d81803ca3993a3d3739118156b51e9dab896e5d77de3d7a136cc0e",
    "ev_24b85bcb7b6f02107a51c32f3b2ab58f167014f21a3ab7732431d42a5e109e30",
    "ev_25f3c3dbdf50fedba08b00fb0472f24af2c02c1caddaaa5cbe371074a29e875d",
    "ev_260219b51bfffa0e540e6c3cb4f434b9428d78944c4f727434cc632bc8596fc0",
@@ -18162,13 +18182,13 @@
    "ev_95e424eaec6eda0b0640cc7543ac3325b75ce6e13b48b4e108883f92c819b564",
    "ev_962e103280cb9c80f2be931414b82ef066db1c0dc5cf8b13f923b4b3205207b6",
    "ev_96403b4d39428d03b55c055c1e4b75d07b0e17be7b6a8063f07942f9febf9fd0",
-   "ev_96c6bcfb9bc2e3243ba76b1914aa49ecd9770781a359993911865ee5b48ac2ec",
    "ev_9949c2545d506e24d01a06822e483aab48be38ed5c5d4d7151783ad6a9de951e",
    "ev_9978957139b62790328ce143f76f1bc27e60267da374644b4a4f1c811e0e1800",
    "ev_9a0e7d95519047851d43316964853f6eb023f03b5de2bda197dd72006a1fa013",
    "ev_9a1f668957617a753e914df1c0a91d4357c25b0e580651d1c7ab7490e92269b3",
    "ev_9a69d753f08286af0ef87ca3fe39ec70b7c1ced3183aca26a553d6186b9a8d50",
    "ev_9be74ca8240fbdc5f8b738f0d11756c138b11aac7dee84cafca119f8e261c7d5",
+   "ev_a09d785543035d5f2caf35adc11719504775791c3226564380657d10b75daf91",
    "ev_a0a7f9dda9d20c065da1245a39262ad4003405c6d8c836be4ea6cb1abee41e7c",
    "ev_a17159ad048ad23364cebd9732d3aee1e83eef8222819fe0a916f658ec543dbc",
    "ev_a218c2f678ee74a5dfe9f6c09b49991d9ec929b874b98c3828ea54cd3c253e5d",
@@ -18206,6 +18226,7 @@
    "ev_e82ff7ef94f07ee767d79b6c4d10aaef9fa561b80303555d17775e549ea605a1",
    "ev_eb3e7536ac4c725d6c29f2a9e6971ba1ebc81f1bd0d5a3d05167408c795d3d95",
    "ev_ec77cc8a70689d0ce84dfb86b2ecb05569bfcd9b4880dee6bb06de9479eb750c",
+   "ev_eca825f63f715790f4f8c6d9c5554457f8a5b412d8556fbf8d4f7db36aa02eaa",
    "ev_ed3992c4d909eb7e2ca59f8bba7490f03a0b168e5a0859174907e4395e181c87",
    "ev_ed434c97506d18f834b446e072875525dcee504ad371d8e184fd7217dbbf244c",
    "ev_f4157d50cf77f67ec4ec0148aa5fee7d38203171433309534b5eaeb149724f5d",
@@ -18255,7 +18276,6 @@
   "ev_1fff77de0927975cf6c8e1ae1f4f756642727a508cab1ec65759d425f7ebbded",
   "ev_210b496b7a2ca2b6eac0606fe3a5ed74764fe4084ee04c8729b0bcf59ab89760",
   "ev_21751fb712fd68c7c9d1256ac941429bce6c4996aec755f8f2ba57dc94040a27",
-  "ev_22691ae9e3d81803ca3993a3d3739118156b51e9dab896e5d77de3d7a136cc0e",
   "ev_24b85bcb7b6f02107a51c32f3b2ab58f167014f21a3ab7732431d42a5e109e30",
   "ev_25f3c3dbdf50fedba08b00fb0472f24af2c02c1caddaaa5cbe371074a29e875d",
   "ev_260219b51bfffa0e540e6c3cb4f434b9428d78944c4f727434cc632bc8596fc0",
@@ -18351,13 +18371,13 @@
   "ev_95e424eaec6eda0b0640cc7543ac3325b75ce6e13b48b4e108883f92c819b564",
   "ev_962e103280cb9c80f2be931414b82ef066db1c0dc5cf8b13f923b4b3205207b6",
   "ev_96403b4d39428d03b55c055c1e4b75d07b0e17be7b6a8063f07942f9febf9fd0",
-  "ev_96c6bcfb9bc2e3243ba76b1914aa49ecd9770781a359993911865ee5b48ac2ec",
   "ev_9949c2545d506e24d01a06822e483aab48be38ed5c5d4d7151783ad6a9de951e",
   "ev_9978957139b62790328ce143f76f1bc27e60267da374644b4a4f1c811e0e1800",
   "ev_9a0e7d95519047851d43316964853f6eb023f03b5de2bda197dd72006a1fa013",
   "ev_9a1f668957617a753e914df1c0a91d4357c25b0e580651d1c7ab7490e92269b3",
   "ev_9a69d753f08286af0ef87ca3fe39ec70b7c1ced3183aca26a553d6186b9a8d50",
   "ev_9be74ca8240fbdc5f8b738f0d11756c138b11aac7dee84cafca119f8e261c7d5",
+  "ev_a09d785543035d5f2caf35adc11719504775791c3226564380657d10b75daf91",
   "ev_a0a7f9dda9d20c065da1245a39262ad4003405c6d8c836be4ea6cb1abee41e7c",
   "ev_a17159ad048ad23364cebd9732d3aee1e83eef8222819fe0a916f658ec543dbc",
   "ev_a218c2f678ee74a5dfe9f6c09b49991d9ec929b874b98c3828ea54cd3c253e5d",
@@ -18395,6 +18415,7 @@
   "ev_e82ff7ef94f07ee767d79b6c4d10aaef9fa561b80303555d17775e549ea605a1",
   "ev_eb3e7536ac4c725d6c29f2a9e6971ba1ebc81f1bd0d5a3d05167408c795d3d95",
   "ev_ec77cc8a70689d0ce84dfb86b2ecb05569bfcd9b4880dee6bb06de9479eb750c",
+  "ev_eca825f63f715790f4f8c6d9c5554457f8a5b412d8556fbf8d4f7db36aa02eaa",
   "ev_ed3992c4d909eb7e2ca59f8bba7490f03a0b168e5a0859174907e4395e181c87",
   "ev_ed434c97506d18f834b446e072875525dcee504ad371d8e184fd7217dbbf244c",
   "ev_f4157d50cf77f67ec4ec0148aa5fee7d38203171433309534b5eaeb149724f5d",

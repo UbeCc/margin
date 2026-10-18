@@ -76,6 +76,8 @@ export interface SourceModeInstance {
   replace(query: string, replacement: string, opts?: SourceModeFindOptions & { all?: boolean }): boolean;
   undo(): boolean;
   redo(): boolean;
+  /** Replace the main selection with text (#116 Paste as Plain Text). */
+  replaceSelection(text: string): void;
   /** The CodeMirror view (escape hatch for advanced integrations). */
   readonly view: EditorView;
 }
@@ -197,6 +199,7 @@ export const createSourceMode: SourceModeFactory = (host, opts) => {
     },
     undo: () => undo(view),
     redo: () => redo(view),
+    replaceSelection: (text) => view.dispatch(view.state.replaceSelection(text)),
   };
   return inst;
 };

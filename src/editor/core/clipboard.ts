@@ -69,7 +69,7 @@ export function onCopy(ed: EditorCore, e: ClipboardEvent, cut: boolean): void {
   const nonce = rich ? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}` : undefined;
   const flavors = buildCopyFlavors(sel.md, html, nonce);
   writeFlavors(e.clipboardData, flavors);
-  if (rich && nonce) scheduleRich(rich, flavors, html, nonce);
+  if (rich && nonce) scheduleRich(rich, flavors, html, nonce, ed.settings.docUrl ?? undefined);
   if (cut) ed.replaceRange(sel.from, sel.to, '', null);
 }
 
@@ -80,7 +80,7 @@ type RichWriter = NonNullable<EditorCore['settings']['writeClipboardRich']>;
  * pasteboard then), add RTF natively. The native side waits for the nonce to
  * appear in public.html before appending, so it never clobbers a newer copy.
  */
-function scheduleRich(rich: RichWriter, f: CopyFlavors, renderedHtml: string, nonce: string): void {
+function scheduleRich(rich: RichWriter, f: CopyFlavors, renderedHtml: string, nonce: string, baseUrl?: string): void {
   setTimeout(() => {
     let rtf: string;
     try {
@@ -88,7 +88,7 @@ function scheduleRich(rich: RichWriter, f: CopyFlavors, renderedHtml: string, no
     } catch {
       return;
     }
-    rich({ plain: f.plain, html: f.html, rtf, markdown: f.markdown, marker: nonce }).catch(() => undefined);
+    rich({ plain: f.plain, html: f.html, rtf, markdown: f.markdown, marker: nonce, ...(baseUrl ? { baseUrl } : {}) }).catch(() => undefined);
   }, 0);
 }
 

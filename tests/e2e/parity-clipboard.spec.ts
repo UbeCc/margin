@@ -351,5 +351,42 @@ test.describe('parity: clipboard & selection (#96)', () => {
       await expect(page.locator('.palette-list li').first()).toContainText(label);
     }
   });
+
+  test('menu.edit.copy-as: in source mode every variant copies the selected source text (#116)', async ({ page, context, browserName }) => {
+    if (browserName === 'chromium') await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    const SRC = 'Some **bold** text\n';
+    await open(page, SRC, '&blocks=0');
+    // enter source mode and select "Some **bo" (raw markdown, markers included)
+    await page.evaluate(() => {
+      window.__core.ed.setSourceMode(true);
+      const ta = document.querySelector<HTMLTextAreaElement>('.md-source-fallback')!;
+      ta.focus();
+      ta.setSelectionRange(0, 10);
+    });
+    for (const format of ['markdown', 'html', 'plain'] as const) {
+      expect(await run(page, { kind: 'copyAs', format })).toBe(true);
+      expect((await clipboard(page))['text/plain']).toBe('Some **bo');
+    }
+    // collapsed selection: nothing to copy
+    await page.evaluate(() => {
+      const ta = document.querySelector<HTMLTextAreaElement>('.md-source-fallback')!;
+      ta.setSelectionRange(2, 2);
+    });
+    expect(await run(page, { kind: 'copyAs', format: 'markdown' })).toBe(false);
+  });
+
+  test('menu.edit.paste-plain: in source mode it is the system plain paste (#116)', async ({ page, context, browserName }) => {
+    if (browserName === 'chromium') await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await open(page, 'one two three\n', '&blocks=0');
+    await page.evaluate(() => navigator.clipboard.writeText('X Y'));
+    await page.evaluate(() => {
+      window.__core.ed.setSourceMode(true);
+      const ta = document.querySelector<HTMLTextAreaElement>('.md-source-fallback')!;
+      ta.focus();
+      ta.setSelectionRange(4, 7); // "two"
+    });
+    expect(await run(page, { kind: 'pastePlain' })).toBe(true);
+    await expect.poll(() => md(page)).toBe('one X Y three\n');
+  });
 });
 
