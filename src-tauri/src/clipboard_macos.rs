@@ -26,6 +26,7 @@ pub struct RichClipboardData {
     pub marker: String,
     /// #115: document URL used as the WebArchive base ("untitled.md" when unsaved).
     #[serde(default, rename = "baseUrl")]
+    #[cfg_attr(not(target_os = "macos"), allow(dead_code))]
     pub base_url: String,
 }
 
@@ -42,6 +43,7 @@ pub struct NativeClipboardData {
     #[serde(default)]
     pub rtf: Option<String>,
     #[serde(default, rename = "baseUrl")]
+    #[cfg_attr(not(target_os = "macos"), allow(dead_code))]
     pub base_url: String,
 }
 
@@ -86,6 +88,7 @@ pub fn validate_native(d: &NativeClipboardData) -> Result<(), String> {
 /// `com.apple.webarchive` payload (#115): a binary property list wrapping the
 /// copied HTML with the document URL as base, so relative image paths resolve
 /// in other apps (Typora `convertHtmlToWebArchieve:`, clipboard-contextmenu §3.4).
+#[cfg(any(test, target_os = "macos"))]
 pub fn webarchive(html: &str, base_url: &str) -> Option<Vec<u8>> {
     let url = if base_url.is_empty() { "untitled.md" } else { base_url };
     let main = plist::Dictionary::from_iter([
