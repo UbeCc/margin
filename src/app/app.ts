@@ -16,6 +16,7 @@ import { themeLabel } from '../themes';
 import { ask } from './ui/modal';
 import { closePalette, isPaletteOpen, openPalette, type PaletteItem } from './ui/palette';
 import { toast } from './ui/toast';
+import { exportWithPandoc, PANDOC_ACTIONS, type PandocFormat } from './export-pandoc';
 import { closeContextMenu } from './ui/contextmenu';
 import { debounce, h } from './util/dom';
 import { fuzzyFilter, fuzzyMatch } from './util/fuzzy';
@@ -562,6 +563,10 @@ export class App {
       case 'exportHtml':
       case 'exportPdf':
         return this.export(id === 'exportHtml' ? 'html' : 'pdf');
+      case 'exportDocx':
+      case 'exportLatex':
+      case 'exportEpub':
+        return this.exportPandoc(PANDOC_ACTIONS[id]);
       case 'print':
         await this.platform.print();
         return true;
@@ -646,6 +651,16 @@ export class App {
       isDarkTheme: (n) => this.themes.isDark(n),
       openThemesFolder: () => void this.openThemesFolder(),
       pickFolder: () => this.platform.openFileDialog({ directory: true }),
+      detectPandoc: async (path) => {
+        const detect = extras(this.platform).pandocDetect;
+        if (!detect) return 'Pandoc export is only available in the desktop app.';
+        try {
+          const r = await detect.call(this.platform, path || null);
+          return `Found pandoc ${r.version} at ${r.path}`;
+        } catch (e) {
+          return e instanceof Error ? e.message : String(e);
+        }
+      },
     });
   }
 
@@ -780,6 +795,23 @@ export class App {
       action: reveal ? { label: 'Show', run: () => void reveal.call(this.platform, target) } : undefined,
     });
     return true;
+  }
+
+  private exportPandoc(format: PandocFormat): Promise<boolean> {
+    const md = this.editor.getMarkdown();
+    const reveal = extras(this.platform).revealInFolder;
+    return exportWithPandoc(format, {
+      platform: this.platform,
+      markdown: md,
+      name: this.doc.path ? stripExt(basename(this.doc.path)) : documentTitle(md, null),
+      docDir: this.doc.dir ?? null,
+      fallbackDir: this.folder,
+      title: documentTitle(md, this.doc.path ? basename(this.doc.path) : null),
+      pandocPath: this.settings.pandocPath,
+      progress: (m) => toast(m, { kind: 'info', timeout: 0 }),
+      notify: (m, kind, action) => void toast(m, { kind, action }),
+      reveal: reveal ? (p) => void reveal.call(this.platform, p).catch(() => {}) : undefined,
+    });
   }
 
   /** For tests / devtools. */
