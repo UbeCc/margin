@@ -76,6 +76,7 @@ describe('DocumentController', () => {
       onState: vi.fn(),
       onOpened: vi.fn(),
       defaultDir: () => '/n',
+      imageRule: () => ({ kind: 'relative', dir: './assets' }),
     };
     doc = new DocumentController(host);
   });
@@ -128,6 +129,29 @@ describe('DocumentController', () => {
     expect(doc.path).toBe('/n/hello.md');
     expect(await platform.read('/n/hello.md')).toBe('# Hello world\n');
     expect(host.onOpened).toHaveBeenCalledWith('/n/hello.md');
+  });
+
+  it('first save relocates images pasted into the untitled doc (#17)', async () => {
+    await doc.newDocument();
+    editor.type('![x](/app-data/img-1.png)\n');
+    editor.exec = (cmd) => {
+      if (cmd.kind !== 'replace') return false;
+      editor.setMarkdown(editor.getMarkdown().split(cmd.query).join(cmd.replacement));
+      return true;
+    };
+    const relocate = vi.fn(async (_d: string, _r: unknown, srcs: string[]) =>
+      Object.fromEntries(srcs.map((s) => [s, './assets/img-1.png'])),
+    );
+    (platform as unknown as { relocateImages: typeof relocate }).relocateImages = relocate;
+    platform.dialogQueue.push('/n/pics.md');
+    expect(await doc.save()).toBe(true);
+    expect(relocate).toHaveBeenCalledWith('/n/pics.md', { kind: 'relative', dir: './assets' }, ['/app-data/img-1.png']);
+    expect(await platform.read('/n/pics.md')).toBe('![x](./assets/img-1.png)\n');
+    // a second save of an already-titled doc does not relocate again
+    relocate.mockClear();
+    editor.type('more\n');
+    await doc.save();
+    expect(relocate).not.toHaveBeenCalled();
   });
 
   it('reloads silently on external change when clean, asks when dirty', async () => {

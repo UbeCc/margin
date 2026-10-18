@@ -19,6 +19,8 @@ export interface MarginSettings extends AppSettings {
   /** Auto-save delay in ms after the last edit. */
   autoSaveDelay: number;
   restoreLastFolder: boolean;
+  /** Pandoc binary (or its folder) for docx/latex/epub export; '' = auto-detect (#81). */
+  pandocPath: string;
 }
 
 export const SETTINGS_VERSION = 2;
@@ -44,6 +46,7 @@ export const DEFAULT_SETTINGS: Readonly<MarginSettings> = Object.freeze({
   sidebarTab: 'files',
   sidebarWidth: 260,
   restoreLastFolder: true,
+  pandocPath: '',
 });
 
 export const MAX_RECENT = 15;
@@ -121,6 +124,7 @@ export function migrateSettings(input: unknown): MarginSettings {
     sidebarTab: tab === 'files' || tab === 'outline' ? tab : d.sidebarTab,
     sidebarWidth: Math.round(num(raw.sidebarWidth, d.sidebarWidth, 180, 520)),
     restoreLastFolder: bool(raw.restoreLastFolder, d.restoreLastFolder),
+    pandocPath: typeof raw.pandocPath === 'string' ? raw.pandocPath.trim() : '',
   };
 }
 

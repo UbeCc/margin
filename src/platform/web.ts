@@ -520,6 +520,11 @@ export class WebPlatform implements Platform {
 
   async allowAssetDir(_path: string): Promise<void> {}
 
+  /** Web stores unsaved-doc images as data: URLs, so nothing is parked to relocate. */
+  async relocateImages(_docPath: string, _rule: ImageRule, _srcs: string[]): Promise<Record<string, string>> {
+    return {};
+  }
+
   // ---- optional file-tree operations (PlatformExtras, #21). Own operations emit
   // watch events like the desktop watcher does (rename → renamed, remove → removed).
 

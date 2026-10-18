@@ -27,10 +27,14 @@ export npm_config_cache="${npm_config_cache:-/cache/npm}"
 export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-/cache/target}"
 export CARGO_BUILD_JOBS="${CARGO_BUILD_JOBS:-16}"
 export PLAYWRIGHT_BROWSERS_PATH="${PLAYWRIGHT_BROWSERS_PATH:-/ms-playwright}"
+# A private vite port per run (#75): a stale or parallel run can't take ours.
+. "$ROOT/scripts/free-port.sh"
+export E2E_PORT="${E2E_PORT:-$(free_port)}"
+echo "e2e port: $E2E_PORT" >>"$OUT/cache.txt"
 mkdir -p "$npm_config_cache" "$CARGO_TARGET_DIR" 2>/dev/null || true
 
 SKIP=" ${CI_SKIP:-} "
-[ $QUICK = 1 ] && SKIP="$SKIP bundle smoke "
+[ $QUICK = 1 ] && SKIP="$SKIP bundle smoke native_qa "
 OPTIONAL=" clippy "   # reported as warn, never fails the run
 T_START=$SECONDS
 
@@ -100,8 +104,14 @@ s_bundle() {
   grep -q '^Exec=.* %[fFuU]' "$desk"   # file managers pass the clicked file
 }
 s_smoke() { bash "$ROOT/scripts/linux-smoke.sh" "$OUT"; }
+# Native scenarios on the installed .deb (single instance, xdg-open, close veto, PDF
+# fallback). Fails when any RESULT line says fail.
+s_native_qa() {
+  bash "$ROOT/scripts/linux-native-qa.sh" "$OUT" | tee "$OUT/native-qa.txt"
+  ! grep -q '^RESULT [a-z_]* fail' "$OUT/native-qa.txt"
+}
 
-export -f with_target_lock s_npm_ci s_typecheck s_vitest s_e2e s_cargo_test s_clippy s_bundle s_smoke
+export -f with_target_lock s_npm_ci s_typecheck s_vitest s_e2e s_cargo_test s_clippy s_bundle s_smoke s_native_qa
 
 # --- schedule -------------------------------------------------------------
 if run_step npm_ci s_npm_ci; then
@@ -114,14 +124,14 @@ if run_step npm_ci s_npm_ci; then
   (
     if run_step cargo_test s_cargo_test; then
       run_step clippy s_clippy
-      run_step bundle s_bundle && run_step smoke s_smoke
+      run_step bundle s_bundle && run_step smoke s_smoke && run_step native_qa s_native_qa
     fi
-    skip_rest clippy bundle smoke
+    skip_rest clippy bundle smoke native_qa
   ) &
   RUST=$!
   wait $JS; wait $RUST
 fi
-skip_rest typecheck vitest e2e cargo_test clippy bundle smoke
+skip_rest typecheck vitest e2e cargo_test clippy bundle smoke native_qa
 echo "$((SECONDS - T_START))" >"$OUT/total-seconds"
 
 node "$ROOT/scripts/ci-report.mjs" "$OUT"

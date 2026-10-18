@@ -57,9 +57,9 @@ test('external change reloads silently when clean and prompts when dirty', async
   await expect.poll(() => editorValue(page)).toBe('# Changed elsewhere\n');
   await typeInEditor(page, 'mine');
   await page.evaluate((p) => window.__MARGIN_WEB__!.externalWrite(p, '# Again\n'), `${ROOT}/Welcome.md`);
-  const dialog = page.locator('.dialog');
-  await expect(dialog).toContainText('changed by another application');
-  await dialog.locator('[data-id=reload]').click();
+  const banner = page.locator('.extchange-banner');
+  await expect(banner).toContainText('changed on disk');
+  await banner.locator('[data-id=load]').click();
   await expect.poll(() => editorValue(page)).toBe('# Again\n');
 });
 

@@ -17,7 +17,7 @@ apt-get install -y --no-install-recommends \
   build-essential pkg-config libssl-dev \
   libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev \
   libxdo-dev patchelf desktop-file-utils xdg-utils shared-mime-info \
-  xvfb xauth dbus-x11 x11-utils xdotool imagemagick \
+  xvfb xauth dbus-x11 x11-utils xdotool imagemagick poppler-utils \
   at-spi2-core fonts-dejavu-core fonts-noto-cjk
 
 # Node (official tarball; the distro's node is too old).

@@ -1,0 +1,50 @@
+/* External change prompt + diff (#82). Colours derive from theme variables so every
+   theme (light and dark) gets readable contrast. */
+.extchange-banner {
+  --extchange-tint: #d9a400;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 7px 12px 7px 14px;
+  font: 13px/1.4 var(--margin-font-ui, system-ui);
+  color: var(--margin-fg);
+  background: color-mix(in srgb, var(--extchange-tint) 14%, var(--margin-bg));
+  border-bottom: 1px solid color-mix(in srgb, var(--extchange-tint) 40%, var(--margin-border));
+}
+.extchange-banner[hidden] { display: none; }
+:root[data-scheme='dark'] .extchange-banner { --extchange-tint: #e0b84a; }
+.extchange-icon { width: 15px; height: 15px; flex: none; color: color-mix(in srgb, var(--extchange-tint) 70%, var(--margin-fg)); }
+.extchange-msg { flex: 1 1 220px; min-width: 0; }
+.extchange-actions { display: flex; gap: 6px; flex: none; }
+
+.extdiff-card { width: min(880px, calc(100vw - 48px)); max-height: calc(100vh - 64px); display: flex; }
+.extdiff { --extdiff-add: #2da44e; --extdiff-del: #cf222e; display: flex; flex-direction: column; min-height: 0; width: 100%; padding: 18px 20px 16px; }
+:root[data-scheme='dark'] .extdiff { --extdiff-add: #3fb950; --extdiff-del: #f85149; }
+.extdiff-head .dialog-title { margin-bottom: 6px; }
+.extdiff-legend { display: flex; gap: 8px; margin: 0 0 10px; font-size: 12px; }
+.extdiff-badge { padding: 1px 7px; border-radius: 10px; }
+.extdiff-badge-add { background: color-mix(in srgb, var(--extdiff-add) 20%, var(--margin-bg)); }
+.extdiff-badge-del { background: color-mix(in srgb, var(--extdiff-del) 20%, var(--margin-bg)); }
+.extdiff-body {
+  flex: 1 1 auto;
+  min-height: 120px;
+  max-height: 60vh;
+  overflow: auto;
+  margin-bottom: 14px;
+  border: 1px solid var(--margin-border);
+  border-radius: var(--margin-radius, 6px);
+  background: var(--margin-bg);
+  font: 12px/1.55 var(--margin-font-mono, ui-monospace, monospace);
+  color: var(--margin-fg);
+}
+.extdiff-row { display: grid; grid-template-columns: 3.5em 3.5em 1.4em 1fr; min-width: max-content; }
+.extdiff-gutter { padding: 0 6px; text-align: right; color: var(--margin-fg-muted); user-select: none; border-right: 1px solid color-mix(in srgb, var(--margin-border) 60%, transparent); }
+.extdiff-sign { text-align: center; user-select: none; }
+.extdiff-text { padding-right: 12px; white-space: pre; }
+.extdiff-add { background: color-mix(in srgb, var(--extdiff-add) 16%, var(--margin-bg)); }
+.extdiff-add .extdiff-sign { color: var(--extdiff-add); }
+.extdiff-del { background: color-mix(in srgb, var(--extdiff-del) 16%, var(--margin-bg)); }
+.extdiff-del .extdiff-sign { color: var(--extdiff-del); }
+.extdiff-skip { color: var(--margin-fg-muted); background: color-mix(in srgb, var(--margin-fg) 5%, var(--margin-bg)); font-style: italic; }
+.extdiff-empty { padding: 14px; color: var(--margin-fg-muted); font-family: var(--margin-font-ui, system-ui); }

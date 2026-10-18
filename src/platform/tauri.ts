@@ -1,6 +1,6 @@
 import { convertFileSrc, invoke } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
-import type { AppSettings, DirEntry, FsEvent, ImageRule, MenuAction, Platform, UploadConfig } from '../contracts';
+import type { AppSettings, DirEntry, FsEvent, ImageRule, MenuAction, Platform, RichClipboardData, UploadConfig } from '../contracts';
 import { builtinThemes, normalizeSettings, printHtmlInIframe } from './common';
 
 /** Event names emitted by `src-tauri/src/lib.rs`. */
@@ -125,6 +125,28 @@ export class TauriPlatform implements Platform {
     }
   }
 
+  // ---- optional Pandoc export (PlatformExtras, #81)
+  pandocExport(
+    markdown: string,
+    outPath: string,
+    opts: { format: string; docDir: string | null; title: string | null; pandocPath: string | null; timeoutMs: number },
+  ): Promise<string> {
+    return call('pandoc_export', { markdown, outPath, ...opts });
+  }
+
+  pandocDetect(pandocPath: string | null): Promise<{ path: string; version: string }> {
+    return call('pandoc_detect', { pandocPath });
+  }
+
+  /**
+   * After the first save of a document: copy images that were stored while it was
+   * unsaved (`<app data>/images`, absolute srcs) under `rule`. Returns
+   * `{ oldSrc: newSrc }`; rewrite those srcs in the document. Others are untouched.
+   */
+  relocateImages(docPath: string, rule: ImageRule, srcs: string[]): Promise<Record<string, string>> {
+    return call('relocate_images', { docPath, rule, srcs });
+  }
+
   // ---- optional file-tree operations (PlatformExtras, #21)
   rename(from: string, to: string): Promise<void> {
     return call('rename_path', { from, to });
@@ -185,6 +207,11 @@ export class TauriPlatform implements Platform {
   }
 
   /** http(s)/mailto only; other schemes are refused natively. */
+  /** #79: RTF onto the macOS pasteboard (no-op returning false on other OSes). */
+  writeClipboardRich(data: RichClipboardData): Promise<boolean> {
+    return call<boolean>('clipboard_write_rich', { data });
+  }
+
   openExternal(url: string): Promise<void> {
     return call('open_external', { url });
   }
