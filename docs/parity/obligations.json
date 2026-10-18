@@ -2,11 +2,11 @@
  "generated_from": {
   "spec": "typora-re/parity-spec.md",
   "prose": "typora-re/sections/*.md",
-  "margin_head": "5bf5087ac09c012be0c65e588d8581c73ec49460"
+  "margin_head": "c86a3648e480b7028a52d6bf945a00bea1c424ad"
  },
  "summary": {
-  "head": "5bf5087ac09c012be0c65e588d8581c73ec49460",
-  "artifact_sha256": "0e8a9f54bc2218644e48e9e561d68eb058546f4630f04cde1859f7ef14a58a74",
+  "head": "c86a3648e480b7028a52d6bf945a00bea1c424ad",
+  "artifact_sha256": "7586778f0e7298e4fb1ef5f2795d0eef0512ef57622abaa10585a3221549b4b5",
   "inventory": {
    "total": 171,
    "owned": 76,
@@ -16,8 +16,8 @@
    "verified_by_test": 63
   },
   "ledger": {
-   "ledger_id": "rol_61ed245c27d2bd87092ae470f9b3fe624954a064fa44924546977e8c8ec887ee",
-   "closure_digest": "1f9e19d7a8cece012d7f32b12a9856e3b1cb17de0d64acd509a5511b72458c18",
+   "ledger_id": "rol_86bb7cb54671f1e3cfd1837584592d209e758c4b8a59218e2aab4eea5b2a3659",
+   "closure_digest": "ff2645d71581a751969899f102185f1b59f3ef5d8c52161e5e058cf736bbef92",
    "status": "unknown",
    "summary": {
     "total": 176,
@@ -119,7 +119,7 @@
      }
     ]
    },
-   "evidence_id": "ev_20bb5055b694c8b8ca8e5284a2bc1065b8be9eadc6f6846a8d1970e58dea9743"
+   "evidence_id": "ev_cbff1055134e554f6f8dae70e38d1940e8151f175579eade5acc6f159238cc7b"
   },
   "coverage": {
    "status": "unknown",
@@ -206,7 +206,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'preferences'",
-    "sha256": "2c76de0a06c4f71f08cf3169450f3313254cee2c63850079bc11d2daa04aca56"
+    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -282,7 +282,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'new'",
-    "sha256": "2c76de0a06c4f71f08cf3169450f3313254cee2c63850079bc11d2daa04aca56"
+    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -391,7 +391,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'open'",
-    "sha256": "2c76de0a06c4f71f08cf3169450f3313254cee2c63850079bc11d2daa04aca56"
+    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -438,7 +438,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'openFolder'",
-    "sha256": "2c76de0a06c4f71f08cf3169450f3313254cee2c63850079bc11d2daa04aca56"
+    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -485,7 +485,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "quickOpen(): void",
-    "sha256": "2c76de0a06c4f71f08cf3169450f3313254cee2c63850079bc11d2daa04aca56"
+    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
    },
    "verifier": {
     "file": "tests/e2e/app-navigation.spec.ts",
@@ -606,7 +606,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'save'",
-    "sha256": "2c76de0a06c4f71f08cf3169450f3313254cee2c63850079bc11d2daa04aca56"
+    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -654,7 +654,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'saveAs'",
-    "sha256": "2c76de0a06c4f71f08cf3169450f3313254cee2c63850079bc11d2daa04aca56"
+    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -804,7 +804,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'reloadFromDisk'",
-    "sha256": "2c76de0a06c4f71f08cf3169450f3313254cee2c63850079bc11d2daa04aca56"
+    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
    },
    "verifier": null,
    "spec": {
@@ -870,7 +870,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'toggleLineEnding'",
-    "sha256": "2c76de0a06c4f71f08cf3169450f3313254cee2c63850079bc11d2daa04aca56"
+    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
    },
    "verifier": {
     "file": "src/app/__tests__/document.test.ts",
@@ -1008,7 +1008,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'print'",
-    "sha256": "2c76de0a06c4f71f08cf3169450f3313254cee2c63850079bc11d2daa04aca56"
+    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
    },
    "verifier": null,
    "spec": {
@@ -1044,7 +1044,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'close'",
-    "sha256": "2c76de0a06c4f71f08cf3169450f3313254cee2c63850079bc11d2daa04aca56"
+    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
    },
    "verifier": {
     "file": "tests/e2e/app-files.spec.ts",
@@ -1138,7 +1138,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'undo'",
-    "sha256": "2c76de0a06c4f71f08cf3169450f3313254cee2c63850079bc11d2daa04aca56"
+    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
    },
    "verifier": {
     "file": "tests/e2e/core-cases.ts",
@@ -1520,7 +1520,7 @@
    "owner": {
     "path": "src/app/preferences.ts",
     "anchor": "'Check spelling while typing'",
-    "sha256": "12934a571a7273d6d20dca532419e8db37ef592212ee96444079505b9e958e70"
+    "sha256": "88b923ee22dcc73298ff6999da23c27cb292933ce50458a403fcb09eaff728e0"
    },
    "verifier": null,
    "spec": {
@@ -2580,7 +2580,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'toggleSource'",
-    "sha256": "2c76de0a06c4f71f08cf3169450f3313254cee2c63850079bc11d2daa04aca56"
+    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
    },
    "verifier": {
     "file": "tests/e2e/core-cases.ts",
@@ -2626,7 +2626,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'toggleFocus'",
-    "sha256": "2c76de0a06c4f71f08cf3169450f3313254cee2c63850079bc11d2daa04aca56"
+    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
    },
    "verifier": {
     "file": "tests/e2e/app-navigation.spec.ts",
@@ -2670,7 +2670,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'toggleSidebar'",
-    "sha256": "2c76de0a06c4f71f08cf3169450f3313254cee2c63850079bc11d2daa04aca56"
+    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
    },
    "verifier": {
     "file": "tests/e2e/app-navigation.spec.ts",
@@ -2772,7 +2772,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'zoomIn'",
-    "sha256": "2c76de0a06c4f71f08cf3169450f3313254cee2c63850079bc11d2daa04aca56"
+    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
    },
    "verifier": null,
    "spec": {
@@ -2971,7 +2971,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "case 'openThemesFolder'",
-    "sha256": "2c76de0a06c4f71f08cf3169450f3313254cee2c63850079bc11d2daa04aca56"
+    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
    },
    "verifier": null,
    "spec": {
@@ -3875,7 +3875,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "private async storeImage(",
-    "sha256": "2c76de0a06c4f71f08cf3169450f3313254cee2c63850079bc11d2daa04aca56"
+    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
    },
    "verifier": {
     "file": "src/platform/web.test.ts",
@@ -4401,7 +4401,7 @@
    "owner": {
     "path": "src/app/preferences.ts",
     "anchor": "'restoreLastFolder'",
-    "sha256": "12934a571a7273d6d20dca532419e8db37ef592212ee96444079505b9e958e70"
+    "sha256": "88b923ee22dcc73298ff6999da23c27cb292933ce50458a403fcb09eaff728e0"
    },
    "verifier": null,
    "spec": {
@@ -4514,7 +4514,7 @@
    "owner": {
     "path": "src/app/preferences.ts",
     "anchor": "'darkTheme'",
-    "sha256": "12934a571a7273d6d20dca532419e8db37ef592212ee96444079505b9e958e70"
+    "sha256": "88b923ee22dcc73298ff6999da23c27cb292933ce50458a403fcb09eaff728e0"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -4562,7 +4562,7 @@
    "owner": {
     "path": "src/app/preferences.ts",
     "anchor": "'Font size'",
-    "sha256": "12934a571a7273d6d20dca532419e8db37ef592212ee96444079505b9e958e70"
+    "sha256": "88b923ee22dcc73298ff6999da23c27cb292933ce50458a403fcb09eaff728e0"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -4704,7 +4704,7 @@
    "owner": {
     "path": "src/app/preferences.ts",
     "anchor": "'autoSave'",
-    "sha256": "12934a571a7273d6d20dca532419e8db37ef592212ee96444079505b9e958e70"
+    "sha256": "88b923ee22dcc73298ff6999da23c27cb292933ce50458a403fcb09eaff728e0"
    },
    "verifier": null,
    "spec": {
@@ -5045,7 +5045,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "private async export(",
-    "sha256": "2c76de0a06c4f71f08cf3169450f3313254cee2c63850079bc11d2daa04aca56"
+    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
@@ -6057,7 +6057,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "setDocumentEdited",
-    "sha256": "2c76de0a06c4f71f08cf3169450f3313254cee2c63850079bc11d2daa04aca56"
+    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
    },
    "verifier": null,
    "spec": {
@@ -6089,7 +6089,7 @@
    "owner": {
     "path": "src-tauri/src/lib.rs",
     "anchor": "on_second_instance",
-    "sha256": "6bac0b38de8cd42c8cb8afb712b49fbbf20a18e44b0b21801168cbc5e2159044"
+    "sha256": "1d4abc67157d4a81271686617bf57eed558ee731afee52177b87563787bfcec1"
    },
    "verifier": null,
    "spec": {
@@ -6218,7 +6218,7 @@
    "owner": {
     "path": "src/app/app.ts",
     "anchor": "applyAppearance",
-    "sha256": "2c76de0a06c4f71f08cf3169450f3313254cee2c63850079bc11d2daa04aca56"
+    "sha256": "4eb81dbd1b31b1d772e095257f0774312c69716e80c0d8e65be5da23e4354ebf"
    },
    "verifier": {
     "file": "tests/e2e/app-themes.spec.ts",
