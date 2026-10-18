@@ -64,6 +64,7 @@ describe('external change prompt (#82)', () => {
       platform,
       editor,
       askUnsaved: vi.fn(async () => 'discard' as const),
+      imageRule: () => ({ kind: 'relative', dir: './assets' }),
       askReloadDirty: vi.fn(async () => false),
       externalChange: (c) => void shown.push(c),
       notify: vi.fn(),
