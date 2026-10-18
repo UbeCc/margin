@@ -5,7 +5,7 @@
  * focused, it is a static, syntax-highlighted <pre>. The info string is edited in a
  * small language box; fence chars/length/indent/info/trailing lines round-trip.
  */
-import type { BlockWidget, EditorSettings, WidgetContext, WidgetInstance } from '../../contracts';
+import { DEFAULT_MARKDOWN_OPTIONS, type BlockWidget, type EditorSettings, type WidgetContext, type WidgetInstance } from '../../contracts';
 import { createCodeEditor, CodeEditor, languageNames, loadLanguage, loadedLanguage } from './cm/setup';
 import { highlightToHtml } from './cm/highlight';
 import { buildFenceRaw, FenceParts, parseFence, rawRangeToBody, withFenceInfo } from './util/delimited';
@@ -106,6 +106,7 @@ class CodeFenceInstance implements WidgetInstance {
       this.body,
     );
     this.root.dataset.scheme = this.settings.colorScheme;
+    this.root.classList.toggle('mb-wrap', this.mdPref().codeLineWrap);
     this.root.dataset.lang = this.parts.lang;
     isolateEvents(this.root);
     host.append(this.root);
@@ -151,7 +152,7 @@ class CodeFenceInstance implements WidgetInstance {
       });
       this.body.replaceChildren(this.staticPre);
     }
-    this.staticPre.classList.toggle('mb-line-numbers', wantsLineNumbers(this.parts.info, !!this.opts.lineNumbers));
+    this.staticPre.classList.toggle('mb-line-numbers', wantsLineNumbers(this.parts.info, this.lineNumbersPref()));
     const html = highlightToHtml(this.parts.body, loadedLanguage(this.parts.lang));
     this.staticPre.innerHTML = `<code>${html || '<br>'}</code>`;
   }
@@ -164,8 +165,9 @@ class CodeFenceInstance implements WidgetInstance {
       parent: mount,
       doc: this.parts.body,
       dark: this.settings.colorScheme === 'dark',
-      lineNumbers: wantsLineNumbers(this.parts.info, !!this.opts.lineNumbers),
-      lineWrapping: false,
+      lineNumbers: wantsLineNumbers(this.parts.info, this.lineNumbersPref()),
+      lineWrapping: this.mdPref().codeLineWrap,
+      indentSize: this.mdPref().codeIndentSize,
       ariaLabel: `code block${this.parts.lang ? ' ' + this.parts.lang : ''}`,
       exit: {
         onExit: (d) => this.ctx.onExit(d),
@@ -199,7 +201,7 @@ class CodeFenceInstance implements WidgetInstance {
       this.editor?.setLanguage(this.parts.lang);
       if (!this.editor) loadLanguage(this.parts.lang).then(() => !this.destroyed && this.renderStatic());
     }
-    this.editor?.setLineNumbers(wantsLineNumbers(this.parts.info, !!this.opts.lineNumbers));
+    this.editor?.setLineNumbers(wantsLineNumbers(this.parts.info, this.lineNumbersPref()));
   }
 
   private async copy() {
@@ -231,7 +233,7 @@ class CodeFenceInstance implements WidgetInstance {
     if (this.editor) {
       this.editor.setDoc(this.parts.body);
       if (prevLang !== this.parts.lang) this.editor.setLanguage(this.parts.lang);
-      this.editor.setLineNumbers(wantsLineNumbers(this.parts.info, !!this.opts.lineNumbers));
+      this.editor.setLineNumbers(wantsLineNumbers(this.parts.info, this.lineNumbersPref()));
     } else this.renderStatic();
   }
 
@@ -250,6 +252,30 @@ class CodeFenceInstance implements WidgetInstance {
     return staticCodeHTML(this.parts, this.settings.colorScheme === 'dark' ? 'dark' : 'light');
   }
 
+  /** Preferences › Code Fences (#100); widget option `lineNumbers` forces numbers on. */
+  private mdPref() {
+    return { ...DEFAULT_MARKDOWN_OPTIONS, ...this.settings.markdown };
+  }
+
+  private lineNumbersPref(): boolean {
+    return !!this.opts.lineNumbers || this.mdPref().codeLineNumbers;
+  }
+
+  private applyCodePrefs(): void {
+    const m = this.mdPref();
+    this.root.classList.toggle('mb-wrap', m.codeLineWrap);
+    const sig = `${m.codeLineNumbers}|${m.codeLineWrap}|${m.codeIndentSize}`;
+    if (sig === this.prefSig) return;
+    this.prefSig = sig;
+    if (this.editor) {
+      this.editor.setLineNumbers(wantsLineNumbers(this.parts.info, this.lineNumbersPref()));
+      this.editor.setLineWrapping(m.codeLineWrap);
+      this.editor.setIndentSize(m.codeIndentSize);
+    } else if (this.staticPre) this.renderStatic();
+  }
+
+  private prefSig = '';
+
   updateSettings(settings: EditorSettings): void {
     const dark = settings.colorScheme === 'dark';
     // compare with the rendered scheme: the core mutates one settings object in place
@@ -257,6 +283,7 @@ class CodeFenceInstance implements WidgetInstance {
     this.settings = settings;
     this.root.dataset.scheme = settings.colorScheme;
     if (changed) this.editor?.setDark(dark);
+    this.applyCodePrefs();
   }
 
   destroy(): void {

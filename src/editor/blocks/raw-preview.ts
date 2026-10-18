@@ -30,6 +30,8 @@ export interface RawPreviewSpec<P extends Parsed> {
   render(preview: HTMLElement, p: P, settings: EditorSettings, env: RenderEnv): void | Promise<void>;
   /** Static export HTML. */
   renderHTML(p: P, settings: EditorSettings, preview: HTMLElement): string;
+  /** Optional: settings signature; the preview re-renders when it changes (e.g. math numbering, #102). */
+  settingsKey?(settings: EditorSettings): string;
   /** Label shown in the editor header (e.g. "$$", "mermaid"). */
   label?(p: P): string;
   placeholder?: string;
@@ -60,6 +62,7 @@ class RawPreviewInstance<P extends Parsed> implements WidgetInstance {
   private raw: string;
   private parsed: P;
   private settings: EditorSettings;
+  private settingsSig = '';
   private root: HTMLElement;
   private preview: HTMLElement;
   private panel: HTMLElement;
@@ -202,7 +205,9 @@ class RawPreviewInstance<P extends Parsed> implements WidgetInstance {
 
   updateSettings(settings: EditorSettings): void {
     // compare with the rendered scheme: the core mutates one settings object in place
-    const schemeChanged = settings.colorScheme !== this.root.dataset.scheme;
+    const key = this.spec.settingsKey?.(settings) ?? '';
+    const schemeChanged = settings.colorScheme !== this.root.dataset.scheme || key !== this.settingsSig;
+    this.settingsSig = key;
     this.settings = settings;
     this.applyScheme();
     if (schemeChanged) {

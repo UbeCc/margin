@@ -94,7 +94,7 @@ function node(parent: Node, n: INode, ctx: InlineCtx, s: number): number {
       parent.appendChild(meta(n.v, 'md-br'));
       return s + n.v.length;
     case 'html':
-      parent.appendChild(el('span', n.v.startsWith('<!--') ? 'md-html md-comment' : 'md-html', n.v));
+      parent.appendChild(el('span', n.v.startsWith('<!--') ? 'md-html md-comment' : /^<br\s*\/?>$/i.test(n.v) ? 'md-html md-html-br' : 'md-html', n.v));
       return s + n.v.length;
     case 'entity': {
       const w = wrap('entity', s, s + n.v.length);

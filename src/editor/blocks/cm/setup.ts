@@ -6,7 +6,7 @@
 import { Annotation, Compartment, EditorState, Extension, Prec, Transaction } from '@codemirror/state';
 import { EditorView, keymap, lineNumbers, highlightActiveLine, drawSelection, placeholder as cmPlaceholder } from '@codemirror/view';
 import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
-import { LanguageDescription, LanguageSupport, bracketMatching, indentOnInput, syntaxHighlighting } from '@codemirror/language';
+import { LanguageDescription, LanguageSupport, bracketMatching, indentOnInput, indentUnit, syntaxHighlighting } from '@codemirror/language';
 import { languages } from '@codemirror/language-data';
 import { classHighlighter } from '@lezer/highlight';
 
@@ -133,6 +133,8 @@ export interface CodeEditorOptions {
   dark: boolean;
   lineNumbers?: boolean;
   lineWrapping?: boolean;
+  /** Spaces per indent; 0 = indent with tabs (Preferences › Code Fences, #100). Default 4. */
+  indentSize?: number;
   placeholder?: string;
   exit: ExitHandlers;
   onDocChange(doc: string): void;
@@ -145,6 +147,8 @@ export interface CodeEditor {
   setLanguage(name: string): void;
   setDark(dark: boolean): void;
   setLineNumbers(on: boolean): void;
+  setLineWrapping(on: boolean): void;
+  setIndentSize(n: number): void;
   setDoc(doc: string): void;
   getDoc(): string;
   focus(at: 'start' | 'end'): void;
@@ -157,6 +161,9 @@ export function createCodeEditor(o: CodeEditorOptions): CodeEditor {
   const lang = new Compartment();
   const theme = new Compartment();
   const gutter = new Compartment();
+  const wrap = new Compartment();
+  const indent = new Compartment();
+  const indentExt = (n: number) => [EditorState.tabSize.of(n || 4), indentUnit.of(n ? ' '.repeat(n) : '\t')];
   let langName = '';
   const view = new EditorView({
     parent: o.parent,
@@ -174,9 +181,9 @@ export function createCodeEditor(o: CodeEditorOptions): CodeEditor {
         lang.of([]),
         theme.of(themeExtension(o.dark)),
         gutter.of(o.lineNumbers ? lineNumbers() : []),
-        o.lineWrapping ? EditorView.lineWrapping : [],
+        wrap.of(o.lineWrapping ? EditorView.lineWrapping : []),
         o.placeholder ? cmPlaceholder(o.placeholder) : [],
-        EditorState.tabSize.of(4),
+        indent.of(indentExt(o.indentSize ?? 4)),
         EditorView.contentAttributes.of({ 'aria-label': o.ariaLabel || 'code editor', spellcheck: 'false', autocorrect: 'off', autocapitalize: 'off' }),
         EditorView.updateListener.of((u) => {
           if (u.docChanged && !u.transactions.some((t) => t.annotation(External))) o.onDocChange(u.state.doc.toString());
@@ -208,6 +215,12 @@ export function createCodeEditor(o: CodeEditorOptions): CodeEditor {
     },
     setLineNumbers(on) {
       view.dispatch({ effects: gutter.reconfigure(on ? lineNumbers() : []) });
+    },
+    setLineWrapping(on) {
+      view.dispatch({ effects: wrap.reconfigure(on ? EditorView.lineWrapping : []) });
+    },
+    setIndentSize(n) {
+      view.dispatch({ effects: indent.reconfigure(indentExt(n)) });
     },
     setDoc(doc) {
       setDocKeepSelection(view, doc);

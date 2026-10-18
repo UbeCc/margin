@@ -146,3 +146,14 @@
   background: transparent;
   color: inherit;
 }
+
+/* #102 Preferences › Markdown › Whitespace and Line Breaks (CSS only; the source is untouched) */
+.md-editor.md-ignore-linebreak .md-paragraph:not(.md-focus) > .md-content { white-space: normal; }
+.md-editor.md-ignore-linebreak .md-paragraph:not(.md-focus) .md-br::after { content: '\A'; white-space: pre; }
+.md-editor .md-html-br { font-size: 0; }
+.md-editor .md-html-br::after { content: '\A'; white-space: pre; }
+.md-editor.md-visible-br .md-html-br { font-size: 0.75em; opacity: 0.6; }
+.md-editor .md-focus .md-html-br { font-size: 0.9em; }
+.md-editor.md-indent-first .md-paragraph > .md-content { text-indent: 2em; }
+/* Display source for simple blocks on focus: off → heading `#` stays hidden while editing */
+.md-editor.md-no-expand-simple .md-focus.md-heading > .md-content > .md-meta.md-bmeta { display: none; }
