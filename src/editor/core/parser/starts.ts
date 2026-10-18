@@ -1,10 +1,13 @@
 /** Block-start recognisers (operate on the line rest after container prefixes). */
 import { indentCols, consumeCols } from './lines';
-import { syntaxOptions } from './options';
+import { syntaxOptions, remapOn } from './options';
 
-/** ATX heading level; outside Strict Mode `#Heading` (no space) also counts (#102). */
+/** ATX heading level; outside Strict Mode `#Heading` (no space) also counts (#102).
+ *  #133 remap: full-width `＃` counts like `#`. */
+const ATX_STRICT = [/^ {0,3}(#{1,6})(?:[ \t]|$)/, /^ {0,3}([#＃]{1,6})(?:[ \t]|$)/];
+const ATX_LOOSE = [/^ {0,3}(#{1,6})(?:[ \t]|$|(?=[^#\s]))/, /^ {0,3}([#＃]{1,6})(?:[ \t]|$|(?=[^#\s＃]))/];
 export function atxLevel(s: string): number {
-  const m = (syntaxOptions.strict ? /^ {0,3}(#{1,6})(?:[ \t]|$)/ : /^ {0,3}(#{1,6})(?:[ \t]|$|(?=[^#\s]))/).exec(s);
+  const m = (syntaxOptions.strict ? ATX_STRICT : ATX_LOOSE)[remapOn() ? 1 : 0].exec(s);
   return m ? m[1].length : 0;
 }
 
@@ -40,8 +43,13 @@ export function isMathClose(s: string): boolean {
   return s.trimEnd().endsWith('$$');
 }
 
+/** Thematic break; #133 remap: en/em dashes (`–—`) count like `---`. */
+const THEMATIC = [
+  /^ {0,3}(?:(?:\*[ \t]*){3,}|(?:-[ \t]*){3,}|(?:_[ \t]*){3,})$/,
+  /^ {0,3}(?:(?:\*[ \t]*){3,}|(?:[-–—][ \t]*){3,}|(?:_[ \t]*){3,})$/,
+];
 export function isThematic(s: string): boolean {
-  return /^ {0,3}(?:(?:\*[ \t]*){3,}|(?:-[ \t]*){3,}|(?:_[ \t]*){3,})$/.test(s);
+  return THEMATIC[remapOn() ? 1 : 0].test(s);
 }
 
 export function setextLevel(s: string): number {
@@ -85,12 +93,13 @@ export function htmlEnds(kind: number, s: string): boolean {
   }
 }
 
-export const isToc = (s: string) => /^ {0,3}\[toc\][ \t]*$/i.test(s);
+export const isToc = (s: string) => /^ {0,3}(?:\[toc\]|【toc】)[ \t]*$/i.test(s); // 【toc】 always on (typora-re editor-core §289)
 export const isFootnoteDef = (s: string) => /^ {0,3}\[\^[^\]\s]+\]:/.test(s);
 export const isLinkDef = (s: string) => /^ {0,3}\[(?!\^)(?:[^\]\\]|\\.)+\]:[ \t]*\S/.test(s);
 
 export function quoteStart(s: string): number {
-  const m = /^ {0,3}>/.exec(s);
+  // #133 remap: `〉`/`》` start a blockquote like `>` (the original chars stay in the source).
+  const m = remapOn() ? /^ {0,3}(?:>|〉|》)/.exec(s) : /^ {0,3}>/.exec(s);
   if (!m) return 0;
   let n = m[0].length;
   if (s[n] === ' ' || s[n] === '\t') n++;
@@ -111,10 +120,16 @@ export interface ListStart {
 }
 
 export function listStart(s: string, col0 = 0): ListStart | null {
-  const m = /^( {0,3})([-+*]|\d{1,9}[.)])(?=[ \t]|$)/.exec(s);
+  // #133 remap: full-width markers (－＋＊), full-width digits with ASCII/full-width
+  // delimiters, and CJK task boxes 【x】/【 】 — the original characters stay in the source.
+  const remap = remapOn();
+  const m = (remap
+    ? /^( {0,3})([-+*－＋＊]|\d{1,9}[.)．）]|[０-９]{1,9}[.)．）])(?=[ \t]|$)/
+    : /^( {0,3})([-+*]|\d{1,9}[.)])(?=[ \t]|$)/
+  ).exec(s);
   if (!m) return null;
   if (isThematic(s)) return null;
-  const ordered = /\d/.test(m[2][0]);
+  const ordered = /[\d０-９]/.test(m[2][0]);
   const after = s.slice(m[0].length);
   const empty = /^[ \t]*$/.test(after);
   const base = indentCols(s, col0) + m[2].length;
@@ -132,16 +147,19 @@ export function listStart(s: string, col0 = 0): ListStart | null {
   let consumed = m[0].length + spaceChars;
   const markerText = s.slice(0, consumed);
   let task: null | string = null;
-  const t = /^\[([ xX])\](?:[ \t]|$)/.exec(s.slice(consumed));
+  const rest = s.slice(consumed);
+  const t = remap
+    ? /^(?:\[([ xX])\]|【([ xX])】)(?:[ \t]|$)/.exec(rest)
+    : /^\[([ xX])\](?:[ \t]|$)/.exec(rest);
   if (t && !empty) {
-    task = t[1];
+    task = t[1] ?? t[2];
     consumed += t[0].length;
   }
   return {
     consumed,
     ordered,
     delim: ordered ? m[2].slice(-1) : m[2],
-    start: ordered ? parseInt(m[2], 10) : 1,
+    start: ordered ? parseInt(m[2].normalize('NFKC'), 10) : 1,
     markerText,
     width: base + spaceCols,
     task,
