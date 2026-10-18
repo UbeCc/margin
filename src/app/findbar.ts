@@ -110,6 +110,18 @@ export class FindBar {
     this.refresh();
   }
 
+  /** Open the bar with `query` (sidebar search results) and select its first match. */
+  searchFor(query: string, caseSensitive: boolean): boolean {
+    this.el.hidden = false;
+    this.el.classList.remove('with-replace');
+    this.query.value = query;
+    if (caseSensitive !== this.caseSensitive) this.toggleCase();
+    this.editor().exec({ kind: 'jump', to: 'top' });
+    const ok = this.find();
+    this.refresh();
+    return ok;
+  }
+
   close(): void {
     if (this.el.hidden) return;
     this.el.hidden = true;

@@ -1,7 +1,7 @@
 import { h } from '../util/dom';
 
 export type MenuItem =
-  | { label: string; run: () => void; disabled?: boolean; danger?: boolean; hint?: string }
+  | { label: string; run: () => void; disabled?: boolean; danger?: boolean; hint?: string; checked?: boolean }
   | { separator: true };
 
 let current: { close(): void } | null = null;
@@ -24,7 +24,8 @@ export function showContextMenu(x: number, y: number, items: MenuItem[]): void {
       'button.context-item',
       {
         type: 'button',
-        role: 'menuitem',
+        role: it.checked === undefined ? 'menuitem' : 'menuitemcheckbox',
+        'aria-checked': it.checked === undefined ? null : String(it.checked),
         disabled: !!it.disabled,
         class: it.danger ? 'danger' : null,
         onclick: () => {
@@ -32,7 +33,12 @@ export function showContextMenu(x: number, y: number, items: MenuItem[]): void {
           it.run();
         },
       },
-      h('span', { text: it.label }),
+      h(
+        'span',
+        null,
+        it.checked === undefined ? null : h('span.context-check', { 'aria-hidden': 'true', text: it.checked ? '✓' : '' }),
+        it.label,
+      ),
       it.hint ? h('span.context-hint', { text: it.hint }) : null,
     );
     buttons.push(b);

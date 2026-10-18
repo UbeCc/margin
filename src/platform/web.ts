@@ -34,10 +34,13 @@ interface FileNode {
   content: string;
   binary?: boolean;
   mtime: number;
+  /** creation time; absent in older persisted filesystems (falls back to mtime) */
+  ctime?: number;
 }
 interface DirNode {
   kind: 'dir';
   mtime: number;
+  ctime?: number;
 }
 type Node = FileNode | DirNode;
 
@@ -212,7 +215,7 @@ export class WebPlatform implements Platform {
       cur += '/' + part;
       const n = this.nodes.get(cur);
       if (!n) {
-        this.nodes.set(cur, { kind: 'dir', mtime: Date.now() });
+        this.nodes.set(cur, { kind: 'dir', mtime: Date.now(), ctime: Date.now() });
         created.push(cur);
       } else if (n.kind !== 'dir') throw new Error(`ENOTDIR: ${cur}`);
     }
@@ -225,7 +228,8 @@ export class WebPlatform implements Platform {
     const existing = this.nodes.get(p);
     if (existing?.kind === 'dir') throw new Error(`EISDIR: ${p}`);
     const created = this.ensureDir(dirname(p));
-    this.nodes.set(p, { kind: 'file', content, binary: binary || undefined, mtime: Date.now() });
+    const now = Date.now();
+    this.nodes.set(p, { kind: 'file', content, binary: binary || undefined, mtime: now, ctime: existing?.ctime ?? now });
     if (!existing) created.push(p);
     return created;
   }
@@ -255,6 +259,7 @@ export class WebPlatform implements Platform {
       path: p,
       isDir: n.kind === 'dir',
       mtime: n.mtime,
+      ctime: n.ctime ?? n.mtime,
       size: n.kind === 'file' ? (n.binary ? Math.floor((n.content.length - n.content.indexOf(',') - 1) * 0.75) : new Blob([n.content]).size) : 0,
     };
   }

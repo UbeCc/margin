@@ -129,7 +129,9 @@ const VIEW: &[Item] = &[
     ("-", "", None),
     ("toggleSidebar", "Toggle Sidebar", Some("CmdOrCtrl+Backslash")),
     ("showOutline", "Outline", Some("CmdOrCtrl+Shift+1")),
+    ("showArticles", "Articles", Some("CmdOrCtrl+Shift+2")),
     ("showFiles", "Files", Some("CmdOrCtrl+Shift+3")),
+    ("sidebarSearch", "Search", Some("CmdOrCtrl+Shift+F")),
     ("revealActiveFile", "Reveal Active File in Sidebar", None),
     ("toggleSource", "Source Code Mode", Some("CmdOrCtrl+Slash")),
     ("-", "", None),
@@ -344,7 +346,7 @@ mod tests {
                 "new", "open", "openFolder", "save", "saveAs", "close", "exportHtml", "exportPdf", "print", "undo",
                 "redo", "find", "replace", "toggleSidebar", "toggleSource", "toggleFocus", "toggleTypewriter",
                 "quickOpen", "zoomIn", "zoomOut", "zoomReset", "preferences", "clearRecent", "commandPalette", "showOutline",
-                "showFiles", "revealActiveFile", "reloadFromDisk", "toggleLineEnding", "exportDocx", "exportLatex",
+                "showFiles", "showArticles", "sidebarSearch", "revealActiveFile", "reloadFromDisk", "toggleLineEnding", "exportDocx", "exportLatex",
                 "exportEpub", "clearFormat",
             ]
             .contains(&a)

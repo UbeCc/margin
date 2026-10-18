@@ -1,7 +1,8 @@
 import type { DirEntry, FsEvent, Platform } from '../../contracts';
 import { extras } from '../platform-extras';
 import { h, icon, clearChildren } from '../util/dom';
-import { basename, dirname, isInside, isMarkdownPath, isValidFileName, join, naturalCompare, uniqueName, extname } from '../util/path';
+import { basename, dirname, isInside, isMarkdownPath, isValidFileName, join, uniqueName, extname } from '../util/path';
+import { DEFAULT_SORT, sortEntries, type SortOrder } from './sort';
 import { showContextMenu, type MenuItem } from '../ui/contextmenu';
 import { confirmDialog, promptDialog } from '../ui/modal';
 
@@ -14,6 +15,10 @@ export interface FileTreeHost {
   openFolderDialog(): void;
   openFolder(path: string): void;
   recentFolders(): string[];
+  /** Extra header buttons (sort, list/tree switch, search). */
+  extraActions?(): (HTMLElement | null)[];
+  /** Refresh button outside tree mode (list / search). */
+  refreshMode?(): void;
 }
 
 interface DirNode {
@@ -26,12 +31,10 @@ interface DirNode {
   list: HTMLUListElement;
 }
 
-/** Sort: folders first, then natural name order; hide dotfiles. */
-export function sortEntries(entries: DirEntry[]): DirEntry[] {
-  return entries
-    .filter((e) => !e.name.startsWith('.'))
-    .sort((a, b) => (a.isDir === b.isDir ? naturalCompare(a.name, b.name) : a.isDir ? -1 : 1));
-}
+export { sortEntries } from './sort';
+
+/** Files panel modes: lazy tree, flat Articles list, or full-text search results. */
+export type FilesMode = 'tree' | 'list' | 'search';
 
 export class FileTree {
   readonly el: HTMLElement;
@@ -41,11 +44,13 @@ export class FileTree {
   private dirs = new Map<string, DirNode>();
   private rows = new Map<string, HTMLElement>();
   private active: string | null = null;
+  private order: SortOrder = DEFAULT_SORT;
+  mode: FilesMode = 'tree';
 
   constructor(private host: FileTreeHost) {
     this.header = h('div.tree-header');
     this.body = h('div.tree-body', { role: 'tree', tabindex: '0', 'aria-label': 'Files' });
-    this.el = h('div.file-tree', null, this.header, this.body);
+    this.el = h('div.file-tree', { 'data-mode': 'tree' }, this.header, this.body);
     this.body.addEventListener('contextmenu', (e) => {
       if ((e.target as HTMLElement).closest('.tree-row') || !this.root) return;
       e.preventDefault();
@@ -72,6 +77,38 @@ export class FileTree {
     if (this.active) this.setActive(this.active);
   }
 
+  /** Mount the list / search views under the shared header. */
+  mountPanel(el: HTMLElement): void {
+    this.el.appendChild(el);
+  }
+
+  setMode(mode: FilesMode): void {
+    this.mode = mode;
+    this.el.dataset.mode = mode;
+    if (this.root) this.renderHeader();
+  }
+
+  get sortOrder(): SortOrder {
+    return this.order;
+  }
+
+  /** Re-sort every loaded folder in place (keeps expansion state). */
+  setSort(order: SortOrder): void {
+    if (order === this.order) return;
+    this.order = order;
+    for (const node of this.dirs.values()) {
+      if (!node.loaded) continue;
+      node.children = sortEntries(node.children, order);
+      this.renderChildren(node);
+    }
+    if (this.active) this.setActive(this.active);
+  }
+
+  /** Re-render the header (e.g. after a mode / sort change). */
+  refreshHeader(): void {
+    if (this.root) this.renderHeader();
+  }
+
   private renderHeader(): void {
     clearChildren(this.header);
     if (!this.root) return;
@@ -82,7 +119,8 @@ export class FileTree {
         null,
         h('button.icon-btn', { type: 'button', title: 'New File', 'aria-label': 'New File', onclick: () => void this.newFile(this.root!) }, icon('plus')),
         h('button.icon-btn', { type: 'button', title: 'Reveal Active File', 'aria-label': 'Reveal Active File', onclick: () => this.active && void this.reveal(this.active) }, icon('target')),
-        h('button.icon-btn', { type: 'button', title: 'Refresh', 'aria-label': 'Refresh', onclick: () => void this.refreshAll() }, icon('refresh')),
+        h('button.icon-btn', { type: 'button', title: 'Refresh', 'aria-label': 'Refresh', onclick: () => (this.mode === 'tree' ? void this.refreshAll() : this.host.refreshMode?.()) }, icon('refresh')),
+        ...(this.host.extraActions?.() ?? []),
       ),
     );
   }
@@ -129,7 +167,7 @@ export class FileTree {
     node.loading = (async () => {
       let entries: DirEntry[] = [];
       try {
-        entries = sortEntries(await this.host.platform.listDir(node.path));
+        entries = sortEntries(await this.host.platform.listDir(node.path), this.order);
       } catch (e) {
         this.host.notify(`Couldn't list ${basename(node.path)}: ${e instanceof Error ? e.message : e}`, 'error');
       }

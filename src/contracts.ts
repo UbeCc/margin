@@ -170,6 +170,8 @@ export interface DirEntry {
   isDir: boolean;
   /** ms since epoch */
   mtime: number;
+  /** Creation (birth) time, ms since epoch, when the platform knows it (#101 sort). */
+  ctime?: number;
   size: number;
 }
 
@@ -201,7 +203,7 @@ export type MenuAction =
   | 'undo' | 'redo' | 'find' | 'replace'
   | 'toggleSidebar' | 'toggleSource' | 'toggleFocus' | 'toggleTypewriter' | 'quickOpen'
   | 'zoomIn' | 'zoomOut' | 'zoomReset'
-  | 'clearRecent' | 'commandPalette' | 'showOutline' | 'showFiles' | 'revealActiveFile' | 'reloadFromDisk' | 'toggleLineEnding'
+  | 'clearRecent' | 'commandPalette' | 'showOutline' | 'showFiles' | 'showArticles' | 'sidebarSearch' | 'revealActiveFile' | 'reloadFromDisk' | 'toggleLineEnding'
   | `heading:${0 | 1 | 2 | 3 | 4 | 5 | 6}`
   | `mark:${InlineMark}`
   | `block:${BlockKind}`

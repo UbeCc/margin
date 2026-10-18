@@ -1,4 +1,5 @@
 import type { AppSettings, ImageRule } from '../contracts';
+import { DEFAULT_SORT, isSortOrder, type SortOrder } from './sidebar/sort';
 
 /**
  * App-side settings: the `AppSettings` contract plus shell-only preferences.
@@ -16,6 +17,14 @@ export interface MarginSettings extends AppSettings {
   sidebarVisible: boolean;
   sidebarTab: 'files' | 'outline';
   sidebarWidth: number;
+  /** File tree / Articles ordering (#101). */
+  sidebarSort: SortOrder;
+  /** Files panel layout: lazy tree or flat Articles list (#101). */
+  sidebarFileView: 'tree' | 'list';
+  /** Articles list: "Group By Folder". */
+  sidebarGroupByFolder: boolean;
+  /** Outline: "Collapsible Outline" vs "Flat Outline". */
+  outlineCollapsible: boolean;
   /** Auto-save delay in ms after the last edit. */
   autoSaveDelay: number;
   restoreLastFolder: boolean;
@@ -45,6 +54,10 @@ export const DEFAULT_SETTINGS: Readonly<MarginSettings> = Object.freeze({
   sidebarVisible: true,
   sidebarTab: 'files',
   sidebarWidth: 260,
+  sidebarSort: DEFAULT_SORT,
+  sidebarFileView: 'tree',
+  sidebarGroupByFolder: false,
+  outlineCollapsible: false,
   restoreLastFolder: true,
   pandocPath: '',
 });
@@ -123,6 +136,10 @@ export function migrateSettings(input: unknown): MarginSettings {
     sidebarVisible: bool(raw.sidebarVisible, d.sidebarVisible),
     sidebarTab: tab === 'files' || tab === 'outline' ? tab : d.sidebarTab,
     sidebarWidth: Math.round(num(raw.sidebarWidth, d.sidebarWidth, 180, 520)),
+    sidebarSort: isSortOrder(raw.sidebarSort) ? raw.sidebarSort : d.sidebarSort,
+    sidebarFileView: raw.sidebarFileView === 'list' ? 'list' : 'tree',
+    sidebarGroupByFolder: bool(raw.sidebarGroupByFolder, d.sidebarGroupByFolder),
+    outlineCollapsible: bool(raw.outlineCollapsible, d.outlineCollapsible),
     restoreLastFolder: bool(raw.restoreLastFolder, d.restoreLastFolder),
     pandocPath: typeof raw.pandocPath === 'string' ? raw.pandocPath.trim() : '',
   };

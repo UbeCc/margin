@@ -8,7 +8,8 @@ import { FindBar } from './findbar';
 import { extras } from './platform-extras';
 import { openPreferences } from './preferences';
 import { DEFAULT_SETTINGS, migrateSettings, pushRecent, type MarginSettings } from './settings';
-import { FileTree } from './sidebar/filetree';
+import type { FileTree } from './sidebar/filetree';
+import { FilesPanel } from './sidebar/files-panel';
 import { OutlineView } from './sidebar/outline';
 import { StatusBar } from './statusbar';
 import { ThemeManager } from './themes';
@@ -51,6 +52,7 @@ export class App {
   private uploader!: ImageUploader;
   private scroller!: HTMLElement;
   private tree!: FileTree;
+  private files!: FilesPanel;
   private outline!: OutlineView;
   private findbar!: FindBar;
   private status!: StatusBar;
@@ -170,7 +172,10 @@ export class App {
     this.titleEl = h('span.title-text', { text: 'Untitled' });
     const titlebar = h('header.titlebar', { 'data-tauri-drag-region': '' }, h('div.title', { 'data-tauri-drag-region': '' }, this.titleEl));
 
-    this.tree = new FileTree({
+    this.files = new FilesPanel({
+      settings: () => this.settings,
+      updateSettings: (p) => this.updateSettings(p),
+      openAt: (p, q, cs) => void this.openAt(p, q, cs),
       platform: this.platform,
       openFile: (p) => void this.doc.open(p),
       onRenamed: (from, to) => {
@@ -184,11 +189,15 @@ export class App {
       openFolder: (p) => void this.openFolder(p),
       recentFolders: () => this.settings.recentFolders,
     });
-    this.outline = new OutlineView((id) => {
-      this.caretToBlock(id);
-      this.editor.scrollToHeading(id);
-      this.outline.setActive(id);
-    });
+    this.tree = this.files.tree;
+    this.outline = new OutlineView(
+      (id) => {
+        this.caretToBlock(id);
+        this.editor.scrollToHeading(id);
+        this.outline.setActive(id);
+      },
+      { collapsible: this.settings.outlineCollapsible, onCollapsibleChange: (on) => this.updateSettings({ outlineCollapsible: on }) },
+    );
 
     const tab = (id: 'files' | 'outline', label: string): HTMLButtonElement =>
       (this.tabs[id] = h('button.sidebar-tab', {
@@ -203,7 +212,7 @@ export class App {
       'aside.sidebar',
       { 'aria-label': 'Sidebar' },
       h('nav.sidebar-tabs', { role: 'tablist' }, tab('files', 'Files'), tab('outline', 'Outline')),
-      h('div.sidebar-panel', { 'data-panel': 'files' }, this.tree.el),
+      h('div.sidebar-panel', { 'data-panel': 'files' }, this.files.el),
       h('div.sidebar-panel', { 'data-panel': 'outline' }, this.outline.el),
       resizer,
     );
@@ -330,7 +339,7 @@ export class App {
     else if (s.dirty) this.status.setSaveState(this.settings.autoSave && s.path ? 'Saving…' : 'Edited', 'dirty');
     else if (s.savedAt) this.status.setSaveState('Saved', 'saved');
     else this.status.setSaveState('');
-    this.tree.setActive(s.path);
+    this.files.setActive(s.path);
     this.refreshOutlineSoon();
     this.refreshStatsSoon();
   }
@@ -345,6 +354,12 @@ export class App {
     }
   }
 
+  /** Sidebar search result: open the file, then find the query in it. */
+  private async openAt(path: string, query: string | null, caseSensitive: boolean): Promise<void> {
+    if (path !== this.doc.path && !(await this.doc.open(path))) return;
+    if (query) this.findbar.searchFor(query, caseSensitive);
+  }
+
   async openFolder(path: string, opts: { implicit?: boolean; quiet?: boolean } = {}): Promise<void> {
     const st = await this.platform.stat(path).catch(() => null);
     if (!st || !st.isDir) {
@@ -356,10 +371,10 @@ export class App {
     this.implicitFolder = !!opts.implicit;
     this.unwatchFolder?.();
     this.unwatchFolder = null;
-    await this.tree.setRoot(path);
+    await this.files.setRoot(path);
     if (this.doc.path) await this.tree.reveal(this.doc.path);
     try {
-      const un = await this.platform.watch(path, (evs) => this.tree.onFsEvents(evs));
+      const un = await this.platform.watch(path, (evs) => this.files.onFsEvents(evs));
       if (this.folder === path) this.unwatchFolder = un;
       else un();
     } catch {
@@ -617,6 +632,19 @@ export class App {
         const tab = id === 'showFiles' ? 'files' : 'outline';
         if (this.settings.sidebarVisible && this.settings.sidebarTab === tab) this.updateSettings({ sidebarVisible: false });
         else this.showSidebarTab(tab);
+        return true;
+      }
+      case 'showArticles':
+        if (this.settings.sidebarVisible && this.settings.sidebarTab === 'files' && this.files.mode === 'list') this.updateSettings({ sidebarVisible: false });
+        else {
+          this.showSidebarTab('files');
+          await this.files.setMode('list');
+        }
+        return true;
+      case 'sidebarSearch': {
+        this.showSidebarTab('files');
+        const sel = window.getSelection()?.toString().trim();
+        await this.files.openSearch(sel && sel.length < 200 ? sel : undefined);
         return true;
       }
       case 'revealActiveFile':

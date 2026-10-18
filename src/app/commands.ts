@@ -121,6 +121,8 @@ export const COMMANDS: CommandSpec[] = [
   { id: 'toggleSidebar', label: 'Toggle Sidebar', category: 'View', keys: ['Mod+\\', 'Mod+Shift+L'] },
   { id: 'showOutline', label: 'Show Outline', category: 'View', keys: ['Mod+Shift+1'] },
   { id: 'showFiles', label: 'Show Files', category: 'View', keys: ['Mod+Shift+3'] },
+  { id: 'showArticles', label: 'Show Articles (List View)', category: 'View', keys: ['Mod+Shift+2'] },
+  { id: 'sidebarSearch', label: 'Search in Folder', category: 'View', keys: ['Mod+Shift+F'] },
   { id: 'revealActiveFile', label: 'Reveal Active File in Sidebar', category: 'View' },
   { id: 'toggleSource', label: 'Toggle Source Code Mode', category: 'View', keys: ['Mod+/'] },
   { id: 'toggleFocus', label: 'Focus Mode', category: 'View', keys: ['F8'] },
