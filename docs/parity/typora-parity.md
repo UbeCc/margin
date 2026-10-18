@@ -8,15 +8,15 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 
 | | surfaces |
 |---|---|
-| total | 171 |
-| owned (implemented) | 98 (with a named passing test: 85) |
+| total | 172 |
+| owned (implemented) | 99 (with a named passing test: 86) |
 | partial | 14 |
 | missing | 51 |
 | out of scope | 8 |
 
-REA ledger `rol_a70675286af12719d17b6ed342ad04fc4436b3d5b93ced964a195fd013759bbe` (closure `a086bf1eb0234acf…`): status **unknown**; unowned 51, implemented 112, out-of-scope 8, unknown 5.
+REA ledger `rol_50e09a840ab2489df9feed4a2b7a4485d69803357ffe95e1cb6b07195f70012a` (closure `f911b46e0ee693be…`): status **unknown**; unowned 51, implemented 113, out-of-scope 8, unknown 5.
 
-REA coverage boundary `margin.typora-parity`: status **unknown**; 85/163 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 51, package-proof-missing 1, verifier-missing 72, verifier-unknown 6.
+REA coverage boundary `margin.typora-parity`: status **unknown**; 86/164 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 51, package-proof-missing 1, verifier-missing 72, verifier-unknown 6.
 
 Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): build exit 0, cargo-test exit 0, independence exit 0, playwright exit 0, vitest exit 0. See `rea/summary.json`.
 
@@ -261,7 +261,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `sidebar.sort` | File tree sorting (name/natural/created/modified, asc/desc) | **missing** | P1 | — | none | 9 |
 | `sidebar.outline` | Outline: headings, jump, highlight current header | owned |  | `src/app/sidebar/outline.ts` `activeId` | `tests/e2e/app-navigation.spec.ts` › outline lists headings and jumps on click | 2 |
 | `sidebar.outline-collapse` | Outline: collapsible/flat outline, expand/collapse all, filter, unpin | **missing** | P1 | — | none | 7 |
-| `sidebar.drag` | Drag files from sidebar into the editor / other apps; drop files to open — #23 | **missing** | P2 | — | none | 1 |
+| `sidebar.drag` | Drag files from sidebar into the editor / other apps; drop files to open — dropping files onto the window is beh.files.drop (#23); dragging out of the sidebar is not implemented | **missing** | P2 | — | none | 1 |
 
 ## Export / print / import
 
@@ -311,6 +311,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `beh.files.folder-watch` | Folder watcher: incremental tree updates, rename pairing, hidden/unsupported filtered | owned |  | `src-tauri/src/watch.rs` `fn ` | `src/platform/web.test.ts` › suppresses own modifications but reports creations and external changes | 1 |
 | `beh.files.title-dirty` | Window title shows document name and edited state | owned |  | `src/app/app.ts` `setDocumentEdited` | none | 0 |
 | `beh.files.single-instance` | Single instance: opening files from Finder reuses the running app | owned |  | `src-tauri/src/lib.rs` `on_second_instance` | `tests/e2e/parity-files.spec.ts` › beh.files.single-instance: Single instance: opening files from Finder reuses the running app | 0 |
+| `beh.files.drop` | Drop files from the OS: open Markdown/folders, insert images and links — #23; macOS native paths via src-tauri/src/drop_macos.rs; Linux/Windows drops not intercepted yet | owned |  | `src/app/filedrop.ts` `export async function handleFileDrop(` | `tests/e2e/parity-files.spec.ts` › beh.files.drop: Drop files from the OS: open Markdown/folders, insert images and links | 0 |
 | `beh.files.snapshot-undo` | Reopen keeps undo history and caret (per-document snapshot) | owned |  | `src/app/doctabs.ts` `private async revive(` | `tests/e2e/parity-files.spec.ts` › beh.files.snapshot-undo: Reopen keeps undo history and caret (per-document snapshot) | 4 |
 | `beh.files.quicklook` | Quick Look / preview of a file from the sidebar | **missing** | P2 | — | none | 3 |
 | `beh.files.asset-scope` | Asset access scoped to doc/folder (no whole-disk file:// access) — prose flags Typora granting "/" read access; Margin scopes per folder (#48 open) | owned |  | `src-tauri/src/commands.rs` `allow_asset_dir` | none | 0 |

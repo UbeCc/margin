@@ -1,23 +1,23 @@
 {
- "head": "f4cfd70a6158d290b2910bfec823a93196bc6d6a",
- "artifact_sha256": "8479dcb1149d9c17d01be98ba84a9edbbe03e35ba53c601560bcad35b5a3a34d",
+ "head": "debf4a5f5a89d032a18feadc68fadb26f8ad1d05",
+ "artifact_sha256": "3683621aa1a9351243917a0feafebd148eb0ebd3ec083fbbe26ddcee05ecb8c4",
  "inventory": {
-  "total": 171,
-  "owned": 98,
+  "total": 172,
+  "owned": 99,
   "partial": 14,
   "missing": 51,
   "oos": 8,
-  "verified_by_test": 85
+  "verified_by_test": 86
  },
  "ledger": {
-  "ledger_id": "rol_a70675286af12719d17b6ed342ad04fc4436b3d5b93ced964a195fd013759bbe",
-  "closure_digest": "a086bf1eb0234acff6782c228cf75a32cf1cb6edbe3dd164c69e8ce2c5b6a024",
+  "ledger_id": "rol_50e09a840ab2489df9feed4a2b7a4485d69803357ffe95e1cb6b07195f70012a",
+  "closure_digest": "f911b46e0ee693be4660c9d65e9b198b918681766132c1cc698a4a5692ceebcf",
   "status": "unknown",
   "summary": {
-   "total": 176,
-   "required": 168,
+   "total": 177,
+   "required": 169,
    "verified": 0,
-   "required_open": 168,
+   "required_open": 169,
    "by_status": [
     {
      "key": "unowned",
@@ -29,7 +29,7 @@
     },
     {
      "key": "implemented",
-     "count": 112
+     "count": 113
     },
     {
      "key": "verified",
@@ -67,7 +67,7 @@
     },
     {
      "key": "persistence",
-     "count": 21
+     "count": 22
     },
     {
      "key": "process",
@@ -105,7 +105,7 @@
     },
     {
      "key": "reviewed",
-     "count": 171
+     "count": 172
     },
     {
      "key": "unknown",
@@ -113,7 +113,7 @@
     }
    ]
   },
-  "evidence_id": "ev_c1cc8c4ea40e2def78c35bd1b2646247712d7ba1788492c0aba4215f0b0e44d2"
+  "evidence_id": "ev_978d1eac5a4b08cbc380482651f379b126b047338a193b44e864377767e73dd9"
  },
  "coverage": {
   "status": "unknown",
@@ -123,9 +123,9 @@
    "verifier-missing": 72,
    "verifier-unknown": 6
   },
-  "claims_total": 163,
-  "claims_qualified_by_controlled_replay": 85,
-  "evidence_ids_cited": 175
+  "claims_total": 164,
+  "claims_qualified_by_controlled_replay": 86,
+  "evidence_ids_cited": 176
  },
  "verifier_runs": {
   "build": {

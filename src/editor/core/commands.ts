@@ -234,11 +234,17 @@ export function execCommand(ed: EditorCore, cmd: EditorCommand): boolean {
       insertMarkdown(ed, cmd.text);
       return true;
     case 'replaceDocument': {
+      // #89: replace only the changed middle so the caret keeps its place (mapped
+      // across the edit) and the whole replace is one undo step.
       const md = cmd.markdown;
-      if (md === ed.doc.text()) return true;
+      const old = ed.doc.text();
+      if (md === old) return true;
+      const { from, to, text } = diffRange(old, md);
+      const map = (p: number) => (p <= from ? p : p >= to ? p + text.length - (to - from) : from + text.length);
+      const caret = map(ed.sel().to);
       ed.change(() => {
-        ed.doc.replace(0, ed.doc.text().length, md);
-        return { pos: 0 };
+        ed.doc.replace(from, to, text);
+        return { pos: caret };
       }, null);
       return true;
     }
@@ -275,3 +281,18 @@ export function execCommand(ed: EditorCore, cmd: EditorCommand): boolean {
       return insertAtPoint(ed, cmd.markdown, cmd.x, cmd.y);
   }
 }
+
+/** Smallest `old[from, to)` → `text` replacement turning `old` into `next` (never splits a surrogate pair). */
+export function diffRange(old: string, next: string): { from: number; to: number; text: string } {
+  const max = Math.min(old.length, next.length);
+  let a = 0;
+  while (a < max && old.charCodeAt(a) === next.charCodeAt(a)) a++;
+  if (a > 0 && a < max && isHigh(old.charCodeAt(a - 1))) a--;
+  let b = 0;
+  while (b < max - a && old.charCodeAt(old.length - 1 - b) === next.charCodeAt(next.length - 1 - b)) b++;
+  if (b > 0 && isLow(old.charCodeAt(old.length - b)) && old.length - b > a) b--;
+  return { from: a, to: old.length - b, text: next.slice(a, next.length - b) };
+}
+
+const isHigh = (c: number) => c >= 0xd800 && c <= 0xdbff;
+const isLow = (c: number) => c >= 0xdc00 && c <= 0xdfff;
