@@ -81,13 +81,13 @@ mod mac {
         unsafe { msg_send![pb, changeCount] }
     }
 
-    fn string_for(pb: &AnyObject, ty: &str) -> Option<String> {
+    pub(super) fn string_for(pb: &AnyObject, ty: &str) -> Option<String> {
         let ty = NSString::from_str(ty);
         let s: Option<Retained<NSString>> = unsafe { msg_send![pb, stringForType: &*ty] };
         s.map(|s| s.to_string())
     }
 
-    fn set_string(pb: &AnyObject, ty: &str, value: &str) -> bool {
+    pub(super) fn set_string(pb: &AnyObject, ty: &str, value: &str) -> bool {
         let (ty, v) = (NSString::from_str(ty), NSString::from_str(value));
         let ok: Bool = unsafe { msg_send![pb, setString: &*v, forType: &*ty] };
         ok.as_bool()
@@ -108,16 +108,22 @@ mod mac {
     }
 
     pub fn write(d: &RichClipboardData) -> bool {
-        let Some(pb) = board() else { return false };
-        let start = change_count(&pb);
-        let deadline = Instant::now() + WAIT;
+        match board() {
+            Some(pb) => write_to(&pb, d, WAIT),
+            None => false,
+        }
+    }
+
+    pub(super) fn write_to(pb: &AnyObject, d: &RichClipboardData, wait: Duration) -> bool {
+        let start = change_count(pb);
+        let deadline = Instant::now() + wait;
         loop {
-            match string_for(&pb, "public.html") {
+            match string_for(pb, "public.html") {
                 Some(h) if h.contains(&d.marker) => {
-                    add_type(&pb, "public.rtf");
-                    return set_data(&pb, "public.rtf", d.rtf.as_bytes());
+                    add_type(pb, "public.rtf");
+                    return set_data(pb, "public.rtf", d.rtf.as_bytes());
                 }
-                Some(_) if change_count(&pb) != start => return false, // a newer copy landed
+                Some(_) if change_count(pb) != start => return false, // a newer copy landed
                 _ => {}
             }
             if Instant::now() >= deadline {
@@ -127,14 +133,14 @@ mod mac {
         }
         // WebKit's write never showed up; write every flavour ourselves unless the
         // pasteboard moved on meanwhile.
-        if change_count(&pb) != start {
+        if change_count(pb) != start {
             return false;
         }
-        let _: isize = unsafe { msg_send![&*pb, clearContents] };
-        let mut ok = set_string(&pb, "public.utf8-plain-text", &d.plain);
-        ok &= set_string(&pb, "public.html", &d.html);
-        ok &= set_data(&pb, "public.rtf", d.rtf.as_bytes());
-        ok &= set_string(&pb, "net.daringfireball.markdown", &d.markdown);
+        let _: isize = unsafe { msg_send![pb, clearContents] };
+        let mut ok = set_string(pb, "public.utf8-plain-text", &d.plain);
+        ok &= set_string(pb, "public.html", &d.html);
+        ok &= set_data(pb, "public.rtf", d.rtf.as_bytes());
+        ok &= set_string(pb, "net.daringfireball.markdown", &d.markdown);
         ok
     }
 }
@@ -165,6 +171,51 @@ mod tests {
         let mut d = data();
         d.marker.clear();
         assert!(validate(&d).is_err());
+    }
+
+    /// Exercises the real NSPasteboard calls on a private, uniquely named
+    /// pasteboard (never the user's general clipboard).
+    #[cfg(target_os = "macos")]
+    #[test]
+    fn appends_rtf_or_writes_all_on_private_pasteboard() {
+        use objc2::rc::Retained;
+        use objc2::runtime::AnyObject;
+        use objc2::{class, msg_send};
+        use std::time::Duration;
+        let pb: Retained<AnyObject> =
+            unsafe { msg_send![class!(NSPasteboard), pasteboardWithUniqueName] };
+        let d = data();
+        // nothing from WebKit → fallback writes every flavour
+        assert!(mac::write_to(&pb, &d, Duration::from_millis(30)));
+        assert_eq!(
+            mac::string_for(&pb, "public.html").as_deref(),
+            Some(d.html.as_str())
+        );
+        assert_eq!(
+            mac::string_for(&pb, "public.utf8-plain-text").as_deref(),
+            Some("**a**")
+        );
+        assert!(
+            mac::string_for(&pb, "public.rtf")
+                .unwrap()
+                .starts_with("{\\rtf1")
+        );
+        // WebKit-like write present → RTF appended, HTML untouched
+        let _: isize = unsafe { msg_send![&*pb, clearContents] };
+        assert!(mac::set_string(&pb, "public.html", &d.html));
+        let mut d2 = data();
+        d2.rtf = "{\\rtf1\\ansi second\\par}".into();
+        assert!(mac::write_to(&pb, &d2, Duration::from_millis(30)));
+        assert!(
+            mac::string_for(&pb, "public.rtf")
+                .unwrap()
+                .contains("second")
+        );
+        assert_eq!(
+            mac::string_for(&pb, "public.html").as_deref(),
+            Some(d.html.as_str())
+        );
+        let _: () = unsafe { msg_send![&*pb, releaseGlobally] };
     }
 
     #[cfg(not(target_os = "macos"))]

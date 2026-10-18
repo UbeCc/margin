@@ -2,6 +2,8 @@
 import { describe, it, expect } from 'vitest';
 import { MARGIN_MIME, buildCopyFlavors, embeddedMarkdown, pickPasteMarkdown, writeFlavors } from './clipboard-flavors';
 import { htmlToMarkdown } from './paste';
+import { expandToBlockStart } from './clipboard';
+import { Doc } from './model';
 
 const getter = (d: Record<string, string>) => (t: string) => d[t] ?? '';
 const MD = '# T\n\n- a **b** "q" <x> & y\n';
@@ -73,5 +75,26 @@ describe('paste priority', () => {
       return t === 'text/plain' ? 'p' : '';
     };
     expect(pickPasteMarkdown(get, htmlToMarkdown)).toEqual({ md: 'p', source: 'plain' });
+  });
+});
+
+describe('copy range widening (expandToBlockStart)', () => {
+  const at = (src: string, from: string, to: string) => {
+    const d = new Doc(src);
+    const f = src.indexOf(from);
+    const t = src.indexOf(to) + to.length;
+    return src.slice(expandToBlockStart(d, f, t), t);
+  };
+  it('selection starting after hidden heading/list/quote markers carries them', () => {
+    expect(at('# Title\n\npara\n', 'Title', 'para')).toBe('# Title\n\npara');
+    expect(at('# Title\n', 'Title', 'Title')).toBe('# Title');
+    expect(at('- one\n- two\n', 'one', 'two')).toBe('- one\n- two');
+    expect(at('> q\n> r\n', 'q', 'r')).toBe('> q\n> r');
+  });
+  it('partial selections stay exact', () => {
+    expect(at('# Title\n', 'itl', 'itl')).toBe('itl');
+    expect(at('# Title\n', 'Tit', 'Tit')).toBe('Tit');
+    expect(at('- one\n- two\n', 'one', 'one')).toBe('one');
+    expect(at('para one\n\nx\n', 'one', 'x')).toBe('one\n\nx');
   });
 });

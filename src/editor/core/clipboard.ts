@@ -3,6 +3,7 @@ import type { EditorCore } from './editor';
 import { Doc, contPrefix, leafContent, widgetRaw } from './model';
 import { isTextLeaf } from './edit';
 import { docHTML } from './html';
+import { splitBlockMeta } from './render-inline';
 import { htmlToMarkdown } from './paste';
 import { buildCopyFlavors, pickPasteMarkdown, writeFlavors, type CopyFlavors } from './clipboard-flavors';
 import { htmlToRtf } from './clipboard-rtf';
@@ -12,9 +13,31 @@ export { MARGIN_HTML_ATTR, MARGIN_MIME } from './clipboard-flavors';
 export function selectionMarkdown(ed: EditorCore): { from: number; to: number; md: string } | null {
   const s = ed.readSel();
   if (!s || s.anchor === s.focus) return null;
-  const from = Math.min(s.anchor, s.focus);
+  const from = expandToBlockStart(ed.doc, Math.min(s.anchor, s.focus), Math.max(s.anchor, s.focus));
   const to = Math.max(s.anchor, s.focus);
   return { from, to, md: ed.doc.text().slice(from, to) };
+}
+
+/**
+ * Hidden block markers (`# `, `- `, `> `) sit before the caret's first
+ * visible position, so a selection made by dragging or select-all starts after
+ * them. When such a selection runs past the end of its first block, widen it to
+ * the start of that line so the copy carries the block syntax (#79).
+ */
+export function expandToBlockStart(doc: Doc, from: number, to: number): number {
+  if (!doc.leaves.length) return from;
+  const a = doc.locate(from);
+  const l = doc.leaves[a.i];
+  if (!l || !isTextLeaf(l)) return from;
+  const lead = splitBlockMeta(l, leafContent(l))[0];
+  if (a.off > lead.length) return from;
+  const text = doc.text();
+  let lineEnd = text.indexOf('\n', from);
+  if (lineEnd < 0) lineEnd = text.length;
+  else if (text[lineEnd - 1] === '\r') lineEnd--;
+  // whole rest of a marked line (heading), or the selection continues onto later lines
+  if (!(to > lineEnd || (lead && to >= lineEnd))) return from;
+  return text.lastIndexOf('\n', from - 1) + 1;
 }
 
 /**
