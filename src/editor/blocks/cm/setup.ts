@@ -148,6 +148,8 @@ export interface CodeEditor {
   setDoc(doc: string): void;
   getDoc(): string;
   focus(at: 'start' | 'end'): void;
+  /** Select `[from, to)` of the doc, scroll it into view and focus (find, #35). */
+  select(from: number, to: number): void;
   destroy(): void;
 }
 
@@ -215,6 +217,13 @@ export function createCodeEditor(o: CodeEditorOptions): CodeEditor {
       const pos = at === 'start' ? 0 : view.state.doc.length;
       view.dispatch({ selection: { anchor: pos }, scrollIntoView: true });
       view.focus();
+    },
+    select(from, to) {
+      const len = view.state.doc.length;
+      const a = Math.max(0, Math.min(from, len));
+      const b = Math.max(a, Math.min(to, len));
+      view.focus();
+      view.dispatch({ selection: { anchor: a, head: b }, scrollIntoView: true });
     },
     destroy() {
       view.destroy();

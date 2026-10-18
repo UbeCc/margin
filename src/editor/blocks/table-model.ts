@@ -370,3 +370,62 @@ export function pasteGrid(m: TableModel, r: number, c: number, grid: string[][])
   grid.forEach((row, i) => row.forEach((v, j) => (n.rows[r + i][c + j] = v)));
   return n;
 }
+
+// ------------------------------------------------------------------ find support (#35)
+
+/** Source spans `[start, end)` of each cell's trimmed text in `line` (same split as `splitRow`). */
+export function cellSpans(line: string): { start: number; end: number }[] {
+  let a = 0;
+  let b = line.length;
+  while (a < b && /\s/.test(line[a])) a++;
+  while (b > a && /\s/.test(line[b - 1])) b--;
+  if (line[a] === '|') a++;
+  if (b > a && line[b - 1] === '|' && !isEscaped(line, b - 1)) b--;
+  const spans: { start: number; end: number }[] = [];
+  const push = (s: number, e: number) => {
+    while (s < e && /\s/.test(line[s])) s++;
+    while (e > s && /\s/.test(line[e - 1])) e--;
+    spans.push({ start: s, end: e });
+  };
+  let cs = a;
+  for (let i = a; i < b; i++) {
+    if (line[i] === '\\' && i + 1 < b) {
+      i++;
+      continue;
+    }
+    if (line[i] === '|') {
+      push(cs, i);
+      cs = i + 1;
+    }
+  }
+  push(cs, b);
+  return spans;
+}
+
+/**
+ * Locate raw range `[from, to)` of a table source inside one cell: model row/column
+ * and offsets into that cell's text. Null when the range spans cells, touches pipes
+ * or padding, lies in the delimiter row, or the cell is outside the column count.
+ */
+export function locateCell(t: ParsedTable, from: number, to: number): { r: number; c: number; from: number; to: number } | null {
+  const lines = t.raw.slice(0, t.raw.length - t.tail.length).split('\n');
+  let start = 0;
+  for (let li = 0; li < lines.length; li++) {
+    const line = lines[li];
+    const end = start + line.length;
+    if (from >= start && from <= end) {
+      if (to > end) return null;
+      const hasDelim = t.delimLine !== null;
+      if (hasDelim && li === 1) return null;
+      const r = hasDelim && li > 1 ? li - 1 : li;
+      const spans = cellSpans(line);
+      for (let c = 0; c < spans.length && c < t.align.length; c++) {
+        const s = spans[c];
+        if (from - start >= s.start && to - start <= s.end) return { r, c, from: from - start - s.start, to: to - start - s.start };
+      }
+      return null;
+    }
+    start = end + 1;
+  }
+  return null;
+}

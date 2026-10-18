@@ -10,10 +10,13 @@
 import type { BlockWidget, EditorSettings, WidgetBlockType, WidgetContext, WidgetInstance } from '../../contracts';
 import { createCodeEditor, CodeEditor } from './cm/setup';
 import { debounce, h, isolateEvents } from './util/dom';
+import { rawRangeToBody, type Envelope } from './util/delimited';
 
 export interface Parsed {
   body: string;
   build(body: string): string;
+  /** Envelope of the raw source; enables find-in-widget selection (#35). */
+  parts?: Envelope;
 }
 
 export interface RawPreviewSpec<P extends Parsed> {
@@ -183,6 +186,14 @@ class RawPreviewInstance<P extends Parsed> implements WidgetInstance {
 
   focus(at: 'start' | 'end'): void {
     this.startEditing(at);
+  }
+
+  select(from: number, to: number): boolean {
+    const r = this.parsed.parts && rawRangeToBody(this.parsed.parts, from, to);
+    if (!r) return false;
+    this.startEditing('start');
+    this.editor!.select(r.from, r.to);
+    return true;
   }
 
   renderHTML(): string {

@@ -39,3 +39,4 @@ export async function caret(page: Page, block: number, off: number): Promise<voi
 
 export const docEnd = process.platform === 'darwin' ? 'Meta+ArrowDown' : 'Control+End';
 export const lineStart = process.platform === 'darwin' ? 'Meta+ArrowLeft' : 'Home';
+export const docStart = process.platform === 'darwin' ? 'Meta+ArrowUp' : 'Control+Home';

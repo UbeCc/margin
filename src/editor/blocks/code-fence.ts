@@ -8,7 +8,7 @@
 import type { BlockWidget, EditorSettings, WidgetContext, WidgetInstance } from '../../contracts';
 import { createCodeEditor, CodeEditor, languageNames, loadLanguage, loadedLanguage } from './cm/setup';
 import { highlightToHtml } from './cm/highlight';
-import { buildFenceRaw, FenceParts, parseFence, withFenceInfo } from './util/delimited';
+import { buildFenceRaw, FenceParts, parseFence, rawRangeToBody, withFenceInfo } from './util/delimited';
 import { escapeHtml, h, isolateEvents, offsetAtPoint } from './util/dom';
 
 export interface CodeFenceOptions {
@@ -61,10 +61,11 @@ function wantsLineNumbers(info: string, global: boolean): boolean {
   return global;
 }
 
-export function staticCodeHTML(p: FenceParts): string {
+export function staticCodeHTML(p: FenceParts, scheme?: 'light' | 'dark'): string {
   const code = highlightToHtml(p.body, loadedLanguage(p.lang));
   const lang = escapeHtml(p.lang);
-  return `<pre class="md-fences"${lang ? ` lang="${lang}"` : ''}><code${lang ? ` class="language-${lang}"` : ''}>${code}</code></pre>`;
+  const sch = scheme === 'dark' ? ' data-scheme="dark"' : '';
+  return `<pre class="md-fences"${lang ? ` lang="${lang}"` : ''}${sch}><code${lang ? ` class="language-${lang}"` : ''}>${code}</code></pre>`;
 }
 
 class CodeFenceInstance implements WidgetInstance {
@@ -238,8 +239,15 @@ class CodeFenceInstance implements WidgetInstance {
     this.ensureEditor().focus(at);
   }
 
+  select(from: number, to: number): boolean {
+    const r = rawRangeToBody(this.parts, from, to);
+    if (!r) return false;
+    this.ensureEditor().select(r.from, r.to);
+    return true;
+  }
+
   renderHTML(): string {
-    return staticCodeHTML(this.parts);
+    return staticCodeHTML(this.parts, this.settings.colorScheme === 'dark' ? 'dark' : 'light');
   }
 
   updateSettings(settings: EditorSettings): void {

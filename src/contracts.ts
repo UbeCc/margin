@@ -111,6 +111,13 @@ export interface WidgetInstance {
   renderHTML(): string;
   /** Settings changed (theme etc.). */
   updateSettings?(settings: EditorSettings): void;
+  /**
+   * Find support: select the given character range of this widget's own content
+   * (offsets into `raw`, end exclusive) and scroll it into view. Return false when
+   * the range is not editable/selectable inside the widget (the core then selects
+   * the whole widget as before).
+   */
+  select?(from: number, to: number): boolean;
   destroy(): void;
 }
 
