@@ -6,6 +6,7 @@ import * as E from './edit';
 import { splitBlockMeta } from './render-inline';
 import { find, replace } from './find';
 import { insertMarkdown } from './clipboard';
+import { copyBlock } from './block-copy';
 import { nextHeadingLevel, insertParagraph, taskStatus, clearFormat, insertFootnote } from './para-cmds';
 import { selectScope, deleteScope, jumpTo } from './scopes';
 import { copyAs, pastePlain } from './copy-as';
@@ -293,6 +294,8 @@ export function execCommand(ed: EditorCore, cmd: EditorCommand): boolean {
       return copyAs(ed, cmd.format);
     case 'pastePlain':
       return pastePlain(ed);
+    case 'copyBlock':
+      return copyBlock(ed, cmd.part);
     case 'insertTable':
       return insertTableAtCaret(ed, tableMarkdown(cmd.rows, cmd.cols));
     case 'table':

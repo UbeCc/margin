@@ -70,6 +70,8 @@ export type EditorCommand =
   | { kind: 'jump'; to: 'top' | 'bottom' | 'selection' }
   | { kind: 'copyAs'; format: CopyAsFormat }
   | { kind: 'pastePlain' }
+  // #97 (additive): copy the block at the caret — markdown source, or the inner text of a code / math fence
+  | { kind: 'copyBlock'; part: 'source' | 'content' }
   // #98 (additive): block tools — Paragraph › Table / Code Tools / Math Tools
   /** Insert a `rows`×`cols` table (rows include the header row). */
   | { kind: 'insertTable'; rows: number; cols: number }

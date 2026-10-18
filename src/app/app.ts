@@ -23,6 +23,7 @@ import { closePalette, isPaletteOpen, openPalette, type PaletteItem } from './ui
 import { toast } from './ui/toast';
 import { PANDOC_ACTIONS, type PandocFormat } from './export-pandoc';
 import { closeContextMenu } from './ui/contextmenu';
+import { EditorContextMenu } from './ctxmenu';
 import { ImageUploader } from './upload-actions';
 import { debounce, h } from './util/dom';
 import { fuzzyFilter, fuzzyMatch } from './util/fuzzy';
@@ -121,7 +122,19 @@ export class App {
       settings: () => this.settings,
       notify: (m, k) => void toast(m, { kind: k }),
     });
-    this.uploader.attachContextMenu(this.editorHost);
+    // #97: editor context menus (text, link, image, table, code, math, diagram, atomic blocks).
+    new EditorContextMenu(
+      {
+        editor: () => this.editor,
+        platform: this.platform,
+        run: (id) => this.run(id),
+        openLink: (href) => void this.openLink(href),
+        baseDir: () => this.doc.dir,
+        uploadImage: (src) => void this.uploader.uploadSrcs([src]),
+        notify: (m, k) => void toast(m, { kind: k }),
+      },
+      this.editorHost,
+    ).attach();
     this.editor.onChange(() => {
       this.refreshFindSoon();
       this.refreshOutlineSoon();
