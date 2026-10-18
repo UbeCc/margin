@@ -50,6 +50,7 @@ export interface PlatformExtras {
   setMenuEnabled?(id: string, enabled: boolean): Promise<void>;
   /** Edit › Spelling and Grammar › Show Spelling and Grammar: system panel (desktop). */
   showSpellingPanel?(): Promise<void>;
+  /**
    * #99: copy (or move) an image file into `dir` (created when missing). Without
    * `name`, a clash gets Typora's `stem-<7 digits>.ext` suffix (identical bytes are
    * reused); with `name` an existing file is refused. Resolves to the absolute destination.

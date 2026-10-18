@@ -41,8 +41,10 @@ export class EditorCore {
     this.root = document.createElement('div');
     this.root.className = 'md-editor';
     this.root.contentEditable = 'true';
-    this.root.setAttribute('autocorrect', settings.autocorrect === false ? 'off' : 'on');
-    this.root.setAttribute('autocapitalize', settings.autocorrect === false ? 'off' : 'sentences');
+    this.root.spellcheck = settings.spellcheck;
+    // #103 Substitutions / Spelling autocorrect: WebKit typing aids on the contenteditable.
+    this.root.setAttribute('autocorrect', settings.autocorrect ? 'on' : 'off');
+    this.root.setAttribute('autocapitalize', settings.autocorrect ? 'sentences' : 'off');
     this.root.setAttribute('role', 'textbox');
     this.root.setAttribute('aria-multiline', 'true');
     host.append(this.root);
@@ -69,9 +71,10 @@ export class EditorCore {
   applyModes(): void {
     this.root.classList.toggle('md-focus-mode', !!this.settings.focusMode);
     this.root.classList.toggle('md-typewriter', !!this.settings.typewriterMode);
-    this.root.setAttribute('autocorrect', this.settings.autocorrect === false ? 'off' : 'on');
-    this.root.setAttribute('autocapitalize', this.settings.autocorrect === false ? 'off' : 'sentences');
-    this.root.classList.toggle('md-mid-caret', !!this.settings.typewriterCaret);
+    this.root.spellcheck = !!this.settings.spellcheck;
+    this.root.setAttribute('autocorrect', this.settings.autocorrect ? 'on' : 'off');
+    this.root.setAttribute('autocapitalize', this.settings.autocorrect ? 'sentences' : 'off');
+    this.root.classList.toggle('md-mid-caret', this.settings.typewriterCaret !== false);
     this.root.dataset.scheme = this.settings.colorScheme;
     // #102 whitespace / display options are pure CSS over the unchanged source.
     const md = this.md();

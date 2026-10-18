@@ -27,10 +27,6 @@ export interface MarginSettings extends AppSettings {
   wordCountUnit: CountUnit;
   /** Reading speed for the reading-time count (`wordsPerMinute`, 1–999). */
   wordsPerMinute: number;
-  /** Edit › Substitutions, converted on input (`smartQuote` / `smartDash`). */
-  smartQuotes: boolean;
-  /** Convert timing for smart punctuation (`SmartyPantsOnRendering`; input = false). */
-  smartPunctMode: 'input' | 'render';
   /** Substitutions › Text Replacement (system dictionary via the web view). */
   smartTextReplacement: boolean;
   /** Spelling and Grammar › Check Grammar With Spelling. */
@@ -150,8 +146,6 @@ export const DEFAULT_SETTINGS: Readonly<MarginSettings> = Object.freeze({
   alwaysShowWordCount: false,
   wordCountUnit: 'words',
   wordsPerMinute: DEFAULT_WPM,
-  smartQuotes: false,
-  smartPunctMode: 'input',
   smartTextReplacement: false,
   spellGrammar: false,
   spellAutocorrect: false,
@@ -255,6 +249,10 @@ export function migrateSettings(input: unknown): MarginSettings {
   }
   const scheme = raw.colorScheme;
   const tab = raw.sidebarTab;
+  // #134: a legacy single `fontSize` (10–32) migrates to Customized, clamped to Typora's 9–24.
+  const legacySize = raw.useCustomFontSize === undefined && typeof raw.fontSize === 'number' && raw.fontSize !== 16 ? clampFontSize(raw.fontSize) : d.customFontSize;
+  const customized = raw.useCustomFontSize === undefined ? legacySize !== d.customFontSize : bool(raw.useCustomFontSize, false);
+  const customSize = Math.round(num(raw.customFontSize, legacySize, 9, 24));
   return {
     ...raw,
     settingsVersion: SETTINGS_VERSION,
@@ -279,18 +277,14 @@ export function migrateSettings(input: unknown): MarginSettings {
     alwaysShowWordCount: bool(raw.alwaysShowWordCount, d.alwaysShowWordCount),
     wordCountUnit: UNIT_CODES.includes(raw.wordCountUnit as CountUnit) ? (raw.wordCountUnit as CountUnit) : d.wordCountUnit,
     wordsPerMinute: Math.round(num(raw.wordsPerMinute, d.wordsPerMinute, 1, 999)),
-    smartQuotes: bool(raw.smartQuotes, d.smartQuotes),
-    smartPunctMode: raw.smartPunctMode === 'render' ? 'render' : 'input',
     smartTextReplacement: bool(raw.smartTextReplacement, d.smartTextReplacement),
     spellGrammar: bool(raw.spellGrammar, d.spellGrammar),
     spellAutocorrect: bool(raw.spellAutocorrect, d.spellAutocorrect),
     allowMagnification: bool(raw.allowMagnification, d.allowMagnification),
-    useCustomFontSize: bool(raw.useCustomFontSize, raw.useCustomFontSize === undefined && typeof raw.fontSize === 'number' && raw.fontSize !== 16 ? true : d.useCustomFontSize),
-    customFontSize: Math.round(num(raw.customFontSize, raw.useCustomFontSize === undefined && typeof raw.fontSize === 'number' && raw.fontSize !== 16 ? clampFontSize(raw.fontSize) : d.customFontSize, 9, 24)),
+    useCustomFontSize: customized,
+    customFontSize: customSize,
     // #134: Auto uses the theme default (16); Customized uses the 9–24 px box.
-    fontSize: (raw.useCustomFontSize === undefined && typeof raw.fontSize === 'number' && raw.fontSize !== 16 ? true : bool(raw.useCustomFontSize, false))
-      ? Math.round(num(raw.customFontSize, raw.useCustomFontSize === undefined && typeof raw.fontSize === 'number' && raw.fontSize !== 16 ? clampFontSize(raw.fontSize) : d.customFontSize, 9, 24))
-      : 16,
+    fontSize: customized ? customSize : 16,
     copyMarkdownByDefault: bool(raw.copyMarkdownByDefault, d.copyMarkdownByDefault),
     lineWiseCopyCut: bool(raw.lineWiseCopyCut, d.lineWiseCopyCut),
     typewriterCaret: bool(raw.typewriterCaret, d.typewriterCaret),

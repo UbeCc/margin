@@ -469,6 +469,7 @@ pub fn run() {
             commands::toggle_devtools,
             commands::set_magnification,
             commands::show_spelling_panel,
+            upload::upload_images,
             upload::test_uploader,
             upload::cancel_upload,
             image_tools::copy_image,

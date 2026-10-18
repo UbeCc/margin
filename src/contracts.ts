@@ -52,6 +52,7 @@ export interface EditorSettings {
   spellcheck: boolean;
   /** Visual modes. */
   focusMode: boolean;
+  typewriterMode: boolean;
   /** #103 Substitutions › Text Replacement + Spelling › autocorrect: WebKit typing aids on the contenteditable. */
   autocorrect?: boolean;
   /** #134 Editor › Typewriter: false = keep caret visible instead of centered (Typora `no_mid_caret`). */

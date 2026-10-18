@@ -1,7 +1,7 @@
 import type { EditorHandle } from '../contracts';
 import { h, clearChildren } from './util/dom';
 import { smartReplace, type SmartOpts } from './smart-punct';
-import { emojiCandidates } from './emoji-data';
+import { EMOJI, emojiCandidates } from './emoji-data';
 
 export interface AidsHost {
   /** The editor host element (contenteditable lives inside). */
@@ -37,7 +37,7 @@ export function installSmartPunctuation(host: AidsHost): void {
     (e) => {
       if (e.inputType !== 'insertText' || !e.data || e.data.length !== 1 || e.isComposing) return;
       const o = host.smart();
-      if (!o.quotes && !o.dashes) return;
+      if (o.onInput === false || (!o.quotes && !o.dashes)) return;
       const ctx = caretContext(host.root);
       if (!ctx) return;
       const edit = smartReplace(ctx.before, e.data, o);
@@ -65,6 +65,19 @@ export class EmojiComplete {
     host.root.addEventListener('input', () => this.update());
     host.root.addEventListener('keydown', (e) => this.onKey(e), true);
     host.root.addEventListener('blur', () => this.hide(), true);
+    // Edit › Emoji and Symbols: insert a lone `:` and open the picker with the
+    // full shortcode list; accepting replaces it with the `:name:` text.
+    host.root.addEventListener('margin:emoji', () => {
+      this.host.editor().exec({ kind: 'insertText', text: ':' });
+      this.typed = '';
+      this.items = EMOJI.slice(0, 24);
+      this.index = 0;
+      this.render();
+      const r = window.getSelection()!.getRangeAt(0).getBoundingClientRect();
+      this.el.hidden = false;
+      this.el.style.left = `${Math.max(4, Math.min(r.left, window.innerWidth - this.el.offsetWidth - 4))}px`;
+      this.el.style.top = `${r.bottom + 4}px`;
+    });
   }
 
   get open(): boolean {

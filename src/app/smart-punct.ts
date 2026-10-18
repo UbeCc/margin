@@ -7,6 +7,8 @@
 export interface SmartOpts {
   quotes: boolean;
   dashes: boolean;
+  /** "Convert on Input" mode (`SmartyPantsOnRendering` = false); rendering mode keeps the source ASCII. */
+  onInput?: boolean;
 }
 
 export interface SmartEdit {

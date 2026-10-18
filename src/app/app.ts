@@ -18,7 +18,7 @@ import { copyMathAsImage } from './math-image';
 import { FindBar } from './findbar';
 import type { FindOpts } from './findmatches';
 import { extras } from './platform-extras';
-import { openPreferences } from './preferences';
+import { openPreferences, type Section } from './preferences';
 import { DEFAULT_SETTINGS, launchPlan, newFileEol, migrateSettings, pushRecent, type MarginSettings } from './settings';
 import type { FileTree } from './sidebar/filetree';
 import { FilesPanel } from './sidebar/files-panel';
@@ -507,7 +507,11 @@ export class App {
       toggleEol: () => void this.run('toggleLineEnding'),
       setUnit: (u) => this.updateSettings({ wordCountUnit: u }),
     });
-    const aids = { root: this.editorHost, editor: () => this.editor, smart: () => ({ quotes: this.settings.smartQuotes, dashes: this.settings.smartDashes }) };
+    const aids = {
+      root: this.editorHost,
+      editor: () => this.editor,
+      smart: () => ({ quotes: this.settings.markdown.smartQuote, dashes: this.settings.markdown.smartDash, onInput: this.settings.markdown.smartPunctuation === 'input' }),
+    };
     installSmartPunctuation(aids);
     document.body.appendChild(new EmojiComplete(aids).el);
 
@@ -593,19 +597,30 @@ export class App {
     const set = extras(this.platform).setMenuChecked;
     if (!set) return;
     const s = this.settings;
+    // §5.4: in Convert-on-Input mode with quotes or dashes on, Remap Unicode
+    // Punctuation on Parse is forced on and greyed out.
+    const remapForced = s.markdown.smartPunctuation === 'input' && (s.markdown.smartQuote || s.markdown.smartDash);
     const checks: [string, boolean][] = [
       ['toggleStatusBar', s.statusBarVisible],
       ['alwaysOnTop', this.alwaysOnTop],
-      ['toggleMagnification', this.magnification],
+      ['toggleMagnification', s.allowMagnification],
       ['spell:toggle', s.spellcheck],
-      ['subst:quotes', s.smartQuotes],
-      ['subst:dashes', s.smartDashes],
+      ['spell:grammar', s.spellGrammar],
+      ['spell:autocorrect', s.spellAutocorrect],
+      ['subst:input', s.markdown.smartPunctuation === 'input'],
+      ['subst:render', s.markdown.smartPunctuation === 'rendering'],
+      ['subst:quotes', s.markdown.smartQuote],
+      ['subst:dashes', s.markdown.smartDash],
+      ['subst:textReplacement', s.smartTextReplacement],
+      ['subst:remap', remapForced || s.markdown.remapPunctuation],
       ['toggleFocus', s.focusMode],
       ['toggleTypewriter', s.typewriterMode],
     ];
     const key = JSON.stringify(checks);
     if (key === this.lastChecks) return;
     this.lastChecks = key;
+    const enable = extras(this.platform).setMenuEnabled;
+    void enable?.call(this.platform, 'subst:remap', !remapForced).catch(() => {});
     for (const [id, on] of checks) void set.call(this.platform, id, on).catch(() => {});
   }
 
@@ -1094,25 +1109,61 @@ export class App {
         this.syncMenuChecks();
         return true;
       }
-      case 'toggleMagnification': {
-        const set = extras(this.platform).setMagnification;
-        this.magnification = !this.magnification;
-        await set?.call(this.platform, this.magnification).catch(() => {});
-        this.syncMenuChecks();
+      case 'toggleMagnification':
+        this.updateSettings({ allowMagnification: !this.settings.allowMagnification });
+        void extras(this.platform).setMagnification?.call(this.platform, this.settings.allowMagnification).catch(() => {});
         return true;
-      }
       case 'toggleDevtools':
         await extras(this.platform).toggleDevtools?.call(this.platform).catch(() => {});
         return true;
       case 'spell:toggle':
         this.updateSettings({ spellcheck: !this.settings.spellcheck });
         return true;
+      case 'spell:panel':
+        await extras(this.platform).showSpellingPanel?.call(this.platform).catch(() => {});
+        return true;
+      case 'spell:now': {
+        // Typora runs the system checker over the editable area (§5.3); on the
+        // web the closest equivalent is re-running the browser spellcheck pass.
+        const ed = this.editorHost.querySelector('.md-editor') as HTMLElement | null;
+        if (ed?.spellcheck) {
+          ed.spellcheck = false;
+          void ed.offsetHeight;
+          ed.spellcheck = true;
+        }
+        return true;
+      }
+      case 'spell:grammar':
+        this.updateSettings({ spellGrammar: !this.settings.spellGrammar });
+        return true;
+      case 'spell:autocorrect':
+        this.updateSettings({ spellAutocorrect: !this.settings.spellAutocorrect });
+        return true;
+      case 'subst:input':
+      case 'subst:render':
+        this.updateSettings({ markdown: { ...this.settings.markdown, smartPunctuation: id === 'subst:input' ? 'input' : 'rendering' } });
+        return true;
       case 'subst:quotes':
-        this.updateSettings({ smartQuotes: !this.settings.smartQuotes });
+        this.updateSettings({ markdown: { ...this.settings.markdown, smartQuote: !this.settings.markdown.smartQuote } });
         return true;
       case 'subst:dashes':
-        this.updateSettings({ smartDashes: !this.settings.smartDashes });
+        this.updateSettings({ markdown: { ...this.settings.markdown, smartDash: !this.settings.markdown.smartDash } });
         return true;
+      case 'subst:textReplacement':
+        this.updateSettings({ smartTextReplacement: !this.settings.smartTextReplacement });
+        return true;
+      case 'subst:remap':
+        this.updateSettings({ markdown: { ...this.settings.markdown, remapPunctuation: !this.settings.markdown.remapPunctuation } });
+        return true;
+      case 'subst:more':
+        this.preferences('markdown');
+        return true;
+      case 'emojiPicker': {
+        // "Emoji and Symbols": the system picker on desktop; here, open the
+        // :shortcode: autocomplete at the caret (fe-preferences §10).
+        this.editorHost.dispatchEvent(new CustomEvent('margin:emoji'));
+        return true;
+      }
       case 'speech:start':
         if (!startSpeaking(this.editorHost)) toast('Speech is not available here', { kind: 'warning' });
         return true;
@@ -1122,7 +1173,6 @@ export class App {
       case 'toggleSidebar':
         this.updateSettings({ sidebarVisible: !this.settings.sidebarVisible });
         return true;
-      case 'showFiles':
       case 'showFiles':
       case 'showOutline': {
         const tab = id === 'showFiles' ? 'files' : 'outline';
@@ -1244,7 +1294,7 @@ export class App {
     toast(`${key === 'inlineMath' ? 'Inline Math' : 'Highlight'} syntax enabled (Preferences › Markdown › Syntax Support)`, { timeout: 3000 });
   }
 
-  private preferences(section?: 'export' | 'images'): void {
+  private preferences(section?: Section): void {
     openPreferences({
       settings: () => this.settings,
       update: (p) => this.updateSettings(p),

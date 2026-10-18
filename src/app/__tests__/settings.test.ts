@@ -20,12 +20,20 @@ describe('settings migration', () => {
   });
   it('validates and clamps values', () => {
     const s = migrateSettings({ fontSize: 99, colorScheme: 'blue', zoom: '1.5', theme: 'night.css', sidebarWidth: 10, autoSave: 'true' });
-    expect(s.fontSize).toBe(32);
+    // #134: Font Size "Customized" clamps to Typora's 9–24 px (Auto = theme default 16).
+    expect(s.useCustomFontSize).toBe(true);
+    expect(s.customFontSize).toBe(24);
+    expect(s.fontSize).toBe(24);
     expect(s.colorScheme).toBe('system');
     expect(s.zoom).toBe(1.5);
     expect(s.theme).toBe('night');
     expect(s.sidebarWidth).toBe(180);
     expect(s.autoSave).toBe(true);
+  });
+  it('#134: font size Auto keeps the theme default; explicit Customized clamps to 9–24', () => {
+    expect(migrateSettings({ useCustomFontSize: false, customFontSize: 30 }).fontSize).toBe(16);
+    expect(migrateSettings({ useCustomFontSize: true, customFontSize: 4 }).customFontSize).toBe(9);
+    expect(migrateSettings({ useCustomFontSize: true, customFontSize: 30 }).customFontSize).toBe(24);
   });
   it('migrates v1 keys', () => {
     const s = migrateSettings({ darkMode: true, sidebar: false, autosave: true, imageFolder: './img' });
