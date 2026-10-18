@@ -533,7 +533,7 @@ pub fn run() {
                 state.confirmed.lock().unwrap().remove(window.label());
                 // General › Quit Margin when last window is closed (#134). Off by
                 // default; the macOS convention is to keep running.
-                let others = app.webview_windows().into_iter().filter(|(l, _)| l != &window.label()).count();
+                let others = app.webview_windows().into_iter().filter(|(l, _)| l != window.label()).count();
                 if others == 0
                     && settings::typed(&settings::load(&commands::settings_path(app).unwrap_or_default()))
                         .quit_on_last_window_close

@@ -4,7 +4,7 @@
  "summary": {
   "required_surfaces": 172,
   "required_claims": 164,
-  "reasons": 36
+  "reasons": 28
  },
  "reasons": [
   {
@@ -20,21 +20,6 @@
   {
    "code": "owner-missing",
    "subject_id": "menu.edit.substitutions",
-   "detail": "Required surface has no reconstructed owner or explicit disposition."
-  },
-  {
-   "code": "owner-missing",
-   "subject_id": "menu.view.always-on-top",
-   "detail": "Required surface has no reconstructed owner or explicit disposition."
-  },
-  {
-   "code": "owner-missing",
-   "subject_id": "menu.view.devtools",
-   "detail": "Required surface has no reconstructed owner or explicit disposition."
-  },
-  {
-   "code": "owner-missing",
-   "subject_id": "menu.view.magnification",
    "detail": "Required surface has no reconstructed owner or explicit disposition."
   },
   {
@@ -104,37 +89,12 @@
   },
   {
    "code": "verifier-missing",
-   "subject_id": "claim.menu.state-sync",
-   "detail": "No verifier contract covers this claim."
-  },
-  {
-   "code": "verifier-missing",
    "subject_id": "claim.menu.themes.folder",
    "detail": "No verifier contract covers this claim."
   },
   {
    "code": "verifier-missing",
-   "subject_id": "claim.menu.view.always-on-top",
-   "detail": "No verifier contract covers this claim."
-  },
-  {
-   "code": "verifier-missing",
-   "subject_id": "claim.menu.view.devtools",
-   "detail": "No verifier contract covers this claim."
-  },
-  {
-   "code": "verifier-missing",
    "subject_id": "claim.menu.view.fullscreen",
-   "detail": "No verifier contract covers this claim."
-  },
-  {
-   "code": "verifier-missing",
-   "subject_id": "claim.menu.view.magnification",
-   "detail": "No verifier contract covers this claim."
-  },
-  {
-   "code": "verifier-missing",
-   "subject_id": "claim.menu.view.status-bar",
    "detail": "No verifier contract covers this claim."
   },
   {
@@ -206,21 +166,6 @@
   },
   {
    "operation": "reconcile_reconstruction_owner",
-   "subject_id": "menu.view.always-on-top",
-   "rationale": "Required surface has no reconstructed owner or explicit disposition."
-  },
-  {
-   "operation": "reconcile_reconstruction_owner",
-   "subject_id": "menu.view.devtools",
-   "rationale": "Required surface has no reconstructed owner or explicit disposition."
-  },
-  {
-   "operation": "reconcile_reconstruction_owner",
-   "subject_id": "menu.view.magnification",
-   "rationale": "Required surface has no reconstructed owner or explicit disposition."
-  },
-  {
-   "operation": "reconcile_reconstruction_owner",
    "subject_id": "tools.diagram.copy-image",
    "rationale": "Required surface has no reconstructed owner or explicit disposition."
   },
@@ -286,37 +231,12 @@
   },
   {
    "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.menu.state-sync",
-   "rationale": "No verifier contract covers this claim."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
    "subject_id": "claim.menu.themes.folder",
    "rationale": "No verifier contract covers this claim."
   },
   {
    "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.menu.view.always-on-top",
-   "rationale": "No verifier contract covers this claim."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.menu.view.devtools",
-   "rationale": "No verifier contract covers this claim."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
    "subject_id": "claim.menu.view.fullscreen",
-   "rationale": "No verifier contract covers this claim."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.menu.view.magnification",
-   "rationale": "No verifier contract covers this claim."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.menu.view.status-bar",
    "rationale": "No verifier contract covers this claim."
   },
   {
@@ -383,7 +303,6 @@
   "ev_105aaee1c3c2a2dfa041084176e9e2a878927d0a482cf551b3fdbcc68a7efda9",
   "ev_1084abad4074c0040604dfa02b61a633f7a7574f819b72f680cb78ae4c09889f",
   "ev_112b65177cac2e34012df57d1709b9c8c821c63988d4bf0850c808ae416f37b0",
-  "ev_11a47dba26a16f3e5efecd055c1b540ddbb0cbe498c9ac9632d16d9604dabdd6",
   "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
   "ev_1389c31ff1eea5fca723a65cbe717f5185041fb02cf5d5c2c811079a0ac290d4",
   "ev_14cc87f4dd7ba2eae71cb6e61e7e455f64f83e3ca9b43bef99296cc0598a89c6",
@@ -401,14 +320,13 @@
   "ev_24b85bcb7b6f02107a51c32f3b2ab58f167014f21a3ab7732431d42a5e109e30",
   "ev_260219b51bfffa0e540e6c3cb4f434b9428d78944c4f727434cc632bc8596fc0",
   "ev_2616a1f8c69ac2e3453df527245b904248bcf765365553110334b681bfe819f2",
-  "ev_27acf375d71ccd72735b8ff1faf3a023245d6a2a9d4e2eff31bd6eb2174cd3d9",
   "ev_27e330e028ac31fa424395a5ad92cc39bedc4be42596fd67c67c4027420aa897",
+  "ev_28d6eb37610d7fb291deffc69815699f8b2e015439221c55cd06f851e57911cd",
   "ev_2942f8ee964e73c11f47052521654a6cd99141b30781901b1390588cbafdbff7",
   "ev_2af20df1cce3adfeeb3d0405c0459fa04c12ca81cef9790b21d266ff208e52be",
   "ev_2b044436ed43d8afdaeb0e1662e27dd702e8bbf4e7d0fa0a339f5023162a09a6",
   "ev_2bfd37b7ac78629a1a8303889452f5ff14da581c3e0147b6c135fd307638aa53",
   "ev_2c3a102fc016c63e88353f5e0f662201f2adcdd205e3e5eedaab2d4db3205990",
-  "ev_2cdb84bedffe598ed99053f40660572101657f97e5934d9e5610e5b8212b3456",
   "ev_2dcfdda5e64014a5fbf45717baa72124a923220a54ed60b65b332207313f588c",
   "ev_2de768edb2decbc991458518769db69fa3b3b66e456768f075966f32d0518035",
   "ev_314ef36ad3a63a5024f1777c4c38fd700c0fe2bc2930ebc1154171876a967597",
@@ -429,11 +347,13 @@
   "ev_3fb8b84cee7279d523a2c19c8441384de2e266aa5ed455b1a6a8c68889ae3be1",
   "ev_41a86ed70f7d352fd1fd4ee4c8fc8d5ed2b1ee32ef2fd8ceb10510601f0c962e",
   "ev_4341a61451354b6c0655830d4b36b6e65cf1f0ef15713d67825e30b7d9413a49",
+  "ev_448b7206d6dc1d172ac42f4686c3964d2474834ef885f3bc02ef3040811b3c9f",
   "ev_458ac6b997a37b852f60228dfea7c1aa22be6b22d999b4a80609d9d097c768ed",
   "ev_48cef36056f7d963046645e2256be9bd5ddb6f50a2d84c19aca934e0903f489a",
   "ev_4ac8f85846afce7299ee1995f6c9d771aa25470f2e3edce8a921a5a5631c0504",
   "ev_4b8c96bd729d6b25102d211569d1b31974d4f00977440cdb1b6697f363feed37",
   "ev_4c4966b6c6c5e491b1802aacfa5e48d94db49c9b0c16f2740962309bcf5f070a",
+  "ev_4e4b516b72c634d6f15902fa266e34139b9b93026bfcd83231b66dd2cc9ae53d",
   "ev_4e9080ec95902c3dbf7b26f5172b9329ab410a3d30403598ecff6ff84bd058e6",
   "ev_4f93070e55fe06b6d47d556d39b17f116e6150a43ef23edfd2c475ece72bd39a",
   "ev_531c2acf6b71db03fd4911744ba2c3508ff323cc8f014b65f6be0d62ca0ccc41",
@@ -445,7 +365,6 @@
   "ev_553d79f1248f3c1a5da0cdda0ba6452ac5ba6b2c2cf80f39fce976bd217f4888",
   "ev_56ab4ebf6543cf3ffc39c332931948edb7e1fe697433bc35d1e1ac6b87d7a6a6",
   "ev_5846b2ce26e08c2151229db306b0075db16fdb4e6fa383b3e95d7415c03681c1",
-  "ev_5cc78d49083c319c48978c753a1fe930f5af6cbc6552747bda552c47f97de264",
   "ev_600ad119f2ab7a079b48df093cf8eb6cb9b74e64f2ae8f8f717b80d51252ff62",
   "ev_61d6c4f5b6e00ebc3ad760c5661fbde2cf3ad4621582eaf7a7caed2a74fc5468",
   "ev_660bc760173268bdd78d40a0f77680b6eb4f78c9e88bac743b9900e6b615488c",
@@ -475,7 +394,6 @@
   "ev_8814e99322262e8b518a06a38ed859b981ea2799dc5a0b2b0eb35c3f6bf36e20",
   "ev_8902a547ac835ab4ec8c803b63b143cabd1b7c608cfd0f96f451f569d923f14e",
   "ev_8a4cf2a54bd77b1409d10539ceba9d24cbad06fe2963022ea84d2a7298ddfcbf",
-  "ev_8de892a16270deb1ccc419f5fd146f958cce7539757d66f31e9cd578af405529",
   "ev_8eca9302d018c154de14872ffe1d201b717ce853a4ed767ad811ca44fb432574",
   "ev_8f97fe73b65237a3f24c53df4b3487a3bf5b406bead032adc3fc62a1ecab4ca2",
   "ev_901307fcbf8d1649c27974c8513eed3ccaa7f60bfc37fc5b495059cc5bf5052e",
@@ -508,12 +426,14 @@
   "ev_a93404de64c98f8760880a1fe66d62523847339601daf23cf3b5c9733cf038ac",
   "ev_ad8d47ce6572d2e8745c6ca03a44aafd5368e4010ec59905f5f4a2deaf275d5b",
   "ev_ae4db42c6a7a086527251882c9742141a1dd425cd8cec913be3b0aa832c9c232",
+  "ev_af4462debc774aea36f7803154b7698019929c9d8b2c7b41a6c3af7f55d6790a",
   "ev_b0fef3dc15507fab320ae8c0e128b72c9aa7d26e2717c872411267aae628ee36",
   "ev_b20611cf4ada7071507dbdcac0ad0c8a7800a8b31ba76fd010a9d70f51130a24",
   "ev_b45d7a6dc13ed512c80f25f36d94475a37931d47eb1766ca2ebfc6e51366fa46",
   "ev_b66f6640ba8e5f28f63adbe1ec9f45625ca306c5ff15ed1e4e8c5215341c1f7c",
   "ev_bcc888f2251ef781135bcfcb0821612dd71d11fe1a02d2db89d56bb2c58d2b38",
   "ev_bee3f21b3c5b52f74c968e276e9406cac8669aabc7261f91c9a984930eb8c448",
+  "ev_c0c6b5c79cd2141b130d7ed03cd92b1e99f58c3bd78d6302268489036065a1a1",
   "ev_c1d56981ab35ed3176235a9b6b619a20c6df2ef2dcc687899e7f2e3627e2756c",
   "ev_c327a668b61c112fa85df30637cc48cc8ebf58987bed8664ebd73322decf07d8",
   "ev_c96959e07acab5d4688aac45beb395972c54a7041ecd41eb092b158fde2a6680",
