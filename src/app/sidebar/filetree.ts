@@ -10,6 +10,10 @@ import { ask, confirmDialog, promptDialog } from '../ui/modal';
 export interface FileTreeHost {
   platform: Platform;
   openFile(path: string): void;
+  /** Open beside the current document (Cmd/Ctrl+click, context menu) (#94). */
+  openInNewTab?(path: string): void;
+  /** Open in another window (#94). */
+  openInNewWindow?(path: string): void;
   onRenamed(from: string, to: string): void;
   onDeleted(path: string): void;
   notify(msg: string, kind?: 'info' | 'success' | 'error' | 'warning'): void;
@@ -250,10 +254,10 @@ export class FileTree {
     if (entry.path === this.active) row.classList.add('active');
     makeDraggable(row, entry.path);
     if (entry.isDir) this.dropTarget(row, entry.path);
-    row.addEventListener('click', () => {
+    row.addEventListener('click', (e) => {
       row.focus({ preventScroll: true });
       if (entry.isDir) void this.toggle(entry.path);
-      else this.activate(entry);
+      else this.activate(entry, (e.metaKey || e.ctrlKey) && !!this.host.openInNewTab);
     });
     row.addEventListener('contextmenu', (e) => {
       e.preventDefault();
@@ -263,8 +267,8 @@ export class FileTree {
     return li;
   }
 
-  private activate(entry: DirEntry): void {
-    if (isMarkdownPath(entry.name)) this.host.openFile(entry.path);
+  private activate(entry: DirEntry, newTab = false): void {
+    if (isMarkdownPath(entry.name)) (newTab ? this.host.openInNewTab! : this.host.openFile)(entry.path);
     else this.host.notify(`${extname(entry.name) || entry.name} files open in other apps`, 'info');
   }
 
@@ -500,7 +504,13 @@ export class FileTree {
     const p = extras(this.host.platform);
     const dir = entry ? (entry.isDir ? entry.path : dirname(entry.path)) : this.root!;
     const items: MenuItem[] = [];
-    if (entry && !entry.isDir) items.push({ label: 'Open', run: () => this.activate(entry) }, { separator: true });
+    if (entry && !entry.isDir) {
+      items.push({ label: 'Open', run: () => this.activate(entry) });
+      const md = isMarkdownPath(entry.name);
+      if (md && this.host.openInNewTab) items.push({ label: 'Open in New Tab', run: () => this.host.openInNewTab!(entry.path) });
+      if (md && this.host.openInNewWindow) items.push({ label: 'Open in New Window', run: () => this.host.openInNewWindow!(entry.path) });
+      items.push({ separator: true });
+    }
     items.push(
       { label: 'New File…', run: () => void this.newFile(dir) },
       { label: 'New Folder…', run: () => void this.newFolder(dir), disabled: !p.createDir },

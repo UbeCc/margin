@@ -268,6 +268,15 @@ export function execCommand(ed: EditorCore, cmd: EditorCommand): boolean {
     case 'insertText':
       insertMarkdown(ed, cmd.text);
       return true;
+    case 'replaceDocument': {
+      const md = cmd.markdown;
+      if (md === ed.doc.text()) return true;
+      ed.change(() => {
+        ed.doc.replace(0, ed.doc.text().length, md);
+        return { pos: 0 };
+      }, null);
+      return true;
+    }
     case 'insertImage':
       insertMarkdown(ed, `![${cmd.alt ?? ''}](${cmd.src.replace(/ /g, '%20')})`);
       return true;

@@ -15,13 +15,15 @@ async function boot(): Promise<void> {
   const app = new App(wiring, mount);
   window.__margin = app;
   // In the browser build, start in the sample folder (or ?folder=) unless files were passed via ?open=.
-  let demo: { initialFolder: string; initialFile: string | null } | undefined;
-  if (wiring.platform.kind === 'web') {
-    const q = new URLSearchParams(location.search);
+  const q = new URLSearchParams(location.search);
+  // File › New Window (#94): an empty window (or one file via ?open=), no folder restore.
+  const fresh = q.get('window') === 'new';
+  let demo: { initialFolder: string | null; initialFile: string | null } | undefined;
+  if (wiring.platform.kind === 'web' && !fresh) {
     const folder = q.get('folder') || WEB_ROOT;
     demo = { initialFolder: folder, initialFile: q.has('open') ? null : `${folder}/Welcome.md` };
   }
-  await app.start(demo);
+  await app.start({ ...demo, fresh });
 }
 
 boot().catch((e) => {

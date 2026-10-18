@@ -190,6 +190,12 @@ export function createEditor(host: HTMLElement, settings: EditorSettings): Edito
           return s.replace?.(cmd.query, cmd.replacement, { all: cmd.all, caseSensitive: cmd.caseSensitive, wholeWord: cmd.wholeWord, regexp: cmd.regex }) ?? false;
         if (cmd.kind === 'undo') return s.undo?.() ?? false;
         if (cmd.kind === 'redo') return s.redo?.() ?? false;
+        if (cmd.kind === 'replaceDocument') {
+          s.setMarkdown(cmd.markdown);
+          ed.doc.reparse(cmd.markdown);
+          ed.emitChange();
+          return true;
+        }
         return false;
       }
       try {

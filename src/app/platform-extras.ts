@@ -13,6 +13,12 @@ export interface PlatformExtras {
   createDir?(path: string): Promise<void>;
   /** Reveal in Finder / Explorer. */
   revealInFolder?(path: string): Promise<void>;
+  /** Open another app window (#94): empty, or showing `path`. */
+  openWindow?(opts?: { path?: string }): Promise<void>;
+  /** Raw file bytes, for decoding with a chosen / detected encoding (#94). */
+  readFileBytes?(path: string): Promise<Uint8Array>;
+  /** Write text to the system clipboard (Copy File Path). */
+  writeClipboardText?(text: string): Promise<void>;
   /** Write binary export output (Export › Image, #95). */
   exportBinary?(bytes: Uint8Array, outPath: string): Promise<void>;
   /** Open a file this session exported with its default app ("Open exported file"). */

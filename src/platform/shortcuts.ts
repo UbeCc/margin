@@ -27,6 +27,12 @@ export const SHORTCUTS: Shortcut[] = [
   m('save', 'KeyS'),
   m('saveAs', 'KeyS', { shift: true }),
   m('close', 'KeyW'),
+  m('newTab', 'KeyT'),
+  m('newWindow', 'KeyN', { shift: true }),
+  m('reopenClosed', 'KeyT', { shift: true }),
+  m('saveAll', 'KeyS', { alt: true }),
+  m('nextTab', 'BracketRight', { shift: true }),
+  m('prevTab', 'BracketLeft', { shift: true }),
   m('exportPdf', 'KeyE', { alt: true }),
   m('print', 'KeyP', { shift: true }),
   m('undo', 'KeyZ'),
@@ -89,7 +95,7 @@ export function matchShortcut(e: Pick<KeyboardEvent, 'code' | 'metaKey' | 'ctrlK
 export function shortcutLabel(action: MenuAction, mac = /Mac|iPhone|iPad/.test(globalThis.navigator?.platform ?? '')): string | null {
   const s = SHORTCUTS.find((x) => x.action === action);
   if (!s) return null;
-  const key = s.code.replace(/^Key|^Digit/, '').replace('Backslash', '\\').replace('Slash', '/').replace('Equal', '=').replace('Minus', '-').replace('Comma', ',');
+  const key = s.code.replace(/^Key|^Digit/, '').replace('Backslash', '\\').replace('Slash', '/').replace('Equal', '=').replace('Minus', '-').replace('Comma', ',').replace('BracketRight', ']').replace('BracketLeft', '[');
   if (mac) return `${s.alt ? '⌥' : ''}${s.shift ? '⇧' : ''}${s.mod === false ? '' : '⌘'}${key}`;
   return [s.mod === false ? null : 'Ctrl', s.alt ? 'Alt' : null, s.shift ? 'Shift' : null, key].filter(Boolean).join('+');
 }

@@ -1,0 +1,53 @@
+/* Document tabs (#94, #23). Hidden with a single document. */
+.tab-bar {
+  display: flex;
+  align-items: stretch;
+  flex: none;
+  height: 32px;
+  background: var(--margin-chrome-bg);
+  border-bottom: 1px solid var(--margin-border);
+  font: 12.5px/1 var(--margin-font-ui);
+  color: var(--margin-chrome-fg);
+  user-select: none;
+}
+.tab-bar[hidden] { display: none; }
+.has-tabs .findbar { top: 40px; }
+.tab-list { display: flex; flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.tab-list::-webkit-scrollbar { display: none; }
+.tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 1 200px;
+  min-width: 90px;
+  padding: 0 6px 0 12px;
+  border-right: 1px solid var(--margin-border);
+  cursor: default;
+  white-space: nowrap;
+}
+.tab:hover { background: var(--margin-hover); }
+.tab[aria-selected='true'] { background: var(--margin-bg); color: var(--margin-fg); box-shadow: inset 0 2px 0 var(--margin-accent); }
+.tab-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.tab.missing .tab-label { text-decoration: line-through; opacity: 0.7; }
+.tab-dirty { width: 6px; height: 6px; border-radius: 50%; flex: none; background: transparent; }
+.tab.dirty .tab-dirty { background: var(--margin-fg-muted); }
+.tab-close, .tab-new {
+  flex: none;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 15px;
+  line-height: 1;
+  width: 20px;
+  height: 20px;
+  margin: auto 0;
+  border-radius: 4px;
+  opacity: 0.55;
+  cursor: pointer;
+}
+.tab-close { opacity: 0; }
+.tab:hover .tab-close, .tab[aria-selected='true'] .tab-close { opacity: 0.55; }
+.tab-close:hover, .tab-new:hover { opacity: 1; background: var(--margin-active); }
+.tab-new { width: 30px; height: 100%; border-radius: 0; font-size: 17px; }

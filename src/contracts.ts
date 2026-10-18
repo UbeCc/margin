@@ -126,6 +126,8 @@ export type EditorCommand =
   /** Remove inline formatting markers in the selection (whole block when collapsed). */
   | { kind: 'clearFormat' }
   | { kind: 'insertText'; text: string }
+  /** Replace the whole document as ONE undoable edit (reload from disk / restore a version). */
+  | { kind: 'replaceDocument'; markdown: string }
   | { kind: 'insertImage'; src: string; alt?: string }
   | { kind: 'undo' }
   | { kind: 'redo' }
@@ -300,6 +302,10 @@ export type MenuAction =
   | 'toggleSidebar' | 'toggleSource' | 'toggleFocus' | 'toggleTypewriter' | 'quickOpen'
   | 'zoomIn' | 'zoomOut' | 'zoomReset'
   | 'clearRecent' | 'commandPalette' | 'showOutline' | 'showFiles' | 'showArticles' | 'sidebarSearch' | 'revealActiveFile' | 'reloadFromDisk' | 'toggleLineEnding'
+  // File lifecycle (#94): tabs / windows / file operations on the current document
+  | 'newTab' | 'newWindow' | 'nextTab' | 'prevTab' | 'reopenClosed' | 'saveAll' | 'duplicate'
+  | 'renameFile' | 'moveTo' | 'revealInFinder' | 'copyFilePath' | 'browseVersions' | 'reopenWithEncoding'
+  | 'properties' | 'recoverDrafts'
   | `heading:${0 | 1 | 2 | 3 | 4 | 5 | 6}`
   | `mark:${InlineMark}`
   | `block:${BlockKind}`

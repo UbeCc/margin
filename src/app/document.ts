@@ -115,6 +115,8 @@ export class DocumentController {
     private host: DocumentHost,
     opts: { externalDebounceMs?: number } = {},
   ) {
+    // A fresh untitled document (e.g. a new tab) starts with the Default Line Ending (#100).
+    this.eol = this.savedEol = host.defaultEol?.() ?? '\n';
     host.editor.onChange(() => this.onEditorChange());
     this.fsDebounce = debounce(() => void this.reconcile(), opts.externalDebounceMs ?? 60);
   }
@@ -125,6 +127,31 @@ export class DocumentController {
 
   get dir(): string | null {
     return this.path ? dirname(this.path) : null;
+  }
+
+  /** LF-normalized content as last loaded/saved (the clean baseline). */
+  get savedText(): string {
+    return this.saved;
+  }
+
+  /** Untitled, unedited and empty: may be replaced by an opened file without asking. */
+  isPristine(): boolean {
+    return !this.path && !this.dirty && !this.host.editor.getMarkdown().trim();
+  }
+
+  /** Stop watching while the document is parked (closed tab kept for "Reopen Closed File"). */
+  suspend(): void {
+    this.fsDebounce.cancel();
+    this.autoSaveTimer.cancel();
+    this.recomputeDirty.cancel();
+    this.unwatch?.();
+    this.unwatch = null;
+  }
+
+  /** Resume a parked document (watching restarts; caller verified the disk baseline). */
+  async resume(): Promise<void> {
+    await this.rewatch();
+    this.emit();
   }
 
   state(): DocState {

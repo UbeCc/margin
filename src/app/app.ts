@@ -3,6 +3,8 @@ import type { EditorHandle, EditorSettings, ImageMenuAction, MenuAction, Platfor
 import type { Wiring } from './wiring';
 import { COMMANDS, commandForKey, commandSpec, isCommandId, setCustomKeys, type CommandId } from './commands';
 import { DocumentController, type DocState } from './document';
+import { DocTabs, type DocTab, type DocHostCallbacks } from './doctabs';
+import { TabBar } from './tabs';
 import { documentTitle, loadKatexCss, needsKatex } from './export';
 import { ExportController, registerPandocExporters } from './export-actions';
 import { DEFAULT_PRINT_SETUP, effectivePage, pageCss, type PrintSetup } from './export-settings';
@@ -41,12 +43,20 @@ export interface StartOptions {
   /** Folder/file to show when nothing is restored (dev stub demo). */
   initialFolder?: string | null;
   initialFile?: string | null;
+  /** A secondary window (File › New Window): no folder restore, no draft recovery. */
+  fresh?: boolean;
 }
 
 export class App {
   readonly platform: Platform;
-  editor!: EditorHandle;
-  doc!: DocumentController;
+  /** Open documents (tabs); `editor` / `doc` are the active one's (#94). */
+  docs!: DocTabs;
+  get editor(): EditorHandle {
+    return this.docs.active.editor;
+  }
+  get doc(): DocumentController {
+    return this.docs.active.doc;
+  }
   exports!: ExportController;
   settings: MarginSettings = { ...DEFAULT_SETTINGS };
   themes: ThemeManager;
@@ -58,11 +68,12 @@ export class App {
   readonly root: HTMLElement;
   private titleEl!: HTMLElement;
   private sidebar!: HTMLElement;
-  private editorHost!: HTMLElement;
+  private page!: HTMLElement;
   private uploader!: ImageUploader;
   private images!: ImageFeature;
   private syncImagesSoon = debounce(() => this.images.sync(), 300);
   private scroller!: HTMLElement;
+  private tabBar!: TabBar;
   private tree!: FileTree;
   private files!: FilesPanel;
   private outline!: OutlineView;
@@ -108,21 +119,16 @@ export class App {
     this.applyAppearance();
     this.applyLayoutSettings();
 
-    this.editor = this.wiring.createEditor(this.editorHost, this.editorSettings());
-    this.doc = new DocumentController({
+    this.docs = new DocTabs({
       platform: this.platform,
-      editor: this.editor,
-      askUnsaved: (name, reason) => this.askUnsaved(name, reason),
-      askReloadDirty: (name) => this.askReloadDirty(name),
-      externalChange: (c) => this.extBanner.show(c),
+      page: this.page,
+      scroller: this.scroller,
+      createEditor: (host, tab) => this.createTabEditor(host, tab),
+      docHost: (tab) => this.docHost(tab),
+      activated: (tab) => this.onTabActivated(tab),
+      changed: () => this.renderTabs(),
+      saveOnSwitch: () => this.settings.saveOnSwitch,
       notify: (m, k) => void toast(m, { kind: k }),
-      autoSave: () => ({ enabled: this.settings.autoSave, delay: this.settings.autoSaveDelay }),
-      imageRule: () => this.settings.imageRule,
-      willLoad: (p) => this.editor.updateSettings({ baseDir: p ? dirname(p) : null }),
-      defaultEol: () => newFileEol(this.settings.defaultLineEnding),
-      onState: (s) => this.onDocState(s),
-      onOpened: (p) => this.onOpened(p),
-      defaultDir: () => this.folder,
     });
     this.exports = this.createExports();
     // #80: "Upload Image" context menu + "Upload All Local Images" command.
@@ -137,7 +143,7 @@ export class App {
     this.images = new ImageFeature({
       platform: extras(this.platform) as Platform & ReturnType<typeof extras>,
       editor: () => this.editor,
-      editorRoot: () => this.editorHost,
+      editorRoot: () => this.docs.active.host,
       docPath: () => this.doc.path,
       settings: () => this.settings,
       uploader: this.uploader,
@@ -146,7 +152,8 @@ export class App {
       openImagePreferences: () => this.preferences('images'),
       resolveAsset: (src) => this.resolveAsset(src),
     });
-    this.images.attach(this.editorHost);
+    this.images.attach(this.page); // tab hosts live in the page (#94)
+    this.docs.newTab();
     // #97: editor context menus (text, link, image, table, code, math, diagram, atomic blocks).
     new EditorContextMenu(
       {
@@ -158,26 +165,14 @@ export class App {
         uploadImage: (src) => void this.uploader.uploadSrcs([src]),
         notify: (m, k) => void toast(m, { kind: k }),
       },
-      this.editorHost,
+      this.page, // active tab's editor host lives here (#94)
     ).attach();
-    this.editor.onChange(() => {
-      this.syncImagesSoon();
-      this.refreshFindSoon();
-      this.refreshOutlineSoon();
-      this.refreshStatsSoon();
-    });
-    let selRaf = 0;
-    this.editor.onSelectionChange(() => {
-      cancelAnimationFrame(selRaf);
-      selRaf = requestAnimationFrame(() => this.outline.setActive(this.editor.getActiveHeadingId()));
-    });
 
     this.installKeys();
     this.platform.onMenu((a) => this.onMenu(a));
     this.platform.onOpenFiles((paths) => void this.openPaths(paths));
     this.platform.onCloseRequested(async () => {
-      await this.doc.flushAutoSave();
-      const ok = await this.doc.confirmLeave('before closing the window');
+      const ok = await this.docs.confirmAll('before closing the window');
       if (ok) await this.persistSettings();
       return ok;
     });
@@ -186,9 +181,9 @@ export class App {
     window.addEventListener('pagehide', () => this.saveSettingsSoon.flush());
 
     // Initial content — General › On Launch (#100)
-    const { folder, file } = launchPlan(this.settings, opts);
-    if (folder) await this.openFolder(folder, { quiet: true });
-    if (file && (await this.platform.stat(file))) await this.doc.open(file);
+    const { folder, file } = launchPlan(this.settings, opts.fresh ? { ...opts, initialFolder: null } : opts);
+    if (folder && !opts.fresh) await this.openFolder(folder, { quiet: true });
+    if (file && !opts.fresh && (await this.platform.stat(file))) await this.docs.openPath(file, 'replace');
     else this.onDocState(this.doc.state());
     this.refreshOutline();
     this.status.setStats(this.editor.getStats());
@@ -196,10 +191,72 @@ export class App {
     this.root.classList.add('ready');
   }
 
-  private editorSettings(): EditorSettings {
+  /** One editor per tab; chrome refreshes only follow the active one. */
+  private createTabEditor(host: HTMLElement, tab: DocTab): EditorHandle {
+    const ed = this.wiring.createEditor(host, this.editorSettings(tab));
+    ed.onChange(() => {
+      if (this.docs.active !== tab) return;
+      this.syncImagesSoon();
+      this.refreshFindSoon();
+      this.refreshOutlineSoon();
+      this.refreshStatsSoon();
+    });
+    let selRaf = 0;
+    ed.onSelectionChange(() => {
+      if (this.docs.active !== tab) return;
+      cancelAnimationFrame(selRaf);
+      selRaf = requestAnimationFrame(() => this.outline.setActive(ed.getActiveHeadingId()));
+    });
+    return ed;
+  }
+
+  private docHost(tab: DocTab): DocHostCallbacks {
+    const front = (): void => {
+      if (this.docs.active !== tab) this.docs.activate(tab);
+    };
+    return {
+      askUnsaved: (name, reason) => (front(), this.askUnsaved(name, reason)),
+      askReloadDirty: (name) => (front(), this.askReloadDirty(name)),
+      externalChange: (c) => {
+        tab.ext = c;
+        if (this.docs.active === tab) this.extBanner.show(c);
+      },
+      notify: (m, k) => void toast(m, { kind: k }),
+      autoSave: () => ({ enabled: this.settings.autoSave, delay: this.settings.autoSaveDelay }),
+      imageRule: () => this.settings.imageRule,
+      willLoad: (p) => tab.editor.updateSettings({ baseDir: p ? dirname(p) : null }),
+      onState: (s) => {
+        if (this.docs.active === tab) this.onDocState(s);
+        this.renderTabs();
+      },
+      onOpened: (p) => this.onOpened(p),
+      defaultDir: () => this.folder,
+      defaultEol: () => newFileEol(this.settings.defaultLineEnding),
+    };
+  }
+
+  private onTabActivated(tab: DocTab): void {
+    this.images?.sync(); // typora-root-url follows the active document (#99)
+    const src = tab.editor.isSourceMode();
+    this.status.setSource(src);
+    this.root.classList.toggle('source-mode', src);
+    this.extBanner.show(tab.ext);
+    this.onDocState(tab.doc.state());
+    this.refreshOutline();
+    this.status.setStats(tab.editor.getStats());
+    this.findbar.refresh();
+  }
+
+  private renderTabs(): void {
+    if (!this.docs?.active) return;
+    this.tabBar.render(this.docs.views(), this.docs.active.id);
+    this.root.classList.toggle('has-tabs', this.docs.tabs.length > 1);
+  }
+
+  private editorSettings(tab?: DocTab): EditorSettings {
     return {
       baseDir: null,
-      resolveAsset: (src) => this.resolveAsset(src),
+      resolveAsset: (src) => this.resolveAsset(src, tab),
       storeImage: (input) => this.storeImage(input),
       openLink: (href) => void this.openLink(href),
       ...(this.platform.writeClipboardRich ? { writeClipboardRich: (d) => this.platform.writeClipboardRich!(d) } : {}),
@@ -223,7 +280,9 @@ export class App {
       updateSettings: (p) => this.updateSettings(p),
       openAt: (p, q, o, n) => void this.openAt(p, q, o, n),
       platform: this.platform,
-      openFile: (p) => void this.doc.open(p),
+      openFile: (p) => void this.docs.openPath(p, 'replace'),
+      openInNewTab: (p) => void this.docs.openPath(p, 'tab'),
+      openInNewWindow: (p) => void this.newWindow(p),
       onRenamed: (from, to) => {
         this.doc.renamed(from, to);
         this.settings.recentFiles = this.settings.recentFiles.map((r) => (isInside(from, r) ? to + r.slice(from.length) : r));
@@ -265,8 +324,20 @@ export class App {
     this.installResizer(resizer);
 
     this.findbar = new FindBar(() => this.editor);
-    this.editorHost = h('div.margin-doc.editor-host');
-    this.scroller = h('div.editor-scroll', null, h('div.editor-page', null, this.editorHost));
+    this.page = h('div.editor-page');
+    this.scroller = h('div.editor-scroll', null, this.page);
+    this.tabBar = new TabBar({
+      activate: (id) => {
+        const t = this.docs.byId(id);
+        if (t) this.docs.activate(t);
+      },
+      close: (id) => {
+        const t = this.docs.byId(id);
+        if (t) void this.docs.close(t);
+      },
+      newTab: () => void this.run('newTab'),
+      move: (id, to) => this.docs.move(id, to),
+    });
     this.scroller.addEventListener('mousedown', (e) => {
       // Clicking the empty margin below/around the page focuses the editor.
       if (e.target === this.scroller || (e.target as HTMLElement).classList.contains('editor-page')) {
@@ -278,7 +349,7 @@ export class App {
       docDir: () => (this.doc.path ? dirname(this.doc.path) : null),
       editor: () => this.editor,
     });
-    const main = h('main.main', null, this.findbar.el, this.extBanner.el, this.scroller);
+    const main = h('main.main', null, this.tabBar.el, this.findbar.el, this.extBanner.el, this.scroller);
 
     this.status = new StatusBar({
       toggleSidebar: () => void this.run('toggleSidebar'),
@@ -338,7 +409,7 @@ export class App {
     const scheme = dark ? 'dark' : 'light';
     if (scheme !== this.colorScheme) {
       this.colorScheme = scheme;
-      this.editor?.updateSettings({ colorScheme: scheme });
+      for (const ed of this.docs?.editors() ?? []) ed.updateSettings({ colorScheme: scheme });
     }
   }
 
@@ -369,7 +440,7 @@ export class App {
       const bad = setCustomKeys(s.keyBinding);
       if (bad.length) void toast(`Unknown command in custom shortcut keys: ${bad.join(', ')}`, { kind: 'warning' });
     }
-    if (Object.keys(ed).length) this.editor.updateSettings(ed);
+    if (Object.keys(ed).length) for (const e of this.docs.editors()) e.updateSettings(ed);
     this.applyLayoutSettings();
     this.saveSettingsSoon();
   }
@@ -414,7 +485,7 @@ export class App {
 
   /** Sidebar search result: open the file, then find the query in it. */
   private async openAt(path: string, query: string | null, opts: FindOpts, occurrence: number): Promise<void> {
-    if (path !== this.doc.path && !(await this.doc.open(path))) return;
+    if (path !== this.doc.path && !(await this.docs.openPath(path, 'replace'))) return;
     if (query) this.findbar.searchFor(query, opts, occurrence);
   }
 
@@ -449,7 +520,7 @@ export class App {
     for (const p of paths) {
       const st = await this.platform.stat(p).catch(() => null);
       if (st?.isDir) await this.openFolder(p);
-      else if (!opened && st) opened = await this.doc.open(p);
+      else if (st) opened = (await this.docs.openPath(p, 'tab')) || opened;
     }
   }
 
@@ -485,7 +556,7 @@ export class App {
    */
   private caretToBlock(id: string): void {
     if (this.editor.isSourceMode()) return;
-    const content = this.editorHost.querySelector<HTMLElement>(`[data-bid="${CSS.escape(id)}"] .md-content`);
+    const content = this.page.querySelector<HTMLElement>(`[data-bid="${CSS.escape(id)}"] .md-content`);
     const root = content?.closest<HTMLElement>('.md-editor');
     if (!content || !root) return;
     root.focus({ preventScroll: true });
@@ -506,15 +577,17 @@ export class App {
   /** File › Page Setup (session only, like Typora's shared print info). */
   private printSetup: PrintSetup = { ...DEFAULT_PRINT_SETUP };
 
-  private resolveAsset(src: string): string {
-    const rooted = this.images?.resolvePath(src);
-    const p = rooted !== undefined ? rooted : resolveDocPath(src, this.doc?.dir ?? null);
+  private resolveAsset(src: string, tab?: DocTab): string {
+    const doc = tab?.doc ?? this.docs?.active?.doc;
+    // typora-root-url (#99) is tracked for the active tab's document.
+    const rooted = !tab || tab === this.docs?.active ? this.images?.resolvePath(src) : undefined;
+    const p = rooted !== undefined ? rooted : resolveDocPath(src, doc?.dir ?? null);
     if (!p) return src;
     if (this.exportDir && isAbsolute(src.trim())) return src; // absolute paths stay absolute
     if (this.exportDir) return encodeURI(relativeFrom(this.exportDir, p)).replace(/[?#]/g, encodeURIComponent);
     // Desktop serves asset:// only from opened folders; whitelist other image dirs.
     const dir = dirname(p);
-    const inside = (this.folder && isInside(this.folder, p)) || (this.doc?.dir && isInside(this.doc.dir, p));
+    const inside = (this.folder && isInside(this.folder, p)) || (doc?.dir && isInside(doc.dir, p));
     if (!inside && !this.allowedAssetDirs.has(dir)) {
       this.allowedAssetDirs.add(dir);
       void this.platform.allowAssetDir(dir).catch(() => undefined);
@@ -536,7 +609,7 @@ export class App {
     if (!isUrlLike(href)) {
       const p = resolveDocPath(href, this.doc.dir);
       if (p && isMarkdownPath(p)) {
-        await this.doc.open(p);
+        await this.docs.openPath(p, 'replace');
         return;
       }
       if (p) {
@@ -588,7 +661,7 @@ export class App {
 
   private focusInEditor(): boolean {
     const a = document.activeElement;
-    return !a || a === document.body || this.editorHost.contains(a);
+    return !a || a === document.body || this.page.contains(a);
   }
 
   private onMenu(action: MenuAction): void {
@@ -652,9 +725,14 @@ export class App {
     }
     switch (id) {
       case 'new':
-        return this.doc.newDocument();
-      case 'open':
-        return this.doc.openDialog();
+      case 'newTab':
+        if (id === 'new' && this.doc.isPristine()) this.editor.focus();
+        else this.docs.newTab().editor.focus();
+        return true;
+      case 'open': {
+        const p = await this.platform.openFileDialog();
+        return p ? this.docs.openPath(p, 'tab') : false;
+      }
       case 'openFolder': {
         const p = await this.platform.openFileDialog({ directory: true });
         if (p) await this.openFolder(p);
@@ -665,7 +743,20 @@ export class App {
       case 'saveAs':
         return this.doc.saveAs();
       case 'close':
-        return this.doc.close();
+        return this.docs.close();
+      case 'nextTab':
+      case 'prevTab':
+        this.docs.cycle(id === 'nextTab' ? 1 : -1);
+        return true;
+      case 'reopenClosed':
+        return this.docs.reopenClosed();
+      case 'saveAll': {
+        const n = await this.docs.saveAll();
+        if (n !== false) toast(n ? `Saved ${n} file${n > 1 ? 's' : ''}` : 'No unsaved changes', { kind: n ? 'success' : 'info' });
+        return n !== false;
+      }
+      case 'newWindow':
+        return this.newWindow();
       case 'reloadFromDisk':
         await this.doc.reloadFromDisk();
         return true;
@@ -802,6 +893,23 @@ export class App {
     return false;
   }
 
+  /** File › New Window (#94): another app window, empty or showing `path`. */
+  private async newWindow(path?: string): Promise<boolean> {
+    const open = extras(this.platform).openWindow;
+    if (!open) {
+      if (path) return this.docs.openPath(path, 'tab');
+      this.docs.newTab();
+      return true;
+    }
+    try {
+      await open.call(this.platform, path ? { path } : {});
+      return true;
+    } catch (e) {
+      toast(`Couldn't open a new window: ${e instanceof Error ? e.message : e}`, { kind: 'error' });
+      return false;
+    }
+  }
+
   /**
    * Format › Inline Math / Highlight while that syntax is off (Typora's fresh-install default):
    * turn it on so the inserted `$…$` / `==…==` renders, and say where the switch lives (#102).
@@ -895,7 +1003,7 @@ export class App {
         }
         return items.slice(0, 50);
       },
-      pick: (it) => void this.doc.open(it.id),
+      pick: (it) => void this.docs.openPath(it.id, 'replace'),
     });
   }
 
@@ -931,7 +1039,7 @@ export class App {
         })),
       pick: (it) => {
         if (it.id.startsWith('custom:')) void this.exports.export(it.id);
-        else if (it.id.startsWith('recent:')) void this.doc.open(it.id.slice(7));
+        else if (it.id.startsWith('recent:')) void this.docs.openPath(it.id.slice(7), 'tab');
         else if (it.id.startsWith('folder:')) void this.openFolder(it.id.slice(7));
         else if (isCommandId(it.id)) {
           // the palette took the DOM selection: put the editor's caret/selection back first

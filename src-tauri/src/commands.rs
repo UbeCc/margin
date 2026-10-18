@@ -3,7 +3,7 @@
 //! frontend should fall back from.
 
 use crate::images::{self, ImageInput, ImageRule};
-use crate::{AppState, EV_FS, FsEventsPayload, MAIN, allow_assets, allow_assets_for_file, fsops, menu, settings, watch};
+use crate::{AppState, EV_FS, FsEventsPayload, allow_assets, allow_assets_for_file, fsops, menu, settings, watch};
 use serde::Deserialize;
 use serde_json::Value;
 use std::collections::HashMap;
@@ -88,8 +88,15 @@ pub async fn list_dir<Rt: Runtime>(app: AppHandle<Rt>, path: String) -> R<Vec<fs
 }
 
 #[tauri::command]
-pub async fn watch<Rt: Runtime>(app: AppHandle<Rt>, state: State<'_, AppState>, path: String) -> R<u32> {
+pub async fn watch<Rt: Runtime>(
+    app: AppHandle<Rt>,
+    window: WebviewWindow<Rt>,
+    state: State<'_, AppState>,
+    path: String,
+) -> R<u32> {
     let root = abs(&path)?;
+    // Batches go to the window that asked (several windows may watch, #94).
+    let label = window.label().to_string();
     let id = state.next_watch_id.fetch_add(1, Ordering::SeqCst) + 1;
     let qo = state.quick_open.clone();
     let app2 = app.clone();
@@ -109,7 +116,7 @@ pub async fn watch<Rt: Runtime>(app: AppHandle<Rt>, state: State<'_, AppState>, 
                 watch::FsEvent::Modified { .. } => {}
             }
         }
-        let _ = app2.emit_to(MAIN, EV_FS, FsEventsPayload { id, events });
+        let _ = app2.emit_to(label.as_str(), EV_FS, FsEventsPayload { id, events });
     })?;
     state.watchers.lock().unwrap().insert(id, w);
     allow_assets(&app, &root, true);
@@ -515,16 +522,41 @@ pub async fn set_document_edited<Rt: Runtime>(window: WebviewWindow<Rt>, edited:
 }
 
 #[tauri::command]
-pub async fn set_close_guard(state: State<'_, AppState>, enabled: bool) -> R<()> {
-    state.close_guard.store(enabled, Ordering::SeqCst);
+pub async fn set_close_guard<Rt: Runtime>(window: WebviewWindow<Rt>, state: State<'_, AppState>, enabled: bool) -> R<()> {
+    let mut g = state.guarded.lock().unwrap();
+    if enabled {
+        g.insert(window.label().to_string());
+    } else {
+        g.remove(window.label());
+    }
     Ok(())
 }
 
 /// Frontend approved closing after a `margin://close-requested` event.
 #[tauri::command]
 pub async fn confirm_close<Rt: Runtime>(window: WebviewWindow<Rt>, state: State<'_, AppState>) -> R<()> {
-    state.close_confirmed.store(true, Ordering::SeqCst);
+    state.confirmed.lock().unwrap().insert(window.label().to_string());
     window.destroy().map_err(err)
+}
+
+/// File › New Window / Open in New Window (#94): another editor window. Its URL carries
+/// `window=new` (no folder restore) and optionally the file to show (`open=`).
+#[tauri::command]
+pub async fn open_window<Rt: Runtime>(app: AppHandle<Rt>, state: State<'_, AppState>, path: Option<String>) -> R<()> {
+    if let Some(p) = &path {
+        let p = abs(p)?;
+        allow_assets_for_file(&app, &p);
+    }
+    let n = state.next_window.fetch_add(1, Ordering::SeqCst) + 1;
+    crate::new_window(&app, &format!("{}{n}", crate::WINDOW_PREFIX), path.as_deref()).map_err(err)
+}
+
+/// Raw bytes of a file, for decoding with a chosen / detected encoding (#94).
+#[tauri::command]
+pub async fn read_file_bytes(path: String) -> R<tauri::ipc::Response> {
+    let p = abs(&path)?;
+    let bytes = blocking(move || std::fs::read(&p)).await?.map_err(|e| format!("{path}: {e}"))?;
+    Ok(tauri::ipc::Response::new(bytes))
 }
 
 #[tauri::command]

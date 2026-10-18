@@ -20,17 +20,38 @@ type Item = (&'static str, &'static str, Option<&'static str>);
 
 const FILE_OPEN: &[Item] = &[
     ("new", "New", Some("CmdOrCtrl+N")),
+    ("newTab", "New Tab", Some("CmdOrCtrl+T")),
+    ("newWindow", "New Window", Some("CmdOrCtrl+Shift+N")),
     ("open", "Open…", Some("CmdOrCtrl+O")),
     ("openFolder", "Open Folder…", Some("CmdOrCtrl+Shift+O")),
 ];
+const REVEAL: &str = if cfg!(target_os = "macos") { "Reveal in Finder" } else { "Open File Location" };
 const FILE: &[Item] = &[
+    ("reopenClosed", "Reopen Closed File", Some("CmdOrCtrl+Shift+T")),
     ("quickOpen", "Quick Open…", Some("CmdOrCtrl+P")),
     ("-", "", None),
     ("save", "Save", Some("CmdOrCtrl+S")),
     ("saveAs", "Save As…", Some("CmdOrCtrl+Shift+S")),
+    ("saveAll", "Save All", Some("CmdOrCtrl+Alt+S")),
+    ("duplicate", "Duplicate", None),
+    ("renameFile", "Rename…", None),
+    ("moveTo", "Move To…", None),
+    ("-", "", None),
     ("reloadFromDisk", "Revert to Saved", None),
+    ("browseVersions", "Browse All Versions…", None),
+    ("reopenWithEncoding", "Reopen with Encoding…", None),
+    ("recoverDrafts", "Recover Unsaved Drafts…", None),
+    ("-", "", None),
+    ("revealInFinder", REVEAL, None),
+    ("copyFilePath", "Copy File Path", None),
+    ("properties", "Properties…", None),
     ("-", "", None),
     ("import", "Import…", None),
+];
+/// Window menu: document tabs (#94).
+const WINDOW_TABS: &[Item] = &[
+    ("nextTab", "Show Next Tab", Some("CmdOrCtrl+Shift+BracketRight")),
+    ("prevTab", "Show Previous Tab", Some("CmdOrCtrl+Shift+BracketLeft")),
 ];
 const EXPORT: &[Item] = &[
     ("exportHtml", "HTML…", None),
@@ -250,7 +271,7 @@ const VIEW: &[Item] = &[
 /// Every action the menu can emit (used by tests to keep Rust and TS in sync).
 #[cfg(test)]
 pub fn all_actions() -> Vec<&'static str> {
-    let mut v: Vec<&'static str> = [FILE_OPEN, FILE, EXPORT, EXPORT_MORE, EDIT_TOP, EDIT_FIND, PARAGRAPH, FORMAT, VIEW]
+    let mut v: Vec<&'static str> = [FILE_OPEN, FILE, EXPORT, EXPORT_MORE, EDIT_TOP, EDIT_FIND, PARAGRAPH, FORMAT, VIEW, WINDOW_TABS]
         .iter()
         .chain(EDIT_EXTRA.iter())
         .chain(IMAGE_ALL.iter())
@@ -396,7 +417,8 @@ pub fn build<R: Runtime>(
     let window = SubmenuBuilder::new(app, "Window")
         .item(&PredefinedMenuItem::minimize(app, None)?)
         .item(&PredefinedMenuItem::maximize(app, if mac { Some("Zoom") } else { None })?)
-        .build()?;
+        .separator();
+    let window = add_items(app, window, WINDOW_TABS)?.build()?;
     menu = menu.item(&window);
 
     let mut help = SubmenuBuilder::new(app, "Help")
@@ -444,7 +466,7 @@ mod tests {
     #[test]
     fn accelerators_are_unique() {
         let mut seen = std::collections::HashSet::new();
-        for g in [FILE_OPEN, FILE, EXPORT, EXPORT_MORE, EDIT_TOP, EDIT_FIND, PARAGRAPH, FORMAT, VIEW]
+        for g in [FILE_OPEN, FILE, EXPORT, EXPORT_MORE, EDIT_TOP, EDIT_FIND, PARAGRAPH, FORMAT, VIEW, WINDOW_TABS]
             .iter()
             .chain(EDIT_EXTRA.iter())
             .chain(SUBMENUS.iter().map(|(_, items)| items))
@@ -470,6 +492,10 @@ mod tests {
                 "exportDocx", "exportLatex",
                 "exportEpub", "clearFormat", "exportOdt", "exportRtf", "exportMediawiki", "exportRst", "exportTextile", "exportOpml",
                 "exportCustom", "import",
+                // #94 file lifecycle
+                "newTab", "newWindow", "nextTab", "prevTab", "reopenClosed", "saveAll", "duplicate", "renameFile",
+                "moveTo", "revealInFinder", "copyFilePath", "browseVersions", "reopenWithEncoding", "properties",
+                "recoverDrafts",
             ]
             .contains(&a)
                 || a.starts_with("heading:")
