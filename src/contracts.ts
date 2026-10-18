@@ -71,7 +71,24 @@ export type EditorCommand =
   | { kind: 'copyAs'; format: CopyAsFormat }
   | { kind: 'pastePlain' }
   // #97 (additive): copy the block at the caret — markdown source, or the inner text of a code / math fence
-  | { kind: 'copyBlock'; part: 'source' | 'content' };
+  | { kind: 'copyBlock'; part: 'source' | 'content' }
+  // #98 (additive): block tools — Paragraph › Table / Code Tools / Math Tools
+  /** Insert a `rows`×`cols` table (rows include the header row). */
+  | { kind: 'insertTable'; rows: number; cols: number }
+  /** Table tools on the table with the caret (`resize` takes rows/cols, rows incl. header). */
+  | { kind: 'table'; op: TableOp; rows?: number; cols?: number }
+  | { kind: 'code'; op: CodeOp }
+  | { kind: 'math'; op: MathOp };
+
+/** Table submenu / toolbar operations (#98). `prettify` = re-format the table source (aligned columns). */
+export type TableOp =
+  | 'rowAbove' | 'rowBelow' | 'colBefore' | 'colAfter' | 'deleteRow' | 'deleteCol'
+  | 'moveRowUp' | 'moveRowDown' | 'moveColLeft' | 'moveColRight'
+  | 'alignLeft' | 'alignCenter' | 'alignRight' | 'resize' | 'copy' | 'prettify' | 'delete';
+/** Code Tools (#98): copy the fence body; re-indent the whole body / the selected lines. */
+export type CodeOp = 'copy' | 'indentAll' | 'indentSelected';
+/** Math Tools (#98): copy the math at the caret as TeX / MathML, delete it, re-render all math. */
+export type MathOp = 'copyTex' | 'copyMathML' | 'delete' | 'refresh';
 
 /**
  * Edit › Copy as (#96). markdown = source only; html = the rendered HTML *source*
@@ -153,6 +170,11 @@ export interface WidgetInstance {
    * the whole widget as before).
    */
   select?(from: number, to: number): boolean;
+  /**
+   * Block tools (#98): run a table/code/math op (`TableOp` | `CodeOp` | `'refresh'`) on
+   * this widget. Return false when the op does not apply; the core may then fall back.
+   */
+  command?(op: string, args?: { rows?: number; cols?: number }): boolean;
   destroy(): void;
 }
 
@@ -218,7 +240,12 @@ export type MenuAction =
   | 'pastePlain'
   | `select:${'word' | 'line' | 'block' | 'styled'}`
   | `delete:${'word' | 'line' | 'block' | 'styled' | 'range'}`
-  | `jump:${'top' | 'bottom' | 'selection'}`;
+  | `jump:${'top' | 'bottom' | 'selection'}`
+  // #98 (additive): Paragraph › Table (Insert Table… opens the rows×columns dialog) / Code Tools / Math Tools
+  | 'table:insert'
+  | `table:${TableOp}`
+  | `code:${CodeOp}`
+  | `math:${MathOp}`;
 
 /** PDF export options (#18 baseDir; #95 page geometry, header/footer, bookmarks, metadata). All optional. */
 export interface PdfExportOptions {
