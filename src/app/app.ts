@@ -170,17 +170,6 @@ export class App {
       settings: () => this.settings,
       notify: (m, k, action) => void toast(m, { kind: k, ...(action ? { action } : {}) }),
     });
-    this.editor.onChange(() => {
-      this.refreshFindSoon();
-      this.refreshOutlineSoon();
-      this.refreshStatsSoon();
-    });
-    let selRaf = 0;
-    this.editor.onSelectionChange(() => {
-      cancelAnimationFrame(selRaf);
-      selRaf = requestAnimationFrame(() => this.outline.setActive(this.editor.getActiveHeadingId()));
-      this.refreshSelectionSoon();
-    });
     // #99: image rules, Format › Image, image context menu, typora-root-url.
     this.images = new ImageFeature({
       platform: extras(this.platform) as Platform & ReturnType<typeof extras>,
@@ -258,6 +247,15 @@ export class App {
   /** One editor per tab; chrome refreshes only follow the active one. */
   private createTabEditor(host: HTMLElement, tab: DocTab): EditorHandle {
     const ed = this.wiring.createEditor(host, this.editorSettings(tab));
+    // #103 writing aids: smart punctuation + :emoji: autocomplete live on each
+    // tab's host; the popup is fixed-position and dies with the tab.
+    const aids = {
+      root: host,
+      editor: () => ed,
+      smart: () => ({ quotes: this.settings.markdown.smartQuote, dashes: this.settings.markdown.smartDash, onInput: this.settings.markdown.smartPunctuation === 'input' }),
+    };
+    installSmartPunctuation(aids);
+    host.appendChild(new EmojiComplete(aids).el);
     ed.onChange(() => {
       if (tab.doc?.dirty) this.saveDraftsSoon();
       if (this.docs.active !== tab) return;
@@ -271,6 +269,7 @@ export class App {
       if (this.docs.active !== tab) return;
       cancelAnimationFrame(selRaf);
       selRaf = requestAnimationFrame(() => this.outline.setActive(ed.getActiveHeadingId()));
+      this.refreshSelectionSoon();
     });
     return ed;
   }
@@ -507,13 +506,7 @@ export class App {
       toggleEol: () => void this.run('toggleLineEnding'),
       setUnit: (u) => this.updateSettings({ wordCountUnit: u }),
     });
-    const aids = {
-      root: this.editorHost,
-      editor: () => this.editor,
-      smart: () => ({ quotes: this.settings.markdown.smartQuote, dashes: this.settings.markdown.smartDash, onInput: this.settings.markdown.smartPunctuation === 'input' }),
-    };
-    installSmartPunctuation(aids);
-    document.body.appendChild(new EmojiComplete(aids).el);
+    // #103 writing aids attach per tab host in createTabEditor (docs exist only after buildLayout).
 
     this.root.replaceChildren(titlebar, h('div.workspace', null, this.sidebar, main), this.status.el, this.status.floating);
   }
@@ -691,6 +684,9 @@ export class App {
       this.applyAppearance();
     const ed: Partial<EditorSettings> = {};
     if (s.spellcheck !== prev.spellcheck) ed.spellcheck = s.spellcheck;
+    const auto = s.spellAutocorrect || s.smartTextReplacement;
+    if (auto !== (prev.spellAutocorrect || prev.smartTextReplacement)) ed.autocorrect = auto;
+    if (s.typewriterCaret !== prev.typewriterCaret) ed.typewriterCaret = s.typewriterCaret;
     if (s.focusMode !== prev.focusMode) ed.focusMode = s.focusMode;
     if (s.typewriterMode !== prev.typewriterMode) ed.typewriterMode = s.typewriterMode;
     if (JSON.stringify(s.markdown) !== JSON.stringify(prev.markdown)) ed.markdown = { ...s.markdown };
@@ -1144,11 +1140,16 @@ export class App {
         this.updateSettings({ markdown: { ...this.settings.markdown, smartPunctuation: id === 'subst:input' ? 'input' : 'rendering' } });
         return true;
       case 'subst:quotes':
-        this.updateSettings({ markdown: { ...this.settings.markdown, smartQuote: !this.settings.markdown.smartQuote } });
+      case 'subst:dashes': {
+        const quotes = id === 'subst:quotes' ? !this.settings.markdown.smartQuote : this.settings.markdown.smartQuote;
+        const dashes = id === 'subst:dashes' ? !this.settings.markdown.smartDash : this.settings.markdown.smartDash;
+        // §5.4: converting on input locks "Remap Unicode Punctuation on Parse" on.
+        const forced = this.settings.markdown.smartPunctuation === 'input' && (quotes || dashes);
+        this.updateSettings({
+          markdown: { ...this.settings.markdown, smartQuote: quotes, smartDash: dashes, ...(forced ? { remapPunctuation: true } : {}) },
+        });
         return true;
-      case 'subst:dashes':
-        this.updateSettings({ markdown: { ...this.settings.markdown, smartDash: !this.settings.markdown.smartDash } });
-        return true;
+      }
       case 'subst:textReplacement':
         this.updateSettings({ smartTextReplacement: !this.settings.smartTextReplacement });
         return true;

@@ -58,18 +58,19 @@ export class EmojiComplete {
   readonly el: HTMLElement;
   private items: [string, string][] = [];
   private index = 0;
-  private typed = '';
 
   constructor(private host: AidsHost) {
     this.el = h('div.emoji-popup', { role: 'listbox', 'aria-label': 'Emoji', hidden: true });
     host.root.addEventListener('input', () => this.update());
+    // Real keystrokes may be inserted by the editor's own path (no DOM input
+    // event) — re-check after beforeinput settles.
+    host.root.addEventListener('beforeinput', (e) => { if (e.inputType === 'insertText') queueMicrotask(() => this.update()); }, true);
     host.root.addEventListener('keydown', (e) => this.onKey(e), true);
     host.root.addEventListener('blur', () => this.hide(), true);
     // Edit › Emoji and Symbols: insert a lone `:` and open the picker with the
     // full shortcode list; accepting replaces it with the `:name:` text.
     host.root.addEventListener('margin:emoji', () => {
       this.host.editor().exec({ kind: 'insertText', text: ':' });
-      this.typed = '';
       this.items = EMOJI.slice(0, 24);
       this.index = 0;
       this.render();
@@ -94,7 +95,6 @@ export class EmojiComplete {
     const m = ctx && /(?:^|[\s(（]):([A-Za-z0-9_+-]+)$/.exec(ctx.before);
     const list = m ? emojiCandidates(m[1]) : [];
     if (!m || !list.length) return this.hide();
-    this.typed = m[1];
     this.items = list;
     this.index = 0;
     this.render();
@@ -131,9 +131,14 @@ export class EmojiComplete {
 
   private accept(): void {
     const it = this.items[this.index];
-    if (!it) return;
+    if (!it) return this.hide();
+    // Re-read the trigger at accept time: the editor batches DOM renders, so
+    // the captured query may lag the last keystroke.
+    const ctx = caretContext(this.host.root);
+    const m = ctx && /(?:^|[\s(（]):([A-Za-z0-9_+-]+)$/.exec(ctx.before);
     this.hide();
-    replaceBefore(this.host.editor(), this.typed.length + 1, `:${it[0]}:`);
+    if (m) replaceBefore(this.host.editor(), m[1].length + 1, `:${it[0]}:`);
+    else if (ctx?.before.endsWith(':')) replaceBefore(this.host.editor(), 1, `:${it[0]}:`); // picker-inserted trigger
   }
 }
 
