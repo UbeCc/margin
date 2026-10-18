@@ -1,10 +1,21 @@
 //! Quick Open: a cached file index per root (built with the `ignore` walker, so
 //! `.gitignore`/hidden files are respected) plus a small fuzzy scorer.
+//!
+//! On macOS a Spotlight fast path (`spotlight_macos.rs`) answers queries while
+//! the walker index is missing or stale (cold open of a huge folder), and adds
+//! hits beyond the walker's `MAX_INDEX` cap. Spotlight results are filtered with
+//! the walker's rules, merged/deduped with any cached index, ranked by the same
+//! scorer, and a background walk refreshes the cache. Unindexed folders, query
+//! errors and timeouts fall back to the synchronous walk.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
+
+#[cfg(target_os = "macos")]
+#[path = "spotlight_macos.rs"]
+pub mod spotlight_macos;
 
 pub const MAX_INDEX: usize = 50_000;
 /// Unwatched roots are re-walked when the cached index is older than this.
@@ -51,18 +62,46 @@ pub fn walk(root: &Path) -> Vec<String> {
     out
 }
 
-#[derive(Default)]
 pub struct QuickOpen {
-    indexes: Mutex<HashMap<PathBuf, Index>>,
+    indexes: Arc<Mutex<HashMap<PathBuf, Index>>>,
+    /// Roots with a background walk in flight.
+    building: Arc<Mutex<HashSet<PathBuf>>>,
+    /// Try the Spotlight fast path (macOS only; ignored elsewhere).
+    pub spotlight: bool,
+}
+
+impl Default for QuickOpen {
+    fn default() -> Self {
+        Self::with_spotlight(cfg!(target_os = "macos"))
+    }
 }
 
 impl QuickOpen {
+    pub fn with_spotlight(spotlight: bool) -> Self {
+        Self { indexes: Default::default(), building: Default::default(), spotlight }
+    }
+
     pub fn search(&self, root: &Path, query: &str, limit: usize, watched: bool) -> Vec<String> {
         let mut map = self.indexes.lock().unwrap();
-        let stale = match map.get(root) {
-            None => true,
-            Some(ix) => ix.dirty || (!watched && ix.built.elapsed() > UNWATCHED_TTL),
+        let (stale, truncated) = match map.get(root) {
+            None => (true, false),
+            Some(ix) => (ix.dirty || (!watched && ix.built.elapsed() > UNWATCHED_TTL), ix.files.len() >= MAX_INDEX),
         };
+        let fuzzy = query.chars().any(|c| !c.is_whitespace());
+        if self.spotlight && fuzzy && (stale || truncated) {
+            let cached: Vec<String> = map.get(root).map(|ix| ix.files.clone()).unwrap_or_default();
+            drop(map);
+            if let Some(hits) = spotlight_hits(root, query) {
+                if stale {
+                    self.refresh_in_background(root);
+                }
+                return rank(&merge(&cached, hits), query, limit)
+                    .into_iter()
+                    .map(|rel| root.join(rel).to_string_lossy().into_owned())
+                    .collect();
+            }
+            map = self.indexes.lock().unwrap();
+        }
         if stale {
             drop(map);
             let files = walk(root); // walk without holding the lock
@@ -97,6 +136,21 @@ impl QuickOpen {
         });
     }
 
+    fn refresh_in_background(&self, root: &Path) {
+        if !self.building.lock().unwrap().insert(root.to_path_buf()) {
+            return;
+        }
+        let (indexes, building, owned) = (self.indexes.clone(), self.building.clone(), root.to_path_buf());
+        let spawned = std::thread::Builder::new().name("quick-open-walk".into()).spawn(move || {
+            let files = walk(&owned);
+            indexes.lock().unwrap().insert(owned.clone(), Index { files, built: Instant::now(), dirty: false });
+            building.lock().unwrap().remove(&owned);
+        });
+        if spawned.is_err() {
+            self.building.lock().unwrap().remove(root);
+        }
+    }
+
     pub fn forget(&self, root: &Path) {
         self.indexes.lock().unwrap().remove(root);
     }
@@ -112,6 +166,163 @@ impl QuickOpen {
             }
         }
     }
+}
+
+// ------------------------------------------------------------ spotlight glue
+
+/// Extensions Spotlight is asked for (mirrors `is_markdown`).
+const MD_EXTS: &[&str] = &["md", "markdown", "mdown", "mkd", "mkdn", "txt"];
+/// Cap on raw Spotlight hits per query; the scorer ranks within these.
+pub const SPOTLIGHT_MAX: usize = 5_000;
+pub const SPOTLIGHT_TIMEOUT: Duration = Duration::from_millis(400);
+/// How long an "is this folder indexed?" probe answer is trusted.
+const PROBE_TTL: Duration = Duration::from_secs(60);
+
+/// Escape a literal for a double-quoted MDQuery string value. `*` and `?` are
+/// wildcards there, `\` and `"` delimit; all are backslash-escaped.
+pub fn md_escape(s: &str) -> String {
+    let mut out = String::with_capacity(s.len());
+    for c in s.chars() {
+        if matches!(c, '\\' | '"' | '*' | '?') {
+            out.push('\\');
+        }
+        out.push(c);
+    }
+    out
+}
+
+/// MDQuery predicate: file name contains the query's characters in order
+/// (`*a*b*c*`, case/diacritic-insensitive) — the substring `*abc*` is a subset,
+/// and this matches what the fuzzy scorer accepts inside a file name — and the
+/// name has a markdown extension. Whitespace is ignored like in `rank`.
+pub fn md_predicate(query: &str) -> String {
+    let mut pat = String::from("*");
+    for c in query.chars().filter(|c| !c.is_whitespace()) {
+        pat.push_str(&md_escape(&c.to_string()));
+        pat.push('*');
+    }
+    let exts: Vec<String> = MD_EXTS.iter().map(|e| format!("kMDItemFSName == \"*.{e}\"c")).collect();
+    format!("kMDItemFSName == \"{pat}\"cd && ({})", exts.join(" || "))
+}
+
+/// Predicate used to probe whether a folder is in the Spotlight index at all:
+/// any item at all under the scope.
+pub const PROBE_PREDICATE: &str = "kMDItemFSName == \"*\"";
+
+/// Map absolute Spotlight paths to root-relative forward-slash paths, keeping
+/// only files the walker would also index (no hidden components, no skipped
+/// dirs, not git-ignored).
+pub fn filter_hits(root: &Path, hits: Vec<PathBuf>) -> Vec<String> {
+    let canon = root.canonicalize().unwrap_or_else(|_| root.to_path_buf());
+    let mut ignores = IgnoreCache::default();
+    let mut out = Vec::new();
+    for hit in hits {
+        let hit = hit.canonicalize().unwrap_or(hit);
+        let Ok(rel) = hit.strip_prefix(&canon).or_else(|_| hit.strip_prefix(root)) else { continue };
+        let rel_s = rel.to_string_lossy().replace('\\', "/");
+        if rel_s.is_empty()
+            || rel_s.split('/').any(|c| c.starts_with('.') || SKIP_DIRS.contains(&c))
+            || ignores.ignored(&canon, rel)
+        {
+            continue;
+        }
+        out.push(rel_s);
+    }
+    out
+}
+
+/// Lazily loaded `.gitignore`/`.ignore` matchers per directory under a root.
+#[derive(Default)]
+struct IgnoreCache {
+    dirs: HashMap<PathBuf, Option<ignore::gitignore::Gitignore>>,
+}
+
+impl IgnoreCache {
+    fn matcher(&mut self, dir: &Path, is_root: bool) -> Option<&ignore::gitignore::Gitignore> {
+        self.dirs
+            .entry(dir.to_path_buf())
+            .or_insert_with(|| {
+                let mut b = ignore::gitignore::GitignoreBuilder::new(dir);
+                let mut any = false;
+                let mut files = vec![dir.join(".gitignore"), dir.join(".ignore")];
+                if is_root {
+                    files.push(dir.join(".git/info/exclude"));
+                }
+                for f in files {
+                    if f.is_file() {
+                        any |= b.add(f).is_none();
+                    }
+                }
+                if any { b.build().ok() } else { None }
+            })
+            .as_ref()
+    }
+
+    /// Deepest matching rule wins (a nested `!keep.md` overrides a parent).
+    fn ignored(&mut self, root: &Path, rel: &Path) -> bool {
+        let full = root.join(rel);
+        let mut dirs = vec![root.to_path_buf()];
+        let comps: Vec<_> = rel.components().collect();
+        for c in &comps[..comps.len().saturating_sub(1)] {
+            let next = dirs.last().unwrap().join(c);
+            dirs.push(next);
+        }
+        for (i, dir) in dirs.iter().enumerate().rev() {
+            if let Some(m) = self.matcher(dir, i == 0) {
+                let r = m.matched_path_or_any_parents(&full, false);
+                if r.is_ignore() {
+                    return true;
+                }
+                if r.is_whitelist() {
+                    return false;
+                }
+            }
+        }
+        false
+    }
+}
+
+/// Union of the cached walker index and Spotlight hits, deduped by relative
+/// path (both sides are relative to the same canonical root).
+pub fn merge(cached: &[String], hits: Vec<String>) -> Vec<String> {
+    let mut seen: HashSet<String> = cached.iter().cloned().collect();
+    let mut out = cached.to_vec();
+    for h in hits {
+        if seen.insert(h.clone()) {
+            out.push(h);
+        }
+    }
+    out
+}
+
+#[cfg(target_os = "macos")]
+fn folder_indexed(root: &Path) -> bool {
+    static PROBES: std::sync::OnceLock<Mutex<HashMap<PathBuf, (bool, Instant)>>> = std::sync::OnceLock::new();
+    let probes = PROBES.get_or_init(Default::default);
+    if let Some((ok, at)) = probes.lock().unwrap().get(root) {
+        if at.elapsed() < PROBE_TTL {
+            return *ok;
+        }
+    }
+    let ok = spotlight_macos::query(root, PROBE_PREDICATE, 1, SPOTLIGHT_TIMEOUT).is_some_and(|v| !v.is_empty());
+    probes.lock().unwrap().insert(root.to_path_buf(), (ok, Instant::now()));
+    ok
+}
+
+/// Filtered, root-relative Spotlight hits, or `None` → use the walker.
+#[cfg(target_os = "macos")]
+pub fn spotlight_hits(root: &Path, query: &str) -> Option<Vec<String>> {
+    let canon = root.canonicalize().ok()?;
+    if !folder_indexed(&canon) {
+        return None;
+    }
+    let hits = spotlight_macos::query(&canon, &md_predicate(query), SPOTLIGHT_MAX, SPOTLIGHT_TIMEOUT)?;
+    Some(filter_hits(root, hits))
+}
+
+#[cfg(not(target_os = "macos"))]
+pub fn spotlight_hits(_root: &Path, _query: &str) -> Option<Vec<String>> {
+    None
 }
 
 /// Rank candidates. Markdown files come first, then by score, then shorter paths.
@@ -275,3 +486,7 @@ mod tests {
         assert_eq!(qo.search(root, "a.md", 10, true).len(), 0);
     }
 }
+
+#[cfg(test)]
+#[path = "quick_open_spotlight_tests.rs"]
+mod spotlight_tests;
