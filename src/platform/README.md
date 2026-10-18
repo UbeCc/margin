@@ -59,6 +59,12 @@ implementations follow `Platform` in `src/contracts.ts` and also provide `print(
     `assetUrl()` srcs.
   - On other desktop OSes and on web it opens the print dialog instead.
   - `print()` prints the current window. Use `@media print` CSS to hide chrome.
+- **pandocExport** (optional, desktop only, #81): `pandocExport(md, outPath, {format, docDir, title, pandocPath, timeoutMs})`
+  runs `pandoc -f markdown -t <docx|latex|epub> -o <out> --resource-path <docDir>` (argv, markdown on stdin,
+  cwd = docDir) and resolves to pandoc's warnings. Pandoc is found via `pandocPath` → `$PATH` →
+  `/opt/homebrew/bin`, `/usr/local/bin`, `~/.local/bin`; version must be ≥ 2. Not found / too old /
+  non-zero exit (stderr included) / timeout (process killed) all reject with a readable message.
+  `pandocDetect(path)` returns `{path, version}` for Preferences.
 - **Themes**: `listThemes()` = built-ins from `src/themes/*.css` + the user's
   `themesDir()` CSS. On desktop it also refreshes the native Themes menu.
   `theme:<name>` arrives via `onMenu`, and `saveSettings` ticks the matching item.
