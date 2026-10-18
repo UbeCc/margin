@@ -75,14 +75,17 @@ export function attachImageMenu(root: HTMLElement, host: ImageMenuHost, md: () =
   root.addEventListener('contextmenu', onMenu);
   return () => root.removeEventListener('contextmenu', onMenu);
 }
+
 export async function buildMenu(host: ImageMenuHost, r: Located, img: HTMLImageElement): Promise<MenuItem[]> {
   const t = host.tools;
+  const ex = extras(host.platform);
+  const native = ex as { writeClipboardImage?: (path: string) => Promise<boolean> };
   const abs = t.absOf(r.src);
   const remote = REMOTE_RE.test(r.src);
   const local = !!abs && !remote && !isUrlLike(r.src);
   const ok = img.complete && img.naturalWidth > 0;
   const html = parseImage(r.raw)?.html ?? false;
-  const scale = local && host.platform.imageScale ? await host.platform.imageScale(abs!).catch(() => 1) : 1;
+  const scale = local && ex.imageScale ? await ex.imageScale(abs!).catch(() => 1) : 1;
   const zoomNow = zoomOf(r.raw);
   const target = t.targetFolder();
 
@@ -109,9 +112,8 @@ export async function buildMenu(host: ImageMenuHost, r: Located, img: HTMLImageE
       { label: 'Upload Image', disabled: host.uploading(), run: () => host.upload(r.src) },
     );
   }
-  if (ok || !items.length) items.push({ separator: true });
-  if (ok) items.push({ label: 'Copy Image Content', run: () => void copyImageContent(img, abs, host.platform.writeClipboardImage).then((done) => host.notify(done ? 'Image copied.' : 'Could not copy the image.', done ? 'success' : 'error')) });
-  if (!ok) items.splice(0, items.length - 1); // error image: only the reveal item survives before zoom
+  if (ok) items.push({ separator: true });
+  if (ok) items.push({ label: 'Copy Image Content', run: () => void copyImageContent(img, abs, native.writeClipboardImage).then((done) => host.notify(done ? 'Image copied.' : 'Could not copy the image.', done ? 'success' : 'error')) });
   items.push(
     { label: 'Zoom Image', run: zoomMenu },
     { label: html ? 'Switch Image Syntax › Markdown Style' : 'Switch Image Syntax › HTML Style', run: () => void t.switchSyntax(r, html ? 'markdown' : 'html') },
@@ -133,11 +135,8 @@ export function moveImageDialog(host: ImageMenuHost, r: Located): Promise<void> 
     .then(() => undefined);
 }
 
-/**
- * "Save %@ As…" (#138): local file bytes (or a fetched remote) written through
- * the platform's binary export.
- */
-export async function saveMediaAs(host: { platform: ImageMenuHost['platform']; notify: ImageMenuHost['notify'] }, abs: string | null, src: string, kind: 'Image' | 'Video'): Promise<void> {
+/** "Save %@ As…" (#138): local file bytes (or a fetched remote) written through the platform's binary export. */
+export async function saveMediaAs(host: Pick<ImageMenuHost, 'platform' | 'notify'>, abs: string | null, src: string, kind: 'Image' | 'Video'): Promise<void> {
   const p = host.platform;
   const ex = extras(p);
   try {

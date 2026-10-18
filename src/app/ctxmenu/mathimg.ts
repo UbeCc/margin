@@ -1,3 +1,7 @@
+import type { Platform } from '../../contracts';
+import { renderTex } from '../../editor/blocks/math';
+import { extras } from '../platform-extras';
+
 /**
  * KaTeX → PNG rasterizer (#138): "Save Math As…" and inline "Copy as Image".
  *
@@ -108,4 +112,25 @@ export async function katexPng(el: Element): Promise<Uint8Array | null> {
   } catch {
     return null;
   }
+}
+
+/** Rasterize TeX source: rendered offscreen with KaTeX, then PNG bytes (#138, shared with `math:copyImage`). */
+export async function rasterizeMathPng(tex: string, display: boolean): Promise<Uint8Array | null> {
+  const holder = document.createElement('div');
+  holder.style.cssText = 'position:fixed;left:-99999px;top:0;';
+  holder.innerHTML = renderTex(tex, display);
+  document.body.append(holder);
+  try {
+    return await katexPng(holder.firstElementChild!);
+  } finally {
+    holder.remove();
+  }
+}
+
+/** "Save Math As…": rasterize the rendered math and write it through the platform's binary export. */
+export async function saveMathAs(platform: Platform, el: Element): Promise<void> {
+  const bytes = await katexPng(el);
+  if (!bytes) throw new Error('rasterization failed');
+  const out = await platform.saveFileDialog({ defaultPath: 'math.png', filters: [{ name: 'PNG', extensions: ['png'] }] });
+  if (out) await extras(platform).exportBinary!(bytes, out);
 }
