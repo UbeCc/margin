@@ -41,6 +41,10 @@ export interface EditorSettings {
   assetKey?: string;
   /** Optional (#79): add native rich flavours (RTF) after a copy; see `RichClipboardData`. */
   writeClipboardRich?(data: RichClipboardData): Promise<boolean>;
+  /** Optional (#116): overwrite the pasteboard directly when the engine refuses execCommand copy. */
+  writeClipboardNative?(data: NativeClipboardData): Promise<boolean>;
+  /** #115: the document's file URL (WebArchive base); `untitled.md` when unsaved. */
+  docUrl?: string | null;
   /** Optional (#96): read the system clipboard outside a paste event (native menu Paste as Plain Text). */
   readClipboard?(): Promise<ClipboardSnapshot | null>;
   /** Optional (#127): rasterize TeX and write it to the clipboard as a PNG (Copy Math ▸ Copy as Image). */
@@ -463,6 +467,8 @@ export interface Platform {
   writeClipboardRich?(data: RichClipboardData): Promise<boolean>;
   /** Optional (#96, macOS): plain/HTML of the general pasteboard, plus HTML converted from RTF/RTFD. */
   readClipboard?(): Promise<ClipboardSnapshot | null>;
+  /** Optional (#116, macOS): overwrite the pasteboard directly (Copy as … without a webview copy event). */
+  writeClipboardNative?(data: NativeClipboardData): Promise<boolean>;
 }
 
 /** System clipboard contents read natively (#96); null fields = flavour absent. */
@@ -484,6 +490,23 @@ export interface RichClipboardData {
   rtf: string;
   markdown: string;
   marker: string;
+  /** #115: document file URL — base of the `com.apple.webarchive` flavour; `untitled.md` when unsaved. */
+  baseUrl?: string;
+}
+
+/**
+ * #116 direct native pasteboard write (Typora `clipboard.write` with shouldClear):
+ * used for Copy as … when WKWebView refuses `execCommand('copy')` (no user
+ * activation behind a native menu item). Null fields keep that flavour off.
+ */
+export interface NativeClipboardData {
+  plain: string;
+  html?: string;
+  /** Private markdown flavour (`net.daringfireball.markdown`). */
+  markdown?: string;
+  rtf?: string;
+  /** #115: WebArchive base; `untitled.md` when empty. */
+  baseUrl?: string;
 }
 
 /** #80 image uploader config passed to `Platform.uploadImages`. timeoutSecs is per image. */

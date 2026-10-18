@@ -72,7 +72,7 @@ export function onCopy(ed: EditorCore, e: ClipboardEvent, cut: boolean): void {
   const nonce = rich ? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}` : undefined;
   const flavors = buildCopyFlavors(sel.md, html, nonce);
   writeFlavors(e.clipboardData, flavors);
-  if (rich && nonce) scheduleRich(rich, flavors, html, nonce);
+  if (rich && nonce) scheduleRich(rich, flavors, html, nonce, ed.settings.docUrl ?? undefined);
   if (cut) ed.replaceRange(sel.from, sel.to, '', null);
 }
 
@@ -83,7 +83,7 @@ type RichWriter = NonNullable<EditorCore['settings']['writeClipboardRich']>;
  * pasteboard then), add RTF natively. The native side waits for the nonce to
  * appear in public.html before appending, so it never clobbers a newer copy.
  */
-function scheduleRich(rich: RichWriter, f: CopyFlavors, renderedHtml: string, nonce: string): void {
+function scheduleRich(rich: RichWriter, f: CopyFlavors, renderedHtml: string, nonce: string, baseUrl?: string): void {
   setTimeout(() => {
     let rtf: string;
     try {
@@ -91,7 +91,7 @@ function scheduleRich(rich: RichWriter, f: CopyFlavors, renderedHtml: string, no
     } catch {
       return;
     }
-    rich({ plain: f.plain, html: f.html, rtf, markdown: f.markdown, marker: nonce }).catch(() => undefined);
+    rich({ plain: f.plain, html: f.html, rtf, markdown: f.markdown, marker: nonce, ...(baseUrl ? { baseUrl } : {}) }).catch(() => undefined);
   }, 0);
 }
 
@@ -107,6 +107,43 @@ async function storeFiles(ed: EditorCore, files: File[]): Promise<string[]> {
     } else src = URL.createObjectURL(f);
     if (src && /^(?:!\[|<img\b)/i.test(src)) out.push(src); // #99: complete snippet from the shell
     else if (src) out.push(`![${f.name.replace(/\.[^.]+$/, '').replace(/[[\]]/g, '')}](${src.replace(/ /g, '%20')})`);
+  }
+  return out;
+}
+
+/** #114: RTFD attachment images arrive as `data:` URIs; hold their place with a token while converting. */
+export function extractDataImages(html: string): { html: string; imgs: { alt: string; mime: string; b64: string }[] } {
+  const imgs: { alt: string; mime: string; b64: string }[] = [];
+  const out = html.replace(/<img\b[^>]*>/gi, (tag) => {
+    const m = /\bsrc="data:(image\/[\w.+-]+);base64,([^"]*)"/i.exec(tag);
+    if (!m) return tag;
+    const alt = (/\balt="([^"]*)"/i.exec(tag)?.[1] ?? '').replace(/"/g, '');
+    imgs.push({ alt, mime: m[1], b64: m[2] });
+    return `\u2063${imgs.length - 1}\u2063`;
+  });
+  return { html: out, imgs };
+}
+
+/** Store each held image through the image rule (storeImage) and return markdown snippets. */
+export async function storeDataImages(
+  ed: EditorCore,
+  imgs: { alt: string; mime: string; b64: string }[],
+): Promise<string[]> {
+  const out: string[] = [];
+  for (const { alt, mime, b64 } of imgs) {
+    const ext = mime === 'image/jpeg' ? 'jpg' : mime === 'image/svg+xml' ? 'svg' : mime.split('/')[1];
+    const name = `${alt.replace(/[[\]]/g, '').replace(/\.[^.]*$/, '') || 'image'}.${ext}`;
+    let src: string | null = null;
+    if (ed.settings.storeImage) {
+      try {
+        const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+        src = await ed.settings.storeImage({ bytes, mime, name });
+      } catch {
+        src = null;
+      }
+    }
+    if (!src) src = `data:${mime};base64,${b64}`; // web fallback: keep the inline image
+    out.push(/^(?:!\[|<img\b)/i.test(src) ? src : `![${alt.replace(/[[\]]/g, '')}](${src.replace(/ /g, '%20')})`);
   }
   return out;
 }
@@ -185,13 +222,18 @@ export function onPaste(ed: EditorCore, e: ClipboardEvent, plain = false): void 
     void ed.settings
       .readClipboard()
       .catch(() => null)
-      .then((s) => {
+      .then(async (s) => {
         let out = plain;
-        if (s?.rtfHtml && !s.html) {
+        const rtf = s?.rtfHtml && !s.html ? extractDataImages(s.rtfHtml) : null;
+        if (rtf) {
           try {
-            out = htmlToMarkdown(s.rtfHtml) || plain;
+            out = htmlToMarkdown(rtf.html) || plain;
           } catch {
             out = plain;
+          }
+          if (rtf.imgs.length) {
+            const snips = await storeDataImages(ed, rtf.imgs);
+            out = out.replace(/\u2063(\d+)\u2063/g, (_, i) => snips[+i] ?? '');
           }
         }
         out = out.replace(/\r\n?/g, ed.doc.eol);

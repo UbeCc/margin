@@ -41,7 +41,7 @@ import { debounce, h } from './util/dom';
 import { fuzzyFilter, fuzzyMatch } from './util/fuzzy';
 import { formatShortcut, isMac } from './util/keymap';
 import { matchShortcut as nativeShortcut } from '../platform/shortcuts';
-import { basename, dirname, displayPath, isAbsolute, isInside, isMarkdownPath, isUrlLike, relative, relativeFrom, resolveDocPath, stripExt } from './util/path';
+import { basename, dirname, displayPath, fileUrl, isAbsolute, isInside, isMarkdownPath, isUrlLike, relative, relativeFrom, resolveDocPath, stripExt } from './util/path';
 
 const ZOOM_STEPS = [0.5, 0.67, 0.75, 0.8, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2, 2.5, 3];
 
@@ -266,7 +266,7 @@ export class App {
       notify: (m, k) => void toast(m, { kind: k }),
       autoSave: () => ({ enabled: this.settings.autoSave, delay: this.settings.autoSaveDelay }),
       imageRule: () => this.settings.imageRule,
-      willLoad: (p) => tab.editor.updateSettings({ baseDir: p ? dirname(p) : null }),
+      willLoad: (p) => tab.editor.updateSettings({ baseDir: p ? dirname(p) : null, docUrl: fileUrl(p) }),
       onState: (s) => {
         if (this.docs.active === tab) this.onDocState(s);
         this.renderTabs();
@@ -371,6 +371,8 @@ export class App {
       resolveAsset: (src) => this.resolveAsset(src, tab),
       storeImage: (input) => this.storeImage(input),
       openLink: (href) => void this.openLink(href),
+      ...(this.platform.writeClipboardNative ? { writeClipboardNative: (d) => this.platform.writeClipboardNative!(d) } : {}),
+      docUrl: fileUrl(tab?.doc?.path),
       ...(this.platform.writeClipboardRich ? { writeClipboardRich: (d) => this.platform.writeClipboardRich!(d) } : {}),
       // #127 Copy Math ▸ Copy as Image: rasterize KaTeX → PNG on the clipboard.
       copyMathImage: async (tex, display) => {

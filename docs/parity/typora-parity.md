@@ -9,14 +9,14 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 | | surfaces |
 |---|---|
 | total | 172 |
-| owned (implemented) | 146 (with a named passing test: 133) |
-| partial | 10 |
+| owned (implemented) | 147 (with a named passing test: 134) |
+| partial | 9 |
 | missing | 8 |
 | out of scope | 8 |
 
-REA ledger `rol_0593c8c93705c46bcf1a8fdf0aba12b7fd79ce450269726e3ef876b0980121f3` (closure `5b3f8e28be7039e8…`): status **unknown**; unowned 8, implemented 156, out-of-scope 8, unknown 5.
+REA ledger `rol_7190eb5a99d26274644c43f6b3a634782fd0cbc3907f4c9034bc4f3ca2e75744` (closure `2b6755140643efc5…`): status **unknown**; unowned 8, implemented 156, out-of-scope 8, unknown 5.
 
-REA coverage boundary `margin.typora-parity`: status **unknown**; 133/164 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 8, package-proof-missing 1, verifier-missing 24, verifier-unknown 7.
+REA coverage boundary `margin.typora-parity`: status **unknown**; 134/164 claims qualified by controlled-replay verifier Evidence. Reasons: owner-missing 8, package-proof-missing 1, verifier-missing 24, verifier-unknown 6.
 
 Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): build exit 0, cargo-test exit 0, independence exit 0, playwright exit 0, vitest exit 0. See `rea/summary.json`.
 
@@ -35,7 +35,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `core-cmds` Paragraph & Format menu commands (headings, inline styles, insert/convert blocks) | P0 | 0 |
 | `files` File lifecycle: tabs/windows, recent, duplicate/move/rename, encoding, versions, recovery | P0 | 0 |
 | `export` Export, import & print: image/Pandoc/custom formats, export settings, export-with-previous | P0 | 0 |
-| `clipboard` Clipboard & selection: copy-as / paste-as, selection & delete scopes, jump-to | P0 | 2 |
+| `clipboard` Clipboard & selection: copy-as / paste-as, selection & delete scopes, jump-to | P0 | 1 |
 | `ctx` Editor & sidebar context menus (text, link, table, image, code, math, diagram, outline, files) | P1 | 3 |
 | `tools` Table, code-fence and math tools | P1 | 1 |
 | `images` Image pipeline: insert-local, copy/move/upload, zoom, syntax switch, image root path | P1 | 0 |
@@ -88,8 +88,8 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `menu.edit.delete-select-all` | Edit › Delete / Select All | owned |  | `src/editor/core/commands.ts` `case 'selectAll'` | `tests/e2e/blocks-core.spec.ts` › Cmd/Ctrl+A in a table cell selects the cell | 2 |
 | `menu.edit.find-replace` | Edit › Find / Find Next / Previous / Replace / Replace Next | owned |  | `src/app/findbar.ts` `caseSensitive` | `tests/e2e/app-navigation.spec.ts` › find keeps focus in the bar, counts and cycles matches | 15 |
 | `menu.edit.find-options` | Find options: whole word and regular expression — Match Case / Whole Word / Regular Expression ($1 replacement) done; no In Selection | **partial** | P1 | `src/editor/core/query.ts` `export function compileQuery` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.find-options: Find options: whole word and regular expression | 3 |
-| `menu.edit.copy-as` | Edit › Copy as Markdown / HTML Code / Plain Text / without Theme Styling / to MS Word | owned |  | `src/editor/core/copy-as.ts` `export function copyAs` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.copy-as: Edit › Copy as Markdown / HTML Code / Plain Text / without Theme Styling / to MS Word | 11 |
-| `menu.edit.paste-plain` | Edit › Paste as Plain Text | owned |  | `src/editor/core/copy-as.ts` `export function pastePlain` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.paste-plain: Edit › Paste as Plain Text | 2 |
+| `menu.edit.copy-as` | Edit › Copy as Markdown / HTML Code / Plain Text / without Theme Styling / to MS Word — source mode: every variant copies the selected source text (#116); WKWebView execCommand refusal falls back to clipboard_write_payload | owned |  | `src/editor/core/copy-as.ts` `export function copyAs` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.copy-as: Edit › Copy as Markdown / HTML Code / Plain Text / without Theme Styling / to MS Word | 11 |
+| `menu.edit.paste-plain` | Edit › Paste as Plain Text — source mode: the system plain paste — native read + replaceSelection (#116) | owned |  | `src/editor/core/copy-as.ts` `export function pastePlain` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.paste-plain: Edit › Paste as Plain Text | 2 |
 | `menu.edit.select-scopes` | Edit › Selection: Select Word / Line-Sentence / Paragraph-Block / Styled Scope | owned |  | `src/editor/core/scopes.ts` `export function selectScope` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.select-scopes: Edit › Selection | 5 |
 | `menu.edit.delete-scopes` | Edit › Delete Word / Line-Sentence / Paragraph-Block / Styled Scope / Range | owned |  | `src/editor/core/scopes.ts` `export function deleteScope` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.delete-scopes: Edit › Delete Word | 5 |
 | `menu.edit.jump` | Edit › Jump To: Top / Bottom / Selection | owned |  | `src/editor/core/scopes.ts` `export function jumpTo` | `tests/e2e/parity-clipboard.spec.ts` › menu.edit.jump: Edit › Jump To: Top / Bottom / Selection | 4 |
@@ -327,8 +327,8 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | id | surface | status | prio | owner | verifier | spec items |
 |---|---|---|---|---|---|---|
 | `beh.clip.paste-priority` | Paste priority: private lossless > HTML > files > image > text; HTML→markdown; markdown heuristic | owned |  | `src/editor/core/paste.ts` `export function htmlToMarkdown` | `tests/e2e/core-qa.spec.ts` › paste Google Docs HTML and markdown blocks mid-paragraph | 0 |
-| `beh.clip.rich-copy` | Rich copy writes plain + HTML + RTF + private format — RTF on macOS via clipboard_write_rich (#79); RTFD / webarchive flavours not written | owned |  | `src/editor/core/clipboard.ts` `export function onCopy` | `tests/e2e/parity-clipboard.spec.ts` › beh.clip.rich-copy: Rich copy writes plain + HTML + RTF + private format | 0 |
-| `beh.clip.rtf-paste` | Paste RTF/RTFD from rich apps (attachments materialized) — RTF/RTFD text+formatting converted natively (NSAttributedString, macOS); RTFD image attachments not materialized | **partial** | P2 | `src-tauri/src/clipboard_read.rs` `pub fn rtf_to_html` | `tests/e2e/parity-clipboard.spec.ts` › beh.clip.rtf-paste: Paste RTF/RTFD from rich apps | 0 |
+| `beh.clip.rich-copy` | Rich copy writes plain + HTML + RTF + RTFD + WebArchive (doc URL base) + private format — postCopy order (webarchive → RTFD → RTF) via clipboard_write_rich with the document file URL as base, untitled.md default (#79 #115); no-WebKit fallback writes every flavour itself | owned |  | `src/editor/core/clipboard.ts` `export function onCopy` | `tests/e2e/parity-clipboard.spec.ts` › beh.clip.rich-copy: Rich copy writes plain + HTML + RTF + private format | 0 |
+| `beh.clip.rtf-paste` | Paste RTF/RTFD from rich apps (attachments materialized) — RTF/RTFD text+formatting converted natively (NSAttributedString, macOS); RTFD image attachments materialized as data: URIs and stored through the image rule (#114) | owned |  | `src-tauri/src/clipboard_read.rs` `pub fn rtf_to_html` | `tests/e2e/parity-clipboard.spec.ts` › beh.clip.rtf-paste: Paste RTF/RTFD from rich apps | 0 |
 
 ## Generic UI
 

@@ -1,7 +1,7 @@
 import { convertFileSrc, invoke } from '@tauri-apps/api/core';
 import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
-import type { FileDrop, AppSettings, DirEntry, FsEvent, ImageRule, MenuAction, PdfExportOptions, Platform, RichClipboardData, ClipboardSnapshot, UploadConfig } from '../contracts';
+import type { FileDrop, AppSettings, DirEntry, FsEvent, ImageRule, MenuAction, PdfExportOptions, Platform, RichClipboardData, NativeClipboardData, ClipboardSnapshot, UploadConfig } from '../contracts';
 import { builtinThemes, normalizeSettings, printHtmlInIframe, withPrintPageCss } from './common';
 
 /** Event names emitted by `src-tauri/src/lib.rs`. */
@@ -280,6 +280,11 @@ export class TauriPlatform implements Platform {
     return call<boolean>('clipboard_write_image', { path });
   }
 
+
+  /** #116: overwrite the pasteboard with the given flavours (Copy as … without a copy event). */
+  writeClipboardNative(data: NativeClipboardData): Promise<boolean> {
+    return call<boolean>('clipboard_write_payload', { data });
+  }
 
   /** #96: general pasteboard plain/HTML (+ HTML from RTF); empty off macOS. */
   async readClipboard(): Promise<ClipboardSnapshot | null> {

@@ -1,0 +1,67 @@
+{
+  "ok": false,
+  "total_seconds": 293,
+  "cache": [
+    "e2e port: 39621",
+    "node_modules: hit (lock 975215959a357a01)",
+    "cargo debug target: warm",
+    "cargo release target: warm"
+  ],
+  "stages": [
+    {
+      "stage": "npm_ci",
+      "status": "pass",
+      "seconds": 0,
+      "notes": ""
+    },
+    {
+      "stage": "typecheck",
+      "status": "pass",
+      "seconds": 3,
+      "notes": ""
+    },
+    {
+      "stage": "vitest",
+      "status": "pass",
+      "seconds": 3,
+      "notes": "606/606 tests"
+    },
+    {
+      "stage": "e2e",
+      "status": "fail",
+      "seconds": 129,
+      "notes": "chromium 207/208, webkit 204/208, **1 failed**",
+      "tail": "        - retrying click action\n          - waiting 100ms\n        54 × waiting for element to be visible, enabled and stable\n           - element is visible, enabled and stable\n           - scrolling into view if needed\n           - done scrolling\n           - performing click action\n           - <div class=\"md-content\">…</div> intercepts pointer events\n         - retrying click action\n           - waiting 500ms\n        - waiting for element to be visible, enabled and stable\n      37 | const settings = (page: Page, p: object) => page.evaluate((x) => (window as unknown as Win).__margin.updateSettings(x), p);\n      38 | const exists = (page: Page, p: string) => page.evaluate(async (x) => !!(await (window as unknown as Win).__MARGIN_WEB__.stat(x)), p);\n    > 39 | const rightClickImage = (page: Page, i = 0) => page.locator('.md-editor .md-image img.md-img, .md-editor .mb-html-block img').nth(i).click({ button: 'right' });\n         |                                                                                                                                      ^\n      40 | const ctxItem = (page: Page, label: string | RegExp) => page.locator('.context-item', { hasText: label });\n      41 |\n      42 | test.beforeEach(async ({ page }) => {\n        at rightClickImage (/ci/work/tests/e2e/parity-images.spec.ts:39:134)\n        at /ci/work/tests/e2e/parity-images.spec.ts:159:9\n    Error Context: test-results/parity-images-images-delet-9db1a-Delete-Image-File-undoable--webkit-retry1/error-context.md\n    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────\n    test-results/parity-images-images-delet-9db1a-Delete-Image-File-undoable--webkit-retry1/trace.zip\n    Usage:\n        npx playwright show-trace test-results/parity-images-images-delet-9db1a-Delete-Image-File-undoable--webkit-retry1/trace.zip\n    ────────────────────────────────────────────────────────────────────────────────────────────────\n  1 failed\n    [webkit] › tests/e2e/parity-images.spec.ts:157:1 › images.delete: Image context: Delete Image / Delete Image File (undoable) \n  4 skipped\n  411 passed (2.1m)"
+    },
+    {
+      "stage": "cargo_test",
+      "status": "pass",
+      "seconds": 18,
+      "notes": "161 passed, 0 failed / 0 passed, 0 failed / 0 passed, 0 failed"
+    },
+    {
+      "stage": "clippy",
+      "status": "pass",
+      "seconds": 27,
+      "notes": "clean"
+    },
+    {
+      "stage": "bundle",
+      "status": "pass",
+      "seconds": 205,
+      "notes": "Margin_0.1.0_amd64.AppImage (81.4 MB), Margin_0.1.0_amd64.deb (6.4 MB)"
+    },
+    {
+      "stage": "smoke",
+      "status": "pass",
+      "seconds": 11,
+      "notes": "window ok, screenshot stddev 0.377855"
+    },
+    {
+      "stage": "native_qa",
+      "status": "pass",
+      "seconds": 32,
+      "notes": "11/13 pass"
+    }
+  ]
+}

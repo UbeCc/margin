@@ -44,6 +44,6 @@ export function copyBlock(ed: EditorCore, part: 'source' | 'content'): boolean {
   if (text === null) return false;
   const p = { 'text/plain': text };
   lastCopyAs.set(ed, p);
-  void writePayload(p);
+  void writePayload(p, ed.settings);
   return true;
 }
