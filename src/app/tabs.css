@@ -47,7 +47,7 @@
   opacity: 0.55;
   cursor: pointer;
 }
-.tab-close { visibility: hidden; }
-.tab:hover .tab-close, .tab[aria-selected='true'] .tab-close { visibility: visible; }
+.tab-close { opacity: 0; }
+.tab:hover .tab-close, .tab[aria-selected='true'] .tab-close { opacity: 0.55; }
 .tab-close:hover, .tab-new:hover { opacity: 1; background: var(--margin-active); }
 .tab-new { width: 30px; height: 100%; border-radius: 0; font-size: 17px; }

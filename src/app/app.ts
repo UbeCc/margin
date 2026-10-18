@@ -216,6 +216,8 @@ export class App {
     this.tree = new FileTree({
       platform: this.platform,
       openFile: (p) => void this.docs.openPath(p, 'replace'),
+      openInNewTab: (p) => void this.docs.openPath(p, 'tab'),
+      openInNewWindow: (p) => void this.newWindow(p),
       onRenamed: (from, to) => {
         this.doc.renamed(from, to);
         this.settings.recentFiles = this.settings.recentFiles.map((r) => (isInside(from, r) ? to + r.slice(from.length) : r));
