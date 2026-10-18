@@ -2118,6 +2118,7 @@ version = "0.1.0"
 dependencies = [
  "block2",
  "chrono",
+ "flate2",
  "gtk",
  "ignore",
  "libc",

@@ -134,9 +134,22 @@ async fn run(
     let _ = std::fs::remove_file(out);
     print_op(win, &file_url(out), paper)?;
     if out.metadata().map(|m| m.len() > 0).unwrap_or(false) {
+        repair_tounicode(out);
         Ok(())
     } else {
         Err("WebKitGTK produced an empty PDF".into())
+    }
+}
+
+/// cairo's font subsetting maps CJK glyphs to their radical-codepoint
+/// lookalikes (#166); rewrite the ToUnicode CMaps in place. Best effort — a
+/// failed repair still leaves a readable, printable PDF.
+fn repair_tounicode(out: &Path) {
+    let Ok(bytes) = std::fs::read(out) else { return };
+    if let Some(fixed) = crate::pdf_tounicode::repair_radical_tounicode(&bytes) {
+        if let Err(e) = std::fs::write(out, fixed) {
+            log::warn!("ToUnicode repair could not rewrite {}: {e}", out.display());
+        }
     }
 }
 
