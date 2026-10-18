@@ -3,7 +3,7 @@ import { h } from '../util/dom';
 /** Generic modal shell: backdrop + centered card. Escape / backdrop click → onDismiss. */
 export function openModal(
   content: HTMLElement,
-  opts: { className?: string; onDismiss?: () => void; label?: string } = {},
+  opts: { className?: string; onDismiss?: () => void; label?: string; /** false: Escape / backdrop clicks do nothing. */ dismissable?: boolean } = {},
 ): { close(): void; root: HTMLElement } {
   const prevFocus = document.activeElement as HTMLElement | null;
   const card = h('div.modal-card', { role: 'dialog', 'aria-modal': 'true', 'aria-label': opts.label ?? null }, content);
@@ -21,6 +21,7 @@ export function openModal(
     if (e.key === 'Escape') {
       e.preventDefault();
       e.stopPropagation();
+      if (opts.dismissable === false) return;
       close();
       opts.onDismiss?.();
     } else if (e.key === 'Tab') {
@@ -36,7 +37,7 @@ export function openModal(
     }
   };
   root.addEventListener('mousedown', (e) => {
-    if (e.target === root) {
+    if (e.target === root && opts.dismissable !== false) {
       close();
       opts.onDismiss?.();
     }
