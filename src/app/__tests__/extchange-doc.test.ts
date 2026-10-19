@@ -38,6 +38,20 @@ function fakeEditor(): EditorHandle & { type(s: string): void; set(s: string): v
 
 const wait = (ms = 120) => new Promise((r) => setTimeout(r, ms));
 
+/** Poll `cond` until truthy, bounded by `timeoutMs` — load-robust replacement
+ *  for fixed sleeps before state assertions. */
+async function waitUntil(
+  cond: () => boolean | Promise<boolean>,
+  timeoutMs = 5000,
+  stepMs = 10,
+): Promise<void> {
+  const deadline = Date.now() + timeoutMs;
+  while (!(await cond())) {
+    if (Date.now() > deadline) throw new Error(`waitUntil: condition not met within ${timeoutMs}ms`);
+    await wait(stepMs);
+  }
+}
+
 describe('hashText', () => {
   it('is stable and distinguishes content', () => {
     expect(hashText('abc')).toBe(hashText('abc'));
@@ -82,7 +96,7 @@ describe('external change prompt (#82)', () => {
   it('dirty: non-blocking prompt; keep mine stays dirty and does not re-prompt for the same disk version', async () => {
     editor.type('mine');
     platform.externalWrite('/n/a.md', '# Disk\n');
-    await wait();
+    await waitUntil(() => Boolean(last()));
     expect(host.askReloadDirty).not.toHaveBeenCalled();
     const c = last()!;
     expect(c.disk).toBe('# Disk\n');
@@ -106,7 +120,7 @@ describe('external change prompt (#82)', () => {
   it('load disk replaces the buffer and the returned undo restores it', async () => {
     editor.type('mine');
     platform.externalWrite('/n/a.md', '# Disk\n');
-    await wait();
+    await waitUntil(() => Boolean(last()));
     const undo = last()!.loadDisk();
     expect(editor.getMarkdown()).toBe('# Disk\n');
     expect(doc.dirty).toBe(false);
@@ -123,7 +137,7 @@ describe('external change prompt (#82)', () => {
     platform.externalWrite('/n/a.md', 'one\n');
     platform.externalWrite('/n/a.md', 'two\n');
     platform.externalWrite('/n/a.md', 'three\n');
-    await wait();
+    await waitUntil(() => shown.filter(Boolean).length >= 1 && last()!.disk === 'three\n');
     expect(shown.filter(Boolean)).toHaveLength(1);
     expect(last()!.disk).toBe('three\n');
   });
@@ -131,9 +145,9 @@ describe('external change prompt (#82)', () => {
   it('a newer disk version while prompting updates the prompt', async () => {
     editor.type('mine');
     platform.externalWrite('/n/a.md', 'one\n');
-    await wait();
+    await waitUntil(() => Boolean(last()) && last()!.disk === 'one\n');
     platform.externalWrite('/n/a.md', 'two\n');
-    await wait();
+    await waitUntil(() => Boolean(last()) && last()!.disk === 'two\n');
     expect(shown.filter(Boolean).map((c) => c!.disk)).toEqual(['one\n', 'two\n']);
     shown[0]!.keepMine(); // stale
     expect(doc.dirty).toBe(true);
@@ -143,7 +157,7 @@ describe('external change prompt (#82)', () => {
 
   it('clean doc reloads silently', async () => {
     platform.externalWrite('/n/a.md', '# Clean reload\n');
-    await wait();
+    await waitUntil(() => editor.getMarkdown() === '# Clean reload\n');
     expect(editor.getMarkdown()).toBe('# Clean reload\n');
     expect(shown).toEqual([]);
   });
@@ -160,9 +174,9 @@ describe('external change prompt (#82)', () => {
   it('deleted on disk while prompting: hides the prompt, notifies, stays dirty', async () => {
     editor.type('mine');
     platform.externalWrite('/n/a.md', '# Disk\n');
-    await wait();
+    await waitUntil(() => Boolean(last()));
     platform.externalRemove('/n/a.md');
-    await wait();
+    await waitUntil(() => last() === null && doc.missing === true);
     expect(last()).toBeNull();
     expect(doc.missing).toBe(true);
     expect(doc.dirty).toBe(true);
@@ -172,9 +186,9 @@ describe('external change prompt (#82)', () => {
   it('undoing edits back to the baseline while prompting takes the disk version', async () => {
     editor.type('mine');
     platform.externalWrite('/n/a.md', '# Disk\n');
-    await wait();
+    await waitUntil(() => Boolean(last()));
     editor.set('# A\n');
-    await wait(200);
+    await waitUntil(() => editor.getMarkdown() === '# Disk\n' && last() === null);
     expect(editor.getMarkdown()).toBe('# Disk\n');
     expect(last()).toBeNull();
   });
@@ -183,13 +197,20 @@ describe('external change prompt (#82)', () => {
     autoSave = true;
     editor.type('mine');
     platform.externalWrite('/n/a.md', '# Disk\n');
-    await wait();
+    // The prompt must be up before typing again: only then does the
+    // controller suppress auto-save.
+    await waitUntil(() => Boolean(last()));
     editor.type('!');
-    await wait(100);
+    // Auto-save (delay 30 ms) must stay suppressed while the prompt is
+    // undecided: hold well past the delay, failing the moment disk deviates.
+    for (const deadline = Date.now() + 400; Date.now() < deadline; ) {
+      expect(await platform.readTextFile('/n/a.md')).toBe('# Disk\n');
+      await wait(25);
+    }
     expect(await platform.readTextFile('/n/a.md')).toBe('# Disk\n');
     last()!.keepMine();
     editor.type('?');
-    await wait(100);
+    await waitUntil(async () => (await platform.readTextFile('/n/a.md')) === '# A\nmine!?\n');
     expect(await platform.readTextFile('/n/a.md')).toBe('# A\nmine!?\n');
   });
 });
