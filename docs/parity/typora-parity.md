@@ -13,8 +13,9 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 | partial | 0 |
 | missing | 0 |
 | out of scope | 8 |
+| of which Margin extensions (beyond Typora, not parity) | 1 |
 
-REA ledger `rol_772b3f0a635ea8e4c4a3dc152b60d46c9eb2acfabadc442ec75f91abae3e2d79` (closure `bdcfd53e3b95cccb…`): status **unknown**; implemented 166, out-of-scope 8, unknown 5.
+REA ledger `rol_412bd1efac321321af100cdfe95978fcacb7675557d2478fc23acb48cbf6cd0e` (closure `40ffa2e616c60e0b…`): status **unknown**; implemented 166, out-of-scope 8, unknown 5.
 
 REA coverage boundary `margin.typora-parity`: status **partial**; 153/166 claims qualified by controlled-replay verifier Evidence. Reasons: package-proof-missing 1, verifier-missing 13.
 
@@ -200,7 +201,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `tools.code.language` | Code fence language box + syntax highlight + copy button | owned |  | `src/editor/blocks/code-fence.ts` `mount` | `tests/e2e/blocks-widgets.spec.ts` › language box edits info string, copy button works | 4 |
 | `tools.code.indent-prettify` | Code tools: Auto Indent Selected/Whole Code, Prettify Source Code — Paragraph › Code Tools (Copy Code Content / Auto Indent); Prettify Source Code is the Table op; Shift+Tab pref not wired | owned |  | `src/editor/blocks/code-fence.ts` `command(op: string)` | `tests/e2e/parity-tools.spec.ts` › tools.code.indent-prettify: | 4 |
 | `tools.code.delete` | Code tools: Delete Code Block — deliberate fix: Typora requests "delete-fences" but its native table is keyed "deleteFences", so the item never shows on macOS; Margin shows it | owned |  | `src/app/ctxmenu/items.ts` `'Delete Code Block'` | `tests/e2e/parity-ctx.spec.ts` › tools.code.delete: | 3 |
-| `tools.code.line-numbers` | Code fences: line numbers, line wrap, indent size | owned |  | `src/editor/blocks/code-fence.ts` `private applyCodePrefs` | `tests/e2e/parity-prefs.spec.ts` › tools.code.line-numbers: Code fences: line numbers, line wrap, indent size | 8 |
+| `tools.code.line-numbers` | Code fences: line numbers, line wrap, indent size — Indent Size for Code defaults to 2 (macOS native injection pins unset codeIndentSize to 2; JS fallback 4 never applies), stored values kept (#170) | owned |  | `src/editor/blocks/code-fence.ts` `private applyCodePrefs` | `tests/e2e/parity-prefs.spec.ts` › tools.code.line-numbers: Code fences: line numbers, line wrap, indent size | 8 |
 
 ## Math tools
 
@@ -233,7 +234,7 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `images.reload` | Image Tools: Reload All Images | owned |  | `src/app/images/tools.ts` `reloadAll(root: HTMLElement)` | `tests/e2e/parity-images.spec.ts` › images.reload: Image Tools: Reload All Images | 1 |
 | `images.upload` | Image upload: custom command (argv) / PicGo; upload one / all local images; test uploader — DELIBERATE DEVIATION (security): the command is tokenized to argv and run without a shell (Typora runs bash -c with only backslash and double quote escaped, so $() or backticks in file names execute); success also needs exit status 0. Same as Typora: 20 s per image, 60 s batch cap (child killed), URL lines http(s)/ftp/file/host.tld scanned from the tail, last URL for one image, exactly n for a batch, Test Uploader needs exactly 2 URLs; upload-on-insert keeps the local image on failure; Cancel kills the run | owned |  | `src-tauri/src/upload.rs` `pub fn test_upload(` | `tests/e2e/parity-images.spec.ts` › images.upload: Image upload: custom command (argv) / PicGo; upload one / all local images; test uploader | 32 |
 | `images.ipic` | iPic uploader (third-party macOS app, private pasteboard protocol) — Proprietary third-party integration with an undocumented pasteboard protocol; command/PicGo uploaders cover the use case. | out-of-scope |  | — | none | 4 |
-| `images.textbundle` | TextBundle: opens as one document, images go to <bundle>/assets, rename guard — #157: .textbundle (spec v2, text.md v1 fallback) is a folder document — sidebar/quick-open list it as one file; relative image rules resolve from the bundle root so assets/ wins over typora-copy-images-to and the global default (§3.1); Markdown ↔ TextBundle renames are refused unless the file is empty (fe-sidebar §5 wording) | owned |  | `src/app/textbundle.ts` `export const RENAME_MD_TO_BUNDLE` | `tests/e2e/parity-images-r4.spec.ts` › images.textbundle: TextBundle opens as one document, images go to <bundle>/assets, rename guard | 0 |
+| `images.textbundle` | TextBundle: opens as one document, images go to <bundle>/assets, rename guard — **Margin extension (not parity):** Typora 1.5.12 on macOS never enables TextBundle (supportTextBundle is never injected; .textbundle is a plain folder there). Margin implements the shared front end rule: content = text.md, else first text.<supported ext>; info.json never validated; new bundles = text.md + assets/ + v2 info.json; no .textpack. Deliberate deviation: spec-v2 markdown.md is read as a last resort so v2 bundles from other apps open — #157: .textbundle is a folder document — sidebar/quick-open list it as one file; relative image rules resolve from the bundle root so assets/ wins over typora-copy-images-to and the global default (§3.1); Markdown ↔ TextBundle renames are refused unless the file is empty (fe-sidebar §5 wording) | owned (extension) |  | `src/app/textbundle.ts` `export const RENAME_MD_TO_BUNDLE` | `tests/e2e/parity-images-r4.spec.ts` › images.textbundle: TextBundle opens as one document, images go to <bundle>/assets, rename guard | 0 |
 
 ## Preferences
 

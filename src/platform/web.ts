@@ -157,7 +157,8 @@ export class WebPlatform implements Platform {
   private fileHandles = new Map<string, FsaFileHandle>();
   private dirHandles = new Map<string, FsaDirHandle>();
   private blobUrls = new Map<string, string>();
-  private edited = false;
+  /** Last `setDocumentEdited` value (native "edited" dot; read by e2e). */
+  edited = false;
   private keyListener: ((e: KeyboardEvent) => void) | null = null;
   private opts: Required<WebPlatformOptions>;
   /** Overridable dialog (e2e tests): return a path or null. */
@@ -733,7 +734,10 @@ export class WebPlatform implements Platform {
     this.quickLooked.push(normalizePath(path));
   }
 
+  /** Print requests, recorded for tests (the system dialog only opens outside automation). */
+  printed = 0;
   async print(): Promise<void> {
+    this.printed++;
     if (!navigatorIsAutomated()) window.print();
   }
 

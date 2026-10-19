@@ -2,22 +2,23 @@
  "generated_from": {
   "spec": "typora-re/parity-spec.md",
   "prose": "typora-re/sections/*.md",
-  "margin_head": "32dc42cdcb768377e5b5d85a2b5a696a21c2bbbc"
+  "margin_head": "1f453855832b84b34d54599bcec2314fc5a5df30"
  },
  "summary": {
-  "head": "32dc42cdcb768377e5b5d85a2b5a696a21c2bbbc",
-  "artifact_sha256": "920aba7ae0becbf5bb211b16be01909faf2204944a4578eaf1d7ea4f34f66075",
+  "head": "1f453855832b84b34d54599bcec2314fc5a5df30",
+  "artifact_sha256": "9defc713261d2907b25d2031428d8853c2c69696bfdad0a6670cf41f8a046d38",
   "inventory": {
    "total": 174,
    "owned": 166,
    "partial": 0,
    "missing": 0,
    "oos": 8,
-   "verified_by_test": 153
+   "verified_by_test": 153,
+   "margin_extensions": 1
   },
   "ledger": {
-   "ledger_id": "rol_772b3f0a635ea8e4c4a3dc152b60d46c9eb2acfabadc442ec75f91abae3e2d79",
-   "closure_digest": "bdcfd53e3b95cccb908fa87fc38184372e66f0fa768d05d29b658d6750facb72",
+   "ledger_id": "rol_412bd1efac321321af100cdfe95978fcacb7675557d2478fc23acb48cbf6cd0e",
+   "closure_digest": "40ffa2e616c60e0b373b48a731bf090b67ebd74a57b1f7fab15491b3d40e025d",
    "status": "unknown",
    "summary": {
     "total": 179,
@@ -119,7 +120,7 @@
      }
     ]
    },
-   "evidence_id": "ev_b60d816d4b9ac33c661e641c1721a995ec54c023e1771778b1039a633a52c52d"
+   "evidence_id": "ev_4603a52482542dc0462b32d08a0a108fe7687e2f7a349139b5ec4c56d5bd0236"
   },
   "coverage": {
    "status": "partial",
@@ -184,6 +185,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -222,6 +224,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -260,6 +263,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -301,6 +305,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -346,6 +351,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -387,6 +393,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -434,6 +441,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -481,6 +489,7 @@
     "prose": []
    },
    "note": "no accelerator: Typora lists none for opening a folder (native-commands.md §menus L235-259); the item is kept for the sidebar flow, former ⇧⌘O handed to Open Quickly (#161)",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -530,6 +539,7 @@
     ]
    },
    "note": "label \"Open Quickly…\" and accelerator ⇧⌘O match Typora (native-commands.md §menus L245, #161); Print took ⌘P and Page Setup ⇧⌘P (L258-259); deliberate search deviations from Typora (native-commands §3, #119): every file type is searchable (Markdown ranked first), extension and name matching are case-insensitive, query text is escaped, an empty/unindexed/stale Spotlight answer falls back to the walker, deleted entries are pruned",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -575,6 +585,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -613,6 +624,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -661,6 +673,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -702,6 +715,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -738,6 +752,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -776,6 +791,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -829,6 +845,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -868,6 +885,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -908,6 +926,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -946,6 +965,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -985,6 +1005,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -1030,6 +1051,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -1068,6 +1090,7 @@
     ]
    },
    "note": "accelerator ⇧⌘P matches Typora (native-commands.md §menus L258, #161)",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -1104,6 +1127,7 @@
     ]
    },
    "note": "accelerator ⌘P matches Typora (native-commands.md §menus L259, #161); freed from Quick Open",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -1144,6 +1168,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -1198,6 +1223,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -1243,6 +1269,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -1288,6 +1315,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -1325,6 +1353,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -1377,6 +1406,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -1415,6 +1445,7 @@
     "prose": []
    },
    "note": "Match Case / Whole Word / Regular Expression ($1 replacement) done; Typora 1.5.12 has no In Selection find scope — fe-sidebar-statusbar-find §85 (\"In Selection\" is only the word-count popover heading; margin gap #113)",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -1467,6 +1498,7 @@
     ]
    },
    "note": "source mode: every variant copies the selected source text (#116); WKWebView execCommand refusal falls back to clipboard_write_payload",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -1507,6 +1539,7 @@
     ]
    },
    "note": "source mode: the system plain paste — native read + replaceSelection (#116)",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -1547,6 +1580,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -1587,6 +1621,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -1626,6 +1661,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -1687,6 +1723,7 @@
     ]
    },
    "note": "#103: check-now/learn/unlearn/grammar per native-commands §5.2; autocorrect folds smartTextReplacement in (Typora pairs them)",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -1732,6 +1769,7 @@
     "prose": []
    },
    "note": "#103: en/em dash rules -- → – and --- → —, smart quotes/closing quotes after letters; toggles push to editors via updateSettings",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -1770,6 +1808,7 @@
     "prose": []
    },
    "note": "#103: speaks the selection (or the document when nothing is selected) via speechSynthesis; Stop cancels",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -1812,6 +1851,7 @@
     "prose": []
    },
    "note": "#103: system picker via insertText path; :emoji: autocomplete listens on capture-phase beforeinput and recomputes its trigger at accept time (editor batches DOM renders)",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -1856,6 +1896,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -1893,6 +1934,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -1939,6 +1981,7 @@
     ]
    },
    "note": "3 columns × 4 rows incl. header, remembers the last size, 1–40 cols / 1–99 rows (typora-re#4); inserts after the caret block instead of splitting the paragraph; no Touch Bar",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -1981,6 +2024,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -2024,6 +2068,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -2062,6 +2107,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -2105,6 +2151,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -2144,6 +2191,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -2184,6 +2232,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -2224,6 +2273,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -2263,6 +2313,7 @@
     "prose": []
    },
    "note": "inserts a [id]: url definition; no hover hint on undefined references yet",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -2301,6 +2352,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -2337,6 +2389,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -2377,6 +2430,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -2413,6 +2467,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -2459,6 +2514,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -2495,6 +2551,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -2531,6 +2588,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -2568,6 +2626,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -2604,6 +2663,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -2640,6 +2700,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -2676,6 +2737,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -2721,6 +2783,7 @@
     ]
    },
    "note": "full Format › Image submenu in Typora order (native menu + palette); per-image entries act on the image at the caret",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -2767,6 +2830,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -2811,6 +2875,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -2857,6 +2922,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -2877,7 +2943,7 @@
    "owner": {
     "path": "src/app/statusbar.ts",
     "anchor": "export class StatusBar",
-    "sha256": "25c97a6c0c2b83a43b3096333a6a8aa737edc7d18fd4800044ccd0d05542174d"
+    "sha256": "3bed2cdfe7d87d397162f8b46223cad84ef34bf637e7e8d5f714094e902a72be"
    },
    "verifier": {
     "file": "tests/e2e/parity-chrome.spec.ts",
@@ -2917,6 +2983,7 @@
     ]
    },
    "note": "#103: toggle hides the bar; \"Always Show Word Count\" keeps a floating count; popover lists words / reading time / lines / characters (+ In Selection); unit choice persists",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -2956,6 +3023,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -2989,6 +3057,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -3027,6 +3096,7 @@
     ]
    },
    "note": "#103: per window, never persisted; check mark follows state",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -3067,6 +3137,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -3103,6 +3174,7 @@
     "prose": []
    },
    "note": "#103/#134: preference-gated (Typora stores the inverse noMagnification)",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -3145,6 +3217,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -3177,6 +3250,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -3205,6 +3279,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": "Links to the vendor-hosted theme gallery; Margin documents user themes instead.",
    "rea_ledger_status": "out-of-scope",
    "rea_diagnostics": [
@@ -3241,6 +3316,7 @@
     "prose": []
    },
    "note": "#103: generic set_checked path; status bar / always-on-top / magnification / focus / typewriter items sync from app state",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -3275,6 +3351,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -3312,6 +3389,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -3345,6 +3423,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": "Vendor-specific web destinations; Margin points at its own repo.",
    "rea_ledger_status": "out-of-scope",
    "rea_diagnostics": [
@@ -3386,6 +3465,7 @@
     ]
    },
    "note": "in-app menu (no native NSMenu merge): key lists per target, actions bound to the right-clicked element",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -3406,7 +3486,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "label: 'Copy / Paste As…'",
-    "sha256": "d091fe8bb9d90820fcc2191b2b17f4dba727ff39c4d4ccf3b77178de7eae7458"
+    "sha256": "f68b9a3616bc03dc042705afe063dff4a10a3e7cfe2519520551fb32d2cc00f5"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -3428,6 +3508,7 @@
     ]
    },
    "note": "Cut/Copy/Paste + Copy / Paste As… + Search with Google; retained WebKit items per §1.2: Look Up “…” (dict: lookup), Spelling and Grammar ▸, Substitutions ▸, Speech ▸ with check state (input menus keep Speech, §6.3); engine spelling-suggestion lists are not exposed to JS — not reproduced",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -3448,7 +3529,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "label: 'Copy Link Address'",
-    "sha256": "d091fe8bb9d90820fcc2191b2b17f4dba727ff39c4d4ccf3b77178de7eae7458"
+    "sha256": "f68b9a3616bc03dc042705afe063dff4a10a3e7cfe2519520551fb32d2cc00f5"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -3471,6 +3552,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -3491,7 +3573,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "block('para:insertBefore', 'Insert Paragraph Before')",
-    "sha256": "d091fe8bb9d90820fcc2191b2b17f4dba727ff39c4d4ccf3b77178de7eae7458"
+    "sha256": "f68b9a3616bc03dc042705afe063dff4a10a3e7cfe2519520551fb32d2cc00f5"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -3519,6 +3601,7 @@
     ]
    },
    "note": "table/HTML/math/diagram/code/atomic lists; Save Math/Image As… not yet (gap)",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -3539,7 +3622,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "function copyMath",
-    "sha256": "d091fe8bb9d90820fcc2191b2b17f4dba727ff39c4d4ccf3b77178de7eae7458"
+    "sha256": "f68b9a3616bc03dc042705afe063dff4a10a3e7cfe2519520551fb32d2cc00f5"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -3562,6 +3645,7 @@
     ]
    },
    "note": ":smile: renders (EMOJI map); inline Copy as Image rasterizes the KaTeX node to PNG (mathimg.ts)",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -3606,6 +3690,7 @@
     ]
    },
    "note": "§1.2 video menu = system items | Save Video As…; no Play/Pause context items in Typora (spec A labels accounted, not shown); download-progress strings not reproduced",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -3650,6 +3735,7 @@
     ]
    },
    "note": "Paragraph › Table submenu + palette + toolbar; ⌘↩ / ⌘⇧⌫ stay cell keys",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -3694,6 +3780,7 @@
     ]
    },
    "note": "header row never moves; ⌘⌥ arrows in a cell",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -3737,6 +3824,7 @@
     ]
    },
    "note": "Width = columns, Height = rows incl. header (typora-re#4)",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -3779,6 +3867,7 @@
     ]
    },
    "note": "copy = markdown plain + bordered HTML; Prettify Source Code re-formats the table",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -3815,6 +3904,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -3857,6 +3947,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -3899,6 +3990,7 @@
     ]
    },
    "note": "Paragraph › Code Tools (Copy Code Content / Auto Indent); Prettify Source Code is the Table op; Shift+Tab pref not wired",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -3919,7 +4011,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "'Delete Code Block'",
-    "sha256": "d091fe8bb9d90820fcc2191b2b17f4dba727ff39c4d4ccf3b77178de7eae7458"
+    "sha256": "f68b9a3616bc03dc042705afe063dff4a10a3e7cfe2519520551fb32d2cc00f5"
    },
    "verifier": {
     "file": "tests/e2e/parity-ctx.spec.ts",
@@ -3939,6 +4031,7 @@
     ]
    },
    "note": "deliberate fix: Typora requests \"delete-fences\" but its native table is keyed \"deleteFences\", so the item never shows on macOS; Margin shows it",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -3979,9 +4072,13 @@
      "Preserve tabs"
     ],
     "bridge": [],
-    "prose": []
+    "prose": [
+     "native-windowcontroller §10",
+     "fe-preferences §4"
+    ]
    },
-   "note": null,
+   "note": "Indent Size for Code defaults to 2 (macOS native injection pins unset codeIndentSize to 2; JS fallback 4 never applies), stored values kept (#170)",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -4018,6 +4115,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -4063,6 +4161,7 @@
     ]
    },
    "note": "copy: block + inline; Delete Math: blocks only (typora-re#4); Copy as Image and Use LaTeX Source / Use Rendered SVG → #127",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -4099,6 +4198,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -4140,6 +4240,7 @@
     "prose": []
    },
    "note": "none (default) / AMS / all; physics = KaTeX macro subset; Apply Line Break at \\\\ and \\newline",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -4180,6 +4281,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -4200,7 +4302,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "math:copyImage",
-    "sha256": "d091fe8bb9d90820fcc2191b2b17f4dba727ff39c4d4ccf3b77178de7eae7458"
+    "sha256": "f68b9a3616bc03dc042705afe063dff4a10a3e7cfe2519520551fb32d2cc00f5"
    },
    "verifier": {
     "file": "tests/e2e/parity-tools.spec.ts",
@@ -4221,6 +4323,7 @@
     ]
    },
    "note": "#127: math block/inline Copy as Image rasterises the rendered KaTeX to the clipboard; Save as PNG writes beside the document",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -4275,6 +4378,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -4326,6 +4430,7 @@
     ]
    },
    "note": "front matter typora-copy-images-to (${filename}; upload/ipic gated by Allow upload…) overrides Preferences; scope toggles, relative / ./, escape, Preferred Image Syntax",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -4364,6 +4469,7 @@
     "prose": []
    },
    "note": "Use Image Root Path toggles typora-root-url (written relative to the document); srcs written site-root style and rendered from the root",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -4400,6 +4506,7 @@
     ]
    },
    "note": "downloaded natively (curl, with timeout) only when Apply above rules to online images is on (Typora default off)",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -4454,6 +4561,7 @@
     ]
    },
    "note": "duplicate names get Typora stem-<last 7 digits of unix seconds>.ext; Margin deviation: identical bytes reuse the existing copy and explicit names never clobber",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -4502,6 +4610,7 @@
     ]
    },
    "note": "Delete Image File moves the file to the Trash after confirmation; removing the reference is one undo step",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -4522,7 +4631,7 @@
    "owner": {
     "path": "src/app/ctxmenu/items.ts",
     "anchor": "Open Image Location",
-    "sha256": "d091fe8bb9d90820fcc2191b2b17f4dba727ff39c4d4ccf3b77178de7eae7458"
+    "sha256": "f68b9a3616bc03dc042705afe063dff4a10a3e7cfe2519520551fb32d2cc00f5"
    },
    "verifier": {
     "file": "tests/e2e/parity-images.spec.ts",
@@ -4543,6 +4652,7 @@
     "prose": []
    },
    "note": "Open Image in Browser only for remote images (desktop openExternal allows http(s) only)",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -4588,6 +4698,7 @@
     ]
    },
    "note": "presets 25–200%; direct \"Zoom Image to N%\" = explicit style zoom, else 100/pixel-ratio when the DPI hint ≠ 72 (ratio prefetched at render via images.getScale, #155); inline <img> renders as an image",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -4624,6 +4735,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -4695,6 +4807,7 @@
     ]
    },
    "note": "DELIBERATE DEVIATION (security): the command is tokenized to argv and run without a shell (Typora runs bash -c with only backslash and double quote escaped, so $() or backticks in file names execute); success also needs exit status 0. Same as Typora: 20 s per image, 60 s batch cap (child killed), URL lines http(s)/ftp/file/host.tld scanned from the tail, last URL for one image, exactly n for a batch, Test Uploader needs exactly 2 URLs; upload-on-insert keeps the local image on failure; Cancel kills the run",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -4730,6 +4843,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": "Proprietary third-party integration with an undocumented pasteboard protocol; command/PicGo uploaders cover the use case.",
    "rea_ledger_status": "out-of-scope",
    "rea_diagnostics": [
@@ -4750,7 +4864,7 @@
    "owner": {
     "path": "src/app/textbundle.ts",
     "anchor": "export const RENAME_MD_TO_BUNDLE",
-    "sha256": "49fd734ea503725b94481f76a0dfedc39179859b8f1b2c699841855865009de1"
+    "sha256": "08024945cb6445a2066de1eff625bbc1c117f423283d41afe0b406458cd0009d"
    },
    "verifier": {
     "file": "tests/e2e/parity-images-r4.spec.ts",
@@ -4762,10 +4876,13 @@
     "panel": [],
     "bridge": [],
     "prose": [
-     "images §3.1"
+     "images §3.4",
+     "images §3.1",
+     "files-windows-settings §8.2"
     ]
    },
-   "note": "#157: .textbundle (spec v2, text.md v1 fallback) is a folder document — sidebar/quick-open list it as one file; relative image rules resolve from the bundle root so assets/ wins over typora-copy-images-to and the global default (§3.1); Markdown ↔ TextBundle renames are refused unless the file is empty (fe-sidebar §5 wording)",
+   "note": "#157: .textbundle is a folder document — sidebar/quick-open list it as one file; relative image rules resolve from the bundle root so assets/ wins over typora-copy-images-to and the global default (§3.1); Markdown ↔ TextBundle renames are refused unless the file is empty (fe-sidebar §5 wording)",
+   "margin_extension": "Typora 1.5.12 on macOS never enables TextBundle (supportTextBundle is never injected; .textbundle is a plain folder there). Margin implements the shared front end rule: content = text.md, else first text.<supported ext>; info.json never validated; new bundles = text.md + assets/ + v2 info.json; no .textpack. Deliberate deviation: spec-v2 markdown.md is read as a last resort so v2 bundles from other apps open",
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -4809,6 +4926,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -4859,6 +4977,7 @@
     "prose": []
    },
    "note": "advanced settings JSON editor + reset (Typora: Windows/Linux only); Reset All Dialog Warnings",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -4902,6 +5021,7 @@
     "prose": []
    },
    "note": "quit-on-last-window persisted only (desktop native, applied after restart)",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -4949,6 +5069,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -4985,6 +5106,7 @@
     "prose": []
    },
    "note": "only English strings ship",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -5033,6 +5155,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -5071,6 +5194,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -5120,6 +5244,7 @@
     "prose": []
    },
    "note": "#134: style stored per settings and applied when each window is created (macOS titlebar bits in window_style.rs; seamless is the fresh-install default per fe-preferences §4.1); native/titlebar path itself is macOS-only by design (Typora 1.5.12 macOS)",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -5165,6 +5290,7 @@
     "prose": []
    },
    "note": "#159: auto pair (markdown pairing depends on bracket pairing) + display source on focus; Indent Size on Save (Auto/0→2, 2–5, Tab = literal \\t) + Pretty indentation shape menu-created quote/list markers via the pattern template (content aligned to the width, e.g. width 4 → `>   Quote`, `1.  item`); Enter mirrors the item marker spacing; Heading Style (atx / atx-with-suffix / setext / variable-width setext, h3–h6 fall back to ATX) shapes Paragraph-menu headings. Generated syntax only — existing text is never rewritten",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -5202,6 +5328,7 @@
     "prose": []
    },
    "note": "in-app JSON key map for the JS keymap (Typora macOS opens a help page); native menu accelerators unchanged",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -5245,6 +5372,7 @@
     "prose": []
    },
    "note": "line ending for new files; default folder via On Launch",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -5279,6 +5407,7 @@
     ]
    },
    "note": "Margin sends no telemetry by construction",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -5340,6 +5469,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -5387,6 +5517,7 @@
     ]
    },
    "note": "Margin defaults to the tree view on every OS (Typora macOS defaults to Articles)",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -5430,6 +5561,7 @@
     ]
    },
    "note": "\"Searching\"/\"Gathering more results\" belong to Quick Open and \"No Results\" to in-document Find (fe-sidebar-statusbar-find §10); \"File Results\" is unused in 1.5.12",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -5476,6 +5608,7 @@
     ]
    },
    "note": "deliberate fix: Typora code −3 serves both natural-desc and creation-desc; Margin keeps all eight orders distinct. Sort menu sits in the files header (Typora: footer menu)",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -5514,6 +5647,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -5560,6 +5694,7 @@
     ]
    },
    "note": "#131: unpin hides the sidebar for a floating drop-down outline (Escape/outside click closes, View ▸ Outline reopens); pin restores the sidebar Outline tab",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -5596,6 +5731,7 @@
     "prose": []
    },
    "note": "#23; #131: drag-move asks 'Are you sure you want to move %@?' (suppressible) and offers Undo Move / Undo Rename %@",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -5642,6 +5778,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -5678,6 +5815,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -5714,6 +5852,7 @@
     ]
    },
    "note": "macOS native; #14 for Windows/Linux",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -5767,6 +5906,7 @@
     ]
    },
    "note": "#15; native-commands §4: paper Default (→ Page Setup)/A5/A4/A3/US Letter/US Legal/Tabloid/Custom, margins Default 45/36 pt or Custom, header/footer presets, Page Break Between Top Headings, Append Extra Content",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -5813,6 +5953,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -5882,6 +6023,7 @@
     ]
    },
    "note": "#81; feed pandoc JSON/native AST from the editor model, argv only; #90 Abort button + per-format Style Reference/Template/Chapter Level/Extra Arguments (verified by export.pandoc-options e2e)",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -5938,6 +6080,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -5999,6 +6142,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6045,6 +6189,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6090,6 +6235,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6133,6 +6279,7 @@
     "prose": []
    },
    "note": "Typora fresh-install defaults (inline math/sub/sup/highlight off, emoji on); pre-#102 installs keep Margin rendering. Deliberate fix: Superscript is independent of Subscript (Typora ties its visibility to the subscript box)",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6174,6 +6321,7 @@
     "prose": []
    },
    "note": "non-strict: `#Heading` without space; list markers for menu-created lists",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6219,6 +6367,7 @@
     "prose": []
    },
    "note": "preserve/ignore single line break, Visible <br/> (default on), first-line indent; Apply Line Break at \\\\ is the Math option (display math). Deliberate fix: one source of truth for the Preserve check state",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6258,6 +6407,7 @@
     ]
    },
    "note": "Insert Final New Line On Save is per document (follows the opened file; palette command); remap scope per typora-re#12: blockquote >〉》 (no space after marker), task brackets [\\[【](x|X)[\\]】], dash family (–→-- / —→--- fence equality + dash-first mixed runs V); full-width digits/dot/minus/＊/＃ inert; effective when the box is on or forced by Convert-on-Input smart quotes/dashes; lossless both states",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6295,6 +6445,7 @@
     ]
    },
    "note": "#151: exactly four writings (block-start keys D/B/L/I/W); case-insensitive [toc]; $$toc$$ is a math block, not a TOC",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6332,6 +6483,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6370,6 +6522,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6407,6 +6560,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6443,6 +6597,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6479,6 +6634,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6516,6 +6672,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6552,6 +6709,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6588,6 +6746,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6624,6 +6783,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6660,6 +6820,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6701,6 +6862,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6735,6 +6897,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6773,6 +6936,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6805,6 +6969,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6841,6 +7006,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6877,6 +7043,7 @@
     ]
    },
    "note": "#23 #129; native paths on all platforms (src-tauri/src/drop_macos.rs, drop_linux.rs, drop_windows.rs); source mode inserts at the drop point (source-mode.ts insertAt)",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6919,6 +7086,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6960,6 +7128,7 @@
     ]
    },
    "note": "#131: shared QLPreviewPanel via main-thread bridge; Space on a focused row, tree + Articles menus",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -6994,6 +7163,7 @@
     ]
    },
    "note": "prose flags Typora granting \"/\" read access; Margin scopes per folder (#48 open)",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -7031,6 +7201,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -7068,6 +7239,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -7106,6 +7278,7 @@
     ]
    },
    "note": "postCopy order (webarchive → RTFD → RTF) via clipboard_write_rich with the document file URL as base, untitled.md default (#79 #115); no-WebKit fallback writes every flavour itself",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -7143,6 +7316,7 @@
     ]
    },
    "note": "RTF/RTFD text+formatting converted natively (NSAttributedString, macOS); RTFD image attachments materialized as data: URIs and stored through the image rule (#114)",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
@@ -7172,6 +7346,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": "Commercial licensing is not a product feature; Margin is free.",
    "rea_ledger_status": "out-of-scope",
    "rea_diagnostics": [
@@ -7214,6 +7389,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": "Distribution concern, not editor behavior; Margin ships via its own release channel.",
    "rea_ledger_status": "out-of-scope",
    "rea_diagnostics": [
@@ -7248,6 +7424,7 @@
     ]
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": "Privacy: Margin collects nothing; logging is local only.",
    "rea_ledger_status": "out-of-scope",
    "rea_diagnostics": [
@@ -7277,6 +7454,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": "Touch Bar hardware is discontinued and Tauri exposes no NSTouchBar API.",
    "rea_ledger_status": "out-of-scope",
    "rea_diagnostics": [
@@ -7307,6 +7485,7 @@
     "prose": []
    },
    "note": null,
+   "margin_extension": null,
    "out_of_scope_rationale": "Version gates for platforms Margin does not target.",
    "rea_ledger_status": "out-of-scope",
    "rea_diagnostics": [
@@ -7366,6 +7545,7 @@
     "prose": []
    },
    "note": "strings attached to features elsewhere where meaningful",
+   "margin_extension": null,
    "out_of_scope_rationale": null,
    "rea_ledger_status": "implemented",
    "rea_diagnostics": [
