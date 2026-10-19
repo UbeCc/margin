@@ -13,6 +13,8 @@ mod fsops_unix;
 mod drop_linux;
 #[cfg(target_os = "linux")]
 mod pdf_linux;
+#[cfg_attr(not(target_os = "linux"), allow(dead_code))]
+mod pdf_tounicode;
 #[cfg(target_os = "windows")]
 mod pdf_windows;
 #[cfg(target_os = "windows")]
