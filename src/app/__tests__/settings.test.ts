@@ -107,12 +107,18 @@ describe('preferences completeness (#100, #102)', () => {
     expect(migrateSettings({ onLaunch: 'bogus' }).onLaunch).toBe('newFile');
   });
 
+  it('Indent Size for Code: fresh default 2 (macOS effective default), stored values kept (#170)', () => {
+    expect(migrateSettings({}).markdown.codeIndentSize).toBe(2);
+    expect(migrateSettings({ markdown: {} }).markdown.codeIndentSize).toBe(2);
+    for (const v of [0, 3, 4] as const) expect(migrateSettings({ markdown: { codeIndentSize: v } }).markdown.codeIndentSize).toBe(v);
+  });
+
   it('validates nested markdown options field by field', () => {
     const m = migrateSettings({ markdown: { emoji: true, ulStyle: '*', olStyle: 'x', codeIndentSize: 7, mathNumbering: 'all', strict: 'nope' } }).markdown;
     expect(m.emoji).toBe(true);
     expect(m.ulStyle).toBe('*');
     expect(m.olStyle).toBe('increment');
-    expect(m.codeIndentSize).toBe(4);
+    expect(m.codeIndentSize).toBe(2); // invalid → effective macOS default 2 (#170)
     expect(m.mathNumbering).toBe('all');
     expect(m.strict).toBe(true);
   });
