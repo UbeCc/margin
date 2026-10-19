@@ -23,12 +23,12 @@ const FILE_OPEN: &[Item] = &[
     ("newTab", "New Tab", Some("CmdOrCtrl+T")),
     ("newWindow", "New Window", Some("CmdOrCtrl+Shift+N")),
     ("open", "Open…", Some("CmdOrCtrl+O")),
-    ("openFolder", "Open Folder…", Some("CmdOrCtrl+Shift+O")),
+    ("openFolder", "Open Folder…", None),
 ];
 const REVEAL: &str = if cfg!(target_os = "macos") { "Reveal in Finder" } else { "Open File Location" };
 const FILE: &[Item] = &[
     ("reopenClosed", "Reopen Closed File", Some("CmdOrCtrl+Shift+T")),
-    ("quickOpen", "Quick Open…", Some("CmdOrCtrl+P")),
+    ("quickOpen", "Open Quickly…", Some("CmdOrCtrl+Shift+O")),
     ("-", "", None),
     ("save", "Save", Some("CmdOrCtrl+S")),
     ("saveAs", "Save As…", Some("CmdOrCtrl+Shift+S")),
@@ -415,8 +415,8 @@ pub fn build<R: Runtime>(
     let mut file = add_items(app, file, FILE)?
         .separator()
         .item(&export)
-        .item(&MenuItem::with_id(app, "pageSetup", "Page Setup…", true, None::<&str>)?)
-        .item(&MenuItem::with_id(app, "print", "Print…", true, Some("CmdOrCtrl+Shift+P"))?)
+        .item(&MenuItem::with_id(app, "pageSetup", "Page Setup…", true, Some("CmdOrCtrl+Shift+P"))?)
+        .item(&MenuItem::with_id(app, "print", "Print…", true, Some("CmdOrCtrl+P"))?)
         .separator()
         .item(&MenuItem::with_id(app, "close", "Close", true, Some("CmdOrCtrl+W"))?);
     if !mac {

@@ -114,7 +114,9 @@ describe('keymap & commands', () => {
     expect(commandForKey(ev('KeyB', { meta: true }), true)?.id).toBe('mark:strong');
     expect(commandForKey(ev('Slash', { meta: true }), true)?.id).toBe('toggleSource');
     expect(commandForKey(ev('F8'), true)?.id).toBe('toggleFocus');
-    expect(commandForKey(ev('KeyP', { meta: true, shift: true }), true)?.id).toBe('print');
+    expect(commandForKey(ev('KeyP', { meta: true }), true)?.id).toBe('print');
+    expect(commandForKey(ev('KeyP', { meta: true, shift: true }), true)?.id).toBe('pageSetup');
+    expect(commandForKey(ev('KeyO', { meta: true, shift: true }), true)?.id).toBe('quickOpen');
     expect(commandForKey(ev('KeyA', { meta: true, shift: true }), true)?.id).toBe('commandPalette');
     expect(commandForKey(ev('Digit0', { meta: true, shift: true }), true)?.id).toBe('zoomReset');
     expect(commandForKey(ev('KeyF', { meta: true, alt: true }), true)?.id).toBe('replace');

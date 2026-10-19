@@ -6,7 +6,7 @@
    {
     "artifact_id": "margin-src",
     "artifact_sha256": "f438716ac808fa7706d73b251a75f1628ee0382fce7b2236e71ed4ec85526cfb",
-    "version": "3c6812b3700a944875d4140ce8a3ffd0aeaef079",
+    "version": "a75f1935cb0e7bb93149b51e775f972ce8bec926",
     "environment_sha256": "20aa30e081a969eaed6bd1d8c33d9e966312a547a57b9f2a8a471dd04b5549ae",
     "evidence_ids": [
      "ev_1fff77de0927975cf6c8e1ae1f4f756642727a508cab1ec65759d425f7ebbded"
@@ -2110,7 +2110,7 @@
      "disposition": "implemented",
      "owner_path": "src-tauri/src/menu.rs",
      "owner_export": "About Margin",
-     "owner_sha256": "290c08df1bd89851af8d3e77f9eb44df9f5d74d8129c7f3e0fd20283c10fcf75",
+     "owner_sha256": "59008d8a159028e5944a42084bc7ba71bc3af6957ba59448b0dc0e29bf4fec04",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2134,7 +2134,7 @@
      "disposition": "implemented",
      "owner_path": "src-tauri/src/menu.rs",
      "owner_export": "PredefinedMenuItem::hide_others",
-     "owner_sha256": "290c08df1bd89851af8d3e77f9eb44df9f5d74d8129c7f3e0fd20283c10fcf75",
+     "owner_sha256": "59008d8a159028e5944a42084bc7ba71bc3af6957ba59448b0dc0e29bf4fec04",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2530,7 +2530,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/commands.ts",
      "owner_export": "spell:toggle",
-     "owner_sha256": "190d7fcff28d6b8d9347545cf5ad2bb3f42bbca6a3d8a795a9760bf88ddc03e0",
+     "owner_sha256": "f62dbb98a8119805ea8a833d5f1430841ed33c991a319c3a4b1407f55a630d36",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2914,7 +2914,7 @@
      "disposition": "implemented",
      "owner_path": "src-tauri/src/menu.rs",
      "owner_export": "PredefinedMenuItem::fullscreen",
-     "owner_sha256": "290c08df1bd89851af8d3e77f9eb44df9f5d74d8129c7f3e0fd20283c10fcf75",
+     "owner_sha256": "59008d8a159028e5944a42084bc7ba71bc3af6957ba59448b0dc0e29bf4fec04",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2962,7 +2962,7 @@
      "disposition": "implemented",
      "owner_path": "src-tauri/src/menu.rs",
      "owner_export": "THEMES_SUBMENU_ID",
-     "owner_sha256": "290c08df1bd89851af8d3e77f9eb44df9f5d74d8129c7f3e0fd20283c10fcf75",
+     "owner_sha256": "59008d8a159028e5944a42084bc7ba71bc3af6957ba59448b0dc0e29bf4fec04",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -2993,7 +2993,7 @@
      "disposition": "implemented",
      "owner_path": "src-tauri/src/menu.rs",
      "owner_export": "pub fn set_checked",
-     "owner_sha256": "290c08df1bd89851af8d3e77f9eb44df9f5d74d8129c7f3e0fd20283c10fcf75",
+     "owner_sha256": "59008d8a159028e5944a42084bc7ba71bc3af6957ba59448b0dc0e29bf4fec04",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -3005,7 +3005,7 @@
      "disposition": "implemented",
      "owner_path": "src-tauri/src/menu.rs",
      "owner_export": "PredefinedMenuItem::minimize",
-     "owner_sha256": "290c08df1bd89851af8d3e77f9eb44df9f5d74d8129c7f3e0fd20283c10fcf75",
+     "owner_sha256": "59008d8a159028e5944a42084bc7ba71bc3af6957ba59448b0dc0e29bf4fec04",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -3017,7 +3017,7 @@
      "disposition": "implemented",
      "owner_path": "src-tauri/src/menu.rs",
      "owner_export": "ID_HELP_MARKDOWN",
-     "owner_sha256": "290c08df1bd89851af8d3e77f9eb44df9f5d74d8129c7f3e0fd20283c10fcf75",
+     "owner_sha256": "59008d8a159028e5944a42084bc7ba71bc3af6957ba59448b0dc0e29bf4fec04",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -3535,7 +3535,7 @@
      "disposition": "implemented",
      "owner_path": "src/app/commands.ts",
      "owner_export": "export function setCustomKeys",
-     "owner_sha256": "190d7fcff28d6b8d9347545cf5ad2bb3f42bbca6a3d8a795a9760bf88ddc03e0",
+     "owner_sha256": "f62dbb98a8119805ea8a833d5f1430841ed33c991a319c3a4b1407f55a630d36",
      "path_state": "present",
      "package_state": "distributed",
      "authority_route": "none"
@@ -9196,7 +9196,7 @@
      "f438716ac808fa7706d73b251a75f1628ee0382fce7b2236e71ed4ec85526cfb"
     ],
     "owner_sha256s": [
-     "190d7fcff28d6b8d9347545cf5ad2bb3f42bbca6a3d8a795a9760bf88ddc03e0"
+     "f62dbb98a8119805ea8a833d5f1430841ed33c991a319c3a4b1407f55a630d36"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -9978,7 +9978,7 @@
      "f438716ac808fa7706d73b251a75f1628ee0382fce7b2236e71ed4ec85526cfb"
     ],
     "owner_sha256s": [
-     "290c08df1bd89851af8d3e77f9eb44df9f5d74d8129c7f3e0fd20283c10fcf75"
+     "59008d8a159028e5944a42084bc7ba71bc3af6957ba59448b0dc0e29bf4fec04"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -10001,7 +10001,7 @@
      "f438716ac808fa7706d73b251a75f1628ee0382fce7b2236e71ed4ec85526cfb"
     ],
     "owner_sha256s": [
-     "290c08df1bd89851af8d3e77f9eb44df9f5d74d8129c7f3e0fd20283c10fcf75"
+     "59008d8a159028e5944a42084bc7ba71bc3af6957ba59448b0dc0e29bf4fec04"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,
@@ -10967,7 +10967,7 @@
      "f438716ac808fa7706d73b251a75f1628ee0382fce7b2236e71ed4ec85526cfb"
     ],
     "owner_sha256s": [
-     "190d7fcff28d6b8d9347545cf5ad2bb3f42bbca6a3d8a795a9760bf88ddc03e0"
+     "f62dbb98a8119805ea8a833d5f1430841ed33c991a319c3a4b1407f55a630d36"
     ],
     "normalization_sha256": "00f12b21c85eb6e9e15c0e984c6999d90afc565ea0454dbe434945b50dd7edc2",
     "repeats": 1,

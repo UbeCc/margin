@@ -14,7 +14,7 @@ Clean-room inputs only: the interface extract `typora-re/parity-spec.md` (281 me
 | missing | 0 |
 | out of scope | 8 |
 
-REA ledger `rol_77c5b170f60e4aa814a4bd29f5e048e887cbf3ac0bef4381b8e16ed5bb5db28c` (closure `c2dcacedf913c260…`): status **unknown**; implemented 166, out-of-scope 8, unknown 5.
+REA ledger `rol_fcda7790a6144b81ab9f442ddd6bdf8b039d72048539f22a1b2dba61f650ba09` (closure `5192553bdf2aa73b…`): status **unknown**; implemented 166, out-of-scope 8, unknown 5.
 
 REA coverage boundary `margin.typora-parity`: status **partial**; 153/166 claims qualified by controlled-replay verifier Evidence. Reasons: package-proof-missing 1, verifier-missing 13.
 
@@ -60,8 +60,8 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `menu.file.new-window` | File › New Window / Open in New Window | owned |  | `src/app/app.ts` `private async newWindow(` | `tests/e2e/parity-files.spec.ts` › menu.file.new-window: File › New Window / Open in New Window | 6 |
 | `menu.file.tabs` | Tabs: New Tab, switch between opened documents, next/previous tab | owned |  | `src/app/doctabs.ts` `export class DocTabs` | `tests/e2e/parity-files.spec.ts` › menu.file.tabs: Tabs: New Tab, switch between opened documents, next/previous tab | 5 |
 | `menu.file.open` | File › Open… (file dialog) | owned |  | `src/app/app.ts` `case 'open'` | `tests/e2e/app-files.spec.ts` › file tree lazily expands folders and opens files | 10 |
-| `menu.file.open-folder` | File › Open Folder… | owned |  | `src/app/app.ts` `case 'openFolder'` | `tests/e2e/app-files.spec.ts` › file tree lazily expands folders and opens files | 10 |
-| `menu.file.quick-open` | File › Open Quickly (fuzzy file finder) — deliberate deviations from Typora (native-commands §3, #119): every file type is searchable (Markdown ranked first), extension and name matching are case-insensitive, query text is escaped, an empty/unindexed/stale Spotlight answer falls back to the walker, deleted entries are pruned | owned |  | `src/app/app.ts` `quickOpen(): void` | `tests/e2e/app-navigation.spec.ts` › quick open fuzzy-finds files with highlights | 9 |
+| `menu.file.open-folder` | File › Open Folder… — no accelerator: Typora lists none for opening a folder (native-commands.md §menus L235-259); the item is kept for the sidebar flow, former ⇧⌘O handed to Open Quickly (#161) | owned |  | `src/app/app.ts` `case 'openFolder'` | `tests/e2e/app-files.spec.ts` › file tree lazily expands folders and opens files | 10 |
+| `menu.file.quick-open` | File › Open Quickly (fuzzy file finder) — label "Open Quickly…" and accelerator ⇧⌘O match Typora (native-commands.md §menus L245, #161); Print took ⌘P and Page Setup ⇧⌘P (L258-259); deliberate search deviations from Typora (native-commands §3, #119): every file type is searchable (Markdown ranked first), extension and name matching are case-insensitive, query text is escaped, an empty/unindexed/stale Spotlight answer falls back to the walker, deleted entries are pruned | owned |  | `src/app/app.ts` `quickOpen(): void` | `tests/e2e/app-navigation.spec.ts` › quick open fuzzy-finds files with highlights | 9 |
 | `menu.file.recent` | File › Open Recent (files + folders, clear) | owned |  | `src-tauri/src/recent.rs` `No Recent Items` | `src/app/__tests__/settings.test.ts` › dedupes and caps recent lists | 8 |
 | `menu.file.reopen-closed` | File › Reopen Closed File | owned |  | `src/app/doctabs.ts` `async reopenClosed()` | `tests/e2e/parity-files.spec.ts` › menu.file.reopen-closed: File › Reopen Closed File | 1 |
 | `menu.file.save` | File › Save (dirty tracking, atomic write) | owned |  | `src/app/app.ts` `case 'save'` | `tests/e2e/app-files.spec.ts` › editing marks dirty, Cmd+S saves to disk | 8 |
@@ -74,8 +74,8 @@ Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): buil
 | `menu.file.line-endings` | File › Line Endings (LF / CRLF), preserved on save | owned |  | `src/app/app.ts` `case 'toggleLineEnding'` | `src/app/__tests__/document.test.ts` › toggling EOL marks dirty and toggling back cleans | 3 |
 | `menu.file.properties` | File › Properties / Get Info (word count, size, dates) | owned |  | `src/app/fileops.ts` `async properties()` | `tests/e2e/parity-files.spec.ts` › menu.file.properties: File › Properties / Get Info (word count, size, dates) | 3 |
 | `menu.file.reveal` | File › Reveal in Finder / Open File Location / Copy File Path (current doc) | owned |  | `src/app/fileops.ts` `async copyPath()` | `tests/e2e/parity-files.spec.ts` › menu.file.reveal: File › Reveal in Finder / Open File Location / Copy File Path (current doc) | 8 |
-| `menu.file.page-setup` | File › Page Setup (paper size for print/PDF) | owned |  | `src/app/export-ui.ts` `export function openPageSetup` | `tests/e2e/parity-export.spec.ts` › menu.file.page-setup: File › Page Setup | 1 |
-| `menu.file.print` | File › Print | owned |  | `src/app/app.ts` `case 'print'` | none | 2 |
+| `menu.file.page-setup` | File › Page Setup (paper size for print/PDF) — accelerator ⇧⌘P matches Typora (native-commands.md §menus L258, #161) | owned |  | `src/app/export-ui.ts` `export function openPageSetup` | `tests/e2e/parity-export.spec.ts` › menu.file.page-setup: File › Page Setup | 1 |
+| `menu.file.print` | File › Print — accelerator ⌘P matches Typora (native-commands.md §menus L259, #161); freed from Quick Open | owned |  | `src/app/app.ts` `case 'print'` | none | 2 |
 | `menu.file.close` | File › Close (asks to save dirty docs) | owned |  | `src/app/app.ts` `case 'close'` | `tests/e2e/app-files.spec.ts` › close request with unsaved changes can be cancelled | 4 |
 | `menu.file.errors` | Open/save error reporting (missing file, open failed, create prompt) | owned |  | `src/app/document.ts` `askCreateMissing` | `tests/e2e/parity-files.spec.ts` › menu.file.errors: Open/save error reporting (missing file, open failed, create prompt) | 17 |
 
