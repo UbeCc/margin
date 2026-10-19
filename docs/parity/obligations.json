@@ -2,11 +2,11 @@
  "generated_from": {
   "spec": "typora-re/parity-spec.md",
   "prose": "typora-re/sections/*.md",
-  "margin_head": "a75f1935cb0e7bb93149b51e775f972ce8bec926"
+  "margin_head": "32dc42cdcb768377e5b5d85a2b5a696a21c2bbbc"
  },
  "summary": {
-  "head": "a75f1935cb0e7bb93149b51e775f972ce8bec926",
-  "artifact_sha256": "f438716ac808fa7706d73b251a75f1628ee0382fce7b2236e71ed4ec85526cfb",
+  "head": "32dc42cdcb768377e5b5d85a2b5a696a21c2bbbc",
+  "artifact_sha256": "920aba7ae0becbf5bb211b16be01909faf2204944a4578eaf1d7ea4f34f66075",
   "inventory": {
    "total": 174,
    "owned": 166,
@@ -16,8 +16,8 @@
    "verified_by_test": 153
   },
   "ledger": {
-   "ledger_id": "rol_fcda7790a6144b81ab9f442ddd6bdf8b039d72048539f22a1b2dba61f650ba09",
-   "closure_digest": "5192553bdf2aa73b71dd7341bac5821a01e11868f22a455efc83f7c95d01d6ca",
+   "ledger_id": "rol_772b3f0a635ea8e4c4a3dc152b60d46c9eb2acfabadc442ec75f91abae3e2d79",
+   "closure_digest": "bdcfd53e3b95cccb908fa87fc38184372e66f0fa768d05d29b658d6750facb72",
    "status": "unknown",
    "summary": {
     "total": 179,
@@ -119,7 +119,7 @@
      }
     ]
    },
-   "evidence_id": "ev_0d8843391a4481b1e6f79167930eff3c9d108864c7b30e5f9da960123cf4732f"
+   "evidence_id": "ev_b60d816d4b9ac33c661e641c1721a995ec54c023e1771778b1039a633a52c52d"
   },
   "coverage": {
    "status": "partial",
@@ -6825,7 +6825,7 @@
    "owner": {
     "path": "src-tauri/src/lib.rs",
     "anchor": "on_second_instance",
-    "sha256": "328c4e636e08ab586e421ed5f78dd190012d15c25d0e98c276405d697c48b9dc"
+    "sha256": "2d37626215586c32bdeeac3d2a691139ade62a59017a395160aaf5e6916f4b7c"
    },
    "verifier": {
     "file": "tests/e2e/parity-files.spec.ts",
