@@ -22,6 +22,8 @@ mod drop_windows;
 mod image_tools;
 mod images;
 mod menu;
+/// Native menu structure self-test (main-thread integration test `tests/menu_main.rs`).
+pub use menu::structure_selftest as menu_structure_selftest;
 mod pandoc;
 mod pandoc_import;
 #[cfg(target_os = "macos")]

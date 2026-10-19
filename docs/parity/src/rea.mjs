@@ -54,7 +54,12 @@ export async function buildReaInputs({ repo, inv, reaDist, specPath, sectionsDir
   const records = [...reviews.values(), ...Object.values(captures)];
   const bundle = createEvidenceBundle(records);
 
-  const suiteFor = (s) => (s.verifierKind === 'e2e' ? 'playwright' : 'vitest');
+  const suiteFor = (s) => ({ e2e: 'playwright', cargo: 'cargo-test' })[s.verifierKind] ?? 'vitest';
+  const isUnit = (s) => s.verifierKind !== 'e2e'; // vitest + cargo (Rust unit/integration) both run below the renderer
+  const command = (s, suite) =>
+    suite === 'playwright' ? `npx playwright test ${s.verifierFile} -g ${JSON.stringify(s.verifierTitle)}`
+    : suite === 'cargo-test' ? (s.verifierFile.startsWith('src-tauri/tests/') ? `cargo test --manifest-path src-tauri/Cargo.toml --test ${s.verifierFile.split('/').pop().replace(/\.rs$/, '')}` : `cargo test --manifest-path src-tauri/Cargo.toml ${JSON.stringify(s.verifierTitle.replace(/^fn /, ''))}`)
+    : `npx vitest run ${s.verifierFile} -t ${JSON.stringify(s.verifierTitle)}`;
   const reviewed = inv.surfaces.map((s) => ({
     obligation_id: oid(s),
     obligation_version: 1,
@@ -65,8 +70,8 @@ export async function buildReaInputs({ repo, inv, reaDist, specPath, sectionsDir
     required: s.status !== 'oos',
     required_case_kinds: ['positive'],
     required_original_authority: 'static',
-    required_fixture_authority: s.verifierKind === 'unit' ? 'unit' : 'renderer',
-    required_verifier_authority: s.verifierKind === 'unit' ? 'unit' : 'renderer',
+    required_fixture_authority: isUnit(s) ? 'unit' : 'renderer',
+    required_verifier_authority: isUnit(s) ? 'unit' : 'renderer',
     requires_parser_type: false,
     dependency_obligation_ids: [],
     residual_unknown_ids: [],
@@ -84,7 +89,7 @@ export async function buildReaInputs({ repo, inv, reaDist, specPath, sectionsDir
     // Partial surfaces keep their test in the coverage workspace only: REA treats any non-pass
     // ledger verifier status as `verifier-failed`, which would misreport an incomplete feature as broken.
     const suite = s.verifier && s.status === 'owned' ? suiteFor(s) : null;
-    const authority = s.verifierKind === 'unit' ? 'unit' : 'renderer';
+    const authority = isUnit(s) ? 'unit' : 'renderer';
     return {
       obligation_id: oid(s),
       owner: { module_path: s.ownerFile, symbol: s.ownerAnchor, owner_sha256: s.ownerSha256 },
@@ -94,7 +99,7 @@ export async function buildReaInputs({ repo, inv, reaDist, specPath, sectionsDir
       verifier: suite ? {
         verifier_id: `margin.${suite}.${s.id}`,
         claim_id: `claim.${s.id}`,
-        command: suite === 'playwright' ? `npx playwright test ${s.verifierFile} -g ${JSON.stringify(s.verifierTitle)}` : `npx vitest run ${s.verifierFile} -t ${JSON.stringify(s.verifierTitle)}`,
+        command: command(s, suite),
         authority,
         status: 'pass',
         result_evidence_id: cap(suite),

@@ -1104,9 +1104,7 @@ export class App {
       case 'import':
         return runImport(this.importHost());
       case 'print':
-        this.applyPrintPageCss();
-        await this.platform.print();
-        return true;
+        return this.print();
       case 'undo':
       case 'redo':
         return ed.exec({ kind: id });
@@ -1522,6 +1520,36 @@ export class App {
   }
 
   /** Page Setup applies to File › Print: keep an @page rule in the live document. */
+  /**
+   * File › Print (export-print §4.2): a dark theme can't be printed (no background colour), so
+   * Typora asks first — Cancel / Print with default theme / Export to PDF.
+   */
+  private async print(): Promise<boolean> {
+    const dark = this.themes.isDark(this.themes.current);
+    if (dark) {
+      const r = await ask({
+        title: 'Print',
+        message: "Sorry, current version of Margin won't print background color. So dark theme is not yet supported for printing.",
+        buttons: [
+          { id: 'cancel', label: 'Cancel' },
+          { id: 'print', label: 'Print with default theme' },
+          { id: 'pdf', label: 'Export to PDF' },
+        ],
+        cancelId: 'cancel',
+      });
+      if (r.id === 'cancel') return false;
+      if (r.id === 'pdf') return this.run('exportPdf');
+      this.themes.apply({ ...this.settings, theme: DEFAULT_SETTINGS.theme, colorScheme: 'light' }); // the default (light) theme
+    }
+    this.applyPrintPageCss();
+    try {
+      await this.platform.print();
+    } finally {
+      if (dark) this.applyAppearance();
+    }
+    return true;
+  }
+
   private applyPrintPageCss(): void {
     let el = document.getElementById('margin-print-page') as HTMLStyleElement | null;
     if (!el) {

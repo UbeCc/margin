@@ -1,13 +1,14 @@
 // pref.privacy (parity ledger): Margin sends no telemetry by construction and keeps network access
 // local-only (network-updates-privacy §5). This audits the shipped configuration and sources.
+// @ts-expect-error node builtin without @types/node
 import { readFileSync, readdirSync, statSync } from 'node:fs';
-import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_SETTINGS } from '../settings';
 
-const repo = join(__dirname, '../../..');
+const repo: string = (globalThis as unknown as { process: { cwd(): string } }).process.cwd();
+const join = (...p: string[]): string => p.join('/');
 const walk = (dir: string): string[] =>
-  readdirSync(dir).flatMap((n) => {
+  (readdirSync(dir) as string[]).flatMap((n: string) => {
     const p = join(dir, n);
     return statSync(p).isDirectory() ? walk(p) : /\.(ts|rs)$/.test(n) && !/(\.test\.ts|_tests\.rs)$/.test(n) ? [p] : [];
   });
@@ -22,7 +23,7 @@ describe('pref.privacy: Privacy/security toggles (no telemetry; local-only netwo
     const files = [...walk(join(repo, 'src')), ...walk(join(repo, 'src-tauri/src'))];
     expect(files.length).toBeGreaterThan(50);
     for (const f of files) {
-      const text = readFileSync(f, 'utf8');
+      const text: string = readFileSync(f, 'utf8');
       expect(text, f).not.toMatch(/sendBeacon|[Ss]entry|google-analytics|googletagmanager|[Mm]ixpanel|segment\.io|[Pp]ost[Hh]og|appcast|\bSparkle\b|SUUpdater/);
     }
 

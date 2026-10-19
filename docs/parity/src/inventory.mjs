@@ -51,7 +51,7 @@ export function loadInventory({ repo, specPath }) {
       if (!existsSync(p) || !readFileSync(p, 'utf8').includes(title)) errors.push(`${s.id}: verifier not found ${s.verifier}`);
       s.verifierFile = file;
       s.verifierTitle = title;
-      s.verifierKind = file.startsWith('tests/e2e/') ? 'e2e' : 'unit';
+      s.verifierKind = file.startsWith('tests/e2e/') ? 'e2e' : file.startsWith('src-tauri/') ? 'cargo' : 'unit';
     }
     s.priority = s.status === 'owned' || s.status === 'oos' ? null : (s.p ?? EPICS[s.e]?.p ?? 2);
   }
