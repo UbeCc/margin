@@ -208,6 +208,8 @@ test.describe('parity: context menus (#97)', () => {
     await page.locator('.md-editor .md-math .md-math-render').click({ button: 'right', force: true });
     expect(await labels(page)).toEqual(['Copy Math', 'Cut', 'Copy', 'Paste', 'Copy / Paste As…']);
     await item(page, 'Copy Math').hover();
+    // Typora's order: Copy as Image / Copy as Tex / Copy as MathML (native-contextmenu §8).
+    await expect(page.locator('.context-submenu .context-item')).toHaveText(['Copy as Image', 'Copy as Tex', 'Copy as MathML']);
     const img = item(page, 'Copy as Image');
     await expect(img).toBeEnabled();
     await img.click();

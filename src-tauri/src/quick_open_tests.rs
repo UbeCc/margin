@@ -153,11 +153,11 @@ fn walk_lists_textbundles_as_single_files() {
     fs::write(root.path().join("a.md"), "").unwrap();
     let bundle = root.path().join("note.textbundle");
     fs::create_dir_all(bundle.join("assets")).unwrap();
-    fs::write(bundle.join("markdown.md"), "").unwrap();
-    fs::write(bundle.join("text.json"), "{}").unwrap();
+    fs::write(bundle.join("text.md"), "").unwrap();
+    fs::write(bundle.join("info.json"), "{}").unwrap();
     let files = walk(root.path());
     assert!(files.contains(&"note.textbundle".to_string()), "{files:?}");
-    assert!(!files.iter().any(|f| f.contains("markdown.md") || f.contains("text.json")), "{files:?}");
+    assert!(!files.iter().any(|f| f.contains("text.md") || f.contains("info.json")), "{files:?}");
     assert!(files.contains(&"a.md".to_string()));
     // Watcher-created bundles index like files; their children never do.
     let qo = QuickOpen::default();

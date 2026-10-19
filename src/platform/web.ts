@@ -18,6 +18,12 @@ import {
 import { rankPaths } from './fuzzy';
 import { matchShortcut } from './shortcuts';
 
+// TextBundle content rule mirrors src-tauri/src/textbundle.rs (images §3.4).
+/** Extensions accepted for the `text.*` content file (SupportedTextFiles, images §3.4). */
+const TEXTBUNDLE_CONTENT_EXTS = ['md', 'markdown', 'mmd', 'mkd', 'mdwn', 'mdown', 'mdx', 'mdtxt', 'mdtext', 'apib', 'rmarkdown', 'rmd', 'qmd', 'txt', 'text'];
+/** `info.json` for new bundles: Typora's v2 shape, Margin's creator identifier. */
+const TEXTBUNDLE_INFO_JSON = '{"version":2,"type":"net.daringfireball.markdown","transient":false,"creatorIdentifier":"dev.ubec.margin"}';
+
 /**
  * In-browser Platform used by `npm run dev` and the Playwright e2e tests.
  *
@@ -278,21 +284,26 @@ export class WebPlatform implements Platform {
     const n = this.nodes.get(p);
     if (!n) throw new Error(`ENOENT: ${path}`);
     if (n.kind === 'dir') {
-      // A `.textbundle` folder is one document (#157): content in markdown.md (v2) / text.md (v1).
+      // A `.textbundle` folder is one document (#157): content in text.* (images §3.4).
       if (!p.toLowerCase().endsWith('.textbundle')) throw new Error(`EISDIR: ${path}`);
       const content = this.bundleContentPath(p);
-      if (!content) throw new Error(`ENOENT: ${path}/markdown.md`);
+      if (!content) throw new Error(`ENOENT: ${path}/text.md`);
       return this.readTextFile(content);
     }
     return n.binary ? '' : n.content;
   }
 
   private bundleContentPath(bundle: string): string | null {
-    for (const name of ['markdown.md', 'text.md']) {
-      const p = `${bundle}/${name}`;
-      if (this.nodes.get(p)?.kind === 'file') return p;
-    }
-    return null;
+    // Same rule as src-tauri/src/textbundle.rs: text.md, else first `text.<ext>` by name,
+    // else Margin's markdown.md fallback (Typora never reads markdown.md).
+    const isFile = (p: string) => this.nodes.get(p)?.kind === 'file';
+    if (isFile(`${bundle}/text.md`)) return `${bundle}/text.md`;
+    const prefix = `${bundle}/text.`;
+    const named = [...this.nodes.keys()]
+      .filter((k) => k.startsWith(prefix) && !k.slice(prefix.length).includes('/') && isFile(k) && TEXTBUNDLE_CONTENT_EXTS.includes(k.slice(prefix.length).toLowerCase()))
+      .sort();
+    if (named.length) return named[0];
+    return isFile(`${bundle}/markdown.md`) ? `${bundle}/markdown.md` : null;
   }
 
   /** Our own writes don't produce `modified` events (same as desktop); new files do produce `created`. */
@@ -308,15 +319,16 @@ export class WebPlatform implements Platform {
     await this.writeThrough(p, content);
   }
 
-  /** Write a TextBundle document: create `text.json` + `assets/` once, save the content file. */
+  /** Write a TextBundle document: create `info.json` + `assets/` for a new bundle, save the content file. */
   private async writeBundle(bundle: string, content: string): Promise<void> {
     const created = this.ensureDir(bundle);
     created.push(...this.ensureDir(`${bundle}/assets`));
-    if (!this.nodes.has(`${bundle}/text.json`)) {
-      this.nodes.set(`${bundle}/text.json`, { kind: 'file', content: '{"version":2,"type":"net.daringfireball.markdown"}', mtime: Date.now(), ctime: Date.now() });
-      created.push(`${bundle}/text.json`);
+    const existing = this.bundleContentPath(bundle);
+    if (!existing && !this.nodes.has(`${bundle}/info.json`)) {
+      this.nodes.set(`${bundle}/info.json`, { kind: 'file', content: TEXTBUNDLE_INFO_JSON, mtime: Date.now(), ctime: Date.now() });
+      created.push(`${bundle}/info.json`);
     }
-    const contentPath = this.bundleContentPath(bundle) ?? `${bundle}/markdown.md`;
+    const contentPath = existing ?? `${bundle}/text.md`;
     if (!this.nodes.has(contentPath)) created.push(contentPath);
     const now = Date.now();
     this.nodes.set(contentPath, { kind: 'file', content, mtime: now, ctime: now });

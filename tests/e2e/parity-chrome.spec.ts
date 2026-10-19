@@ -59,6 +59,9 @@ test('menu.view.status-bar: View › Show Status Bar (word count, toggle)', asyn
   await expect(items.filter({ hasText: /Minute/ })).toBeVisible();
   await expect(items.filter({ hasText: /Lines?/ })).toBeVisible();
   await expect(items.filter({ hasText: /Characters?/ }).first()).toBeVisible();
+  // Typora's fixed order: Minutes, Lines, Words, Characters (native-window-touchbar §3.9).
+  const totals = (await items.allTextContents()).slice(0, 4).map((t) => (/(Minute|Line|Word|Character)/.exec(t) ?? [''])[0]);
+  expect(totals).toEqual(['Minute', 'Line', 'Word', 'Character']);
   await items.filter({ hasText: /Characters?/ }).first().click();
   await expect(bar.locator('.word-count')).toContainText(/Characters?/);
   expect(await setting(page, 'wordCountUnit')).toBe('characters');

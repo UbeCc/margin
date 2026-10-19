@@ -112,7 +112,8 @@ export class StatusBar {
     this.floating.textContent = text;
   }
 
-  /** Word Count popover: four totals, then "In Selection" words / characters. */
+  /** Word Count popover: four totals in Typora's fixed order Minutes, Lines, Words, Characters
+   * (native-window-touchbar §3.4/§3.9), then "In Selection" words / characters. */
   openPopover(anchor: HTMLElement = this.countBtn): void {
     const row = (unit: CountUnit, n: number): MenuItem => ({
       label: formatCount(n, unit),
@@ -123,9 +124,9 @@ export class StatusBar {
       },
     });
     const items: MenuItem[] = [
-      row('words', this.stats.words),
       row('minutes', this.value('minutes')),
       row('lines', this.stats.lines),
+      row('words', this.stats.words),
       row('characters', this.stats.characters),
     ];
     if (this.sel) {

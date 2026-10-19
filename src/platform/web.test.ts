@@ -139,26 +139,35 @@ describe('WebPlatform storeImage', () => {
 describe('WebPlatform textbundle (#157)', () => {
   const png = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 1, 2, 3]);
 
-  it('reads markdown.md, falls back to text.md, refuses other folders', async () => {
+  it('reads text.md first, then text.<ext>, markdown.md only as Margin fallback; refuses other folders (images §3.4)', async () => {
     const p = fresh({ seed: false });
     await p.writeTextFile('/n/a.textbundle/markdown.md', '# v2\n');
     await p.writeTextFile('/n/b.textbundle/text.md', '# v1\n');
-    expect(await p.readTextFile('/n/a.textbundle')).toBe('# v2\n');
+    expect(await p.readTextFile('/n/a.textbundle')).toBe('# v2\n'); // Margin-only fallback
     expect(await p.readTextFile('/n/b.textbundle')).toBe('# v1\n');
-    await p.writeTextFile('/n/b.textbundle/markdown.md', '# both\n'); // v2 wins once present
-    expect(await p.readTextFile('/n/b.textbundle')).toBe('# both\n');
+    await p.writeTextFile('/n/b.textbundle/markdown.md', '# both\n');
+    expect(await p.readTextFile('/n/b.textbundle')).toBe('# v1\n'); // text.md wins when both exist (Typora)
+    await p.writeTextFile('/n/a.textbundle/text.markdown', '# ext\n');
+    expect(await p.readTextFile('/n/a.textbundle')).toBe('# ext\n'); // any text.<supported ext> beats markdown.md
+    await p.writeTextFile('/n/a.textbundle/info.json', '{"version":99}'); // never validated
+    expect(await p.readTextFile('/n/a.textbundle')).toBe('# ext\n');
     await expect(p.readTextFile('/n')).rejects.toThrow(/EISDIR/);
   });
 
-  it('writing a bundle creates text.json + assets/ and keeps saving the content file', async () => {
+  it('writing a new bundle creates text.md + info.json + assets/ and keeps saving the content file', async () => {
     const p = fresh({ seed: false });
     await p.writeTextFile('/n/journal.textbundle', '# one\n');
-    expect(JSON.parse(await p.readTextFile('/n/journal.textbundle/text.json'))).toMatchObject({ version: 2 });
+    expect(JSON.parse(await p.readTextFile('/n/journal.textbundle/info.json'))).toMatchObject({ version: 2, type: 'net.daringfireball.markdown', transient: false });
+    expect(await p.stat('/n/journal.textbundle/text.json')).toBeNull();
     expect((await p.stat('/n/journal.textbundle/assets'))?.isDir).toBe(true);
-    expect(await p.readTextFile('/n/journal.textbundle/markdown.md')).toBe('# one\n');
+    expect(await p.readTextFile('/n/journal.textbundle/text.md')).toBe('# one\n');
     await p.writeTextFile('/n/journal.textbundle', '# two\n');
-    expect(await p.readTextFile('/n/journal.textbundle/markdown.md')).toBe('# two\n');
-    expect(await p.readTextFile('/n/journal.textbundle/text.json')).toMatch(/"version":2/); // untouched
+    expect(await p.readTextFile('/n/journal.textbundle/text.md')).toBe('# two\n');
+    // an existing bundle keeps its own content file
+    await p.writeTextFile('/n/v2.textbundle/markdown.md', '# a\n');
+    await p.writeTextFile('/n/v2.textbundle', '# b\n');
+    expect(await p.readTextFile('/n/v2.textbundle/markdown.md')).toBe('# b\n');
+    expect(await p.stat('/n/v2.textbundle/text.md')).toBeNull();
   });
 
   it('stores images into <bundle>/assets and references them from the bundle root', async () => {
@@ -178,7 +187,7 @@ describe('WebPlatform textbundle (#157)', () => {
     await p.writeTextFile('/n/plain.md', '# p\n');
     const r = await p.quickOpen('/n', 'j');
     expect(r).toContain('/n/journal.textbundle');
-    expect(r.some((x) => x.includes('markdown.md') || x.includes('text.json'))).toBe(false);
+    expect(r.some((x) => x.includes('text.md') || x.includes('info.json'))).toBe(false);
   });
 });
 

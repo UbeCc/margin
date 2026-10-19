@@ -61,10 +61,11 @@ export function loadInventory({ repo, specPath }) {
 }
 
 export function counts(surfaces) {
-  const c = { total: surfaces.length, owned: 0, partial: 0, missing: 0, oos: 0, verified_by_test: 0 };
+  const c = { total: surfaces.length, owned: 0, partial: 0, missing: 0, oos: 0, verified_by_test: 0, margin_extensions: 0 };
   for (const s of surfaces) {
     c[s.status]++;
     if (s.status === 'owned' && s.verifier) c.verified_by_test++;
+    if (s.x) c.margin_extensions++;
   }
   return c;
 }

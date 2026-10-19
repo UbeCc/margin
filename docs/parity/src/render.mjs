@@ -33,6 +33,7 @@ export function renderMarkdown({ inv, summary, obligations }) {
   p(`| partial | ${c.partial} |`);
   p(`| missing | ${c.missing} |`);
   p(`| out of scope | ${c.oos} |`);
+  p(`| of which Margin extensions (beyond Typora, not parity) | ${c.margin_extensions ?? 0} |`);
   p();
   p(`REA ledger \`${summary.ledger.ledger_id}\` (closure \`${summary.ledger.closure_digest.slice(0, 16)}…\`): status **${summary.ledger.status}**; ` + L.by_status.filter((x) => x.count).map((x) => `${x.key} ${x.count}`).join(', ') + '.');
   p();
@@ -69,8 +70,8 @@ export function renderMarkdown({ inv, summary, obligations }) {
       const owner = s.ownerFile ? `\`${s.ownerFile}\` ${'`' + esc(s.ownerAnchor) + '`'}` : '—';
       const ver = s.verifier ? `\`${s.verifierFile}\` › ${esc(s.verifierTitle)}` : 'none';
       const n = (s.A?.length ?? 0) + (s.B?.length ?? 0) + (s.C?.length ?? 0);
-      const extra = s.why ? ` — ${esc(s.why)}` : s.note ? ` — ${esc(s.note)}` : '';
-      p(`| \`${s.id}\` | ${esc(s.title)}${extra} | ${ICON[s.status]} | ${o.priority ?? ''} | ${owner} | ${ver} | ${n} |`);
+      const extra = (s.x ? ` — **Margin extension (not parity):** ${esc(s.x)}` : '') + (s.why ? ` — ${esc(s.why)}` : s.note ? ` — ${esc(s.note)}` : '');
+      p(`| \`${s.id}\` | ${esc(s.title)}${extra} | ${ICON[s.status]}${s.x ? ' (extension)' : ''} | ${o.priority ?? ''} | ${owner} | ${ver} | ${n} |`);
     }
     p();
   }

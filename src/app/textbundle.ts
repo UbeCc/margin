@@ -2,8 +2,13 @@
  * TextBundle support (#157, typora-re images §3.1/§3.2, fe-sidebar §1/§5/§11):
  * a `.textbundle` folder is one document — it opens like a file, images
  * inserted into it are copied to `<bundle>/assets`, and paths inside it are
- * relative to the bundle root. `.textpack` is not documented in the prose
- * (typora-re#14) and is not treated specially.
+ * relative to the bundle root. `.textpack` is not supported (images §3.4).
+ *
+ * Margin extension, not parity: Typora 1.5.12 on macOS never enables TextBundle
+ * (images §3.4). Where Margin implements it, it follows Typora's shared front
+ * end: content = `text.md`, else the first `text.<supported ext>`; `info.json`
+ * is never validated; new bundles get `text.md` + `assets/` + a v2 `info.json`.
+ * Deliberate deviation: spec-v2 `markdown.md` is read as a last resort.
  */
 import { dirname, normalize } from './util/path';
 

@@ -20,7 +20,7 @@ describe('collectDocs: TextBundle folders are single documents (#157)', () => {
   it('lists a .textbundle dir as a doc and does not walk into it', async () => {
     const p = fake({
       '/notes': ['journal.textbundle', 'a.md', 'pics'],
-      '/notes/journal.textbundle': ['markdown.md', 'text.json', 'assets'],
+      '/notes/journal.textbundle': ['text.md', 'info.json', 'assets'],
       '/notes/pics': ['b.md'],
     });
     const { docs } = await collectDocs(p, '/notes');
@@ -28,7 +28,7 @@ describe('collectDocs: TextBundle folders are single documents (#157)', () => {
     expect(names).toContain('journal.textbundle');
     expect(names).toContain('a.md');
     expect(names).toContain('b.md'); // sibling folders still walked
-    expect(names).not.toContain('markdown.md'); // bundle internals stay hidden
+    expect(names).not.toContain('text.md'); // bundle internals stay hidden
   });
 
   it('still skips node_modules and dot-folders, bundle or not', async () => {
