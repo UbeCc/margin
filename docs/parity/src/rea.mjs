@@ -132,6 +132,7 @@ export async function buildReaInputs({ repo, inv, reaDist, specPath, sectionsDir
   }
   const proofs = [
     { proof_id: 'build.npm-run-build', kind: 'build', status: captures.build.normalized_result.exit.code === 0 ? 'pass' : 'fail', artifact_sha256s: [artifactSha256], evidence_ids: [cap('build')] },
+    ...(captures['clean-install'] ? [{ proof_id: 'clean-install.fresh-clone', kind: 'clean-install', status: captures['clean-install'].normalized_result.exit.code === 0 ? 'pass' : 'fail', artifact_sha256s: [artifactSha256], evidence_ids: [cap('clean-install')] }] : []),
     { proof_id: 'independence.dist-scan', kind: 'authority-independence', status: captures.independence.normalized_result.exit.code === 0 ? 'pass' : 'fail', artifact_sha256s: [artifactSha256], evidence_ids: [cap('independence')] },
   ];
   const boundary = { boundary_id: 'margin.typora-parity', title: 'Margin as a complete clean-room reconstruction of Typora (product surface)', required_surface_ids: inv.surfaces.map((s) => s.id), required_claim_ids: claims.map((c) => c.claim_id), required_package_proof_kinds: ['build', 'clean-install', 'authority-independence'], allowed_dispositions: ['non-goal'], allowed_unknown_ids: [] };
