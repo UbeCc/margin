@@ -83,7 +83,7 @@ export function markdownPane(k: PrefKit): HTMLElement {
     md.smartPunctuation,
     (v) => k.setMd({ smartPunctuation: v as MarkdownOptions['smartPunctuation'] }),
   );
-  const quoteRow = k.mdToggle('smartQuote', 'Smart Quotes', 'You could set quote patterns in System Preferences → Keyboard → Text. If it is changed, Typora will need a restart to apply it.');
+  const quoteRow = k.mdToggle('smartQuote', 'Smart Quotes', 'You could set quote patterns in System Preferences → Keyboard → Text. If it is changed, Margin will need a restart to apply it.');
   const dashRow = k.mdToggle('smartDash', 'Smart Dashes');
   const remapRow = k.mdToggle(
     'remapPunctuation',
