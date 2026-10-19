@@ -139,7 +139,8 @@ export const DEFAULT_MARKDOWN_OPTIONS: Readonly<MarkdownOptions> = Object.freeze
   expandSimpleBlock: true,
   codeLineNumbers: false,
   codeLineWrap: true,
-  codeIndentSize: 4,
+  // macOS native settings injection pins an unset codeIndentSize to 2 (native-windowcontroller §10, #170).
+  codeIndentSize: 2,
   shiftTabAutoIndent: false,
   smartPunctuation: 'input',
   smartQuote: false,

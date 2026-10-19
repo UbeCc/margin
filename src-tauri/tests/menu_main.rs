@@ -19,4 +19,13 @@ fn main() {
             std::process::exit(1);
         }
     }
+    // Parity verifiers menu.app.about, menu.app.system, menu.view.fullscreen, menu.window,
+    // menu.help.reference: the native menu carries Typora's macOS items in Typora's order.
+    match margin_lib::menu_structure_selftest(app.handle()) {
+        Ok(labels) => println!("menu_main: native menu structure ok ({} items)", labels.len()),
+        Err(e) => {
+            eprintln!("menu_main FAILED: {e}");
+            std::process::exit(1);
+        }
+    }
 }

@@ -41,7 +41,7 @@ test('images.textbundle: TextBundle opens as one document, images go to <bundle>
   const r = row(page, bundle);
   await expect(r).toHaveCount(1);
   await expect(r).toHaveAttribute('data-kind', 'file');
-  await expect(page.locator('.tree-row[data-path="' + bundle + '/markdown.md"]')).toHaveCount(0);
+  await expect(page.locator('.tree-row[data-path="' + bundle + '/text.md"]')).toHaveCount(0);
 
   // …and opens as a document (fe-sidebar §11).
   await r.click();
@@ -56,21 +56,21 @@ test('images.textbundle: TextBundle opens as one document, images go to <bundle>
   expect(await stat(page, stored)).toMatchObject({ isDir: false });
   expect(await stat(page, '/Margin/Notes/pics')).toBeNull();
 
-  // Saving writes the content file, keeping text.json and assets/ intact.
+  // Saving writes the content file (text.md, images §3.4), keeping info.json and assets/ intact.
   await page.evaluate(() => (window as unknown as Win).__margin.editor.setMarkdown('# Demo\n\nedited\n'));
   await menu(page, 'save');
   await expect(page.locator('.toast').last()).toContainText('Saved');
   await expect.poll(() => editorValue(page)).toBe('# Demo\n\nedited\n');
   const disk = page.evaluate(
     (p) => (window as unknown as Win & { __MARGIN_WEB__: { readTextFile(p: string): Promise<string> } }).__MARGIN_WEB__.readTextFile(p),
-    `${bundle}/markdown.md`,
+    `${bundle}/text.md`,
   );
   await expect.poll(() => disk).toBe('# Demo\n\nedited\n');
 
   // Quick Open lists the bundle as one file, never its children (editor-core §9/§10).
   const qo = await quickOpen(page, '/Margin', 'journal');
   expect(qo).toContain(bundle);
-  expect(qo.every((p) => !p.includes('markdown.md') && !p.includes('text.json'))).toBe(true);
+  expect(qo.every((p) => !p.includes('text.md') && !p.includes('info.json'))).toBe(true);
 
   // Markdown ↔ TextBundle renames are refused with Typora's wording (fe-sidebar §5)…
   await row(page, bundle).click({ button: 'right' });

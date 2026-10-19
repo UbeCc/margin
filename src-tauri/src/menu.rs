@@ -469,8 +469,9 @@ pub fn build<R: Runtime>(
 
     let window = SubmenuBuilder::new(app, "Window")
         .item(&PredefinedMenuItem::minimize(app, None)?)
-        .item(&PredefinedMenuItem::maximize(app, if mac { Some("Zoom") } else { None })?)
-        .separator();
+        .item(&PredefinedMenuItem::maximize(app, if mac { Some("Zoom") } else { None })?);
+    // macOS Window › Bring All to Front (native-commands §menus Window).
+    let window = if mac { window.item(&PredefinedMenuItem::bring_all_to_front(app, None)?) } else { window }.separator();
     let window = add_items(app, window, WINDOW_TABS)?.build()?;
     menu = menu.item(&window);
 
@@ -483,6 +484,75 @@ pub fn build<R: Runtime>(
     menu = menu.item(&help.build()?);
 
     menu.build()
+}
+
+/// Labels of a built menu as `Top › Item` paths (predefined items included), for the
+/// structure self-test (`tests/menu_main.rs`, parity verifiers for the native menus).
+pub fn labels<R: Runtime>(menu: &Menu<R>) -> tauri::Result<Vec<String>> {
+    fn walk<R: Runtime>(items: Vec<MenuItemKind<R>>, prefix: &str, out: &mut Vec<String>) -> tauri::Result<()> {
+        for it in items {
+            let (text, sub) = match &it {
+                MenuItemKind::MenuItem(m) => (m.text()?, None),
+                MenuItemKind::Predefined(m) => (m.text()?, None),
+                MenuItemKind::Check(m) => (m.text()?, None),
+                MenuItemKind::Icon(m) => (m.text()?, None),
+                MenuItemKind::Submenu(m) => (m.text()?, Some(m.items()?)),
+            };
+            if text.is_empty() {
+                continue; // separators
+            }
+            let path = if prefix.is_empty() { text } else { format!("{prefix} › {text}") };
+            out.push(path.clone());
+            if let Some(items) = sub {
+                walk(items, &path, out)?;
+            }
+        }
+        Ok(())
+    }
+    let mut out = Vec::new();
+    walk(menu.items()?, "", &mut out)?;
+    Ok(out)
+}
+
+/// Native menu structure self-test (run on the main thread by `tests/menu_main.rs`):
+/// the application, View, Window and Help surfaces Typora has on macOS.
+pub fn structure_selftest<R: Runtime>(h: &AppHandle<R>) -> Result<Vec<String>, String> {
+    let e = |x: tauri::Error| x.to_string();
+    let m = build(h, &["paper".into()], "paper", &[]).map_err(e)?;
+    let got = labels(&m).map_err(e)?;
+    let need: &[&str] = &[
+        // menu.app.about / menu.app.system
+        "Margin › About Margin",
+        "Margin › Services",
+        "Margin › Hide Others",
+        "Margin › Show All",
+        "Margin › Quit Margin",
+        // menu.view.zoom (custom items) / menu.view.fullscreen (predefined)
+        "View › Actual Size",
+        "View › Zoom In",
+        "View › Zoom Out",
+        // menu.window
+        "Window › Minimize",
+        "Window › Zoom",
+        "Window › Bring All to Front",
+        // menu.help.reference
+        "Help › Markdown Reference",
+    ];
+    let missing: Vec<&str> = need.iter().copied().filter(|n| !got.iter().any(|g| g == n)).collect();
+    if !missing.is_empty() {
+        return Err(format!("missing {missing:?} in {got:?}"));
+    }
+    if !got.iter().any(|g| g.starts_with("Margin › Hide") && g != "Margin › Hide Others") {
+        return Err("no Hide <app> item".into());
+    }
+    if !got.iter().any(|g| g.starts_with("View › ") && g.contains("Full Screen")) {
+        return Err(format!("no View › Full Screen item in {got:?}"));
+    }
+    let order = |a: &str, b: &str| got.iter().position(|g| g == a) < got.iter().position(|g| g == b);
+    if !(order("Margin › About Margin", "Margin › Services") && order("Margin › Show All", "Margin › Quit Margin") && order("Window › Minimize", "Window › Zoom") && order("Window › Zoom", "Window › Bring All to Front")) {
+        return Err(format!("unexpected order {got:?}"));
+    }
+    Ok(got)
 }
 
 /// Replace the Themes submenu's items (called when the frontend knows the full list).

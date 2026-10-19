@@ -3,7 +3,8 @@
 //   status:   'owned' | 'partial' | 'missing' | 'oos'
 //   owner:    'repo/relative/path#verbatim anchor' (anchor must appear in the file) | null
 //   verifier: 'test/file::verbatim test title fragment' | null
-//   opts:     { p: 0|1|2, e: epicId, A/B/C: spec labels covered, sec: prose section refs, note, why }
+//   opts:     { p: 0|1|2, e: epicId, A/B/C: spec labels covered, sec: prose section refs, note, why,
+//               x: rationale — Margin extension: implemented beyond Typora's shipped behaviour (not parity) }
 export const S = (id, title, status, owner, verifier, opts = {}) => ({ id, title, status, owner, verifier, ...opts });
 
 // Verifier prefixes (Playwright e2e + vitest).

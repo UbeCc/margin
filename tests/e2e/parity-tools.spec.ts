@@ -274,14 +274,14 @@ test.describe('parity: table, code and math tools (#98)', () => {
     await page.locator('.mb-code').click();
     await expect(page.locator('.mb-code .cm-content .tok-keyword').first()).toBeVisible(); // language loaded
     expect(await run(page, { kind: 'code', op: 'indentAll' })).toBe(true);
-    await expect.poll(() => md(page)).toBe('```js\nfunction f() {\n    if (x) {\n        return 1;\n    }\n}\n```\n'); // Indent Size for Code default 4 (#100)
+    await expect.poll(() => md(page)).toBe('```js\nfunction f() {\n  if (x) {\n    return 1;\n  }\n}\n```\n'); // Indent Size for Code default 2 on macOS (#170)
     await undo(page);
     expect(await run(page, { kind: 'code', op: 'copy' })).toBe(true);
     expect((await clipboard(page))['text/plain']).toContain('function f() {');
     // Auto Indent Selected Code only touches the selected line
     await page.locator('.mb-code .cm-line').nth(1).click();
     await run(page, { kind: 'code', op: 'indentSelected' });
-    await expect.poll(() => md(page)).toContain('{\n    if (x) {\nreturn 1;');
+    await expect.poll(() => md(page)).toContain('{\n  if (x) {\nreturn 1;');
     // negative: no code block at the caret
     await open(page, 'plain\n');
     await caret(page, 0, 1);
@@ -367,7 +367,7 @@ test.describe('parity: table, code and math tools (#98)', () => {
     await expect.poll(() => md(page)).toBe('```js\nfunction f() {\nreturn 1;\n}\n```\n'); // off (default): outdent at column 0 is a no-op
     await page.evaluate(() => window.__core.ed.updateSettings({ markdown: { shiftTabAutoIndent: true } }));
     await page.keyboard.press('Shift+Tab');
-    await expect.poll(() => md(page)).toBe('```js\nfunction f() {\n    return 1;\n}\n```\n'); // on: auto indent (4 = Indent Size for Code)
+    await expect.poll(() => md(page)).toBe('```js\nfunction f() {\n  return 1;\n}\n```\n'); // on: auto indent (2 = Indent Size for Code, #170)
   });
 
   test('menu.code-tools.state: Code Tools palette entries enable only inside a code block (#127)', async ({ page }) => {

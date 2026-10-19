@@ -26,11 +26,11 @@ test('tools.code.line-numbers: Code fences: line numbers, line wrap, indent size
   const ed = await pane(page, 'markdown');
   await ed.locator('[data-pref="markdown.codeLineNumbers"]').check();
   await ed.locator('[data-pref="markdown.codeLineWrap"]').uncheck();
-  await ed.locator('select[data-pref="markdown.codeIndentSize"]').selectOption('2');
+  await ed.locator('select[data-pref="markdown.codeIndentSize"]').selectOption('3');
   await close(page);
   await expect(fence).not.toHaveClass(/mb-wrap/);
   await expect(fence.locator('.mb-line-numbers, .cm-lineNumbers').first()).toBeAttached();
-  expect(await setting(page, 'markdown')).toMatchObject({ codeLineNumbers: true, codeLineWrap: false, codeIndentSize: 2 });
+  expect(await setting(page, 'markdown')).toMatchObject({ codeLineNumbers: true, codeLineWrap: false, codeIndentSize: 3 });
   // options never rewrite the fence source
   expect(await editorValue(page)).toBe('```js\nconst a = 1;\n```\n');
 });
