@@ -18,15 +18,14 @@
     "positive"
    ],
    "required_original_authority": "static",
-   "required_fixture_authority": "renderer",
-   "required_verifier_authority": "renderer",
+   "required_fixture_authority": "unit",
+   "required_verifier_authority": "unit",
    "requires_parser_type": false,
    "dependency_obligation_ids": [],
    "residual_unknown_ids": [],
    "unavailable_authority": [],
    "required_next_evidence": [
-    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules.",
-    "Add an e2e verifier that enumerates this obligation."
+    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules."
    ],
    "disposition": "active",
    "review_evidence_ids": [
@@ -81,15 +80,14 @@
     "positive"
    ],
    "required_original_authority": "static",
-   "required_fixture_authority": "renderer",
-   "required_verifier_authority": "renderer",
+   "required_fixture_authority": "unit",
+   "required_verifier_authority": "unit",
    "requires_parser_type": false,
    "dependency_obligation_ids": [],
    "residual_unknown_ids": [],
    "unavailable_authority": [],
    "required_next_evidence": [
-    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules.",
-    "Add an e2e verifier that enumerates this obligation."
+    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules."
    ],
    "disposition": "active",
    "review_evidence_ids": [
@@ -709,8 +707,7 @@
    "residual_unknown_ids": [],
    "unavailable_authority": [],
    "required_next_evidence": [
-    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules.",
-    "Add an e2e verifier that enumerates this obligation."
+    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules."
    ],
    "disposition": "active",
    "review_evidence_ids": [
@@ -2074,8 +2071,7 @@
    "residual_unknown_ids": [],
    "unavailable_authority": [],
    "required_next_evidence": [
-    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules.",
-    "Add an e2e verifier that enumerates this obligation."
+    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules."
    ],
    "disposition": "active",
    "review_evidence_ids": [
@@ -2099,15 +2095,14 @@
     "positive"
    ],
    "required_original_authority": "static",
-   "required_fixture_authority": "renderer",
-   "required_verifier_authority": "renderer",
+   "required_fixture_authority": "unit",
+   "required_verifier_authority": "unit",
    "requires_parser_type": false,
    "dependency_obligation_ids": [],
    "residual_unknown_ids": [],
    "unavailable_authority": [],
    "required_next_evidence": [
-    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules.",
-    "Add an e2e verifier that enumerates this obligation."
+    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules."
    ],
    "disposition": "active",
    "review_evidence_ids": [
@@ -2262,8 +2257,7 @@
    "residual_unknown_ids": [],
    "unavailable_authority": [],
    "required_next_evidence": [
-    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules.",
-    "Add an e2e verifier that enumerates this obligation."
+    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules."
    ],
    "disposition": "active",
    "review_evidence_ids": [
@@ -2287,8 +2281,8 @@
     "positive"
    ],
    "required_original_authority": "static",
-   "required_fixture_authority": "renderer",
-   "required_verifier_authority": "renderer",
+   "required_fixture_authority": "unit",
+   "required_verifier_authority": "unit",
    "requires_parser_type": false,
    "dependency_obligation_ids": [],
    "residual_unknown_ids": [],
@@ -2347,15 +2341,14 @@
     "positive"
    ],
    "required_original_authority": "static",
-   "required_fixture_authority": "renderer",
-   "required_verifier_authority": "renderer",
+   "required_fixture_authority": "unit",
+   "required_verifier_authority": "unit",
    "requires_parser_type": false,
    "dependency_obligation_ids": [],
    "residual_unknown_ids": [],
    "unavailable_authority": [],
    "required_next_evidence": [
-    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules.",
-    "Add an e2e verifier that enumerates this obligation."
+    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules."
    ],
    "disposition": "active",
    "review_evidence_ids": [
@@ -2379,15 +2372,14 @@
     "positive"
    ],
    "required_original_authority": "static",
-   "required_fixture_authority": "renderer",
-   "required_verifier_authority": "renderer",
+   "required_fixture_authority": "unit",
+   "required_verifier_authority": "unit",
    "requires_parser_type": false,
    "dependency_obligation_ids": [],
    "residual_unknown_ids": [],
    "unavailable_authority": [],
    "required_next_evidence": [
-    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules.",
-    "Add an e2e verifier that enumerates this obligation."
+    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules."
    ],
    "disposition": "active",
    "review_evidence_ids": [
@@ -2411,8 +2403,8 @@
     "positive"
    ],
    "required_original_authority": "static",
-   "required_fixture_authority": "renderer",
-   "required_verifier_authority": "renderer",
+   "required_fixture_authority": "unit",
+   "required_verifier_authority": "unit",
    "requires_parser_type": false,
    "dependency_obligation_ids": [],
    "residual_unknown_ids": [],
@@ -3401,8 +3393,8 @@
     "positive"
    ],
    "required_original_authority": "static",
-   "required_fixture_authority": "renderer",
-   "required_verifier_authority": "renderer",
+   "required_fixture_authority": "unit",
+   "required_verifier_authority": "unit",
    "requires_parser_type": false,
    "dependency_obligation_ids": [],
    "residual_unknown_ids": [],
@@ -3802,15 +3794,14 @@
     "positive"
    ],
    "required_original_authority": "static",
-   "required_fixture_authority": "renderer",
-   "required_verifier_authority": "renderer",
+   "required_fixture_authority": "unit",
+   "required_verifier_authority": "unit",
    "requires_parser_type": false,
    "dependency_obligation_ids": [],
    "residual_unknown_ids": [],
    "unavailable_authority": [],
    "required_next_evidence": [
-    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules.",
-    "Add an e2e verifier that enumerates this obligation."
+    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules."
    ],
    "disposition": "active",
    "review_evidence_ids": [
@@ -3845,7 +3836,7 @@
    ],
    "disposition": "active",
    "review_evidence_ids": [
-    "ev_03f90c4140cc0a05ce393b04c776bd0bcf57a2d3bfec21423ed14cdf84eb112f"
+    "ev_6a9e694c7391a3441262a219a26b52491b1dc2af445048729f391c5f1979149e"
    ]
   },
   {
@@ -4120,8 +4111,7 @@
    "residual_unknown_ids": [],
    "unavailable_authority": [],
    "required_next_evidence": [
-    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules.",
-    "Add an e2e verifier that enumerates this obligation."
+    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules."
    ],
    "disposition": "active",
    "review_evidence_ids": [
@@ -4927,8 +4917,7 @@
    "residual_unknown_ids": [],
    "unavailable_authority": [],
    "required_next_evidence": [
-    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules.",
-    "Add an e2e verifier that enumerates this obligation."
+    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules."
    ],
    "disposition": "active",
    "review_evidence_ids": [
@@ -5076,15 +5065,14 @@
     "positive"
    ],
    "required_original_authority": "static",
-   "required_fixture_authority": "renderer",
-   "required_verifier_authority": "renderer",
+   "required_fixture_authority": "unit",
+   "required_verifier_authority": "unit",
    "requires_parser_type": false,
    "dependency_obligation_ids": [],
    "residual_unknown_ids": [],
    "unavailable_authority": [],
    "required_next_evidence": [
-    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules.",
-    "Add an e2e verifier that enumerates this obligation."
+    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules."
    ],
    "disposition": "active",
    "review_evidence_ids": [
@@ -5232,8 +5220,8 @@
     "positive"
    ],
    "required_original_authority": "static",
-   "required_fixture_authority": "renderer",
-   "required_verifier_authority": "renderer",
+   "required_fixture_authority": "unit",
+   "required_verifier_authority": "unit",
    "requires_parser_type": false,
    "dependency_obligation_ids": [],
    "residual_unknown_ids": [],
@@ -5261,8 +5249,8 @@
     "positive"
    ],
    "required_original_authority": "static",
-   "required_fixture_authority": "renderer",
-   "required_verifier_authority": "renderer",
+   "required_fixture_authority": "unit",
+   "required_verifier_authority": "unit",
    "requires_parser_type": false,
    "dependency_obligation_ids": [],
    "residual_unknown_ids": [],
@@ -5290,8 +5278,8 @@
     "positive"
    ],
    "required_original_authority": "static",
-   "required_fixture_authority": "renderer",
-   "required_verifier_authority": "renderer",
+   "required_fixture_authority": "unit",
+   "required_verifier_authority": "unit",
    "requires_parser_type": false,
    "dependency_obligation_ids": [],
    "residual_unknown_ids": [],
@@ -5319,8 +5307,8 @@
     "positive"
    ],
    "required_original_authority": "static",
-   "required_fixture_authority": "renderer",
-   "required_verifier_authority": "renderer",
+   "required_fixture_authority": "unit",
+   "required_verifier_authority": "unit",
    "requires_parser_type": false,
    "dependency_obligation_ids": [],
    "residual_unknown_ids": [],
@@ -5348,8 +5336,8 @@
     "positive"
    ],
    "required_original_authority": "static",
-   "required_fixture_authority": "renderer",
-   "required_verifier_authority": "renderer",
+   "required_fixture_authority": "unit",
+   "required_verifier_authority": "unit",
    "requires_parser_type": false,
    "dependency_obligation_ids": [],
    "residual_unknown_ids": [],
@@ -5377,15 +5365,14 @@
     "positive"
    ],
    "required_original_authority": "static",
-   "required_fixture_authority": "renderer",
-   "required_verifier_authority": "renderer",
+   "required_fixture_authority": "unit",
+   "required_verifier_authority": "unit",
    "requires_parser_type": false,
    "dependency_obligation_ids": [],
    "residual_unknown_ids": [],
    "unavailable_authority": [],
    "required_next_evidence": [
-    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules.",
-    "Add an e2e verifier that enumerates this obligation."
+    "Original behavior is characterized only by clean-room prose (analyst-inference); a shipped-artifact or runtime observation of the original is unavailable under clean-room rules."
    ],
    "disposition": "active",
    "review_evidence_ids": [
@@ -5400,7 +5387,7 @@
     "owner": {
      "module_path": "src-tauri/src/menu.rs",
      "symbol": "About Margin",
-     "owner_sha256": "59008d8a159028e5944a42084bc7ba71bc3af6957ba59448b0dc0e29bf4fec04"
+     "owner_sha256": "ee9a5f69aa6bdace6ab484433f6f6d6344c8492d64fd5e9eab0d225aa1a29c35"
     },
     "parser_type": null,
     "original_cases": [
@@ -5410,15 +5397,38 @@
       "location": "typora-re/parity-spec.md"
      }
     ],
-    "fixtures": [],
-    "verifier": null
+    "fixtures": [
+     {
+      "fixture_id": "menu.app.about.positive",
+      "case_kind": "positive",
+      "authority": "unit",
+      "evidence_ids": [
+       "ev_796a61a58eb221edc324157bb52b81302c676d2f0158a5478e918ac774e0023c"
+      ]
+     }
+    ],
+    "verifier": {
+     "verifier_id": "margin.cargo-test.menu.app.about",
+     "claim_id": "claim.menu.app.about",
+     "command": "cargo test --manifest-path src-tauri/Cargo.toml --test menu_main",
+     "authority": "unit",
+     "status": "pass",
+     "result_evidence_id": "ev_796a61a58eb221edc324157bb52b81302c676d2f0158a5478e918ac774e0023c",
+     "enumerated_obligation_ids": [
+      "typora.menu.app.about"
+     ],
+     "nondeterminism": {
+      "mode": "total-order",
+      "specification": "Single deterministic suite run; pass = suite exited 0 with the named test not skipped."
+     }
+    }
    },
    {
     "obligation_id": "typora.menu.app.preferences",
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'preferences'",
-     "owner_sha256": "1044e05ac479633cd76947dc7dd1b442b4211011d535fbadc6a9900a893dabc3"
+     "owner_sha256": "e64e2515a1a9b98aaaef0ff7d8b0e9705f9ecf9d8f3641f60ed1935957318705"
     },
     "parser_type": null,
     "original_cases": [
@@ -5434,7 +5444,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -5444,7 +5454,7 @@
      "command": "npx playwright test tests/e2e/app-themes.spec.ts -g \"theme switching via preferences persists across reloads\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.app.preferences"
      ],
@@ -5459,7 +5469,7 @@
     "owner": {
      "module_path": "src-tauri/src/menu.rs",
      "symbol": "PredefinedMenuItem::hide_others",
-     "owner_sha256": "59008d8a159028e5944a42084bc7ba71bc3af6957ba59448b0dc0e29bf4fec04"
+     "owner_sha256": "ee9a5f69aa6bdace6ab484433f6f6d6344c8492d64fd5e9eab0d225aa1a29c35"
     },
     "parser_type": null,
     "original_cases": [
@@ -5469,15 +5479,38 @@
       "location": "typora-re/parity-spec.md"
      }
     ],
-    "fixtures": [],
-    "verifier": null
+    "fixtures": [
+     {
+      "fixture_id": "menu.app.system.positive",
+      "case_kind": "positive",
+      "authority": "unit",
+      "evidence_ids": [
+       "ev_796a61a58eb221edc324157bb52b81302c676d2f0158a5478e918ac774e0023c"
+      ]
+     }
+    ],
+    "verifier": {
+     "verifier_id": "margin.cargo-test.menu.app.system",
+     "claim_id": "claim.menu.app.system",
+     "command": "cargo test --manifest-path src-tauri/Cargo.toml --test menu_main",
+     "authority": "unit",
+     "status": "pass",
+     "result_evidence_id": "ev_796a61a58eb221edc324157bb52b81302c676d2f0158a5478e918ac774e0023c",
+     "enumerated_obligation_ids": [
+      "typora.menu.app.system"
+     ],
+     "nondeterminism": {
+      "mode": "total-order",
+      "specification": "Single deterministic suite run; pass = suite exited 0 with the named test not skipped."
+     }
+    }
    },
    {
     "obligation_id": "typora.menu.file.new",
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'new'",
-     "owner_sha256": "1044e05ac479633cd76947dc7dd1b442b4211011d535fbadc6a9900a893dabc3"
+     "owner_sha256": "e64e2515a1a9b98aaaef0ff7d8b0e9705f9ecf9d8f3641f60ed1935957318705"
     },
     "parser_type": null,
     "original_cases": [
@@ -5493,7 +5526,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -5503,7 +5536,7 @@
      "command": "npx playwright test tests/e2e/app-files.spec.ts -g \"new untitled document → Save As writes file\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.file.new"
      ],
@@ -5518,7 +5551,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "private async newWindow(",
-     "owner_sha256": "1044e05ac479633cd76947dc7dd1b442b4211011d535fbadc6a9900a893dabc3"
+     "owner_sha256": "e64e2515a1a9b98aaaef0ff7d8b0e9705f9ecf9d8f3641f60ed1935957318705"
     },
     "parser_type": null,
     "original_cases": [
@@ -5534,7 +5567,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -5544,7 +5577,7 @@
      "command": "npx playwright test tests/e2e/parity-files.spec.ts -g \"menu.file.new-window: File › New Window / Open in New Window\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.file.new-window"
      ],
@@ -5575,7 +5608,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -5585,7 +5618,7 @@
      "command": "npx playwright test tests/e2e/parity-files.spec.ts -g \"menu.file.tabs: Tabs: New Tab, switch between opened documents, next/previous tab\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.file.tabs"
      ],
@@ -5600,7 +5633,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'open'",
-     "owner_sha256": "1044e05ac479633cd76947dc7dd1b442b4211011d535fbadc6a9900a893dabc3"
+     "owner_sha256": "e64e2515a1a9b98aaaef0ff7d8b0e9705f9ecf9d8f3641f60ed1935957318705"
     },
     "parser_type": null,
     "original_cases": [
@@ -5616,7 +5649,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -5626,7 +5659,7 @@
      "command": "npx playwright test tests/e2e/app-files.spec.ts -g \"file tree lazily expands folders and opens files\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.file.open"
      ],
@@ -5641,7 +5674,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'openFolder'",
-     "owner_sha256": "1044e05ac479633cd76947dc7dd1b442b4211011d535fbadc6a9900a893dabc3"
+     "owner_sha256": "e64e2515a1a9b98aaaef0ff7d8b0e9705f9ecf9d8f3641f60ed1935957318705"
     },
     "parser_type": null,
     "original_cases": [
@@ -5657,7 +5690,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -5667,7 +5700,7 @@
      "command": "npx playwright test tests/e2e/app-files.spec.ts -g \"file tree lazily expands folders and opens files\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.file.open-folder"
      ],
@@ -5682,7 +5715,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "quickOpen(): void",
-     "owner_sha256": "1044e05ac479633cd76947dc7dd1b442b4211011d535fbadc6a9900a893dabc3"
+     "owner_sha256": "e64e2515a1a9b98aaaef0ff7d8b0e9705f9ecf9d8f3641f60ed1935957318705"
     },
     "parser_type": null,
     "original_cases": [
@@ -5698,7 +5731,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -5708,7 +5741,7 @@
      "command": "npx playwright test tests/e2e/app-navigation.spec.ts -g \"quick open fuzzy-finds files with highlights\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.file.quick-open"
      ],
@@ -5739,7 +5772,7 @@
       "case_kind": "positive",
       "authority": "unit",
       "evidence_ids": [
-       "ev_fbff234ec48d7a423769c9e2d3ea5de846700e84dbbc2837733666f3e2eee501"
+       "ev_db9ea254a88ff63c0543a3b94df23b5cc8bebfc85734e268c966912f9f1c2118"
       ]
      }
     ],
@@ -5749,7 +5782,7 @@
      "command": "npx vitest run src/app/__tests__/settings.test.ts -t \"dedupes and caps recent lists\"",
      "authority": "unit",
      "status": "pass",
-     "result_evidence_id": "ev_fbff234ec48d7a423769c9e2d3ea5de846700e84dbbc2837733666f3e2eee501",
+     "result_evidence_id": "ev_db9ea254a88ff63c0543a3b94df23b5cc8bebfc85734e268c966912f9f1c2118",
      "enumerated_obligation_ids": [
       "typora.menu.file.recent"
      ],
@@ -5780,7 +5813,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -5790,7 +5823,7 @@
      "command": "npx playwright test tests/e2e/parity-files.spec.ts -g \"menu.file.reopen-closed: File › Reopen Closed File\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.file.reopen-closed"
      ],
@@ -5805,7 +5838,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'save'",
-     "owner_sha256": "1044e05ac479633cd76947dc7dd1b442b4211011d535fbadc6a9900a893dabc3"
+     "owner_sha256": "e64e2515a1a9b98aaaef0ff7d8b0e9705f9ecf9d8f3641f60ed1935957318705"
     },
     "parser_type": null,
     "original_cases": [
@@ -5821,7 +5854,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -5831,7 +5864,7 @@
      "command": "npx playwright test tests/e2e/app-files.spec.ts -g \"editing marks dirty, Cmd+S saves to disk\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.file.save"
      ],
@@ -5846,7 +5879,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'saveAs'",
-     "owner_sha256": "1044e05ac479633cd76947dc7dd1b442b4211011d535fbadc6a9900a893dabc3"
+     "owner_sha256": "e64e2515a1a9b98aaaef0ff7d8b0e9705f9ecf9d8f3641f60ed1935957318705"
     },
     "parser_type": null,
     "original_cases": [
@@ -5862,7 +5895,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -5872,7 +5905,7 @@
      "command": "npx playwright test tests/e2e/app-files.spec.ts -g \"new untitled document → Save As writes file\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.file.save-as"
      ],
@@ -5903,7 +5936,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -5913,7 +5946,7 @@
      "command": "npx playwright test tests/e2e/parity-files.spec.ts -g \"menu.file.save-all: File › Save All\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.file.save-all"
      ],
@@ -5944,7 +5977,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -5954,7 +5987,7 @@
      "command": "npx playwright test tests/e2e/parity-files.spec.ts -g \"menu.file.duplicate: File › Duplicate\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.file.duplicate"
      ],
@@ -5985,7 +6018,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -5995,7 +6028,7 @@
      "command": "npx playwright test tests/e2e/parity-files.spec.ts -g \"menu.file.rename-move: File › Rename… / Move To… for the current document\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.file.rename-move"
      ],
@@ -6026,7 +6059,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -6036,7 +6069,7 @@
      "command": "npx playwright test tests/e2e/parity-files.spec.ts -g \"menu.file.revert-versions: File › Revert To / Browse All Versions (version history)\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.file.revert-versions"
      ],
@@ -6067,7 +6100,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -6077,7 +6110,7 @@
      "command": "npx playwright test tests/e2e/parity-files.spec.ts -g \"menu.file.encoding: File › Reopen with Encoding\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.file.encoding"
      ],
@@ -6092,7 +6125,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'toggleLineEnding'",
-     "owner_sha256": "1044e05ac479633cd76947dc7dd1b442b4211011d535fbadc6a9900a893dabc3"
+     "owner_sha256": "e64e2515a1a9b98aaaef0ff7d8b0e9705f9ecf9d8f3641f60ed1935957318705"
     },
     "parser_type": null,
     "original_cases": [
@@ -6108,7 +6141,7 @@
       "case_kind": "positive",
       "authority": "unit",
       "evidence_ids": [
-       "ev_fbff234ec48d7a423769c9e2d3ea5de846700e84dbbc2837733666f3e2eee501"
+       "ev_db9ea254a88ff63c0543a3b94df23b5cc8bebfc85734e268c966912f9f1c2118"
       ]
      }
     ],
@@ -6118,7 +6151,7 @@
      "command": "npx vitest run src/app/__tests__/document.test.ts -t \"toggling EOL marks dirty and toggling back cleans\"",
      "authority": "unit",
      "status": "pass",
-     "result_evidence_id": "ev_fbff234ec48d7a423769c9e2d3ea5de846700e84dbbc2837733666f3e2eee501",
+     "result_evidence_id": "ev_db9ea254a88ff63c0543a3b94df23b5cc8bebfc85734e268c966912f9f1c2118",
      "enumerated_obligation_ids": [
       "typora.menu.file.line-endings"
      ],
@@ -6149,7 +6182,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -6159,7 +6192,7 @@
      "command": "npx playwright test tests/e2e/parity-files.spec.ts -g \"menu.file.properties: File › Properties / Get Info (word count, size, dates)\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.file.properties"
      ],
@@ -6190,7 +6223,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -6200,7 +6233,7 @@
      "command": "npx playwright test tests/e2e/parity-files.spec.ts -g \"menu.file.reveal: File › Reveal in Finder / Open File Location / Copy File Path (current doc)\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.file.reveal"
      ],
@@ -6231,7 +6264,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -6241,7 +6274,7 @@
      "command": "npx playwright test tests/e2e/parity-export.spec.ts -g \"menu.file.page-setup: File › Page Setup\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.file.page-setup"
      ],
@@ -6256,7 +6289,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'print'",
-     "owner_sha256": "1044e05ac479633cd76947dc7dd1b442b4211011d535fbadc6a9900a893dabc3"
+     "owner_sha256": "e64e2515a1a9b98aaaef0ff7d8b0e9705f9ecf9d8f3641f60ed1935957318705"
     },
     "parser_type": null,
     "original_cases": [
@@ -6266,15 +6299,38 @@
       "location": "export-print §4.2"
      }
     ],
-    "fixtures": [],
-    "verifier": null
+    "fixtures": [
+     {
+      "fixture_id": "menu.file.print.positive",
+      "case_kind": "positive",
+      "authority": "renderer",
+      "evidence_ids": [
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
+      ]
+     }
+    ],
+    "verifier": {
+     "verifier_id": "margin.playwright.menu.file.print",
+     "claim_id": "claim.menu.file.print",
+     "command": "npx playwright test tests/e2e/parity-evidence.spec.ts -g \"menu.file.print: File › Print\"",
+     "authority": "renderer",
+     "status": "pass",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
+     "enumerated_obligation_ids": [
+      "typora.menu.file.print"
+     ],
+     "nondeterminism": {
+      "mode": "total-order",
+      "specification": "Single deterministic suite run; pass = suite exited 0 with the named test not skipped."
+     }
+    }
    },
    {
     "obligation_id": "typora.menu.file.close",
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'close'",
-     "owner_sha256": "1044e05ac479633cd76947dc7dd1b442b4211011d535fbadc6a9900a893dabc3"
+     "owner_sha256": "e64e2515a1a9b98aaaef0ff7d8b0e9705f9ecf9d8f3641f60ed1935957318705"
     },
     "parser_type": null,
     "original_cases": [
@@ -6290,7 +6346,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -6300,7 +6356,7 @@
      "command": "npx playwright test tests/e2e/app-files.spec.ts -g \"close request with unsaved changes can be cancelled\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.file.close"
      ],
@@ -6331,7 +6387,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -6341,7 +6397,7 @@
      "command": "npx playwright test tests/e2e/parity-files.spec.ts -g \"menu.file.errors: Open/save error reporting (missing file, open failed, create prompt)\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.file.errors"
      ],
@@ -6356,7 +6412,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'undo'",
-     "owner_sha256": "1044e05ac479633cd76947dc7dd1b442b4211011d535fbadc6a9900a893dabc3"
+     "owner_sha256": "e64e2515a1a9b98aaaef0ff7d8b0e9705f9ecf9d8f3641f60ed1935957318705"
     },
     "parser_type": null,
     "original_cases": [
@@ -6372,7 +6428,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -6382,7 +6438,7 @@
      "command": "npx playwright test tests/e2e/core-cases.ts -g \"typing, Enter split, heading shortcut, undo/redo\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.edit.undo-redo"
      ],
@@ -6413,7 +6469,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -6423,7 +6479,7 @@
      "command": "npx playwright test tests/e2e/core-cases.ts -g \"paste HTML becomes markdown; copy gives markdown\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.edit.cut-copy-paste"
      ],
@@ -6454,7 +6510,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -6464,7 +6520,7 @@
      "command": "npx playwright test tests/e2e/blocks-core.spec.ts -g \"Cmd/Ctrl+A in a table cell selects the cell\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.edit.delete-select-all"
      ],
@@ -6495,7 +6551,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -6505,7 +6561,7 @@
      "command": "npx playwright test tests/e2e/app-navigation.spec.ts -g \"find keeps focus in the bar, counts and cycles matches\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.edit.find-replace"
      ],
@@ -6536,7 +6592,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -6546,7 +6602,7 @@
      "command": "npx playwright test tests/e2e/parity-clipboard.spec.ts -g \"menu.edit.find-options: Find options: whole word and regular expression\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.edit.find-options"
      ],
@@ -6577,7 +6633,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -6587,7 +6643,7 @@
      "command": "npx playwright test tests/e2e/parity-clipboard.spec.ts -g \"menu.edit.copy-as: Edit › Copy as Markdown / HTML Code / Plain Text / without Theme Styling / to MS Word\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.edit.copy-as"
      ],
@@ -6618,7 +6674,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -6628,7 +6684,7 @@
      "command": "npx playwright test tests/e2e/parity-clipboard.spec.ts -g \"menu.edit.paste-plain: Edit › Paste as Plain Text\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.edit.paste-plain"
      ],
@@ -6659,7 +6715,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -6669,7 +6725,7 @@
      "command": "npx playwright test tests/e2e/parity-clipboard.spec.ts -g \"menu.edit.select-scopes: Edit › Selection\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.edit.select-scopes"
      ],
@@ -6700,7 +6756,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -6710,7 +6766,7 @@
      "command": "npx playwright test tests/e2e/parity-clipboard.spec.ts -g \"menu.edit.delete-scopes: Edit › Delete Word\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.edit.delete-scopes"
      ],
@@ -6741,7 +6797,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -6751,7 +6807,7 @@
      "command": "npx playwright test tests/e2e/parity-clipboard.spec.ts -g \"menu.edit.jump: Edit › Jump To: Top / Bottom / Selection\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.edit.jump"
      ],
@@ -6782,7 +6838,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -6792,7 +6848,7 @@
      "command": "npx playwright test tests/e2e/parity-chrome.spec.ts -g \"menu.edit.spelling:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.edit.spelling"
      ],
@@ -6823,7 +6879,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -6833,7 +6889,7 @@
      "command": "npx playwright test tests/e2e/parity-chrome.spec.ts -g \"menu.edit.substitutions:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.edit.substitutions"
      ],
@@ -6864,7 +6920,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -6874,7 +6930,7 @@
      "command": "npx playwright test tests/e2e/parity-chrome.spec.ts -g \"menu.edit.speech:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.edit.speech"
      ],
@@ -6905,7 +6961,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -6915,7 +6971,7 @@
      "command": "npx playwright test tests/e2e/parity-chrome.spec.ts -g \"menu.edit.emoji:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.edit.emoji"
      ],
@@ -6946,7 +7002,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -6956,7 +7012,7 @@
      "command": "npx playwright test tests/e2e/app-navigation.spec.ts -g \"keyboard shortcuts drive editor commands\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.para.headings"
      ],
@@ -6987,7 +7043,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -6997,7 +7053,7 @@
      "command": "npx playwright test tests/e2e/parity-core-cmds.spec.ts -g \"menu.para.heading-level:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.para.heading-level"
      ],
@@ -7028,7 +7084,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -7038,7 +7094,7 @@
      "command": "npx playwright test tests/e2e/parity-tools.spec.ts -g \"menu.para.table:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.para.table"
      ],
@@ -7069,7 +7125,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -7079,7 +7135,7 @@
      "command": "npx playwright test tests/e2e/blocks-widgets.spec.ts -g \"renders KaTeX, edits source, shows errors\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.para.math-block"
      ],
@@ -7110,7 +7166,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -7120,7 +7176,7 @@
      "command": "npx playwright test tests/e2e/core-cases.ts -g \"``` + Enter mounts a code widget\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.para.code-fence"
      ],
@@ -7151,7 +7207,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -7161,7 +7217,7 @@
      "command": "npx playwright test tests/e2e/parity-core-cmds.spec.ts -g \"menu.para.html-block:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.para.html-block"
      ],
@@ -7192,7 +7248,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -7202,7 +7258,7 @@
      "command": "npx playwright test tests/e2e/core-qa.spec.ts -g \"cut/paste list items, toggle list on two blocks\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.para.containers"
      ],
@@ -7233,7 +7289,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -7243,7 +7299,7 @@
      "command": "npx playwright test tests/e2e/parity-core-cmds.spec.ts -g \"menu.para.task-status:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.para.task-status"
      ],
@@ -7274,7 +7330,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -7284,7 +7340,7 @@
      "command": "npx playwright test tests/e2e/core-qa.spec.ts -g \"Tab moves an item with its nested children\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.para.indent"
      ],
@@ -7315,7 +7371,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -7325,7 +7381,7 @@
      "command": "npx playwright test tests/e2e/parity-core-cmds.spec.ts -g \"menu.para.insert-paragraph:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.para.insert-paragraph"
      ],
@@ -7356,7 +7412,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -7366,7 +7422,7 @@
      "command": "npx playwright test tests/e2e/parity-core-cmds.spec.ts -g \"menu.para.link-reference:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.para.link-reference"
      ],
@@ -7397,7 +7453,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -7407,7 +7463,7 @@
      "command": "npx playwright test tests/e2e/parity-core-cmds.spec.ts -g \"menu.para.footnotes:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.para.footnotes"
      ],
@@ -7438,7 +7494,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -7448,7 +7504,7 @@
      "command": "npx playwright test tests/e2e/core-cases.ts -g \"exec: heading, strong, block quote\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.para.hr"
      ],
@@ -7479,7 +7535,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -7489,7 +7545,7 @@
      "command": "npx playwright test tests/e2e/blocks-widgets.spec.ts -g \"toc lists headings and scrolls\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.para.toc"
      ],
@@ -7520,7 +7576,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -7530,7 +7586,7 @@
      "command": "npx playwright test tests/e2e/parity-core-cmds.spec.ts -g \"menu.para.front-matter:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.para.front-matter"
      ],
@@ -7561,7 +7617,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -7571,7 +7627,7 @@
      "command": "npx playwright test tests/e2e/app-navigation.spec.ts -g \"keyboard shortcuts drive editor commands\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.format.basic"
      ],
@@ -7602,7 +7658,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -7612,7 +7668,7 @@
      "command": "npx playwright test tests/e2e/parity-core-cmds.spec.ts -g \"menu.format.underline:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.format.underline"
      ],
@@ -7643,7 +7699,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -7653,7 +7709,7 @@
      "command": "npx playwright test tests/e2e/parity-core-cmds.spec.ts -g \"menu.format.inline-math:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.format.inline-math"
      ],
@@ -7684,7 +7740,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -7694,7 +7750,7 @@
      "command": "npx playwright test tests/e2e/parity-core-cmds.spec.ts -g \"menu.format.sub-sup:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.format.sub-sup"
      ],
@@ -7725,7 +7781,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -7735,7 +7791,7 @@
      "command": "npx playwright test tests/e2e/parity-core-cmds.spec.ts -g \"menu.format.comment:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.format.comment"
      ],
@@ -7766,7 +7822,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -7776,7 +7832,7 @@
      "command": "npx playwright test tests/e2e/core-cases.ts -g \"Cmd+click opens links\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.format.hyperlink"
      ],
@@ -7807,7 +7863,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -7817,7 +7873,7 @@
      "command": "npx playwright test tests/e2e/parity-core-cmds.spec.ts -g \"menu.format.clear:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.format.clear"
      ],
@@ -7848,7 +7904,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -7858,7 +7914,7 @@
      "command": "npx playwright test tests/e2e/parity-images.spec.ts -g \"menu.format.image: Format › Image › Insert Image / Insert Local Images…\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.format.image"
      ],
@@ -7873,7 +7929,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'toggleSource'",
-     "owner_sha256": "1044e05ac479633cd76947dc7dd1b442b4211011d535fbadc6a9900a893dabc3"
+     "owner_sha256": "e64e2515a1a9b98aaaef0ff7d8b0e9705f9ecf9d8f3641f60ed1935957318705"
     },
     "parser_type": null,
     "original_cases": [
@@ -7889,7 +7945,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -7899,7 +7955,7 @@
      "command": "npx playwright test tests/e2e/core-cases.ts -g \"source mode round-trip\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.view.source-mode"
      ],
@@ -7914,7 +7970,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'toggleFocus'",
-     "owner_sha256": "1044e05ac479633cd76947dc7dd1b442b4211011d535fbadc6a9900a893dabc3"
+     "owner_sha256": "e64e2515a1a9b98aaaef0ff7d8b0e9705f9ecf9d8f3641f60ed1935957318705"
     },
     "parser_type": null,
     "original_cases": [
@@ -7930,7 +7986,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -7940,7 +7996,7 @@
      "command": "npx playwright test tests/e2e/app-navigation.spec.ts -g \"native menu actions route through one dispatcher\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.view.focus-typewriter"
      ],
@@ -7955,7 +8011,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'toggleSidebar'",
-     "owner_sha256": "1044e05ac479633cd76947dc7dd1b442b4211011d535fbadc6a9900a893dabc3"
+     "owner_sha256": "e64e2515a1a9b98aaaef0ff7d8b0e9705f9ecf9d8f3641f60ed1935957318705"
     },
     "parser_type": null,
     "original_cases": [
@@ -7971,7 +8027,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -7981,7 +8037,7 @@
      "command": "npx playwright test tests/e2e/app-navigation.spec.ts -g \"outline lists headings and jumps on click\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.view.sidebar"
      ],
@@ -8012,7 +8068,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -8022,7 +8078,7 @@
      "command": "npx playwright test tests/e2e/parity-chrome.spec.ts -g \"menu.view.status-bar:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.view.status-bar"
      ],
@@ -8037,7 +8093,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'zoomIn'",
-     "owner_sha256": "1044e05ac479633cd76947dc7dd1b442b4211011d535fbadc6a9900a893dabc3"
+     "owner_sha256": "e64e2515a1a9b98aaaef0ff7d8b0e9705f9ecf9d8f3641f60ed1935957318705"
     },
     "parser_type": null,
     "original_cases": [
@@ -8047,15 +8103,38 @@
       "location": "typora-re/parity-spec.md"
      }
     ],
-    "fixtures": [],
-    "verifier": null
+    "fixtures": [
+     {
+      "fixture_id": "menu.view.zoom.positive",
+      "case_kind": "positive",
+      "authority": "renderer",
+      "evidence_ids": [
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
+      ]
+     }
+    ],
+    "verifier": {
+     "verifier_id": "margin.playwright.menu.view.zoom",
+     "claim_id": "claim.menu.view.zoom",
+     "command": "npx playwright test tests/e2e/parity-evidence.spec.ts -g \"menu.view.zoom: View › Actual Size / Zoom In / Zoom Out\"",
+     "authority": "renderer",
+     "status": "pass",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
+     "enumerated_obligation_ids": [
+      "typora.menu.view.zoom"
+     ],
+     "nondeterminism": {
+      "mode": "total-order",
+      "specification": "Single deterministic suite run; pass = suite exited 0 with the named test not skipped."
+     }
+    }
    },
    {
     "obligation_id": "typora.menu.view.fullscreen",
     "owner": {
      "module_path": "src-tauri/src/menu.rs",
      "symbol": "PredefinedMenuItem::fullscreen",
-     "owner_sha256": "59008d8a159028e5944a42084bc7ba71bc3af6957ba59448b0dc0e29bf4fec04"
+     "owner_sha256": "ee9a5f69aa6bdace6ab484433f6f6d6344c8492d64fd5e9eab0d225aa1a29c35"
     },
     "parser_type": null,
     "original_cases": [
@@ -8065,15 +8144,38 @@
       "location": "typora-re/parity-spec.md"
      }
     ],
-    "fixtures": [],
-    "verifier": null
+    "fixtures": [
+     {
+      "fixture_id": "menu.view.fullscreen.positive",
+      "case_kind": "positive",
+      "authority": "unit",
+      "evidence_ids": [
+       "ev_796a61a58eb221edc324157bb52b81302c676d2f0158a5478e918ac774e0023c"
+      ]
+     }
+    ],
+    "verifier": {
+     "verifier_id": "margin.cargo-test.menu.view.fullscreen",
+     "claim_id": "claim.menu.view.fullscreen",
+     "command": "cargo test --manifest-path src-tauri/Cargo.toml --test menu_main",
+     "authority": "unit",
+     "status": "pass",
+     "result_evidence_id": "ev_796a61a58eb221edc324157bb52b81302c676d2f0158a5478e918ac774e0023c",
+     "enumerated_obligation_ids": [
+      "typora.menu.view.fullscreen"
+     ],
+     "nondeterminism": {
+      "mode": "total-order",
+      "specification": "Single deterministic suite run; pass = suite exited 0 with the named test not skipped."
+     }
+    }
    },
    {
     "obligation_id": "typora.menu.view.always-on-top",
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'alwaysOnTop'",
-     "owner_sha256": "1044e05ac479633cd76947dc7dd1b442b4211011d535fbadc6a9900a893dabc3"
+     "owner_sha256": "e64e2515a1a9b98aaaef0ff7d8b0e9705f9ecf9d8f3641f60ed1935957318705"
     },
     "parser_type": null,
     "original_cases": [
@@ -8089,7 +8191,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -8099,7 +8201,7 @@
      "command": "npx playwright test tests/e2e/parity-chrome.spec.ts -g \"menu.view.always-on-top:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.view.always-on-top"
      ],
@@ -8114,7 +8216,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'toggleDevtools'",
-     "owner_sha256": "1044e05ac479633cd76947dc7dd1b442b4211011d535fbadc6a9900a893dabc3"
+     "owner_sha256": "e64e2515a1a9b98aaaef0ff7d8b0e9705f9ecf9d8f3641f60ed1935957318705"
     },
     "parser_type": null,
     "original_cases": [
@@ -8130,7 +8232,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -8140,7 +8242,7 @@
      "command": "npx playwright test tests/e2e/parity-chrome.spec.ts -g \"menu.view.devtools:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.view.devtools"
      ],
@@ -8171,7 +8273,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -8181,7 +8283,7 @@
      "command": "npx playwright test tests/e2e/parity-chrome.spec.ts -g \"menu.view.magnification:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.view.magnification"
      ],
@@ -8196,7 +8298,7 @@
     "owner": {
      "module_path": "src-tauri/src/menu.rs",
      "symbol": "THEMES_SUBMENU_ID",
-     "owner_sha256": "59008d8a159028e5944a42084bc7ba71bc3af6957ba59448b0dc0e29bf4fec04"
+     "owner_sha256": "ee9a5f69aa6bdace6ab484433f6f6d6344c8492d64fd5e9eab0d225aa1a29c35"
     },
     "parser_type": null,
     "original_cases": [
@@ -8212,7 +8314,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -8222,7 +8324,7 @@
      "command": "npx playwright test tests/e2e/app-themes.spec.ts -g \"command palette theme entry and custom CSS\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.themes"
      ],
@@ -8237,7 +8339,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "case 'openThemesFolder'",
-     "owner_sha256": "1044e05ac479633cd76947dc7dd1b442b4211011d535fbadc6a9900a893dabc3"
+     "owner_sha256": "e64e2515a1a9b98aaaef0ff7d8b0e9705f9ecf9d8f3641f60ed1935957318705"
     },
     "parser_type": null,
     "original_cases": [
@@ -8247,15 +8349,38 @@
       "location": "typora-re/parity-spec.md"
      }
     ],
-    "fixtures": [],
-    "verifier": null
+    "fixtures": [
+     {
+      "fixture_id": "menu.themes.folder.positive",
+      "case_kind": "positive",
+      "authority": "renderer",
+      "evidence_ids": [
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
+      ]
+     }
+    ],
+    "verifier": {
+     "verifier_id": "margin.playwright.menu.themes.folder",
+     "claim_id": "claim.menu.themes.folder",
+     "command": "npx playwright test tests/e2e/parity-evidence.spec.ts -g \"menu.themes.folder: Themes › Open Theme Folder\"",
+     "authority": "renderer",
+     "status": "pass",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
+     "enumerated_obligation_ids": [
+      "typora.menu.themes.folder"
+     ],
+     "nondeterminism": {
+      "mode": "total-order",
+      "specification": "Single deterministic suite run; pass = suite exited 0 with the named test not skipped."
+     }
+    }
    },
    {
     "obligation_id": "typora.menu.state-sync",
     "owner": {
      "module_path": "src-tauri/src/menu.rs",
      "symbol": "pub fn set_checked",
-     "owner_sha256": "59008d8a159028e5944a42084bc7ba71bc3af6957ba59448b0dc0e29bf4fec04"
+     "owner_sha256": "ee9a5f69aa6bdace6ab484433f6f6d6344c8492d64fd5e9eab0d225aa1a29c35"
     },
     "parser_type": null,
     "original_cases": [
@@ -8271,7 +8396,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -8281,7 +8406,7 @@
      "command": "npx playwright test tests/e2e/parity-chrome.spec.ts -g \"menu.state-sync:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.menu.state-sync"
      ],
@@ -8296,7 +8421,7 @@
     "owner": {
      "module_path": "src-tauri/src/menu.rs",
      "symbol": "PredefinedMenuItem::minimize",
-     "owner_sha256": "59008d8a159028e5944a42084bc7ba71bc3af6957ba59448b0dc0e29bf4fec04"
+     "owner_sha256": "ee9a5f69aa6bdace6ab484433f6f6d6344c8492d64fd5e9eab0d225aa1a29c35"
     },
     "parser_type": null,
     "original_cases": [
@@ -8306,15 +8431,38 @@
       "location": "typora-re/parity-spec.md"
      }
     ],
-    "fixtures": [],
-    "verifier": null
+    "fixtures": [
+     {
+      "fixture_id": "menu.window.positive",
+      "case_kind": "positive",
+      "authority": "unit",
+      "evidence_ids": [
+       "ev_796a61a58eb221edc324157bb52b81302c676d2f0158a5478e918ac774e0023c"
+      ]
+     }
+    ],
+    "verifier": {
+     "verifier_id": "margin.cargo-test.menu.window",
+     "claim_id": "claim.menu.window",
+     "command": "cargo test --manifest-path src-tauri/Cargo.toml --test menu_main",
+     "authority": "unit",
+     "status": "pass",
+     "result_evidence_id": "ev_796a61a58eb221edc324157bb52b81302c676d2f0158a5478e918ac774e0023c",
+     "enumerated_obligation_ids": [
+      "typora.menu.window"
+     ],
+     "nondeterminism": {
+      "mode": "total-order",
+      "specification": "Single deterministic suite run; pass = suite exited 0 with the named test not skipped."
+     }
+    }
    },
    {
     "obligation_id": "typora.menu.help.reference",
     "owner": {
      "module_path": "src-tauri/src/menu.rs",
      "symbol": "ID_HELP_MARKDOWN",
-     "owner_sha256": "59008d8a159028e5944a42084bc7ba71bc3af6957ba59448b0dc0e29bf4fec04"
+     "owner_sha256": "ee9a5f69aa6bdace6ab484433f6f6d6344c8492d64fd5e9eab0d225aa1a29c35"
     },
     "parser_type": null,
     "original_cases": [
@@ -8324,8 +8472,31 @@
       "location": "typora-re/parity-spec.md"
      }
     ],
-    "fixtures": [],
-    "verifier": null
+    "fixtures": [
+     {
+      "fixture_id": "menu.help.reference.positive",
+      "case_kind": "positive",
+      "authority": "unit",
+      "evidence_ids": [
+       "ev_796a61a58eb221edc324157bb52b81302c676d2f0158a5478e918ac774e0023c"
+      ]
+     }
+    ],
+    "verifier": {
+     "verifier_id": "margin.cargo-test.menu.help.reference",
+     "claim_id": "claim.menu.help.reference",
+     "command": "cargo test --manifest-path src-tauri/Cargo.toml --test menu_main",
+     "authority": "unit",
+     "status": "pass",
+     "result_evidence_id": "ev_796a61a58eb221edc324157bb52b81302c676d2f0158a5478e918ac774e0023c",
+     "enumerated_obligation_ids": [
+      "typora.menu.help.reference"
+     ],
+     "nondeterminism": {
+      "mode": "total-order",
+      "specification": "Single deterministic suite run; pass = suite exited 0 with the named test not skipped."
+     }
+    }
    },
    {
     "obligation_id": "typora.ctx.framework",
@@ -8348,7 +8519,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -8358,7 +8529,7 @@
      "command": "npx playwright test tests/e2e/parity-ctx.spec.ts -g \"ctx.framework:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.ctx.framework"
      ],
@@ -8389,7 +8560,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -8399,7 +8570,7 @@
      "command": "npx playwright test tests/e2e/parity-ctx.spec.ts -g \"ctx.text:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.ctx.text"
      ],
@@ -8430,7 +8601,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -8440,7 +8611,7 @@
      "command": "npx playwright test tests/e2e/parity-ctx.spec.ts -g \"ctx.link:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.ctx.link"
      ],
@@ -8471,7 +8642,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -8481,7 +8652,7 @@
      "command": "npx playwright test tests/e2e/parity-ctx.spec.ts -g \"ctx.block-generic:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.ctx.block-generic"
      ],
@@ -8512,7 +8683,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -8522,7 +8693,7 @@
      "command": "npx playwright test tests/e2e/parity-ctx.spec.ts -g \"ctx.emoji:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.ctx.emoji"
      ],
@@ -8553,7 +8724,7 @@
       "case_kind": "positive",
       "authority": "unit",
       "evidence_ids": [
-       "ev_fbff234ec48d7a423769c9e2d3ea5de846700e84dbbc2837733666f3e2eee501"
+       "ev_db9ea254a88ff63c0543a3b94df23b5cc8bebfc85734e268c966912f9f1c2118"
       ]
      }
     ],
@@ -8563,7 +8734,7 @@
      "command": "npx vitest run src/app/__tests__/ctxmenu.test.ts -t \"video and emoji targets\"",
      "authority": "unit",
      "status": "pass",
-     "result_evidence_id": "ev_fbff234ec48d7a423769c9e2d3ea5de846700e84dbbc2837733666f3e2eee501",
+     "result_evidence_id": "ev_db9ea254a88ff63c0543a3b94df23b5cc8bebfc85734e268c966912f9f1c2118",
      "enumerated_obligation_ids": [
       "typora.ctx.media"
      ],
@@ -8594,7 +8765,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -8604,7 +8775,7 @@
      "command": "npx playwright test tests/e2e/parity-tools.spec.ts -g \"tools.table.rows-cols:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.tools.table.rows-cols"
      ],
@@ -8635,7 +8806,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -8645,7 +8816,7 @@
      "command": "npx playwright test tests/e2e/parity-tools.spec.ts -g \"tools.table.move:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.tools.table.move"
      ],
@@ -8676,7 +8847,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -8686,7 +8857,7 @@
      "command": "npx playwright test tests/e2e/parity-tools.spec.ts -g \"tools.table.align-resize:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.tools.table.align-resize"
      ],
@@ -8717,7 +8888,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -8727,7 +8898,7 @@
      "command": "npx playwright test tests/e2e/parity-tools.spec.ts -g \"tools.table.copy-delete:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.tools.table.copy-delete"
      ],
@@ -8758,7 +8929,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -8768,7 +8939,7 @@
      "command": "npx playwright test tests/e2e/blocks-core.spec.ts -g \"pasting TSV / CSV fills and grows the grid\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.tools.table.cells"
      ],
@@ -8799,7 +8970,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -8809,7 +8980,7 @@
      "command": "npx playwright test tests/e2e/blocks-widgets.spec.ts -g \"language box edits info string, copy button works\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.tools.code.language"
      ],
@@ -8840,7 +9011,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -8850,7 +9021,7 @@
      "command": "npx playwright test tests/e2e/parity-tools.spec.ts -g \"tools.code.indent-prettify:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.tools.code.indent-prettify"
      ],
@@ -8881,7 +9052,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -8891,7 +9062,7 @@
      "command": "npx playwright test tests/e2e/parity-ctx.spec.ts -g \"tools.code.delete:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.tools.code.delete"
      ],
@@ -8922,7 +9093,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -8932,7 +9103,7 @@
      "command": "npx playwright test tests/e2e/parity-prefs.spec.ts -g \"tools.code.line-numbers: Code fences: line numbers, line wrap, indent size\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.tools.code.line-numbers"
      ],
@@ -8963,7 +9134,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -8973,7 +9144,7 @@
      "command": "npx playwright test tests/e2e/blocks-core.spec.ts -g \"follows the referenced\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.tools.math.render"
      ],
@@ -9004,7 +9175,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -9014,7 +9185,7 @@
      "command": "npx playwright test tests/e2e/parity-tools.spec.ts -g \"tools.math.copy:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.tools.math.copy"
      ],
@@ -9045,7 +9216,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -9055,7 +9226,7 @@
      "command": "npx playwright test tests/e2e/parity-tools.spec.ts -g \"tools.math.refresh:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.tools.math.refresh"
      ],
@@ -9086,7 +9257,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -9096,7 +9267,7 @@
      "command": "npx playwright test tests/e2e/parity-syntax.spec.ts -g \"tools.math.numbering: Math numbering options (auto-number, AMS rules, physics package)\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.tools.math.numbering"
      ],
@@ -9127,7 +9298,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -9137,7 +9308,7 @@
      "command": "npx playwright test tests/e2e/blocks-widgets.spec.ts -g \"mermaid renders SVG, errors are shown, sequence syntax translated\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.tools.diagram"
      ],
@@ -9168,7 +9339,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -9178,7 +9349,7 @@
      "command": "npx playwright test tests/e2e/parity-tools.spec.ts -g \"tools.math.copy-image:\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.tools.diagram.copy-image"
      ],
@@ -9209,7 +9380,7 @@
       "case_kind": "positive",
       "authority": "unit",
       "evidence_ids": [
-       "ev_fbff234ec48d7a423769c9e2d3ea5de846700e84dbbc2837733666f3e2eee501"
+       "ev_db9ea254a88ff63c0543a3b94df23b5cc8bebfc85734e268c966912f9f1c2118"
       ]
      }
     ],
@@ -9219,7 +9390,7 @@
      "command": "npx vitest run src/platform/web.test.ts -t \"copies (never moves) an existing image and dedupes names\"",
      "authority": "unit",
      "status": "pass",
-     "result_evidence_id": "ev_fbff234ec48d7a423769c9e2d3ea5de846700e84dbbc2837733666f3e2eee501",
+     "result_evidence_id": "ev_db9ea254a88ff63c0543a3b94df23b5cc8bebfc85734e268c966912f9f1c2118",
      "enumerated_obligation_ids": [
       "typora.images.paste-drop"
      ],
@@ -9250,7 +9421,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -9260,7 +9431,7 @@
      "command": "npx playwright test tests/e2e/parity-images.spec.ts -g \"images.rules-scope: Image rule options: apply to local/online images, relative path, ./ prefix, escape URL, YAML override\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.images.rules-scope"
      ],
@@ -9291,7 +9462,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -9301,7 +9472,7 @@
      "command": "npx playwright test tests/e2e/parity-images.spec.ts -g \"images.root-path: Image root path (typora-root-url)\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.images.root-path"
      ],
@@ -9332,7 +9503,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -9342,7 +9513,7 @@
      "command": "npx playwright test tests/e2e/parity-images.spec.ts -g \"images.remote-download: Download remote images into the target folder\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.images.remote-download"
      ],
@@ -9373,7 +9544,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -9383,7 +9554,7 @@
      "command": "npx playwright test tests/e2e/parity-images.spec.ts -g \"images.copy-move-all: Image Tools: Copy / Move All Images to… (and per-image copy/move/rename)\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.images.copy-move-all"
      ],
@@ -9414,7 +9585,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -9424,7 +9595,7 @@
      "command": "npx playwright test tests/e2e/parity-images.spec.ts -g \"images.delete: Image context: Delete Image / Delete Image File (undoable)\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.images.delete"
      ],
@@ -9455,7 +9626,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -9465,7 +9636,7 @@
      "command": "npx playwright test tests/e2e/parity-images.spec.ts -g \"images.reveal-open: Image context: Open Image Location… / Open in Browser… / Copy Image Content\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.images.reveal-open"
      ],
@@ -9496,7 +9667,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -9506,7 +9677,7 @@
      "command": "npx playwright test tests/e2e/parity-images.spec.ts -g \"images.zoom: Image zoom (direct entry + presets) and switch Markdown/HTML image syntax\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.images.zoom"
      ],
@@ -9537,7 +9708,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -9547,7 +9718,7 @@
      "command": "npx playwright test tests/e2e/parity-images.spec.ts -g \"images.reload: Image Tools: Reload All Images\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.images.reload"
      ],
@@ -9578,7 +9749,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -9588,7 +9759,7 @@
      "command": "npx playwright test tests/e2e/parity-images.spec.ts -g \"images.upload: Image upload: custom command (argv) / PicGo; upload one / all local images; test uploader\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.images.upload"
      ],
@@ -9619,7 +9790,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -9629,7 +9800,7 @@
      "command": "npx playwright test tests/e2e/parity-images-r4.spec.ts -g \"images.textbundle: TextBundle opens as one document, images go to <bundle>/assets, rename guard\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.images.textbundle"
      ],
@@ -9660,7 +9831,7 @@
       "case_kind": "positive",
       "authority": "unit",
       "evidence_ids": [
-       "ev_fbff234ec48d7a423769c9e2d3ea5de846700e84dbbc2837733666f3e2eee501"
+       "ev_db9ea254a88ff63c0543a3b94df23b5cc8bebfc85734e268c966912f9f1c2118"
       ]
      }
     ],
@@ -9670,7 +9841,7 @@
      "command": "npx vitest run src/app/__tests__/settings.test.ts -t \"keeps unknown keys for forward compatibility\"",
      "authority": "unit",
      "status": "pass",
-     "result_evidence_id": "ev_fbff234ec48d7a423769c9e2d3ea5de846700e84dbbc2837733666f3e2eee501",
+     "result_evidence_id": "ev_db9ea254a88ff63c0543a3b94df23b5cc8bebfc85734e268c966912f9f1c2118",
      "enumerated_obligation_ids": [
       "typora.pref.storage"
      ],
@@ -9701,7 +9872,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -9711,7 +9882,7 @@
      "command": "npx playwright test tests/e2e/parity-prefs.spec.ts -g \"pref.advanced: Advanced settings: open/reset config file, reset dialog warnings\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.pref.advanced"
      ],
@@ -9742,7 +9913,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -9752,7 +9923,7 @@
      "command": "npx playwright test tests/e2e/parity-prefs.spec.ts -g \"pref.general.launch: General: On Launch\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.pref.general.launch"
      ],
@@ -9783,7 +9954,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -9793,7 +9964,7 @@
      "command": "npx playwright test tests/e2e/parity-files.spec.ts -g \"pref.general.save: General: Auto Save, save-on-switch, recover unsaved drafts\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.pref.general.save"
      ],
@@ -9824,7 +9995,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -9834,7 +10005,7 @@
      "command": "npx playwright test tests/e2e/parity-prefs.spec.ts -g \"pref.general.language: General: UI language\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.pref.general.language"
      ],
@@ -9865,7 +10036,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -9875,7 +10046,7 @@
      "command": "npx playwright test tests/e2e/app-themes.spec.ts -g \"preferences: Theme lists light themes, Dark theme lists dark ones\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.pref.appearance.theme"
      ],
@@ -9906,7 +10077,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -9916,7 +10087,7 @@
      "command": "npx playwright test tests/e2e/app-themes.spec.ts -g \"command palette theme entry and custom CSS\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.pref.appearance.font"
      ],
@@ -9947,7 +10118,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -9957,7 +10128,7 @@
      "command": "npx playwright test tests/e2e/parity-prefs.spec.ts -g \"pref.appearance.window: Appearance: window style (seamless/unibody/native), text column width, outline panel\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.pref.appearance.window"
      ],
@@ -9988,7 +10159,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -9998,7 +10169,7 @@
      "command": "npx playwright test tests/e2e/parity-prefs.spec.ts -g \"pref.editor.general: Editor: auto pair brackets/markdown, display source on focus, heading style, indent\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.pref.editor.general"
      ],
@@ -10029,7 +10200,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -10039,7 +10210,7 @@
      "command": "npx playwright test tests/e2e/parity-prefs.spec.ts -g \"pref.editor.shortcuts: Custom shortcut keys\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.pref.editor.shortcuts"
      ],
@@ -10070,7 +10241,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -10080,7 +10251,7 @@
      "command": "npx playwright test tests/e2e/parity-prefs.spec.ts -g \"pref.files.defaults: Files: default line ending\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.pref.files.defaults"
      ],
@@ -10105,8 +10276,31 @@
       "location": "network-updates-privacy §5"
      }
     ],
-    "fixtures": [],
-    "verifier": null
+    "fixtures": [
+     {
+      "fixture_id": "pref.privacy.positive",
+      "case_kind": "positive",
+      "authority": "unit",
+      "evidence_ids": [
+       "ev_db9ea254a88ff63c0543a3b94df23b5cc8bebfc85734e268c966912f9f1c2118"
+      ]
+     }
+    ],
+    "verifier": {
+     "verifier_id": "margin.vitest.pref.privacy",
+     "claim_id": "claim.pref.privacy",
+     "command": "npx vitest run src/app/__tests__/privacy.test.ts -t \"pref.privacy: no telemetry setting\"",
+     "authority": "unit",
+     "status": "pass",
+     "result_evidence_id": "ev_db9ea254a88ff63c0543a3b94df23b5cc8bebfc85734e268c966912f9f1c2118",
+     "enumerated_obligation_ids": [
+      "typora.pref.privacy"
+     ],
+     "nondeterminism": {
+      "mode": "total-order",
+      "specification": "Single deterministic suite run; pass = suite exited 0 with the named test not skipped."
+     }
+    }
    },
    {
     "obligation_id": "typora.sidebar.tree",
@@ -10119,7 +10313,7 @@
     "original_cases": [
      {
       "kind": "positive",
-      "evidence_id": "ev_03f90c4140cc0a05ce393b04c776bd0bcf57a2d3bfec21423ed14cdf84eb112f",
+      "evidence_id": "ev_6a9e694c7391a3441262a219a26b52491b1dc2af445048729f391c5f1979149e",
       "location": "files-windows-settings §6.1"
      }
     ],
@@ -10129,7 +10323,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -10139,7 +10333,7 @@
      "command": "npx playwright test tests/e2e/app-files.spec.ts -g \"context menu: new file, rename (open doc follows), new folder, trash\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.sidebar.tree"
      ],
@@ -10170,7 +10364,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -10180,7 +10374,7 @@
      "command": "npx playwright test tests/e2e/parity-sidebar.spec.ts -g \"sidebar.list-view: Articles list view\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.sidebar.list-view"
      ],
@@ -10211,7 +10405,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -10221,7 +10415,7 @@
      "command": "npx playwright test tests/e2e/parity-sidebar.spec.ts -g \"sidebar.search: Sidebar full-text search\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.sidebar.search"
      ],
@@ -10252,7 +10446,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -10262,7 +10456,7 @@
      "command": "npx playwright test tests/e2e/parity-sidebar.spec.ts -g \"sidebar.sort: File tree sorting\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.sidebar.sort"
      ],
@@ -10293,7 +10487,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -10303,7 +10497,7 @@
      "command": "npx playwright test tests/e2e/app-navigation.spec.ts -g \"outline lists headings and jumps on click\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.sidebar.outline"
      ],
@@ -10334,7 +10528,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -10344,7 +10538,7 @@
      "command": "npx playwright test tests/e2e/parity-sidebar.spec.ts -g \"sidebar.outline-collapse: Outline: collapsible/flat outline, expand/collapse all, filter, unpin\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.sidebar.outline-collapse"
      ],
@@ -10375,7 +10569,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -10385,7 +10579,7 @@
      "command": "npx playwright test tests/e2e/parity-sidebar.spec.ts -g \"sidebar.drag: Drag files from sidebar\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.sidebar.drag"
      ],
@@ -10400,7 +10594,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "private createExports(",
-     "owner_sha256": "1044e05ac479633cd76947dc7dd1b442b4211011d535fbadc6a9900a893dabc3"
+     "owner_sha256": "e64e2515a1a9b98aaaef0ff7d8b0e9705f9ecf9d8f3641f60ed1935957318705"
     },
     "parser_type": null,
     "original_cases": [
@@ -10416,7 +10610,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -10426,7 +10620,7 @@
      "command": "npx playwright test tests/e2e/app-themes.spec.ts -g \"export HTML inlines the theme\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.export.html"
      ],
@@ -10457,7 +10651,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -10467,7 +10661,7 @@
      "command": "npx playwright test tests/e2e/parity-export.spec.ts -g \"export.html-plain: Export › HTML (without Styles)\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.export.html-plain"
      ],
@@ -10492,8 +10686,31 @@
       "location": "export-print §4.1"
      }
     ],
-    "fixtures": [],
-    "verifier": null
+    "fixtures": [
+     {
+      "fixture_id": "export.pdf.positive",
+      "case_kind": "positive",
+      "authority": "renderer",
+      "evidence_ids": [
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
+      ]
+     }
+    ],
+    "verifier": {
+     "verifier_id": "margin.playwright.export.pdf",
+     "claim_id": "claim.export.pdf",
+     "command": "npx playwright test tests/e2e/parity-evidence.spec.ts -g \"export.pdf: Export › PDF writes the rendered document\"",
+     "authority": "renderer",
+     "status": "pass",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
+     "enumerated_obligation_ids": [
+      "typora.export.pdf"
+     ],
+     "nondeterminism": {
+      "mode": "total-order",
+      "specification": "Single deterministic suite run; pass = suite exited 0 with the named test not skipped."
+     }
+    }
    },
    {
     "obligation_id": "typora.export.pdf-options",
@@ -10516,7 +10733,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -10526,7 +10743,7 @@
      "command": "npx playwright test tests/e2e/parity-export.spec.ts -g \"export.pdf-options: PDF options\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.export.pdf-options"
      ],
@@ -10557,7 +10774,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -10567,7 +10784,7 @@
      "command": "npx playwright test tests/e2e/parity-export.spec.ts -g \"export.image: Export › Image\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.export.image"
      ],
@@ -10598,7 +10815,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -10608,7 +10825,7 @@
      "command": "npx playwright test tests/e2e/parity-export.spec.ts -g \"export.pandoc: Export via Pandoc\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.export.pandoc"
      ],
@@ -10639,7 +10856,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -10649,7 +10866,7 @@
      "command": "npx playwright test tests/e2e/parity-export.spec.ts -g \"export.custom: Custom export commands\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.export.custom"
      ],
@@ -10680,7 +10897,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -10690,7 +10907,7 @@
      "command": "npx playwright test tests/e2e/parity-export.spec.ts -g \"export.settings: Export settings pane\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.export.settings"
      ],
@@ -10721,7 +10938,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -10731,7 +10948,7 @@
      "command": "npx playwright test tests/e2e/parity-export.spec.ts -g \"export.previous: Export with Previous\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.export.previous"
      ],
@@ -10762,7 +10979,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -10772,7 +10989,7 @@
      "command": "npx playwright test tests/e2e/parity-export.spec.ts -g \"export.import: File › Import\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.export.import"
      ],
@@ -10803,7 +11020,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -10813,7 +11030,7 @@
      "command": "npx playwright test tests/e2e/parity-syntax.spec.ts -g \"syntax.extensions: Syntax support toggles: highlight, sub/sup, inline math, emoji shortcodes\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.syntax.extensions"
      ],
@@ -10844,7 +11061,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -10854,7 +11071,7 @@
      "command": "npx playwright test tests/e2e/parity-syntax.spec.ts -g \"syntax.strict: Strict Mode (closer to GFM) and list/quote style preferences\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.syntax.strict"
      ],
@@ -10885,7 +11102,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -10895,7 +11112,7 @@
      "command": "npx playwright test tests/e2e/parity-syntax.spec.ts -g \"syntax.whitespace: Whitespace & line breaks: preserve single line break\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.syntax.whitespace"
      ],
@@ -10926,7 +11143,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -10936,7 +11153,7 @@
      "command": "npx playwright test tests/e2e/parity-syntax.spec.ts -g \"syntax.save-normalize: On save: insert final newline, remap Unicode punctuation on parse\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.syntax.save-normalize"
      ],
@@ -10967,7 +11184,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -10977,7 +11194,7 @@
      "command": "npx playwright test tests/e2e/parity-syntax.spec.ts -g \"syntax.toc: toc writings [toc] 【toc】 {:toc} [[_TOC_]] all render the TOC widget (#151)\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.syntax.toc"
      ],
@@ -11008,7 +11225,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -11018,7 +11235,7 @@
      "command": "npx playwright test tests/e2e/core-cases.ts -g \"lossless load, markers hidden until caret enters\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.beh.core.lossless"
      ],
@@ -11049,7 +11266,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -11059,7 +11276,7 @@
      "command": "npx playwright test tests/e2e/core-cases.ts -g \"lossless load, markers hidden until caret enters\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.beh.core.md-expand"
      ],
@@ -11090,7 +11307,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -11100,7 +11317,7 @@
      "command": "npx playwright test tests/e2e/core-qa.spec.ts -g \"typing in a 5k-line document stays fast\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.beh.core.incremental"
      ],
@@ -11131,7 +11348,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -11141,7 +11358,7 @@
      "command": "npx playwright test tests/e2e/core-qa.spec.ts -g \"type a whole document from empty\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.beh.core.input-rules"
      ],
@@ -11172,7 +11389,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -11182,7 +11399,7 @@
      "command": "npx playwright test tests/e2e/core-cases.ts -g \"IME composition (Chinese) commits once\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.beh.core.ime"
      ],
@@ -11213,7 +11430,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -11223,7 +11440,7 @@
      "command": "npx playwright test tests/e2e/core-qa.spec.ts -g \"undo/redo shortcuts work while focus is inside a widget\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.beh.core.undo"
      ],
@@ -11254,7 +11471,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -11264,7 +11481,7 @@
      "command": "npx playwright test tests/e2e/core-nav-keys.spec.ts -g \"doc start lands after the heading marker\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.beh.core.widgets-nav"
      ],
@@ -11295,7 +11512,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -11305,7 +11522,7 @@
      "command": "npx playwright test tests/e2e/core-widget-find.spec.ts -g \"replace-all across widgets is lossless and one undo step\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.beh.core.find-in-widgets"
      ],
@@ -11336,7 +11553,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -11346,7 +11563,7 @@
      "command": "npx playwright test tests/e2e/core-qa.spec.ts -g \"export sanitizes inline HTML\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.beh.core.html-sanitize"
      ],
@@ -11361,7 +11578,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "private degradeLarge(",
-     "owner_sha256": "1044e05ac479633cd76947dc7dd1b442b4211011d535fbadc6a9900a893dabc3"
+     "owner_sha256": "e64e2515a1a9b98aaaef0ff7d8b0e9705f9ecf9d8f3641f60ed1935957318705"
     },
     "parser_type": null,
     "original_cases": [
@@ -11377,7 +11594,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -11387,7 +11604,7 @@
      "command": "npx playwright test tests/e2e/parity-files.spec.ts -g \"beh.core.large-file: Oversize documents: degrade gracefully (warn / source mode)\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.beh.core.large-file"
      ],
@@ -11418,7 +11635,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -11428,7 +11645,7 @@
      "command": "npx playwright test tests/e2e/app-files.spec.ts -g \"external change reloads silently when clean and prompts when dirty\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.beh.files.external-change"
      ],
@@ -11459,7 +11676,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -11469,7 +11686,7 @@
      "command": "npx playwright test tests/e2e/parity-files.spec.ts -g \"beh.files.external-merge: External change prompt offers Keep mine / Load disk / Show diff\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.beh.files.external-merge"
      ],
@@ -11500,7 +11717,7 @@
       "case_kind": "positive",
       "authority": "unit",
       "evidence_ids": [
-       "ev_fbff234ec48d7a423769c9e2d3ea5de846700e84dbbc2837733666f3e2eee501"
+       "ev_db9ea254a88ff63c0543a3b94df23b5cc8bebfc85734e268c966912f9f1c2118"
       ]
      }
     ],
@@ -11510,7 +11727,7 @@
      "command": "npx vitest run src/platform/web.test.ts -t \"suppresses own modifications but reports creations and external changes\"",
      "authority": "unit",
      "status": "pass",
-     "result_evidence_id": "ev_fbff234ec48d7a423769c9e2d3ea5de846700e84dbbc2837733666f3e2eee501",
+     "result_evidence_id": "ev_db9ea254a88ff63c0543a3b94df23b5cc8bebfc85734e268c966912f9f1c2118",
      "enumerated_obligation_ids": [
       "typora.beh.files.folder-watch"
      ],
@@ -11525,7 +11742,7 @@
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "setDocumentEdited",
-     "owner_sha256": "1044e05ac479633cd76947dc7dd1b442b4211011d535fbadc6a9900a893dabc3"
+     "owner_sha256": "e64e2515a1a9b98aaaef0ff7d8b0e9705f9ecf9d8f3641f60ed1935957318705"
     },
     "parser_type": null,
     "original_cases": [
@@ -11535,15 +11752,38 @@
       "location": "files-windows-settings §7"
      }
     ],
-    "fixtures": [],
-    "verifier": null
+    "fixtures": [
+     {
+      "fixture_id": "beh.files.title-dirty.positive",
+      "case_kind": "positive",
+      "authority": "renderer",
+      "evidence_ids": [
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
+      ]
+     }
+    ],
+    "verifier": {
+     "verifier_id": "margin.playwright.beh.files.title-dirty",
+     "claim_id": "claim.beh.files.title-dirty",
+     "command": "npx playwright test tests/e2e/parity-evidence.spec.ts -g \"beh.files.title-dirty: Window title shows document name and edited state\"",
+     "authority": "renderer",
+     "status": "pass",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
+     "enumerated_obligation_ids": [
+      "typora.beh.files.title-dirty"
+     ],
+     "nondeterminism": {
+      "mode": "total-order",
+      "specification": "Single deterministic suite run; pass = suite exited 0 with the named test not skipped."
+     }
+    }
    },
    {
     "obligation_id": "typora.beh.files.single-instance",
     "owner": {
      "module_path": "src-tauri/src/lib.rs",
      "symbol": "on_second_instance",
-     "owner_sha256": "2d37626215586c32bdeeac3d2a691139ade62a59017a395160aaf5e6916f4b7c"
+     "owner_sha256": "47293296b84d224fc43b59ba7e994e3660ef15c3bdb4738c73144ac8f709370d"
     },
     "parser_type": null,
     "original_cases": [
@@ -11559,7 +11799,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -11569,7 +11809,7 @@
      "command": "npx playwright test tests/e2e/parity-files.spec.ts -g \"beh.files.single-instance: Single instance: opening files from Finder reuses the running app\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.beh.files.single-instance"
      ],
@@ -11600,7 +11840,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -11610,7 +11850,7 @@
      "command": "npx playwright test tests/e2e/parity-files.spec.ts -g \"beh.files.drop: Drop files from the OS: open Markdown/folders, insert images and links\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.beh.files.drop"
      ],
@@ -11641,7 +11881,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -11651,7 +11891,7 @@
      "command": "npx playwright test tests/e2e/parity-files.spec.ts -g \"beh.files.snapshot-undo: Reopen keeps undo history and caret (per-document snapshot)\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.beh.files.snapshot-undo"
      ],
@@ -11682,7 +11922,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -11692,7 +11932,7 @@
      "command": "npx playwright test tests/e2e/parity-sidebar-r3.spec.ts -g \"sidebar.quicklook: Quick Look in tree/list menus and Space on a focused row\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.beh.files.quicklook"
      ],
@@ -11717,15 +11957,38 @@
       "location": "files-windows-settings §3.1"
      }
     ],
-    "fixtures": [],
-    "verifier": null
+    "fixtures": [
+     {
+      "fixture_id": "beh.files.asset-scope.positive",
+      "case_kind": "positive",
+      "authority": "unit",
+      "evidence_ids": [
+       "ev_796a61a58eb221edc324157bb52b81302c676d2f0158a5478e918ac774e0023c"
+      ]
+     }
+    ],
+    "verifier": {
+     "verifier_id": "margin.cargo-test.beh.files.asset-scope",
+     "claim_id": "claim.beh.files.asset-scope",
+     "command": "cargo test --manifest-path src-tauri/Cargo.toml \"real_scope_allows_inside_and_denies_outside\"",
+     "authority": "unit",
+     "status": "pass",
+     "result_evidence_id": "ev_796a61a58eb221edc324157bb52b81302c676d2f0158a5478e918ac774e0023c",
+     "enumerated_obligation_ids": [
+      "typora.beh.files.asset-scope"
+     ],
+     "nondeterminism": {
+      "mode": "total-order",
+      "specification": "Single deterministic suite run; pass = suite exited 0 with the named test not skipped."
+     }
+    }
    },
    {
     "obligation_id": "typora.beh.settings.inject",
     "owner": {
      "module_path": "src/app/app.ts",
      "symbol": "applyAppearance",
-     "owner_sha256": "1044e05ac479633cd76947dc7dd1b442b4211011d535fbadc6a9900a893dabc3"
+     "owner_sha256": "e64e2515a1a9b98aaaef0ff7d8b0e9705f9ecf9d8f3641f60ed1935957318705"
     },
     "parser_type": null,
     "original_cases": [
@@ -11741,7 +12004,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -11751,7 +12014,7 @@
      "command": "npx playwright test tests/e2e/app-themes.spec.ts -g \"system color scheme is followed\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.beh.settings.inject"
      ],
@@ -11782,7 +12045,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -11792,7 +12055,7 @@
      "command": "npx playwright test tests/e2e/core-qa.spec.ts -g \"paste Google Docs HTML and markdown blocks mid-paragraph\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.beh.clip.paste-priority"
      ],
@@ -11823,7 +12086,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -11833,7 +12096,7 @@
      "command": "npx playwright test tests/e2e/parity-clipboard.spec.ts -g \"beh.clip.rich-copy: Rich copy writes plain + HTML + RTF + private format\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.beh.clip.rich-copy"
      ],
@@ -11864,7 +12127,7 @@
       "case_kind": "positive",
       "authority": "renderer",
       "evidence_ids": [
-       "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b"
+       "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb"
       ]
      }
     ],
@@ -11874,7 +12137,7 @@
      "command": "npx playwright test tests/e2e/parity-clipboard.spec.ts -g \"beh.clip.rtf-paste: Paste RTF/RTFD from rich apps\"",
      "authority": "renderer",
      "status": "pass",
-     "result_evidence_id": "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
+     "result_evidence_id": "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
      "enumerated_obligation_ids": [
       "typora.beh.clip.rtf-paste"
      ],
@@ -11899,8 +12162,31 @@
       "location": "typora-re/parity-spec.md"
      }
     ],
-    "fixtures": [],
-    "verifier": null
+    "fixtures": [
+     {
+      "fixture_id": "ui.generic.positive",
+      "case_kind": "positive",
+      "authority": "unit",
+      "evidence_ids": [
+       "ev_db9ea254a88ff63c0543a3b94df23b5cc8bebfc85734e268c966912f9f1c2118"
+      ]
+     }
+    ],
+    "verifier": {
+     "verifier_id": "margin.vitest.ui.generic",
+     "claim_id": "claim.ui.generic",
+     "command": "npx vitest run src/app/ui/modal.test.ts -t \"ui.generic: confirm dialog shows Cancel / OK\"",
+     "authority": "unit",
+     "status": "pass",
+     "result_evidence_id": "ev_db9ea254a88ff63c0543a3b94df23b5cc8bebfc85734e268c966912f9f1c2118",
+     "enumerated_obligation_ids": [
+      "typora.ui.generic"
+     ],
+     "nondeterminism": {
+      "mode": "total-order",
+      "specification": "Single deterministic suite run; pass = suite exited 0 with the named test not skipped."
+     }
+    }
    }
   ],
   "contradictions": []

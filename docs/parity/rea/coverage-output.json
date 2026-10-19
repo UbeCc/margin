@@ -1,161 +1,19 @@
 {
  "boundary_id": "margin.typora-parity",
- "status": "partial",
+ "status": "ready",
  "summary": {
   "required_surfaces": 174,
   "required_claims": 166,
-  "reasons": 14
+  "reasons": 0
  },
- "reasons": [
-  {
-   "code": "package-proof-missing",
-   "subject_id": "clean-install",
-   "detail": "Required package or integration proof is missing."
-  },
-  {
-   "code": "verifier-missing",
-   "subject_id": "claim.beh.files.asset-scope",
-   "detail": "No verifier contract covers this claim."
-  },
-  {
-   "code": "verifier-missing",
-   "subject_id": "claim.beh.files.title-dirty",
-   "detail": "No verifier contract covers this claim."
-  },
-  {
-   "code": "verifier-missing",
-   "subject_id": "claim.export.pdf",
-   "detail": "No verifier contract covers this claim."
-  },
-  {
-   "code": "verifier-missing",
-   "subject_id": "claim.menu.app.about",
-   "detail": "No verifier contract covers this claim."
-  },
-  {
-   "code": "verifier-missing",
-   "subject_id": "claim.menu.app.system",
-   "detail": "No verifier contract covers this claim."
-  },
-  {
-   "code": "verifier-missing",
-   "subject_id": "claim.menu.file.print",
-   "detail": "No verifier contract covers this claim."
-  },
-  {
-   "code": "verifier-missing",
-   "subject_id": "claim.menu.help.reference",
-   "detail": "No verifier contract covers this claim."
-  },
-  {
-   "code": "verifier-missing",
-   "subject_id": "claim.menu.themes.folder",
-   "detail": "No verifier contract covers this claim."
-  },
-  {
-   "code": "verifier-missing",
-   "subject_id": "claim.menu.view.fullscreen",
-   "detail": "No verifier contract covers this claim."
-  },
-  {
-   "code": "verifier-missing",
-   "subject_id": "claim.menu.view.zoom",
-   "detail": "No verifier contract covers this claim."
-  },
-  {
-   "code": "verifier-missing",
-   "subject_id": "claim.menu.window",
-   "detail": "No verifier contract covers this claim."
-  },
-  {
-   "code": "verifier-missing",
-   "subject_id": "claim.pref.privacy",
-   "detail": "No verifier contract covers this claim."
-  },
-  {
-   "code": "verifier-missing",
-   "subject_id": "claim.ui.generic",
-   "detail": "No verifier contract covers this claim."
-  }
- ],
- "recommended_probes": [
-  {
-   "operation": "verify_reconstruction_package",
-   "subject_id": "clean-install",
-   "rationale": "Required package or integration proof is missing."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.beh.files.asset-scope",
-   "rationale": "No verifier contract covers this claim."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.beh.files.title-dirty",
-   "rationale": "No verifier contract covers this claim."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.export.pdf",
-   "rationale": "No verifier contract covers this claim."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.menu.app.about",
-   "rationale": "No verifier contract covers this claim."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.menu.app.system",
-   "rationale": "No verifier contract covers this claim."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.menu.file.print",
-   "rationale": "No verifier contract covers this claim."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.menu.help.reference",
-   "rationale": "No verifier contract covers this claim."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.menu.themes.folder",
-   "rationale": "No verifier contract covers this claim."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.menu.view.fullscreen",
-   "rationale": "No verifier contract covers this claim."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.menu.view.zoom",
-   "rationale": "No verifier contract covers this claim."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.menu.window",
-   "rationale": "No verifier contract covers this claim."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.pref.privacy",
-   "rationale": "No verifier contract covers this claim."
-  },
-  {
-   "operation": "run_reconstruction_verifier",
-   "subject_id": "claim.ui.generic",
-   "rationale": "No verifier contract covers this claim."
-  }
- ],
+ "reasons": [],
+ "recommended_probes": [],
  "evidence_ids": [
   "ev_00a8a5b673277bb633a36c1ea9b59592c34f09080c94204d98b060983668b371",
   "ev_00bb4114edf01f1a518197b3ae369906efc864b9bf1b86d7da0701bb715cc346",
   "ev_034b3648ca1717b75ad970b67d54040c65c00c2655bd8909aa9f90815cbff35b",
-  "ev_03f90c4140cc0a05ce393b04c776bd0bcf57a2d3bfec21423ed14cdf84eb112f",
   "ev_054b83734a8ebe06b5acc6651759f74f7f3e634d98da341ba049831a4db703b3",
+  "ev_05c546eb4226efaafecf953fc12fb0e67bbbf1efaa736bfecff325a80a8139cb",
   "ev_065a1ee5670d968f44f0c41d4b4c25f8458698cb961401702de81dea3c69a292",
   "ev_0910aa32713394468ecd353dd86c8d67dfd920009d041c369658372dba90e854",
   "ev_0a4219b9f7b35813ceb8f2f1397ee986c641d6799886481692a17fdc221f9a97",
@@ -166,7 +24,6 @@
   "ev_105aaee1c3c2a2dfa041084176e9e2a878927d0a482cf551b3fdbcc68a7efda9",
   "ev_1084abad4074c0040604dfa02b61a633f7a7574f819b72f680cb78ae4c09889f",
   "ev_112b65177cac2e34012df57d1709b9c8c821c63988d4bf0850c808ae416f37b0",
-  "ev_1331413e9e7972d041f3945cc72cf926112a61a97bdb53e79ffa5d09baa56a5b",
   "ev_1389c31ff1eea5fca723a65cbe717f5185041fb02cf5d5c2c811079a0ac290d4",
   "ev_14cc87f4dd7ba2eae71cb6e61e7e455f64f83e3ca9b43bef99296cc0598a89c6",
   "ev_15452a040cb0ea7401f619614d21dfb85e2e67f8e97678b5b9c7b295b0efe130",
@@ -174,13 +31,12 @@
   "ev_1842585d6e8c874b593690cda394d985d869016fdfaec32749b7406c41800298",
   "ev_196afff3263dd6a3ade1b0d510328293cbe1c2f21a3154d5d290f8d70c66a8df",
   "ev_1a05624c870369ebdd15bf48a8d515f6482898e461008242574fb5cd42fa40fb",
-  "ev_1fff77de0927975cf6c8e1ae1f4f756642727a508cab1ec65759d425f7ebbded",
   "ev_21751fb712fd68c7c9d1256ac941429bce6c4996aec755f8f2ba57dc94040a27",
+  "ev_250d613a0335909bb1aaff36efd377b3654075c15fb299a2680b477da302be65",
   "ev_260219b51bfffa0e540e6c3cb4f434b9428d78944c4f727434cc632bc8596fc0",
   "ev_2616a1f8c69ac2e3453df527245b904248bcf765365553110334b681bfe819f2",
   "ev_27e330e028ac31fa424395a5ad92cc39bedc4be42596fd67c67c4027420aa897",
   "ev_28d6eb37610d7fb291deffc69815699f8b2e015439221c55cd06f851e57911cd",
-  "ev_2942f8ee964e73c11f47052521654a6cd99141b30781901b1390588cbafdbff7",
   "ev_2af20df1cce3adfeeb3d0405c0459fa04c12ca81cef9790b21d266ff208e52be",
   "ev_2b044436ed43d8afdaeb0e1662e27dd702e8bbf4e7d0fa0a339f5023162a09a6",
   "ev_2bfd37b7ac78629a1a8303889452f5ff14da581c3e0147b6c135fd307638aa53",
@@ -205,6 +61,7 @@
   "ev_4341a61451354b6c0655830d4b36b6e65cf1f0ef15713d67825e30b7d9413a49",
   "ev_448b7206d6dc1d172ac42f4686c3964d2474834ef885f3bc02ef3040811b3c9f",
   "ev_458ac6b997a37b852f60228dfea7c1aa22be6b22d999b4a80609d9d097c768ed",
+  "ev_4711119add47bd15262705c9b48d11fb90c4f98b383fb9ff9b2d6901215a2b9b",
   "ev_48cef36056f7d963046645e2256be9bd5ddb6f50a2d84c19aca934e0903f489a",
   "ev_4ac8f85846afce7299ee1995f6c9d771aa25470f2e3edce8a921a5a5631c0504",
   "ev_4b8c96bd729d6b25102d211569d1b31974d4f00977440cdb1b6697f363feed37",
@@ -214,6 +71,7 @@
   "ev_4f93070e55fe06b6d47d556d39b17f116e6150a43ef23edfd2c475ece72bd39a",
   "ev_531c2acf6b71db03fd4911744ba2c3508ff323cc8f014b65f6be0d62ca0ccc41",
   "ev_53e144d0eaabc4d8e9647cc68f0a64e8042ddccc967ba0684f9940f4995a9467",
+  "ev_546a4b79e14381a4ffc1e44a6ff34db72a86285fc30a1a93da283bc8d77d3764",
   "ev_54c14f9025afa3e3ed92458c4357fbde3045b8dc5074a3f3835e2bf3a71193fd",
   "ev_55356aba164fd0682d5a10149c4e1e4a4deeb9f7cb8d4c6a253ff1550f6f8958",
   "ev_553d79f1248f3c1a5da0cdda0ba6452ac5ba6b2c2cf80f39fce976bd217f4888",
@@ -227,6 +85,7 @@
   "ev_660bc760173268bdd78d40a0f77680b6eb4f78c9e88bac743b9900e6b615488c",
   "ev_6625dc4b81a220e1b6ee30324d28507ce72cb785f2a0318324b375da26057ddf",
   "ev_68145a123f798eedbb29fcdff242eaca627c302fffcd1a48a3defe95d8434bec",
+  "ev_6a9e694c7391a3441262a219a26b52491b1dc2af445048729f391c5f1979149e",
   "ev_6b1e1403acf1d8d0bed57dd401ce004f77d36290f62d70e59eeb16eab6bcaaf5",
   "ev_6ba4a74ddf7a8625183a27fe8e3f3ac3965d4c8cfb18b0c11a3c36be3468b318",
   "ev_6c6eb49d9f54c607f814071e84f46cc9eabb9314e4d91632f81d579709999af3",
@@ -237,6 +96,7 @@
   "ev_75550e26f630ec58fbe44745141c0a9f0ac0db57073aa82df150059849dffb59",
   "ev_76be0815ced111501446a0675b1d19cacb1845c661a065ec40df02941aa3e212",
   "ev_791885648f87b7894864a9b9ae52c86a59e4466b41a195d2977a3e28150077b3",
+  "ev_796a61a58eb221edc324157bb52b81302c676d2f0158a5478e918ac774e0023c",
   "ev_796d6950b9783c0345dc388f06ac4466c20096be7b6d76aee28667a20ce1bd5b",
   "ev_79a9624b4144fe26d326f4f8b7d253baaa660931ead28ea049c91c789dc8c35d",
   "ev_7bdc9eb6910a751400eb7a2b6fa5e2acf4ed0e1b3dea63ebe38a73164480d7e3",
@@ -306,6 +166,7 @@
   "ev_d8a65e114dd0a62d01ed1519a5bb1298a931c96600f0cafbfed9177771e74847",
   "ev_dacf0faf0df8a387b8d87a7c1eb81deef222213ebc89ea6a307d1cd986beb8c0",
   "ev_dadc99ee559baa52695cab0736189cb75a92d1ce92589f50553279de580b7035",
+  "ev_db9ea254a88ff63c0543a3b94df23b5cc8bebfc85734e268c966912f9f1c2118",
   "ev_decd579e1e9bdbe5b174eda3e5d9f2b7ed739be69527caf274c4ef71c5494fb3",
   "ev_e046fa3a88b3a8ab6966891891417352e94ef17025ff3ecbab2cd8eee6ec7730",
   "ev_e11601aa84b4ddc3401c09ef0edc289b52773d8ef03b61b1e02de804d8ec2fec",
@@ -327,7 +188,6 @@
   "ev_f9543f37e843fcedcf1b83b51e2ede35830b5025b44221f3a59df131a1fee93d",
   "ev_fa662c7b21b10318bfbdbb0c5b7c00db4d7f4421e7f777bd5b0c436910e04844",
   "ev_fadb8b14f3d0d7c55f292f6535731268bfd986d049715b2ee75fe3fc92ee0301",
-  "ev_fbff234ec48d7a423769c9e2d3ea5de846700e84dbbc2837733666f3e2eee501",
   "ev_ffee5338b2559429862977e0692921ddf9c2e4fb4817832658cad5ab791c7e68"
  ]
 }

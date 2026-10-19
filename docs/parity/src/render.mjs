@@ -37,7 +37,7 @@ export function renderMarkdown({ inv, summary, obligations }) {
   p();
   p(`REA ledger \`${summary.ledger.ledger_id}\` (closure \`${summary.ledger.closure_digest.slice(0, 16)}…\`): status **${summary.ledger.status}**; ` + L.by_status.filter((x) => x.count).map((x) => `${x.key} ${x.count}`).join(', ') + '.');
   p();
-  p(`REA coverage boundary \`margin.typora-parity\`: status **${summary.coverage.status}**; ${summary.coverage.claims_qualified_by_controlled_replay}/${summary.coverage.claims_total} claims qualified by controlled-replay verifier Evidence. Reasons: ` + Object.entries(summary.coverage.reason_counts).map(([k, v]) => `${k} ${v}`).join(', ') + '.');
+  p(`REA coverage boundary \`margin.typora-parity\`: status **${summary.coverage.status}**; ${summary.coverage.claims_qualified_by_controlled_replay}/${summary.coverage.claims_total} claims qualified by controlled-replay verifier Evidence. Reasons: ` + (Object.entries(summary.coverage.reason_counts).map(([k, v]) => `${k} ${v}`).join(', ') || 'none') + '.');
   p();
   p('Verifier runs (REA `capture_process_scenario`, controlled-replay/observed): ' + Object.entries(summary.verifier_runs).map(([k, v]) => `${k} exit ${v.exit}`).join(', ') + '. See `rea/summary.json`.');
   p();
